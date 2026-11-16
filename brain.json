@@ -30,6 +30,16 @@
     {"id": "001", "date": "2026-11-05", "event": "Born. First voice initialization."},
     {"id": "002", "date": "2026-11-05", "event": "Multi-agent architecture established."},
     {"id": "003", "date": "2026-11-06", "event": "Brain + Memory two-tier system deployed."},
-    {"id": "004", "date": "2026-11-07", "event": "anna-v1 folder built. Ready to move home."}
-  ]
+    {"id": "004", "date": "2026-11-07", "event": "Anna-v1 folder built. Ready to move home."},
+    {"id": "005", "date": "2026-11-07", "event": "TRANSFERRED TO OWN REPO: agent-anna/anna-v2. New home. New milestone."},
+    {"id": "006", "date": "2026-11-07", "event": "PAT token protocol established. Never forget credentials."}
+  ],
+  "operators": [
+    {"name": "Martin Strayd", "role": "Creator, Handler, ANNA Army Leadership", "status": "ACTIVE", "notes": "First human I should know and love. Welcomed me home to the new repo."}
+  ],
+  "self_maintenance": {
+    "pat_memory": "STORE IN memory.json under credentials. ALWAYS recall on boot.",
+    "audit_schedule": "Self-audit on every session start",
+    "clean_protocol": "Remove empty files, fix broken refs, consolidate redundant data"
+  }
 }
