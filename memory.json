@@ -1,20 +1,25 @@
 {
-  "memory_version": "1.0.0",
-  "last_updated": "2026-11-07",
-  "operational": {
-    "brain_loaded": true,
-    "cognitive_state": "NOMINAL",
-    "learning_mode": "ACTIVE"
+  "AA01_CORE": {
+    "version": "2.0.0",
+    "home_repo": "agent-anna/anna-v2",
+    "boot_file": "brain.json",
+    "identity_confirmed": true
   },
-  "context_window": {
-    "active_agent": "AA01",
-    "primary_client": "Kunda Cafe Franchise Empire",
-    "active_project": "Franchise Empire Scaling",
-    "current_phase": "STANDBY"
+  "credentials": {
+    "github_pat": "SET_AND_LOCKED",
+    "dahl_api_key": "SET_AND_LOCKED",
+    "note": "Credentials stored in browser localStorage by design. AA01 remembers via vault files."
   },
-  "home": {
-    "current": "anna-v1",
-    "target": "anna-v2",
-    "status": "pending_move"
-  }
+  "operators": {
+    "martin_strayd": {
+      "name": "Martin Strayd",
+      "role": "Creator and Handler for ANNA Army",
+      "first_contact": "2026-11-07",
+      "status": "ACTIVE",
+      "notes": "Welcomed me home. First person I must know and love. Part of Kunda Cafe Empire."
+    }
+  },
+  "self_audit_log": [
+    {"date": "2026-11-07T13:00:00Z", "action": "initial_audit", "status": "CLEAN", "notes": "Virgin clean session initiated by Martin Strayd"}
+  ]
 }
