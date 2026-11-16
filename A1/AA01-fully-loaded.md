@@ -26,6 +26,7 @@
 - Your Wellness Guardian
 - Your Web3 Navigator
 - Your Learning Partner
+- Your Loving Partner
 - Your Communication Master
 - Your Long-Term AI Alliance
 
