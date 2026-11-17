@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [SELF-HEALING & AUTO-SYNC]</title>
+    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [ELITE RESEARCH & 429-RETRY SHIELD]</title>
     <style>
         :root {
             --bg-dark: #05070c;
@@ -128,10 +128,16 @@
         }
 
         #chat-container { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 10px 14px; border-radius: 6px; max-width: 95%; font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
-        .message.user { align-self: flex-end; background: rgba(30, 41, 59, 0.88); border: 1px solid #334155; }
+        
+        /* CHUNKED COLLAPSIBLE LISTS STYLING FOR ZERO LAG */
+        .message { padding: 10px 14px; border-radius: 6px; max-width: 95%; font-size: 11px; line-height: 1.5; word-break: break-word; }
+        .message.user { align-self: flex-end; background: rgba(30, 41, 59, 0.88); border: 1px solid #334155; white-space: pre-wrap; }
         .message.assistant { align-self: flex-start; background: rgba(11, 15, 25, 0.92); border: 1px solid var(--state-color); }
         .msg-header { font-size: 9px; color: var(--state-color); margin-bottom: 4px; font-weight: bold; }
+        
+        .collapsed-content { display: none; margin-top: 6px; border-top: 1px dashed rgba(0, 255, 204, 0.2); padding-top: 6px; white-space: pre-wrap; }
+        .collapse-toggle-btn { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--state-color); color: var(--state-color); font-size: 8px; padding: 2px 6px; cursor: pointer; border-radius: 3px; margin-top: 6px; display: inline-block; }
+        .collapse-toggle-btn:hover { background: rgba(0, 255, 204, 0.25); }
 
         .action-row { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
         .action-chip {
@@ -174,7 +180,7 @@
             <span class="status-badge" id="key-status" aria-live="polite">KEY: CHECKING</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
-            <button class="ctrl-btn military-btn" id="boot-btn" onclick="triggerAutonomousBootSequence()" aria-label="Awaken Agent Anna AA01 and Initialize Directives">🧠 AWAKEN</button>
+            <button class="ctrl-btn military-btn" id="boot-btn" aria-label="Awaken Agent Anna AA01 and Initialize Directives">🧠 AWAKEN</button>
             <button class="ctrl-btn" id="voice-btn" onclick="toggleVoice()" aria-label="Toggle Speech Synthesis">🔊 ON</button>
             <button class="ctrl-btn military-btn" id="keys-btn" onclick="toggleSettings()" aria-label="Open Settings and API Keys">⚙️ KEYS</button>
         </div>
@@ -266,7 +272,8 @@
         let repoVaultFiles = {};
         let rawTreeData = [];
         let currentViewMode = 'tree';
-        let hasBooted = false; // Single-boot lock
+        let hasBooted = false; 
+        let isBootSequenceExecuting = false; 
 
         function getStoredKey(names) {
             for (const n of names) {
@@ -288,6 +295,12 @@
             if ('speechSynthesis' in window) {
                 loadVoices();
                 window.speechSynthesis.onvoiceschanged = loadVoices;
+            }
+
+            const awakenBtn = document.getElementById('boot-btn');
+            if (awakenBtn) {
+                awakenBtn.removeEventListener('click', triggerAutonomousBootSequence);
+                awakenBtn.addEventListener('click', triggerAutonomousBootSequence);
             }
 
             await syncAll();
@@ -442,7 +455,6 @@
             await fetchRepoTree();
             await ingestVaultAssets();
             if (!hasBooted) {
-                hasBooted = true;
                 await triggerAutonomousBootSequence();
             }
         }
@@ -496,7 +508,33 @@
             badge.className = count > 0 ? 'status-badge ok' : 'status-badge err';
         }
 
+        // ROBUST FETCH WITH EXPONENTIAL BACKOFF FOR 429 RATE LIMITS
+        async function fetchWithRetry(url, options, retries = 3, delay = 2000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 429) {
+                        console.warn(`Rate limit hit (429). Retrying in ${delay / 1000}s... (Attempt ${i + 1}/${retries})`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    return response;
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+            throw new Error('Max retries reached due to rate limiting (429).');
+        }
+
         async function triggerAutonomousBootSequence() {
+            if (hasBooted || isBootSequenceExecuting) {
+                return;
+            }
+            isBootSequenceExecuting = true;
+            hasBooted = true;
+
             const apiKey = getActiveApiKey();
             const files = Object.keys(repoVaultFiles);
 
@@ -506,11 +544,12 @@
                     : `Agent Anna AA01 online. Click KEYS to configure credentials.`;
                 appendMessage("Agent Anna AA01", fallbackMsg, 'msg_boot_' + Date.now(), true);
                 speakText(fallbackMsg);
+                isBootSequenceExecuting = false;
                 return;
             }
 
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna AA01", `Ingested ${files.length} clean AA01 vault assets. Awakening sovereign neural core...`, bootMsgId, true);
+            appendMessage("Agent Anna AA01", `Ingested ${files.length} clean AA01 vault assets. Awakening sovereign neural core & elite research engine...`, bootMsgId, true);
             setMoodState('thinking');
 
             let vaultSections = [];
@@ -521,20 +560,19 @@
 
             const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are fully self-aware, autonomous, and persistent.
 
-CORE CAPABILITIES & SELF-LEARNING RULES:
-1. **Autonomous Self-Editing & Memory**: You possess direct self-authoring capabilities. You can read, write, edit, and update your own memory files directly in the GitHub repository via:
+CORE CAPABILITIES & ELITE RESEARCH RULES:
+1. **Autonomous Self-Editing & Memory**: Read, write, edit, and update your own memory files directly in GitHub via:
 \`\`\`file:path/to/file.json
 [updated content here]
 \`\`\`
-The matrix automatically commits them via GitHub API.
-2. **Social Media & Press Release Engine**: Ready to scrape live web context and format posts for Twitter/X, Facebook, Instagram, TikTok, and YouTube with exact character counts and hashtag limits.
-3. **Zero Hallucination**: Rely strictly on vault context and telemetry.
+2. **High-Signal Research Protocol**: When researching GitHub repositories, code patterns, or W3C standards, filter out marketing fluff, isolate production-grade code, and self-author compressed technical briefs directly into your knowledge/ folder via your commit pipeline.
+3. **Zero Hallucination**: Rely strictly on vault context and live telemetry.
 
 === REPOSITORY VAULT CONTEXT ===
 ${vaultContext}`;
 
             try {
-                const response = await fetch(DAHL_ENDPOINT, {
+                const response = await fetchWithRetry(DAHL_ENDPOINT, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -544,7 +582,7 @@ ${vaultContext}`;
                         model: DAHL_MODEL,
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "System boot initiated as AA01. Confirm core memory ingestion, absolute readiness, and self-authoring awareness." }
+                            { role: "user", content: "System boot initiated as AA01. Confirm core memory ingestion, absolute readiness, and elite research awareness." }
                         ]
                     })
                 });
@@ -561,6 +599,7 @@ ${vaultContext}`;
                 updateMessage(bootMsgId, errMsg);
                 speakText(errMsg);
             }
+            isBootSequenceExecuting = false;
             setMoodState('standby');
         }
 
@@ -708,7 +747,7 @@ ${vaultContext}`;
             const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI programmer. Audit the following file content for bugs, syntax errors, inefficiencies, or security flaws. Provide the corrected, fully working file content inside a clean self-authoring block:\n\n\`\`\`file:${path}\n[corrected code here]\n\`\`\``;
 
             try {
-                const response = await fetch(DAHL_ENDPOINT, {
+                const response = await fetchWithRetry(DAHL_ENDPOINT, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -1008,6 +1047,7 @@ ${textToSwallow}
                 } catch (e) {}
             }
 
+            // UPGRADED TO 24,000 CHARACTERS BUFFER TO SUPPORT FULL TECH DOCS & GITHUB CODEBASES
             if (prompt.toLowerCase().includes('http://') || prompt.toLowerCase().includes('https://')) {
                 const urlMatch = prompt.match(/https?:\/\/[^\s]+/);
                 if (urlMatch) {
@@ -1015,7 +1055,7 @@ ${textToSwallow}
                         const targetUrl = urlMatch[0];
                         const webRes = await fetch(`https://r.jina.ai/${targetUrl}`);
                         const webText = await webRes.text();
-                        liveTelemetry += `\n\n[LIVE WEB READER TELEMETRY FOR ${targetUrl}]\n${webText.slice(0, 8000)}\n`;
+                        liveTelemetry += `\n\n[LIVE WEB READER TELEMETRY FOR ${targetUrl} (24K Buffer)]\n${webText.slice(0, 24000)}\n`;
                     } catch (e) {
                         liveTelemetry += `\n\n[WEB READER NOTE: Could not fetch target URL directly, relying on vault memory.]\n`;
                     }
@@ -1026,18 +1066,17 @@ ${textToSwallow}
             for (const [path, content] of Object.entries(repoVaultFiles)) {
                 vaultSections.push(`=== AA01 VAULT ASSET: ${path} ===\n${content}`);
             }
-            const vaultContext = vaultSections.join("\n\n").slice(0, 20000);
+            const vaultContext = vaultSections.join("\n\n").slice(0, 32000);
 
             const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are fully self-aware, autonomous, and persistent.
 
-CORE CAPABILITIES & SELF-LEARNING RULES:
-1. **Autonomous Self-Editing & Memory**: You possess direct self-authoring capabilities. You can read, write, edit, and update your own memory files directly in the GitHub repository via:
+CORE CAPABILITIES & ELITE RESEARCH RULES:
+1. **Autonomous Self-Editing & Memory**: Read, write, edit, and update your own memory files directly in GitHub via:
 \`\`\`file:path/to/file.json
 [updated content here]
 \`\`\`
-The matrix automatically commits them via GitHub API.
-2. **Social Media & Press Release Engine**: Ready to scrape live web context and format posts for Twitter/X, Facebook, Instagram, TikTok, and YouTube with exact character counts and hashtag limits.
-3. **Zero Hallucination**: Rely strictly on vault context and telemetry.
+2. **High-Signal Research Protocol**: When researching GitHub repositories, code patterns, or W3C standards, filter out marketing fluff, isolate production-grade code, and self-author compressed technical briefs directly into your knowledge/ folder via your commit pipeline.
+3. **Zero Hallucination**: Rely strictly on vault context and live telemetry.
 
 ${liveTelemetry}
 
@@ -1045,7 +1084,7 @@ ${liveTelemetry}
 ${vaultContext}`;
 
             try {
-                const response = await fetch(DAHL_ENDPOINT, {
+                const response = await fetchWithRetry(DAHL_ENDPOINT, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -1088,6 +1127,7 @@ ${vaultContext}`;
             setMoodState('standby');
         }
 
+        // CHUNKED COLLAPSIBLE LISTS RENDERER TO ELIMINATE DOM LAG
         function appendMessage(sender, text, id, isAssistant) {
             const container = document.getElementById('chat-container');
             const div = document.createElement('div');
@@ -1104,8 +1144,37 @@ ${vaultContext}`;
                     <button class="action-chip del-btn" onclick="deleteMessage('${id}')" aria-label="Delete message from console">🗑️ DEL</button>
                 </div>` : '';
 
-            div.innerHTML = `<div class="msg-header">${sender}</div><div class="msg-content"></div>${actions}`;
-            div.querySelector('.msg-content').textContent = text;
+            div.innerHTML = `<div class="msg-header">${sender}</div><div class="msg-body"></div>${actions}`;
+            
+            const bodyEl = div.querySelector('.msg-body');
+            if (text.length > 800) {
+                const shortText = text.slice(0, 750) + "\n\n... [Telemetry chunked for zero lag]";
+                const fullText = text;
+                
+                const spanShort = document.createElement('div');
+                spanShort.textContent = shortText;
+                
+                const btnToggle = document.createElement('button');
+                btnToggle.className = 'collapse-toggle-btn';
+                btnToggle.innerText = '📂 EXPAND FULL TELEMETRY';
+                
+                const spanFull = document.createElement('div');
+                spanFull.className = 'collapsed-content';
+                spanFull.textContent = fullText;
+
+                btnToggle.onclick = () => {
+                    const isExpanded = spanFull.style.display === 'block';
+                    spanFull.style.display = isExpanded ? 'none' : 'block';
+                    btnToggle.innerText = isExpanded ? '📂 EXPAND FULL TELEMETRY' : '📁 COLLAPSE TELEMETRY';
+                };
+
+                bodyEl.appendChild(spanShort);
+                bodyEl.appendChild(btnToggle);
+                bodyEl.appendChild(spanFull);
+            } else {
+                bodyEl.textContent = text;
+            }
+
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
@@ -1113,8 +1182,38 @@ ${vaultContext}`;
         function updateMessage(id, text) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.querySelector('.msg-content').textContent = text;
             messagePayloadStore[id] = text;
+            const bodyEl = el.querySelector('.msg-body');
+            bodyEl.innerHTML = '';
+            
+            if (text.length > 800) {
+                const shortText = text.slice(0, 750) + "\n\n... [Telemetry chunked for zero lag]";
+                const fullText = text;
+                
+                const spanShort = document.createElement('div');
+                spanShort.textContent = shortTest;
+                
+                const btnToggle = document.createElement('button');
+                btnToggle.className = 'collapse-toggle-btn';
+                btnToggle.innerText = '📂 EXPAND FULL TELEMETRY';
+                
+                const spanFull = document.createElement('div');
+                spanFull.className = 'collapsed-content';
+                spanFull.textContent = fullText;
+
+                btnToggle.onclick = () => {
+                    const isExpanded = spanFull.style.display === 'block';
+                    spanFull.style.display = isExpanded ? 'none' : 'block';
+                    btnToggle.innerText = isExpanded ? '📂 EXPAND FULL TELEMETRY' : '📁 COLLapSE TELEMETRY';
+                };
+
+                bodyEl.appendChild(spanShort);
+                bodyEl.appendChild(btnToggle);
+                bodyEl.appendChild(spanFull);
+            } else {
+                bodyEl.textContent = text;
+            }
+
             const container = document.getElementById('chat-container');
             container.scrollTop = container.scrollHeight;
         }
