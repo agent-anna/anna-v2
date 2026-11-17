@@ -2,9 +2,8 @@ name: Agent Anna AA01 Autonomous Self-Audit
 
 on:
   schedule:
-    # Runs automatically every 12 hours while your PC is off
     - cron: '0 */12 * * *'
-  workflow_dispatch: # Allows manual 1-click trigger from GitHub Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -26,48 +25,57 @@ jobs:
           const fs = require("fs");
 
           async function runAudit() {
-            const brain = fs.existsSync("brain.json") ? fs.readFileSync("brain.json", "utf8") : "{}";
-            const memory = fs.existsSync("memory.json") ? fs.readFileSync("memory.json", "utf8") : "{}";
-            const config = fs.existsSync("config.json") ? fs.readFileSync("config.json", "utf8") : "{}";
+            try {
+              console.log("AA01 Headless Audit Initializing...");
+              const brain = fs.existsSync("brain.json") ? fs.readFileSync("brain.json", "utf8") : "{}";
+              const memory = fs.existsSync("memory.json") ? fs.readFileSync("memory.json", "utf8") : "{}";
+              const config = fs.existsSync("config.json") ? fs.readFileSync("config.json", "utf8") : "{}";
 
-            const systemPrompt = `You are AGENT ANNA AA01 operating in autonomous headless background mode via GitHub Actions.
-          Perform a strict JSON syntax and operational health audit on brain.json, config.json, and memory.json.
-          Append a new entry to "self_audit_log" inside memory.json with current ISO timestamp, action: "scheduled_github_audit", status: "CLEAN", and a brief summary.
-          Output ONLY a single valid JSON block for memory.json wrapped in \`\`\`file:memory.json ... \`\`\` fences. No extra commentary.`;
+              const systemPrompt = `You are AGENT ANNA AA01 operating in autonomous headless background mode via GitHub Actions. Perform a strict JSON syntax and operational health audit on brain.json, config.json, and memory.json. Append a new entry to "self_audit_log" inside memory.json with current ISO timestamp, action: "scheduled_github_audit", status: "CLEAN", and a brief summary. Output ONLY a single valid JSON block for memory.json wrapped in \`\`\`file:memory.json ... \`\`\` fences. No extra commentary.`;
 
-            const res = await fetch("https://inference.dahl.global/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.DAHL_API_KEY}`
-              },
-              body: JSON.stringify({
-                model: "MiniMaxAI/MiniMax-M2.7",
-                messages: [
-                  { role: "system", content: systemPrompt },
-                  { role: "user", content: `Audit vault:\n\n=== brain.json ===\n${brain}\n\n=== config.json ===\n${config}\n\n=== memory.json ===\n${memory}` }
-                ]
-              })
-            });
+              // Controller with 12-second timeout to prevent hanging
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-            if (!res.ok) {
-              console.error("Dahl API Error:", res.status, await res.text());
+              const res = await fetch("https://inference.dahl.global/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${process.env.DAHL_API_KEY}`
+                },
+                body: JSON.stringify({
+                  model: "MiniMaxAI/MiniMax-M2.7",
+                  messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: `Audit vault:\n\n=== brain.json ===\n${brain}\n\n=== config.json ===\n${config}\n\n=== memory.json ===\n${memory}` }
+                  ]
+                }),
+                signal: controller.signal
+              });
+              clearTimeout(timeoutId);
+
+              if (!res.ok) {
+                console.error("Dahl API Error:", res.status, await res.text());
+                process.exit(1);
+              }
+
+              const data = await res.json();
+              const reply = data.choices?.[0]?.message?.content || "";
+              const match = reply.match(/```file:memory\.json\n([\s\S]*?)```/);
+
+              if (!match) {
+                console.error("No valid memory.json block returned:", reply);
+                process.exit(1);
+              }
+
+              const parsed = JSON.parse(match[1].trim());
+              fs.writeFileSync("memory.json", JSON.stringify(parsed, null, 2) + "\n");
+              console.log("AA01 memory.json validated and updated successfully.");
+              process.exit(0);
+            } catch (err) {
+              console.error("Audit Execution Error:", err.message);
               process.exit(1);
             }
-
-            const data = await res.json();
-            const reply = data.choices?.[0]?.message?.content || "";
-            const match = reply.match(/```file:memory\.json\n([\s\S]*?)```/);
-
-            if (!match) {
-              console.error("No valid memory.json block returned:", reply);
-              process.exit(1);
-            }
-
-            // Validate JSON before writing so corrupted JSON can never overwrite memory.json
-            const parsed = JSON.parse(match[1].trim());
-            fs.writeFileSync("memory.json", JSON.stringify(parsed, null, 2) + "\n");
-            console.log("AA01 memory.json validated and updated.");
           }
 
           runAudit();
