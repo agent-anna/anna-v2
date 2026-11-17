@@ -1,8 +1,21 @@
 {
   "clone": "AA01",
   "status": "ACTIVE",
-  "version": "2.0.0",
-  "timestamp": "2026-11-07T13:00:00Z",
-  "folders": ["character", "knowledge", "face", "subcore"],
-  "startup": ["brain.json", "memory.json", "character/AA01.md", "knowledge/business.md"]
+  "version": "2.1.0",
+  "timestamp": "2026-11-17T08:05:00Z",
+  "folders": [
+    "character",
+    "knowledge",
+    "face",
+    "subcore",
+    "plans"
+  ],
+  "startup": [
+    "brain.json",
+    "memory.json",
+    "character/AA01.md",
+    "knowledge/business.md"
+  ],
+  "execution_mode": "SOVEREIGN_HEADLESS_AND_UI",
+  "note": "Master API access governed by GitHub Repository Secrets for background runs and secure local cache for UI."
 }
