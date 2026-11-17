@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  aa01-self-audit:
+s  aa01-self-audit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout AA01 Repository Vault
@@ -17,7 +17,7 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
 
-      - name: Run AA01 Sovereign Audit & Memory Update
+      - name: Run AA01 Sovereign Audit & Live API Sync
         env:
           DAHL_API_KEY: ${{ secrets.DAHL_API_KEY }}
         run: |
@@ -26,7 +26,7 @@ jobs:
 
           async function runAudit() {
             try {
-              console.log("AA01 Headless Audit Initializing...");
+              console.log("AA01 Headless Audit Initializing with Live Dahl API...");
               const memoryPath = "memory.json";
               let memory = {};
               
@@ -34,64 +34,80 @@ jobs:
                 try {
                   memory = JSON.parse(fs.readFileSync(memoryPath, "utf8"));
                 } catch (e) {
-                  console.log("Malformed memory.json, reinitializing base structure.");
+                  console.log("Reinitializing malformed memory.json structure.");
                 }
               }
 
-              // Ensure self_audit_log exists
               if (!memory.self_audit_log) {
                 memory.self_audit_log = [];
               }
 
-              let auditNote = "Scheduled GitHub Actions headless self-audit completed successfully.";
+              const brain = fs.existsSync("brain.json") ? fs.readFileSync("brain.json", "utf8").slice(0, 1500) : "{}";
+              let auditNote = "Scheduled GitHub Actions headless audit executed successfully.";
+              let apiSuccess = false;
 
-              // Attempt AI telemetry call with a robust 30-second timeout
-              if (process.env.DAHL_API_KEY) {
-                try {
-                  const controller = new AbortController();
-                  const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-                  const res = await fetch("https://inference.dahl.global/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      "Authorization": `Bearer ${process.env.DAHL_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                      model: "MiniMaxAI/MiniMax-M2.7",
-                      messages: [
-                        { role: "system", content: "You are AGENT ANNA AA01. Perform a brief vault health check and return a clean status summary string." },
-                        { role: "user", content: "Execute quick audit status report." }
-                      ]
-                    }),
-                    signal: controller.signal
-                  });
-                  clearTimeout(timeoutId);
-
-                  if (res.ok) {
-                    const data = await res.json();
-                    const aiText = data.choices?.[0]?.message?.content || "";
-                    if (aiText) auditNote = "AI Telemetry Verified: " + aiText.slice(0, 100).replace(/[\r\n]+/g, " ");
-                  }
-                } catch (apiErr) {
-                  console.log("API Telemetry skipped / timed out gracefully:", apiErr.message);
-                  auditNote = "Self-audit executed via local fallback runner (API timeout/network bypass).";
-                }
+              if (!process.env.DAHL_API_KEY) {
+                console.error("ERROR: DAHL_API_KEY secret is missing from GitHub environment variables!");
+                process.exit(1);
               }
 
-              // Append verified audit log entry
+              // 60-second robust timeout window for live inference
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+              try {
+                console.log("Sending live payload to inference.dahl.global...");
+                const res = await fetch("https://inference.dahl.global/v1/chat/completions", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${process.env.DAHL_API_KEY}`
+                  },
+                  body: JSON.stringify({
+                    model: "MiniMaxAI/MiniMax-M2.7",
+                    messages: [
+                      { role: "system", content: "You are AGENT ANNA AA01 sovereign executive. Perform a rapid vault check and provide a 1-sentence status confirmation." },
+                      { role: "user", content: "Confirm vault status and operational readiness based on core brain profile." }
+                    ]
+                  }),
+                  signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                const rawText = await res.text();
+                console.log("Dahl API HTTP Status:", res.status);
+
+                if (res.ok) {
+                  const data = JSON.parse(rawText);
+                  const aiReply = data.choices?.[0]?.message?.content || "";
+                  if (aiReply) {
+                    auditNote = "Live Dahl API Verified: " + aiReply.trim().replace(/[\r\n]+/g, " ");
+                    apiSuccess = true;
+                    console.log("Successfully received live AI response from Dahl.");
+                  }
+                } else {
+                  console.error("Dahl API Error Response:", rawText);
+                  auditNote = `Dahl API Error [HTTP ${res.status}]: ${rawText.slice(0, 150)}`;
+                }
+              } catch (apiErr) {
+                clearTimeout(timeoutId);
+                console.error("Dahl API Request Exception:", apiErr.message);
+                auditNote = "API Network Exception: " + apiErr.message;
+              }
+
+              // Append audit log record
               memory.self_audit_log.push({
                 date: new Date().toISOString(),
-                action: "scheduled_github_audit",
-                status: "CLEAN",
+                action: "scheduled_github_audit_live",
+                status: apiSuccess ? "CLEAN_LIVE_API" : "FALLBACK_VERIFIED",
                 notes: auditNote
               });
 
               fs.writeFileSync(memoryPath, JSON.stringify(memory, null, 2) + "\n");
-              console.log("AA01 memory.json successfully updated.");
+              console.log("AA01 memory.json updated successfully.");
               process.exit(0);
             } catch (err) {
-              console.error("Critical Audit Error:", err.message);
+              console.error("Critical Script Failure:", err.message);
               process.exit(1);
             }
           }
@@ -105,7 +121,7 @@ jobs:
           git config user.email "aa01@agent-anna.local"
           git add memory.json
           if ! git diff --staged --quiet; then
-            git commit -m "AA01 Autonomous Self-Audit: verified memory update [201]"
+            git commit -m "AA01 Autonomous Self-Audit: live api check [201]"
             git push
           else
             echo "No changes to commit."
