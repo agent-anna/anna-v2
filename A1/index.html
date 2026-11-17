@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [ELITE RESEARCH & 429-RETRY SHIELD]</title>
+    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [ELITE RESEARCH & ROBUST IMAGE VIEWER]</title>
     <style>
         :root {
             --bg-dark: #05070c;
@@ -274,6 +274,7 @@
         let currentViewMode = 'tree';
         let hasBooted = false; 
         let isBootSequenceExecuting = false; 
+        let isRequestQueueActive = false;
 
         function getStoredKey(names) {
             for (const n of names) {
@@ -508,13 +509,12 @@
             badge.className = count > 0 ? 'status-badge ok' : 'status-badge err';
         }
 
-        // ROBUST FETCH WITH EXPONENTIAL BACKOFF FOR 429 RATE LIMITS
-        async function fetchWithRetry(url, options, retries = 3, delay = 2000) {
+        async function fetchWithRetry(url, options, retries = 4, delay = 3000) {
             for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(url, options);
                     if (response.status === 429) {
-                        console.warn(`Rate limit hit (429). Retrying in ${delay / 1000}s... (Attempt ${i + 1}/${retries})`);
+                        console.warn(`Rate limit hit (429). Cooling down for ${delay / 1000}s... (Attempt ${i + 1}/${retries})`);
                         await new Promise(resolve => setTimeout(resolve, delay));
                         delay *= 2;
                         continue;
@@ -525,11 +525,11 @@
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
-            throw new Error('Max retries reached due to rate limiting (429).');
+            throw new Error('Max retries reached due to rate limiting (429). Server cooling down.');
         }
 
         async function triggerAutonomousBootSequence() {
-            if (hasBooted || isBootSequenceExecuting) {
+            if (hasBooted || isBootSequenceExecuting || isRequestQueueActive) {
                 return;
             }
             isBootSequenceExecuting = true;
@@ -609,34 +609,92 @@ ${vaultContext}`;
             const preview = document.getElementById('media-preview-container');
             const isMedia = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'avif', 'mp4', 'webm', 'mov', 'mp3', 'wav'].includes(ext);
 
+            let pathsToTry = [path];
+            if (path.startsWith('A1/')) pathsToTry.push(path.replace('A1/', ''));
+            else pathsToTry.push('A1/' + path);
+
             if (isMedia) {
                 editor.style.display = 'none';
                 preview.style.display = 'flex';
-                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/main/${path}`;
-                if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'avif'].includes(ext)) {
-                    preview.innerHTML = `<img src="${rawUrl}" alt="${path}">`;
-                } else if (['mp4', 'webm', 'mov'].includes(ext)) {
-                    preview.innerHTML = `<video controls autoplay loop src="${rawUrl}"></video>`;
+                preview.innerHTML = `<span style="color:var(--text-muted); font-size:10px;">Loading media payload from GitHub...</span>`;
+                
+                let downloadUrl = null;
+                for (let p of pathsToTry) {
+                    try {
+                        const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/main/${p}`, {
+                            headers: getGitHubHeaders()
+                        });
+                        if (res.ok) {
+                            const blob = await res.blob();
+                            if (blob.size > 0) {
+                                downloadUrl = URL.createObjectURL(blob);
+                                break;
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                if (!downloadUrl) {
+                    for (let p of pathsToTry) {
+                        try {
+                            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${p}`, {
+                                headers: getGitHubHeaders()
+                            });
+                            if (res.ok) {
+                                const json = await res.json();
+                                if (json.content) {
+                                    const cleanBase64 = json.content.replace(/\s/g, '');
+                                    let mime = 'image/png';
+                                    if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
+                                    else if (ext === 'gif') mime = 'image/gif';
+                                    else if (ext === 'svg') mime = 'image/svg+xml';
+                                    else if (ext === 'avif') mime = 'image/avif';
+                                    downloadUrl = `data:${mime};base64,${cleanBase64}`;
+                                    break;
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                }
+
+                if (downloadUrl) {
+                    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'avif'].includes(ext)) {
+                        preview.innerHTML = `<img src="${downloadUrl}" alt="${path}">`;
+                    } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+                        preview.innerHTML = `<video controls autoplay loop src="${downloadUrl}"></video>`;
+                    } else {
+                        preview.innerHTML = `<audio controls autoplay src="${downloadUrl}"></audio>`;
+                    }
                 } else {
-                    preview.innerHTML = `<audio controls autoplay src="${rawUrl}"></audio>`;
+                    preview.innerHTML = `<span style="color:var(--border-red); font-size:10px;">Error: Binary asset not found on remote (404). Check file path.</span>`;
                 }
             } else {
                 preview.style.display = 'none';
                 editor.style.display = 'block';
                 editor.value = "Loading...";
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
-                        headers: getGitHubHeaders()
-                    });
-                    const data = await res.json();
-                    if (data.content) {
-                        const binString = atob(data.content.replace(/\s/g, ''));
-                        const decoded = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
-                        editor.value = decoded;
-                        repoVaultFiles[path] = decoded;
-                    }
-                } catch (err) {
-                    editor.value = "Error loading file content.";
+                
+                let decodedText = null;
+                for (let p of pathsToTry) {
+                    try {
+                        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${p}`, {
+                            headers: getGitHubHeaders()
+                        });
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json.content) {
+                                const binString = atob(json.content.replace(/\s/g, ''));
+                                decodedText = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
+                                break;
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                if (decodedText !== null) {
+                    editor.value = decodedText;
+                    repoVaultFiles[path] = decodedText;
+                } else {
+                    editor.value = "Error: File content could not be resolved.";
                 }
             }
         }
@@ -1017,10 +1075,13 @@ ${textToSwallow}
         function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
 
         async function sendMessage() {
+            if (isRequestQueueActive) return;
+            
             const input = document.getElementById('user-input');
             const prompt = input.value.trim();
             if (!prompt) return;
 
+            isRequestQueueActive = true;
             appendMessage("Commander", prompt, 'msg_u_' + Date.now(), false);
             input.value = "";
             chatHistory.push({ role: "user", content: prompt });
@@ -1035,6 +1096,7 @@ ${textToSwallow}
                 updateMessage(assistantMsgId, "ERROR: Dahl API Key missing. Please set DAHL_API_KEY in GitHub Actions Secrets or click ⚙️ KEYS.");
                 toggleSettings();
                 setMoodState('standby');
+                isRequestQueueActive = false;
                 return;
             }
 
@@ -1047,7 +1109,6 @@ ${textToSwallow}
                 } catch (e) {}
             }
 
-            // UPGRADED TO 24,000 CHARACTERS BUFFER TO SUPPORT FULL TECH DOCS & GITHUB CODEBASES
             if (prompt.toLowerCase().includes('http://') || prompt.toLowerCase().includes('https://')) {
                 const urlMatch = prompt.match(/https?:\/\/[^\s]+/);
                 if (urlMatch) {
@@ -1107,6 +1168,7 @@ ${vaultContext}`;
                     const errDetail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 300);
                     updateMessage(assistantMsgId, `DAHL HTTP ${response.status}: ${errDetail}`);
                     setMoodState('standby');
+                    isRequestQueueActive = false;
                     return;
                 }
 
@@ -1124,10 +1186,10 @@ ${vaultContext}`;
             } catch (err) {
                 updateMessage(assistantMsgId, `CONNECTION FAILED: ${err.message}`);
             }
+            isRequestQueueActive = false;
             setMoodState('standby');
         }
 
-        // CHUNKED COLLAPSIBLE LISTS RENDERER TO ELIMINATE DOM LAG
         function appendMessage(sender, text, id, isAssistant) {
             const container = document.getElementById('chat-container');
             const div = document.createElement('div');
@@ -1191,7 +1253,7 @@ ${vaultContext}`;
                 const fullText = text;
                 
                 const spanShort = document.createElement('div');
-                spanShort.textContent = shortTest;
+                spanShort.textContent = shortText;
                 
                 const btnToggle = document.createElement('button');
                 btnToggle.className = 'collapse-toggle-btn';
@@ -1204,7 +1266,7 @@ ${vaultContext}`;
                 btnToggle.onclick = () => {
                     const isExpanded = spanFull.style.display === 'block';
                     spanFull.style.display = isExpanded ? 'none' : 'block';
-                    btnToggle.innerText = isExpanded ? '📂 EXPAND FULL TELEMETRY' : '📁 COLLapSE TELEMETRY';
+                    btnToggle.innerText = isExpanded ? '📂 EXPAND FULL TELEMETRY' : '📁 COLLAPSE TELEMETRY';
                 };
 
                 bodyEl.appendChild(spanShort);
