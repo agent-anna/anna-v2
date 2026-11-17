@@ -26,15 +26,15 @@ jobs:
 
           async function runAudit() {
             try {
-              console.log("AA01 Headless Audit Initializing with Live Dahl API...");
-              const memoryPath = "memory.json";
+              console.log("AA01 Headless Audit Initializing with Live Dahl API inside A1 folder...");
+              const memoryPath = "A1/memory.json";
               let memory = {};
               
               if (fs.existsSync(memoryPath)) {
                 try {
                   memory = JSON.parse(fs.readFileSync(memoryPath, "utf8"));
                 } catch (e) {
-                  console.log("Reinitializing malformed memory.json structure.");
+                  console.log("Reinitializing malformed A1/memory.json structure.");
                 }
               }
 
@@ -94,7 +94,7 @@ jobs:
                 auditNote = "API Network Exception: " + apiErr.message;
               }
 
-              // Append audit log record
+              // Append audit log record to A1/memory.json
               memory.self_audit_log.push({
                 date: new Date().toISOString(),
                 action: "scheduled_github_audit_live",
@@ -103,7 +103,7 @@ jobs:
               });
 
               fs.writeFileSync(memoryPath, JSON.stringify(memory, null, 2) + "\n");
-              console.log("AA01 memory.json updated successfully.");
+              console.log("A1/memory.json updated successfully.");
               process.exit(0);
             } catch (err) {
               console.error("Critical Script Failure:", err.message);
@@ -118,9 +118,9 @@ jobs:
         run: |
           git config user.name "Agent Anna AA01"
           git config user.email "aa01@agent-anna.local"
-          git add memory.json
+          git add A1/memory.json
           if ! git diff --staged --quiet; then
-            git commit -m "AA01 Autonomous Self-Audit: live api check [201]"
+            git commit -m "AA01 Autonomous Self-Audit: A1 live api memory sync [201]"
             git push
           else
             echo "No changes to commit."
