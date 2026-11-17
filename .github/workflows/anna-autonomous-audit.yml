@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-s  aa01-self-audit:
+  aa01-self-audit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout AA01 Repository Vault
@@ -42,7 +42,6 @@ s  aa01-self-audit:
                 memory.self_audit_log = [];
               }
 
-              const brain = fs.existsSync("brain.json") ? fs.readFileSync("brain.json", "utf8").slice(0, 1500) : "{}";
               let auditNote = "Scheduled GitHub Actions headless audit executed successfully.";
               let apiSuccess = false;
 
