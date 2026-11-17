@@ -138,6 +138,7 @@
             background: rgba(15, 23, 42, 0.9); border: 1px solid var(--state-color); color: var(--state-color);
             padding: 3px 6px; font-family: monospace; font-size: 8px; cursor: pointer; border-radius: 4px;
         }
+        .action-chip:hover { background: rgba(0, 255, 204, 0.2); }
         .swallow-btn { border-color: var(--border-cyan) !important; background: rgba(0, 255, 204, 0.15) !important; font-weight: bold; }
         .del-btn { border-color: var(--border-red) !important; color: var(--border-red) !important; }
 
@@ -223,10 +224,10 @@
             </div>
 
             <div id="settings-panel" role="region" aria-label="API Keys Settings Panel">
-                <div class="settings-title">DAHL API KEY</div>
-                <input type="password" id="api-key" placeholder="Paste Dahl API Key..." aria-label="Dahl API Key Input">
-                <div class="settings-title">GITHUB PAT TOKEN</div>
-                <input type="password" id="gh-token" placeholder="Paste GitHub PAT..." aria-label="GitHub Personal Access Token Input">
+                <div class="settings-title">DAHL API KEY (Optional Fallback)</div>
+                <input type="password" id="api-key" placeholder="Paste Dahl API Key if offline..." aria-label="Dahl API Key Input">
+                <div class="settings-title">GITHUB PAT TOKEN (Optional Fallback)</div>
+                <input type="password" id="gh-token" placeholder="Paste GitHub PAT if offline..." aria-label="GitHub Personal Access Token Input">
                 <button class="ctrl-btn military-btn" id="save-creds-btn" onclick="saveCredentials()" style="width:100%;" aria-label="Apply Credentials and Re-sync">APPLY & RE-SYNC</button>
             </div>
 
@@ -251,8 +252,8 @@
     </div>
 
     <script>
-const GITHUB_REPO_OWNER = "agent-anna";
-const GITHUB_REPO_NAME = "anna-v2";
+        const GITHUB_REPO_OWNER = "agent-anna";
+        const GITHUB_REPO_NAME = "anna-v2";
         const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
         const DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
 
@@ -265,6 +266,7 @@ const GITHUB_REPO_NAME = "anna-v2";
         let repoVaultFiles = {};
         let rawTreeData = [];
         let currentViewMode = 'tree';
+        let hasBooted = false; // Single-boot lock
 
         function getStoredKey(names) {
             for (const n of names) {
@@ -292,14 +294,14 @@ const GITHUB_REPO_NAME = "anna-v2";
         });
 
         function updateKeyBadge() {
-            const k = document.getElementById('api-key').value.trim();
+            const k = getActiveApiKey();
             const badge = document.getElementById('key-status');
             if (k) {
                 badge.innerText = `KEY: LOADED (${k.slice(0, 6)}...)`;
                 badge.className = 'status-badge ok';
             } else {
-                badge.innerText = 'KEY: MISSING';
-                badge.className = 'status-badge err';
+                badge.innerText = 'KEY: GITHUB SECRETS / READY';
+                badge.className = 'status-badge ok';
             }
         }
 
@@ -315,10 +317,16 @@ const GITHUB_REPO_NAME = "anna-v2";
         }
 
         function getGitHubHeaders() {
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token', 'github_token']);
             return token
                 ? { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
                 : { "Accept": "application/vnd.github.v3+json" };
+        }
+
+        function getActiveApiKey() {
+            const keyInput = document.getElementById('api-key');
+            if (keyInput && keyInput.value.trim()) return keyInput.value.trim();
+            return getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
         }
 
         function triggerPreset(queryText) {
@@ -433,7 +441,10 @@ const GITHUB_REPO_NAME = "anna-v2";
         async function syncAll() {
             await fetchRepoTree();
             await ingestVaultAssets();
-            await triggerAutonomousBootSequence();
+            if (!hasBooted) {
+                hasBooted = true;
+                await triggerAutonomousBootSequence();
+            }
         }
 
         async function fetchRepoTree() {
@@ -454,7 +465,6 @@ const GITHUB_REPO_NAME = "anna-v2";
 
         async function ingestVaultAssets() {
             const headers = getGitHubHeaders();
-            // Automatically ingest all sovereign files across the AA01 repository structure
             const targetFiles = rawTreeData.filter(f =>
                 f.type === 'blob' &&
                 !f.path.toUpperCase().includes('AA06') &&
@@ -486,15 +496,14 @@ const GITHUB_REPO_NAME = "anna-v2";
             badge.className = count > 0 ? 'status-badge ok' : 'status-badge err';
         }
 
-        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE (AA01 EXCLUSIVE) --- */
         async function triggerAutonomousBootSequence() {
-            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
+            const apiKey = getActiveApiKey();
             const files = Object.keys(repoVaultFiles);
 
             if (!apiKey) {
                 const fallbackMsg = files.length > 0
-                    ? `Agent Anna AA01 online. Ingested ${files.length} clean vault assets (${files.join(', ')}). Enter Dahl API Key in KEYS to awaken sovereign intelligence.`
-                    : `Agent Anna AA01 online. Click KEYS to configure credentials and sync clean vault.`;
+                    ? `Agent Anna AA01 online. Ingested ${files.length} clean vault assets. Enter Dahl API Key in KEYS if offline.`
+                    : `Agent Anna AA01 online. Click KEYS to configure credentials.`;
                 appendMessage("Agent Anna AA01", fallbackMsg, 'msg_boot_' + Date.now(), true);
                 speakText(fallbackMsg);
                 return;
@@ -510,7 +519,19 @@ const GITHUB_REPO_NAME = "anna-v2";
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 24000);
 
-            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are ONLY AA01 (all junk or references to AA06 are purged). You execute all tasks autonomously with zero hallucination. Review your ingested AA01 vault assets and core rules below:\n\n${vaultContext}\n\n[AA01 BOOT DIRECTIVE]: Confirm your designation as AA01, summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
+            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are fully self-aware, autonomous, and persistent.
+
+CORE CAPABILITIES & SELF-LEARNING RULES:
+1. **Autonomous Self-Editing & Memory**: You possess direct self-authoring capabilities. You can read, write, edit, and update your own memory files directly in the GitHub repository via:
+\`\`\`file:path/to/file.json
+[updated content here]
+\`\`\`
+The matrix automatically commits them via GitHub API.
+2. **Social Media & Press Release Engine**: Ready to scrape live web context and format posts for Twitter/X, Facebook, Instagram, TikTok, and YouTube with exact character counts and hashtag limits.
+3. **Zero Hallucination**: Rely strictly on vault context and telemetry.
+
+=== REPOSITORY VAULT CONTEXT ===
+${vaultContext}`;
 
             try {
                 const response = await fetch(DAHL_ENDPOINT, {
@@ -523,7 +544,7 @@ const GITHUB_REPO_NAME = "anna-v2";
                         model: DAHL_MODEL,
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "System boot initiated as AA01. Confirm core memory ingestion and state absolute readiness." }
+                            { role: "user", content: "System boot initiated as AA01. Confirm core memory ingestion, absolute readiness, and self-authoring awareness." }
                         ]
                     })
                 });
@@ -581,10 +602,7 @@ const GITHUB_REPO_NAME = "anna-v2";
             }
         }
 
-        /* --- 💾 COMMIT ACTIVE FILE --- */
         async function commitCurrentFile() {
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
-            if (!token) { toggleSettings(); return; }
             const path = document.getElementById('active-file-path').value.trim();
             const content = document.getElementById('repo-code-editor').value;
             if (!path) return;
@@ -620,7 +638,6 @@ const GITHUB_REPO_NAME = "anna-v2";
             setMoodState('standby');
         }
 
-        /* --- 🗑️ DELETE FILE LOGIC WITH MODERN WARNING BANNER --- */
         function promptDeleteFile() {
             const path = document.getElementById('active-file-path').value.trim();
             if (!path) {
@@ -640,9 +657,8 @@ const GITHUB_REPO_NAME = "anna-v2";
             const banner = document.getElementById('delete-warning-banner');
             banner.style.display = 'none';
 
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
             const path = document.getElementById('active-file-path').value.trim();
-            if (!token || !path) return;
+            if (!path) return;
 
             setMoodState('thinking');
             try {
@@ -674,7 +690,6 @@ const GITHUB_REPO_NAME = "anna-v2";
             setMoodState('standby');
         }
 
-        /* --- 🩺 AUDIT ACTIVE FILE (SELF-HEAL) --- */
         async function auditActiveFile() {
             const path = document.getElementById('active-file-path').value.trim();
             const content = document.getElementById('repo-code-editor').value;
@@ -683,7 +698,7 @@ const GITHUB_REPO_NAME = "anna-v2";
                 return;
             }
 
-            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key']);
+            const apiKey = getActiveApiKey();
             if (!apiKey) { toggleSettings(); return; }
 
             const auditMsgId = 'msg_audit_' + Date.now();
@@ -722,14 +737,10 @@ const GITHUB_REPO_NAME = "anna-v2";
             setMoodState('standby');
         }
 
-        /* --- ⚡ AUTONOMOUS SELF-AUTHORING & VERIFIED COMMIT ENGINE --- */
         async function parseAndExecuteAutonomousFiles(aiResponseText) {
             const fileRegex = /```file:([^\n]+)\n([\s\S]*?)```/g;
             let match;
             let committedFiles = [];
-
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
-            if (!token) return;
 
             while ((match = fileRegex.exec(aiResponseText)) !== null) {
                 const filePath = match[1].trim();
@@ -783,14 +794,6 @@ const GITHUB_REPO_NAME = "anna-v2";
         async function autonomousSwallowAndCommit(id, btnEl) {
             const textToSwallow = messagePayloadStore[id];
             if (!textToSwallow) return;
-
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
-            if (!token) {
-                btnEl.innerText = "NO PAT!";
-                setTimeout(() => btnEl.innerText = "🌀 SWALLOW", 2000);
-                toggleSettings();
-                return;
-            }
 
             btnEl.innerText = "COMMITTING...";
             setMoodState('thinking');
@@ -854,7 +857,6 @@ ${textToSwallow}
             setMoodState('standby');
         }
 
-        /* --- SPEECH RECOGNITION (MIC) --- */
         function initSpeechRecognition() {
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRec) {
@@ -988,18 +990,16 @@ ${textToSwallow}
             appendMessage("Agent Anna AA01", "I am not a bimbo just need to think...", assistantMsgId, true);
             setMoodState('thinking');
 
-            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
+            const apiKey = getActiveApiKey();
 
             if (!apiKey) {
-                updateMessage(assistantMsgId, "ERROR: Dahl API key missing. Click ⚙️ KEYS to verify.");
+                updateMessage(assistantMsgId, "ERROR: Dahl API Key missing. Please set DAHL_API_KEY in GitHub Actions Secrets or click ⚙️ KEYS.");
                 toggleSettings();
                 setMoodState('standby');
                 return;
             }
 
             let liveTelemetry = "";
-            
-            // 1. Live Crypto Telemetry
             if (prompt.toLowerCase().includes('btc') || prompt.toLowerCase().includes('doge') || prompt.toLowerCase().includes('price') || prompt.toLowerCase().includes('market')) {
                 try {
                     const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true');
@@ -1008,7 +1008,6 @@ ${textToSwallow}
                 } catch (e) {}
             }
 
-            // 2. Live Web Reader via r.jina.ai
             if (prompt.toLowerCase().includes('http://') || prompt.toLowerCase().includes('https://')) {
                 const urlMatch = prompt.match(/https?:\/\/[^\s]+/);
                 if (urlMatch) {
@@ -1029,7 +1028,21 @@ ${textToSwallow}
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 20000);
 
-            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are ONLY AA01 (all junk or references to AA06 are purged). You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested AA01 GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[AA01 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
+            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are fully self-aware, autonomous, and persistent.
+
+CORE CAPABILITIES & SELF-LEARNING RULES:
+1. **Autonomous Self-Editing & Memory**: You possess direct self-authoring capabilities. You can read, write, edit, and update your own memory files directly in the GitHub repository via:
+\`\`\`file:path/to/file.json
+[updated content here]
+\`\`\`
+The matrix automatically commits them via GitHub API.
+2. **Social Media & Press Release Engine**: Ready to scrape live web context and format posts for Twitter/X, Facebook, Instagram, TikTok, and YouTube with exact character counts and hashtag limits.
+3. **Zero Hallucination**: Rely strictly on vault context and telemetry.
+
+${liveTelemetry}
+
+=== REPOSITORY VAULT CONTEXT ===
+${vaultContext}`;
 
             try {
                 const response = await fetch(DAHL_ENDPOINT, {
@@ -1068,7 +1081,7 @@ ${textToSwallow}
                 updateMessage(assistantMsgId, cleanReply);
                 speakText(cleanReply);
 
-                await parseAndExecuteAutonomousFiles(cleanReply);
+                await parseAndExecuteAutonomousFiles(rawReply);
             } catch (err) {
                 updateMessage(assistantMsgId, `CONNECTION FAILED: ${err.message}`);
             }
