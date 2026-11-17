@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [ELITE RESEARCH & PARALLEL PARSING & LIGHTNING SYNC]</title>
+    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [ELITE RESEARCH & 429 RATE-LIMIT SHIELD]</title>
     <style>
         :root {
             --bg-dark: #05070c;
@@ -468,7 +468,13 @@
                 });
                 const data = await res.json();
                 if (data.tree) {
-                    rawTreeData = data.tree.filter(f => !f.path.toUpperCase().includes('AA06'));
+                    rawTreeData = data.tree.filter(f => 
+                        !f.path.toUpperCase().includes('AA06') &&
+                        !f.path.startsWith('plans/logs/') &&
+                        !f.path.endsWith('.png') &&
+                        !f.path.endsWith('.jpg') &&
+                        !f.path.endsWith('.mp4')
+                    );
                     if (currentViewMode === 'tree') renderTreeView();
                     else renderGridView();
                 }
@@ -476,18 +482,13 @@
             setMoodState('standby');
         }
 
-        // LIGHTNING-FAST PARALLEL VAULT INGESTION (PROMISE.ALL)
         async function ingestVaultAssets() {
             const headers = getGitHubHeaders();
             const targetFiles = rawTreeData.filter(f =>
                 f.type === 'blob' &&
-                !f.path.toUpperCase().includes('AA06') &&
                 (
                     f.path.toLowerCase().endsWith('.md') ||
                     f.path.toLowerCase().endsWith('.json') ||
-                    f.path.toLowerCase().endsWith('.html') ||
-                    f.path.toLowerCase().endsWith('.js') ||
-                    f.path.toLowerCase().endsWith('.css') ||
                     f.path.toLowerCase().includes('aa01')
                 )
             );
@@ -509,11 +510,12 @@
 
             const count = Object.keys(repoVaultFiles).length;
             const badge = document.getElementById('vault-status');
-            badge.innerText = `VAULT: ${count} ASSETS`;
+            badge.innerText = `VAULT: ${count} CORE ASSETS`;
             badge.className = count > 0 ? 'status-badge ok' : 'status-badge err';
         }
 
-        async function fetchWithRetry(url, options, retries = 4, delay = 3000) {
+        // 🛡️ UPGRADED 429 RATE-LIMIT SHIELD & EXPONENTIAL BACKOFF
+        async function fetchWithRetry(url, options, retries = 3, delay = 2000) {
             for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(url, options);
@@ -529,7 +531,7 @@
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
-            throw new Error('Max retries reached due to rate limiting (429). Server cooling down.');
+            throw new Error('Server rate limit (429) active. Dahl inference is cooling down—please wait 10 seconds before next prompt.');
         }
 
         async function triggerAutonomousBootSequence() {
@@ -544,7 +546,7 @@
 
             if (!apiKey) {
                 const fallbackMsg = files.length > 0
-                    ? `Agent Anna AA01 online. Ingested ${files.length} clean vault assets. Enter Dahl API Key in KEYS if offline.`
+                    ? `Agent Anna AA01 online. Ingested ${files.length} clean core vault assets. Enter Dahl API Key in KEYS if offline.`
                     : `Agent Anna AA01 online. Click KEYS to configure credentials.`;
                 appendMessage("Agent Anna AA01", fallbackMsg, 'msg_boot_' + Date.now(), true);
                 speakText(fallbackMsg);
@@ -553,7 +555,7 @@
             }
 
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna AA01", `Ingested ${files.length} clean AA01 vault assets. Awakening sovereign neural core & elite research engine...`, bootMsgId, true);
+            appendMessage("Agent Anna AA01", `Ingested ${files.length} clean AA01 core assets. Awakening sovereign neural core & elite research engine...`, bootMsgId, true);
             setMoodState('thinking');
 
             let vaultSections = [];
@@ -592,14 +594,14 @@ ${vaultContext}`;
                 });
 
                 const json = await response.json();
-                const rawReply = json.choices?.[0]?.message?.content || json.reply || `Agent Anna AA01 online. Ingested ${files.length} clean vault assets and standing by.`;
+                const rawReply = json.choices?.[0]?.message?.content || json.reply || `Agent Anna AA01 online. Ingested ${files.length} clean core vault assets and standing by.`;
                 const cleanReply = sanitizeResponse(rawReply);
 
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(bootMsgId, cleanReply);
                 speakText(cleanReply);
             } catch (err) {
-                const errMsg = `Agent Anna AA01 online. Ingested ${files.length} clean vault assets. Ready for execution.`;
+                const errMsg = `Agent Anna AA01 online. Ingested ${files.length} clean core vault assets. Ready for execution. (${err.message})`;
                 updateMessage(bootMsgId, errMsg);
                 speakText(errMsg);
             }
