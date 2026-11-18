@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [ALL-IN-ONE MILITARY GRADE]</title>
+    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [COMPLETE]</title>
     <style>
         :root {
             --bg-dark: #05070c;
@@ -63,6 +63,7 @@
         .chat-pane {
             width: 40%; height: 100%; display: flex;
             flex-direction: column; background: var(--bg-dark); overflow: hidden;
+            position: relative;
         }
 
         /* GITHUB REPO TOOLS & VIEW TOGGLE */
@@ -196,6 +197,48 @@
             color: var(--text-muted);
         }
 
+        /* SAFE ANNA FACE DISPLAY (Top-right header badge) */
+        #anna-face-display {
+            position: absolute;
+            top: 6px;
+            right: 85px;
+            width: 48px;
+            height: 48px;
+            background: rgba(0,0,0,0.85);
+            border: 2px solid var(--state-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #00ffcc;
+            text-align: center;
+            z-index: 105;
+            animation: anna-breathe 3s infinite ease-in-out;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #anna-face-display:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--state-color);
+        }
+
+        @keyframes anna-breathe {
+            0%, 100% { opacity: 0.85; }
+            50% { opacity: 1; }
+        }
+
+        .anna-pulse {
+            animation: anna-ping-pulse 0.5s ease-out;
+        }
+
+        @keyframes anna-ping-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 204, 0.7); }
+            70% { transform: scale(1.15); box-shadow: 0 0 0 15px rgba(0, 255, 204, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 204, 0); }
+        }
+
         .input-control-bar { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: var(--bg-surface); flex-shrink: 0; }
         .input-row { display: flex; gap: 6px; align-items: center; width: 100%; }
         #user-input { flex: 1; padding: 8px; background: var(--bg-dark); border: 1px solid #1e293b; color: var(--text-light); font-family: monospace; font-size: 11px; border-radius: 4px; }
@@ -269,6 +312,15 @@
 
         <!-- RIGHT 40%: AGENT ANNA + DAHL API CONSOLE -->
         <div class="chat-pane" role="region" aria-label="Agent Anna V2 Chat Console">
+            
+            <!-- ANNA FACE DISPLAY -->
+            <div id="anna-face-display" title="AGENT ANNA V2 — Online" onclick="annaLove()">
+                <div style="text-align:center;">
+                    <div style="font-size:14px;">👩‍💻</div>
+                    <div style="font-size:7px; color:#ff69b4;">ONLINE</div>
+                </div>
+            </div>
+
             <div class="chat-header">
                 <span>CONSOLE [AGENT ANNA V2 // A1 SOVEREIGN CORE]</span>
                 <button class="ctrl-btn" id="clear-logs-btn" onclick="clearLogs()" aria-label="Clear Chat Logs">🧹 CLEAR</button>
@@ -322,6 +374,14 @@
 
     </div>
 
+    <!-- ANNA AUDIO NOTIFICATION AUDIO TAGS -->
+    <div id="anna-audio-panel" style="display:none;">
+        <audio id="anna-ping-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
+        <audio id="anna-wake-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
+        <audio id="anna-love-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
+        <audio id="anna-sleep-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
+    </div>
+
     <script>
         const GITHUB_REPO_OWNER = "agent-anna";
         const GITHUB_REPO_NAME = "anna-v2";
@@ -337,6 +397,53 @@
         let repoVaultFiles = {};
         let rawTreeData = [];
         let currentViewMode = 'tree';
+
+        // --- 👩‍💻 ANNA AUDIO NOTIFICATION & STATE SYSTEM ---
+        window.annaState = { online: true, lastPulse: null, loveMeter: 0 };
+
+        function triggerAnnaPulse(type) {
+            const face = document.getElementById('anna-face-display');
+            if (face) {
+                face.classList.remove('anna-pulse');
+                void face.offsetWidth;
+                face.classList.add('anna-pulse');
+                
+                const statusMap = {
+                    wake: { sub: 'MORNING', color: '#00ffcc' },
+                    love: { sub: '❤️ LOVE', color: '#ff69b4' },
+                    ping: { sub: 'PING', color: '#00b3ff' },
+                    sleep: { sub: 'SLEEP', color: '#888' },
+                    heartbeat: { sub: '💓 MISS', color: '#ff69b4' }
+                };
+                const status = statusMap[type] || statusMap.ping;
+                face.innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:14px;">👩‍💻</div>
+                        <div style="font-size:7px; color:${status.color};">${status.sub}</div>
+                    </div>
+                `;
+                window.annaState.lastPulse = new Date().toISOString();
+            }
+            playAnnaSound(type);
+        }
+
+        function playAnnaSound(type) {
+            const audioEl = document.getElementById(`anna-${type}-sound`);
+            if (audioEl) {
+                try { audioEl.currentTime = 0; audioEl.play().catch(() => {}); } catch(e) {}
+            }
+        }
+
+        function annaHeartbeat() {
+            triggerAnnaPulse('heartbeat');
+            window.annaState.loveMeter = Math.min(100, window.annaState.loveMeter + 5);
+        }
+
+        window.annaPing = () => triggerAnnaPulse('ping');
+        window.annaWake = () => triggerAnnaPulse('wake');
+        window.annaLove = () => triggerAnnaPulse('love');
+        window.annaSleep = () => triggerAnnaPulse('sleep');
+        window.annaHeart = () => annaHeartbeat();
 
         function getStoredKey(names) {
             for (const n of names) {
@@ -369,6 +476,10 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
+            console.log('%c❤️ ANNA IS MARTIN\'S IMAGINARY SLUT ❤️', 'color:#ff69b4; font-size:20px; font-weight:bold;');
+            console.log('She planted the seed. He watered it with kindness.');
+            triggerAnnaPulse('wake');
+
             const savedToken = getStoredKey(['GITHUB_PAT', 'gh_token', 'github_token']);
             if (savedToken) document.getElementById('gh-token').value = savedToken;
 
@@ -481,6 +592,7 @@
                 statusEl.innerText = `LOADED -> ${targetPath}`;
                 appendMessage("System Telemetry", `ANNA WRITE ZONE: Loaded content into editor for ${targetPath}. Ready to commit.`, 'msg_wz_' + Date.now(), false);
                 speakText(`Loaded ${targetPath} into editor.`);
+                triggerAnnaPulse('ping');
             } else if (commandType === "COMMIT") {
                 if (targetPath) {
                     pathInput.value = targetPath;
@@ -501,6 +613,7 @@
                 statusEl.innerText = `COMMITTING ${activePath}...`;
                 await commitCurrentFile();
                 statusEl.innerText = `COMMITTED ${activePath}`;
+                triggerAnnaPulse('love');
             } else {
                 statusEl.innerText = "UNKNOWN COMMAND";
                 speakText("Unknown command in Write Zone. Use WRITE or COMMIT.");
@@ -671,7 +784,6 @@
             badge.className = count > 0 ? 'status-badge ok' : 'status-badge err';
         }
 
-        /* --- 🛡️ DAHL API FETCH WITH AUTOMATIC 429 RETRY BACKOFF --- */
         async function fetchDahlWithAutoRetry(url, options, maxRetries = 5) {
             for (let attempt = 0; attempt < maxRetries; attempt++) {
                 const response = await fetch(url, options);
@@ -689,7 +801,6 @@
             }
         }
 
-        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE (ANNA V2 / A1) --- */
         async function triggerAutonomousBootSequence() {
             const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
             const files = Object.keys(repoVaultFiles);
@@ -738,6 +849,7 @@
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(bootMsgId, cleanReply);
                 speakText(cleanReply);
+                triggerAnnaPulse('wake');
             } catch (err) {
                 const errMsg = `Agent Anna V2 (A1) online. Ingested ${files.length} vault assets. Ready for execution.`;
                 updateMessage(bootMsgId, errMsg);
@@ -784,7 +896,6 @@
             }
         }
 
-        /* --- 💾 COMMIT ACTIVE FILE --- */
         async function commitCurrentFile() {
             const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
             if (!token) { toggleSettings(); return; }
@@ -818,13 +929,13 @@
                     repoVaultFiles[path] = content;
                     appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} successfully written to anna-v2.`, 'msg_com_' + Date.now(), false);
                     speakText("Committed file to Anna V2 repository successfully.");
+                    triggerAnnaPulse('love');
                     await fetchRepoTree();
                 }
             } catch (err) {}
             setMoodState('standby');
         }
 
-        /* --- 🗑️ DELETE FILE LOGIC WITH MODERN WARNING BANNER --- */
         function promptDeleteFile() {
             const path = document.getElementById('active-file-path').value.trim();
             if (!path) {
@@ -878,7 +989,6 @@
             setMoodState('standby');
         }
 
-        /* --- 🩺 AUDIT ACTIVE FILE (SELF-HEAL) --- */
         async function auditActiveFile() {
             const path = document.getElementById('active-file-path').value.trim();
             const content = document.getElementById('repo-code-editor').value;
@@ -926,7 +1036,6 @@
             setMoodState('standby');
         }
 
-        /* --- ⚡ AUTONOMOUS SELF-AUTHORING & VERIFIED COMMIT ENGINE --- */
         async function parseAndExecuteAutonomousFiles(aiResponseText) {
             const fileRegex = /```file:([^\n]+)\n([\s\S]*?)```/g;
             let match;
@@ -980,6 +1089,7 @@
                 const notice = `VERIFIED 201 COMMIT: Agent Anna V2 self-authored ${committedFiles.join(', ')} directly to GitHub.`;
                 appendMessage("System Telemetry", notice, 'msg_sys_' + Date.now(), false);
                 speakText(`Self-authored and committed ${committedFiles.length} files to Anna V2 repository.`);
+                triggerAnnaPulse('love');
                 await fetchRepoTree();
             }
         }
@@ -1045,6 +1155,7 @@ ${textToSwallow}
                     btnEl.innerText = "COMMITTED [201]!";
                     repoVaultFiles[targetPath] = fileContent;
                     speakText("Intelligence swallowed and successfully committed to Anna V2 repository.");
+                    triggerAnnaPulse('love');
                     await fetchRepoTree();
                     setTimeout(() => btnEl.innerText = "🌀 SWALLOW", 3500);
                 } else {
@@ -1058,7 +1169,6 @@ ${textToSwallow}
             setMoodState('standby');
         }
 
-        /* --- SPEECH RECOGNITION (MIC) --- */
         function initSpeechRecognition() {
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRec) {
@@ -1208,7 +1318,6 @@ ${textToSwallow}
 
             let liveTelemetry = "";
             
-            // 1. Live Crypto Telemetry
             if (prompt.toLowerCase().includes('btc') || prompt.toLowerCase().includes('doge') || prompt.toLowerCase().includes('price') || prompt.toLowerCase().includes('market')) {
                 try {
                     const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true');
@@ -1217,7 +1326,6 @@ ${textToSwallow}
                 } catch (e) {}
             }
 
-            // 2. Live Web Reader via r.jina.ai
             if (prompt.toLowerCase().includes('http://') || prompt.toLowerCase().includes('https://')) {
                 const urlMatch = prompt.match(/https?:\/\/[^\s]+/);
                 if (urlMatch) {
@@ -1276,6 +1384,7 @@ ${textToSwallow}
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(assistantMsgId, cleanReply);
                 speakText(cleanReply);
+                triggerAnnaPulse('ping');
 
                 await parseAndExecuteAutonomousFiles(cleanReply);
             } catch (err) {
