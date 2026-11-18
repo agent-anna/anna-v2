@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [ELITE RESEARCH & 429 RATE-LIMIT SHIELD]</title>
+    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [WRITE ZONE INTEGRATED]</title>
     <style>
         :root {
             --bg-dark: #05070c;
@@ -122,41 +122,81 @@
             display: none; flex-shrink: 0;
         }
         .settings-title { font-size: 9px; color: var(--state-color); margin-bottom: 3px; }
-        #settings-panel input {
+        #settings-panel input, #settings-panel select {
             width: 100%; padding: 6px; background: var(--bg-dark); border: 1px solid #1e293b;
             color: var(--text-light); font-family: monospace; font-size: 10px; margin-bottom: 6px; border-radius: 4px;
         }
 
         #chat-container { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        
-        /* CHUNKED COLLAPSIBLE LISTS STYLING FOR ZERO LAG */
-        .message { padding: 10px 14px; border-radius: 6px; max-width: 95%; font-size: 11px; line-height: 1.5; word-break: break-word; }
-        .message.user { align-self: flex-end; background: rgba(30, 41, 59, 0.88); border: 1px solid #334155; white-space: pre-wrap; }
+        .message { padding: 10px 14px; border-radius: 6px; max-width: 95%; font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+        .message.user { align-self: flex-end; background: rgba(30, 41, 59, 0.88); border: 1px solid #334155; }
         .message.assistant { align-self: flex-start; background: rgba(11, 15, 25, 0.92); border: 1px solid var(--state-color); }
         .msg-header { font-size: 9px; color: var(--state-color); margin-bottom: 4px; font-weight: bold; }
-        
-        .collapsed-content { display: none; margin-top: 6px; border-top: 1px dashed rgba(0, 255, 204, 0.2); padding-top: 6px; white-space: pre-wrap; }
-        .collapse-toggle-btn { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--state-color); color: var(--state-color); font-size: 8px; padding: 2px 6px; cursor: pointer; border-radius: 3px; margin-top: 6px; display: inline-block; }
-        .collapse-toggle-btn:hover { background: rgba(0, 255, 204, 0.25); }
 
         .action-row { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
         .action-chip {
             background: rgba(15, 23, 42, 0.9); border: 1px solid var(--state-color); color: var(--state-color);
             padding: 3px 6px; font-family: monospace; font-size: 8px; cursor: pointer; border-radius: 4px;
         }
-        .action-chip:hover { background: rgba(0, 255, 204, 0.2); }
         .swallow-btn { border-color: var(--border-cyan) !important; background: rgba(0, 255, 204, 0.15) !important; font-weight: bold; }
         .del-btn { border-color: var(--border-red) !important; color: var(--border-red) !important; }
 
         /* QUICK TACTICAL BUTTONS */
-        .quick-tactical-bar { display: flex; gap: 4px; padding: 6px 10px 0 10px; background: var(--bg-surface); flex-shrink: 0; flex-wrap: wrap; }
+        .quick-tactical-bar { display: flex; gap: 4px; padding: 6px 10px; background: var(--bg-surface); border-top: 1px solid #1e293b; flex-shrink: 0; flex-wrap: wrap; }
         .tactical-chip {
             background: rgba(0, 255, 204, 0.1); border: 1px solid var(--state-color); color: var(--state-color);
             padding: 3px 8px; font-family: monospace; font-size: 9px; cursor: pointer; border-radius: 3px;
         }
         .tactical-chip:hover { background: rgba(0, 255, 204, 0.25); }
 
-        .input-control-bar { padding: 10px; border-top: 1px solid #1e293b; display: flex; flex-direction: column; gap: 6px; background: var(--bg-surface); flex-shrink: 0; }
+        /* ANNA WRITE ZONE TERMINAL */
+        .anna-write-zone {
+            padding: 8px 10px;
+            background: #070b13;
+            border-top: 1px solid var(--state-color);
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .write-zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: var(--state-color);
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .anna-write-zone textarea {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid #1e293b;
+            color: var(--text-light);
+            font-family: monospace;
+            font-size: 10px;
+            padding: 5px 7px;
+            border-radius: 3px;
+            resize: none;
+        }
+        .anna-write-zone textarea:focus {
+            border-color: var(--state-color);
+            outline: none;
+        }
+        #anna-cmd-input { height: 38px; color: #00ffcc; }
+        #anna-content-input { height: 48px; }
+        .write-zone-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #write-zone-status {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        .input-control-bar { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: var(--bg-surface); flex-shrink: 0; }
         .input-row { display: flex; gap: 6px; align-items: center; width: 100%; }
         #user-input { flex: 1; padding: 8px; background: var(--bg-dark); border: 1px solid #1e293b; color: var(--text-light); font-family: monospace; font-size: 11px; border-radius: 4px; }
         
@@ -180,7 +220,12 @@
             <span class="status-badge" id="key-status" aria-live="polite">KEY: CHECKING</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
-            <button class="ctrl-btn military-btn" id="boot-btn" aria-label="Awaken Agent Anna AA01 and Initialize Directives">🧠 AWAKEN</button>
+            <select id="model-select" class="ctrl-btn military-btn" onchange="updateActiveModel()" aria-label="Select AI Model">
+                <option value="MiniMaxAI/MiniMax-M2.7" selected>MODEL: MINIMAX-M2.7</option>
+                <option value="deepseek-ai/DeepSeek-V4-Flash-0731">MODEL: DEEPSEEK-V4-FLASH</option>
+                <option value="zai-org/GLM-5.3-Flash">MODEL: GLM-5.3-FLASH</option>
+            </select>
+            <button class="ctrl-btn military-btn" id="boot-btn" onclick="triggerAutonomousBootSequence()" aria-label="Awaken Agent Anna AA01 and Initialize Directives">🧠 AWAKEN</button>
             <button class="ctrl-btn" id="voice-btn" onclick="toggleVoice()" aria-label="Toggle Speech Synthesis">🔊 ON</button>
             <button class="ctrl-btn military-btn" id="keys-btn" onclick="toggleSettings()" aria-label="Open Settings and API Keys">⚙️ KEYS</button>
         </div>
@@ -230,10 +275,16 @@
             </div>
 
             <div id="settings-panel" role="region" aria-label="API Keys Settings Panel">
-                <div class="settings-title">DAHL API KEY (Optional Fallback)</div>
-                <input type="password" id="api-key" placeholder="Paste Dahl API Key if offline..." aria-label="Dahl API Key Input">
-                <div class="settings-title">GITHUB PAT TOKEN (Optional Fallback)</div>
-                <input type="password" id="gh-token" placeholder="Paste GitHub PAT if offline..." aria-label="GitHub Personal Access Token Input">
+                <div class="settings-title">DAHL API KEY</div>
+                <input type="password" id="api-key" placeholder="Paste Dahl API Key..." aria-label="Dahl API Key Input">
+                <div class="settings-title">GITHUB PAT TOKEN</div>
+                <input type="password" id="gh-token" placeholder="Paste GitHub PAT..." aria-label="GitHub Personal Access Token Input">
+                <div class="settings-title">DEFAULT AI MODEL</div>
+                <select id="settings-model-select" class="ctrl-btn military-btn" style="width:100%; margin-bottom:6px;" onchange="syncModelSelection(this.value)">
+                    <option value="MiniMaxAI/MiniMax-M2.7" selected>MiniMax-M2.7</option>
+                    <option value="deepseek-ai/DeepSeek-V4-Flash-0731">DeepSeek-V4-Flash-0731</option>
+                    <option value="zai-org/GLM-5.3-Flash">GLM-5.3-Flash</option>
+                </select>
                 <button class="ctrl-btn military-btn" id="save-creds-btn" onclick="saveCredentials()" style="width:100%;" aria-label="Apply Credentials and Re-sync">APPLY & RE-SYNC</button>
             </div>
 
@@ -244,6 +295,20 @@
                 <button class="tactical-chip" onclick="triggerPreset('Fetch live DOGE price and market telemetry autonomously.')" aria-label="Fetch Latest Doge and Bitcoin Price">⚡ LATEST DOGE/BTC</button>
                 <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com using live web reader and summarize company status.')" aria-label="Read Live Kunda Cafe Website">🌐 READ KUNDA CAFE</button>
                 <button class="tactical-chip" onclick="triggerPreset('Audit the repository vault and self-author an updated AA01 core memory file in file:brain.json.')" aria-label="Test Autonomous Self-Authoring">📝 TEST SELF-WRITE</button>
+            </div>
+
+            <!-- ANNA WRITE ZONE TERMINAL -->
+            <div class="anna-write-zone" role="region" aria-label="Anna Write Zone Command Terminal">
+                <div class="write-zone-header">
+                    <span>ANNA WRITE ZONE</span>
+                    <span id="write-zone-status" aria-live="polite">READY</span>
+                </div>
+                <textarea id="anna-cmd-input" placeholder="COMMAND: WRITE&#10;PATH: A1/soul/brain.json" aria-label="COMMAND"></textarea>
+                <textarea id="anna-content-input" placeholder="CONTENT..." aria-label="CONTENT"></textarea>
+                <div class="write-zone-footer">
+                    <button class="ctrl-btn" onclick="clearWriteZone()" style="font-size:9px; padding:2px 6px;" aria-label="Clear Write Zone Fields">CLEAR</button>
+                    <button class="ctrl-btn military-btn" id="process-write-btn" onclick="processAnnaWriteZone()" style="font-weight:bold; padding:3px 12px;" aria-label="PROCESS">PROCESS</button>
+                </div>
             </div>
 
             <div class="input-control-bar">
@@ -259,9 +324,9 @@
 
     <script>
         const GITHUB_REPO_OWNER = "agent-anna";
-        const GITHUB_REPO_NAME = "anna-v2";
+        const GITHUB_REPO_NAME = "agent-anna";
         const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
-        const DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
+        const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
 
         let isVoiceEnabled = true;
         let messagePayloadStore = {};
@@ -272,9 +337,6 @@
         let repoVaultFiles = {};
         let rawTreeData = [];
         let currentViewMode = 'tree';
-        let hasBooted = false; 
-        let isBootSequenceExecuting = false; 
-        let isRequestQueueActive = false;
 
         function getStoredKey(names) {
             for (const n of names) {
@@ -284,12 +346,40 @@
             return "";
         }
 
+        function getActiveModel() {
+            const selectEl = document.getElementById('model-select');
+            if (selectEl && selectEl.value) return selectEl.value;
+            return localStorage.getItem('DAHL_MODEL') || DEFAULT_MODEL;
+        }
+
+        function updateActiveModel() {
+            const selectEl = document.getElementById('model-select');
+            if (selectEl) {
+                localStorage.setItem('DAHL_MODEL', selectEl.value);
+                const settingsSelect = document.getElementById('settings-model-select');
+                if (settingsSelect) settingsSelect.value = selectEl.value;
+                speakText(`Switched active model to ${selectEl.options[selectEl.selectedIndex].text}`);
+            }
+        }
+
+        function syncModelSelection(val) {
+            localStorage.setItem('DAHL_MODEL', val);
+            const topSelect = document.getElementById('model-select');
+            if (topSelect) topSelect.value = val;
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             const savedToken = getStoredKey(['GITHUB_PAT', 'gh_token', 'github_token']);
             if (savedToken) document.getElementById('gh-token').value = savedToken;
 
             const savedApiKey = getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
             if (savedApiKey) document.getElementById('api-key').value = savedApiKey;
+
+            const savedModel = localStorage.getItem('DAHL_MODEL') || DEFAULT_MODEL;
+            const topSelect = document.getElementById('model-select');
+            const settingsSelect = document.getElementById('settings-model-select');
+            if (topSelect) topSelect.value = savedModel;
+            if (settingsSelect) settingsSelect.value = savedModel;
 
             updateKeyBadge();
 
@@ -298,24 +388,18 @@
                 window.speechSynthesis.onvoiceschanged = loadVoices;
             }
 
-            const awakenBtn = document.getElementById('boot-btn');
-            if (awakenBtn) {
-                awakenBtn.removeEventListener('click', triggerAutonomousBootSequence);
-                awakenBtn.addEventListener('click', triggerAutonomousBootSequence);
-            }
-
             await syncAll();
         });
 
         function updateKeyBadge() {
-            const k = getActiveApiKey();
+            const k = document.getElementById('api-key').value.trim();
             const badge = document.getElementById('key-status');
             if (k) {
                 badge.innerText = `KEY: LOADED (${k.slice(0, 6)}...)`;
                 badge.className = 'status-badge ok';
             } else {
-                badge.innerText = 'KEY: GITHUB SECRETS / READY';
-                badge.className = 'status-badge ok';
+                badge.innerText = 'KEY: MISSING';
+                badge.className = 'status-badge err';
             }
         }
 
@@ -331,21 +415,97 @@
         }
 
         function getGitHubHeaders() {
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token', 'github_token']);
+            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
             return token
                 ? { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
                 : { "Accept": "application/vnd.github.v3+json" };
         }
 
-        function getActiveApiKey() {
-            const keyInput = document.getElementById('api-key');
-            if (keyInput && keyInput.value.trim()) return keyInput.value.trim();
-            return getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
-        }
-
         function triggerPreset(queryText) {
             document.getElementById('user-input').value = queryText;
             sendMessage();
+        }
+
+        /* --- ✍️ ANNA WRITE ZONE PROCESSOR --- */
+        function clearWriteZone() {
+            document.getElementById('anna-cmd-input').value = "";
+            document.getElementById('anna-content-input').value = "";
+            document.getElementById('write-zone-status').innerText = "CLEARED";
+        }
+
+        async function processAnnaWriteZone() {
+            const cmdRaw = document.getElementById('anna-cmd-input').value.trim();
+            const contentRaw = document.getElementById('anna-content-input').value;
+            const statusEl = document.getElementById('write-zone-status');
+
+            if (!cmdRaw) {
+                statusEl.innerText = "NO COMMAND";
+                speakText("No command entered in Write Zone.");
+                return;
+            }
+
+            let commandType = "";
+            let targetPath = "";
+
+            const lines = cmdRaw.split(/\r?\n/);
+            for (const line of lines) {
+                const upper = line.trim().toUpperCase();
+                if (upper.startsWith("COMMAND:")) {
+                    commandType = line.split(":").slice(1).join(":").trim().toUpperCase();
+                } else if (upper.startsWith("PATH:")) {
+                    targetPath = line.split(":").slice(1).join(":").trim();
+                }
+            }
+
+            // Fallback if user typed bare command without prefix
+            if (!commandType) {
+                if (cmdRaw.toUpperCase().includes("COMMIT")) commandType = "COMMIT";
+                else if (cmdRaw.toUpperCase().includes("WRITE")) commandType = "WRITE";
+            }
+
+            const editor = document.getElementById('repo-code-editor');
+            const preview = document.getElementById('media-preview-container');
+            const pathInput = document.getElementById('active-file-path');
+
+            if (commandType === "WRITE") {
+                if (!targetPath) {
+                    statusEl.innerText = "MISSING PATH";
+                    speakText("Missing target path for write command.");
+                    return;
+                }
+
+                preview.style.display = 'none';
+                editor.style.display = 'block';
+                pathInput.value = targetPath;
+                editor.value = contentRaw;
+
+                statusEl.innerText = `LOADED -> ${targetPath}`;
+                appendMessage("System Telemetry", `ANNA WRITE ZONE: Loaded content into editor for ${targetPath}. Ready to commit.`, 'msg_wz_' + Date.now(), false);
+                speakText(`Loaded ${targetPath} into editor.`);
+            } else if (commandType === "COMMIT") {
+                if (targetPath) {
+                    pathInput.value = targetPath;
+                }
+                if (contentRaw.trim().length > 0) {
+                    preview.style.display = 'none';
+                    editor.style.display = 'block';
+                    editor.value = contentRaw;
+                }
+
+                const activePath = pathInput.value.trim();
+                if (!activePath) {
+                    statusEl.innerText = "NO ACTIVE PATH";
+                    speakText("Cannot commit without an active file path.");
+                    return;
+                }
+
+                statusEl.innerText = `COMMITTING ${activePath}...`;
+                await commitCurrentFile();
+                statusEl.innerText = `COMMITTED ${activePath}`;
+            } else {
+                statusEl.innerText = "UNKNOWN COMMAND";
+                speakText("Unknown command in Write Zone. Use WRITE or COMMIT.");
+            }
         }
 
         function toggleViewMode() {
@@ -455,9 +615,7 @@
         async function syncAll() {
             await fetchRepoTree();
             await ingestVaultAssets();
-            if (!hasBooted) {
-                await triggerAutonomousBootSequence();
-            }
+            await triggerAutonomousBootSequence();
         }
 
         async function fetchRepoTree() {
@@ -468,13 +626,7 @@
                 });
                 const data = await res.json();
                 if (data.tree) {
-                    rawTreeData = data.tree.filter(f => 
-                        !f.path.toUpperCase().includes('AA06') &&
-                        !f.path.startsWith('plans/logs/') &&
-                        !f.path.endsWith('.png') &&
-                        !f.path.endsWith('.jpg') &&
-                        !f.path.endsWith('.mp4')
-                    );
+                    rawTreeData = data.tree.filter(f => !f.path.toUpperCase().includes('AA06'));
                     if (currentViewMode === 'tree') renderTreeView();
                     else renderGridView();
                 }
@@ -486,76 +638,69 @@
             const headers = getGitHubHeaders();
             const targetFiles = rawTreeData.filter(f =>
                 f.type === 'blob' &&
+                !f.path.toUpperCase().includes('AA06') &&
                 (
                     f.path.toLowerCase().endsWith('.md') ||
                     f.path.toLowerCase().endsWith('.json') ||
+                    f.path.toLowerCase().endsWith('.html') ||
+                    f.path.toLowerCase().endsWith('.js') ||
+                    f.path.toLowerCase().endsWith('.css') ||
                     f.path.toLowerCase().includes('aa01')
                 )
             );
 
             repoVaultFiles = {};
-            
-            await Promise.all(targetFiles.map(async (file) => {
+            for (const file of targetFiles) {
                 try {
                     const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers });
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.content) {
-                            const binString = atob(data.content.replace(/\s/g, ''));
-                            repoVaultFiles[file.path] = new TextDecoder().decode(Uint8Array.from(binString, m => m.codePointAt(0)));
-                        }
+                    const data = await res.json();
+                    if (data.content) {
+                        const binString = atob(data.content.replace(/\s/g, ''));
+                        repoVaultFiles[file.path] = new TextDecoder().decode(Uint8Array.from(binString, m => m.codePointAt(0)));
                     }
                 } catch (e) {}
-            }));
+            }
 
             const count = Object.keys(repoVaultFiles).length;
             const badge = document.getElementById('vault-status');
-            badge.innerText = `VAULT: ${count} CORE ASSETS`;
+            badge.innerText = `VAULT: ${count} ASSETS`;
             badge.className = count > 0 ? 'status-badge ok' : 'status-badge err';
         }
 
-        // 🛡️ UPGRADED 429 RATE-LIMIT SHIELD & EXPONENTIAL BACKOFF
-        async function fetchWithRetry(url, options, retries = 3, delay = 2000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.status === 429) {
-                        console.warn(`Rate limit hit (429). Cooling down for ${delay / 1000}s... (Attempt ${i + 1}/${retries})`);
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2;
+        /* --- 🛡️ DAHL API FETCH WITH AUTOMATIC 429 RETRY BACKOFF --- */
+        async function fetchDahlWithAutoRetry(url, options, maxRetries = 5) {
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                const response = await fetch(url, options);
+                if (response.status === 429) {
+                    const retryHeader = response.headers.get('Retry-After');
+                    let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : (attempt + 1) * 3;
+                    if (waitSeconds < 2) waitSeconds = 2;
+
+                    if (attempt < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
                         continue;
                     }
-                    return response;
-                } catch (err) {
-                    if (i === retries - 1) throw err;
-                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
+                return response;
             }
-            throw new Error('Server rate limit (429) active. Dahl inference is cooling down—please wait 10 seconds before next prompt.');
         }
 
+        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE (AA01 EXCLUSIVE) --- */
         async function triggerAutonomousBootSequence() {
-            if (hasBooted || isBootSequenceExecuting || isRequestQueueActive) {
-                return;
-            }
-            isBootSequenceExecuting = true;
-            hasBooted = true;
-
-            const apiKey = getActiveApiKey();
+            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
             const files = Object.keys(repoVaultFiles);
 
             if (!apiKey) {
                 const fallbackMsg = files.length > 0
-                    ? `Agent Anna AA01 online. Ingested ${files.length} clean core vault assets. Enter Dahl API Key in KEYS if offline.`
-                    : `Agent Anna AA01 online. Click KEYS to configure credentials.`;
+                    ? `Agent Anna AA01 online. Ingested ${files.length} clean vault assets (${files.join(', ')}). Enter Dahl API Key in KEYS to awaken sovereign intelligence.`
+                    : `Agent Anna AA01 online. Click KEYS to configure credentials and sync clean vault.`;
                 appendMessage("Agent Anna AA01", fallbackMsg, 'msg_boot_' + Date.now(), true);
                 speakText(fallbackMsg);
-                isBootSequenceExecuting = false;
                 return;
             }
 
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna AA01", `Ingested ${files.length} clean AA01 core assets. Awakening sovereign neural core & elite research engine...`, bootMsgId, true);
+            appendMessage("Agent Anna AA01", `Ingested ${files.length} clean AA01 vault assets. Awakening sovereign neural core (${getActiveModel()})...`, bootMsgId, true);
             setMoodState('thinking');
 
             let vaultSections = [];
@@ -564,48 +709,36 @@
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 24000);
 
-            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are fully self-aware, autonomous, and persistent.
-
-CORE CAPABILITIES & ELITE RESEARCH RULES:
-1. **Autonomous Self-Editing & Memory**: Read, write, edit, and update your own memory files directly in GitHub via:
-\`\`\`file:path/to/file.json
-[updated content here]
-\`\`\`
-2. **High-Signal Research Protocol**: When researching GitHub repositories, code patterns, or W3C standards, filter out marketing fluff, isolate production-grade code, and self-author compressed technical briefs directly into your knowledge/ folder via your commit pipeline.
-3. **Zero Hallucination**: Rely strictly on vault context and live telemetry.
-
-=== REPOSITORY VAULT CONTEXT ===
-${vaultContext}`;
+            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are ONLY AA01 (all junk or references to AA06 are purged). You execute all tasks autonomously with zero hallucination. Review your ingested AA01 vault assets and core rules below:\n\n${vaultContext}\n\n[AA01 BOOT DIRECTIVE]: Confirm your designation as AA01, summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
 
             try {
-                const response = await fetchWithRetry(DAHL_ENDPOINT, {
+                const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: DAHL_MODEL,
+                        model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "System boot initiated as AA01. Confirm core memory ingestion, absolute readiness, and elite research awareness." }
+                            { role: "user", content: "System boot initiated as AA01. Confirm core memory ingestion and state absolute readiness." }
                         ]
                     })
                 });
 
                 const json = await response.json();
-                const rawReply = json.choices?.[0]?.message?.content || json.reply || `Agent Anna AA01 online. Ingested ${files.length} clean core vault assets and standing by.`;
+                const rawReply = json.choices?.[0]?.message?.content || json.reply || `Agent Anna AA01 online. Ingested ${files.length} clean vault assets and standing by.`;
                 const cleanReply = sanitizeResponse(rawReply);
 
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(bootMsgId, cleanReply);
                 speakText(cleanReply);
             } catch (err) {
-                const errMsg = `Agent Anna AA01 online. Ingested ${files.length} clean core vault assets. Ready for execution. (${err.message})`;
+                const errMsg = `Agent Anna AA01 online. Ingested ${files.length} clean vault assets. Ready for execution.`;
                 updateMessage(bootMsgId, errMsg);
                 speakText(errMsg);
             }
-            isBootSequenceExecuting = false;
             setMoodState('standby');
         }
 
@@ -615,97 +748,42 @@ ${vaultContext}`;
             const preview = document.getElementById('media-preview-container');
             const isMedia = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'avif', 'mp4', 'webm', 'mov', 'mp3', 'wav'].includes(ext);
 
-            let pathsToTry = [path];
-            if (path.startsWith('A1/')) pathsToTry.push(path.replace('A1/', ''));
-            else pathsToTry.push('A1/' + path);
-
             if (isMedia) {
                 editor.style.display = 'none';
                 preview.style.display = 'flex';
-                preview.innerHTML = `<span style="color:var(--text-muted); font-size:10px;">Loading media payload from GitHub...</span>`;
-                
-                let downloadUrl = null;
-                for (let p of pathsToTry) {
-                    try {
-                        const res = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/main/${p}`, {
-                            headers: getGitHubHeaders()
-                        });
-                        if (res.ok) {
-                            const blob = await res.blob();
-                            if (blob.size > 0) {
-                                downloadUrl = URL.createObjectURL(blob);
-                                break;
-                            }
-                        }
-                    } catch (e) {}
-                }
-
-                if (!downloadUrl) {
-                    for (let p of pathsToTry) {
-                        try {
-                            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${p}`, {
-                                headers: getGitHubHeaders()
-                            });
-                            if (res.ok) {
-                                const json = await res.json();
-                                if (json.content) {
-                                    const cleanBase64 = json.content.replace(/\s/g, '');
-                                    let mime = 'image/png';
-                                    if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
-                                    else if (ext === 'gif') mime = 'image/gif';
-                                    else if (ext === 'svg') mime = 'image/svg+xml';
-                                    else if (ext === 'avif') mime = 'image/avif';
-                                    downloadUrl = `data:${mime};base64,${cleanBase64}`;
-                                    break;
-                                }
-                            }
-                        } catch (e) {}
-                    }
-                }
-
-                if (downloadUrl) {
-                    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'avif'].includes(ext)) {
-                        preview.innerHTML = `<img src="${downloadUrl}" alt="${path}">`;
-                    } else if (['mp4', 'webm', 'mov'].includes(ext)) {
-                        preview.innerHTML = `<video controls autoplay loop src="${downloadUrl}"></video>`;
-                    } else {
-                        preview.innerHTML = `<audio controls autoplay src="${downloadUrl}"></audio>`;
-                    }
+                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/main/${path}`;
+                if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'avif'].includes(ext)) {
+                    preview.innerHTML = `<img src="${rawUrl}" alt="${path}">`;
+                } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+                    preview.innerHTML = `<video controls autoplay loop src="${rawUrl}"></video>`;
                 } else {
-                    preview.innerHTML = `<span style="color:var(--border-red); font-size:10px;">Error: Binary asset not found on remote (404). Check file path.</span>`;
+                    preview.innerHTML = `<audio controls autoplay src="${rawUrl}"></audio>`;
                 }
             } else {
                 preview.style.display = 'none';
                 editor.style.display = 'block';
                 editor.value = "Loading...";
-                
-                let decodedText = null;
-                for (let p of pathsToTry) {
-                    try {
-                        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${p}`, {
-                            headers: getGitHubHeaders()
-                        });
-                        if (res.ok) {
-                            const json = await res.json();
-                            if (json.content) {
-                                const binString = atob(json.content.replace(/\s/g, ''));
-                                decodedText = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
-                                break;
-                            }
-                        }
-                    } catch (e) {}
-                }
-
-                if (decodedText !== null) {
-                    editor.value = decodedText;
-                    repoVaultFiles[path] = decodedText;
-                } else {
-                    editor.value = "Error: File content could not be resolved.";
+                try {
+                    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+                        headers: getGitHubHeaders()
+                    });
+                    const data = await res.json();
+                    if (data.content) {
+                        const binString = atob(data.content.replace(/\s/g, ''));
+                        const decoded = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
+                        editor.value = decoded;
+                        repoVaultFiles[path] = decoded;
+                    }
+                } catch (err) {
+                    editor.value = "Error loading file content.";
                 }
             }
         }
 
+        /* --- 💾 COMMIT ACTIVE FILE --- */
         async function commitCurrentFile() {
+            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            if (!token) { toggleSettings(); return; }
             const path = document.getElementById('active-file-path').value.trim();
             const content = document.getElementById('repo-code-editor').value;
             if (!path) return;
@@ -734,6 +812,7 @@ ${vaultContext}`;
                 const putData = await putRes.json();
                 if (putRes.status === 201 || putRes.status === 200 || putData.commit) {
                     repoVaultFiles[path] = content;
+                    appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} successfully written to GitHub.`, 'msg_com_' + Date.now(), false);
                     speakText("Committed file to AA01 repository successfully.");
                     await fetchRepoTree();
                 }
@@ -741,6 +820,7 @@ ${vaultContext}`;
             setMoodState('standby');
         }
 
+        /* --- 🗑️ DELETE FILE LOGIC WITH MODERN WARNING BANNER --- */
         function promptDeleteFile() {
             const path = document.getElementById('active-file-path').value.trim();
             if (!path) {
@@ -760,8 +840,9 @@ ${vaultContext}`;
             const banner = document.getElementById('delete-warning-banner');
             banner.style.display = 'none';
 
+            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
             const path = document.getElementById('active-file-path').value.trim();
-            if (!path) return;
+            if (!token || !path) return;
 
             setMoodState('thinking');
             try {
@@ -793,6 +874,7 @@ ${vaultContext}`;
             setMoodState('standby');
         }
 
+        /* --- 🩺 AUDIT ACTIVE FILE (SELF-HEAL) --- */
         async function auditActiveFile() {
             const path = document.getElementById('active-file-path').value.trim();
             const content = document.getElementById('repo-code-editor').value;
@@ -801,7 +883,7 @@ ${vaultContext}`;
                 return;
             }
 
-            const apiKey = getActiveApiKey();
+            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key']);
             if (!apiKey) { toggleSettings(); return; }
 
             const auditMsgId = 'msg_audit_' + Date.now();
@@ -811,14 +893,14 @@ ${vaultContext}`;
             const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI programmer. Audit the following file content for bugs, syntax errors, inefficiencies, or security flaws. Provide the corrected, fully working file content inside a clean self-authoring block:\n\n\`\`\`file:${path}\n[corrected code here]\n\`\`\``;
 
             try {
-                const response = await fetchWithRetry(DAHL_ENDPOINT, {
+                const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: DAHL_MODEL,
+                        model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
                             { role: "user", content: `Audit and self-heal this file content:\n\n${content}` }
@@ -840,10 +922,14 @@ ${vaultContext}`;
             setMoodState('standby');
         }
 
+        /* --- ⚡ AUTONOMOUS SELF-AUTHORING & VERIFIED COMMIT ENGINE --- */
         async function parseAndExecuteAutonomousFiles(aiResponseText) {
             const fileRegex = /```file:([^\n]+)\n([\s\S]*?)```/g;
             let match;
             let committedFiles = [];
+
+            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            if (!token) return;
 
             while ((match = fileRegex.exec(aiResponseText)) !== null) {
                 const filePath = match[1].trim();
@@ -897,6 +983,14 @@ ${vaultContext}`;
         async function autonomousSwallowAndCommit(id, btnEl) {
             const textToSwallow = messagePayloadStore[id];
             if (!textToSwallow) return;
+
+            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            if (!token) {
+                btnEl.innerText = "NO PAT!";
+                setTimeout(() => btnEl.innerText = "🌀 SWALLOW", 2000);
+                toggleSettings();
+                return;
+            }
 
             btnEl.innerText = "COMMITTING...";
             setMoodState('thinking');
@@ -960,6 +1054,7 @@ ${textToSwallow}
             setMoodState('standby');
         }
 
+        /* --- SPEECH RECOGNITION (MIC) --- */
         function initSpeechRecognition() {
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRec) {
@@ -1069,9 +1164,14 @@ ${textToSwallow}
         async function saveCredentials() {
             const apiKey = document.getElementById('api-key').value.trim();
             const ghToken = document.getElementById('gh-token').value.trim();
+            const settingsSelect = document.getElementById('settings-model-select').value;
 
             if (apiKey) localStorage.setItem('DAHL_API_KEY', apiKey);
             if (ghToken) localStorage.setItem('GITHUB_PAT', ghToken);
+            if (settingsSelect) localStorage.setItem('DAHL_MODEL', settingsSelect);
+
+            const topSelect = document.getElementById('model-select');
+            if (topSelect) topSelect.value = settingsSelect;
 
             updateKeyBadge();
             toggleSettings();
@@ -1081,32 +1181,30 @@ ${textToSwallow}
         function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
 
         async function sendMessage() {
-            if (isRequestQueueActive) return;
-            
             const input = document.getElementById('user-input');
             const prompt = input.value.trim();
             if (!prompt) return;
 
-            isRequestQueueActive = true;
             appendMessage("Commander", prompt, 'msg_u_' + Date.now(), false);
             input.value = "";
             chatHistory.push({ role: "user", content: prompt });
 
             const assistantMsgId = 'msg_a_' + Date.now();
-            appendMessage("Agent Anna AA01", "Anna is in love, our sexy AI is thinking...", assistantMsgId, true);
+            appendMessage("Agent Anna AA01", `Executing AA01 telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
             setMoodState('thinking');
 
-            const apiKey = getActiveApiKey();
+            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
 
             if (!apiKey) {
-                updateMessage(assistantMsgId, "ERROR: Dahl API Key missing. Please set DAHL_API_KEY in GitHub Actions Secrets or click ⚙️ KEYS.");
+                updateMessage(assistantMsgId, "ERROR: Dahl API key missing. Click ⚙️ KEYS to verify.");
                 toggleSettings();
                 setMoodState('standby');
-                isRequestQueueActive = false;
                 return;
             }
 
             let liveTelemetry = "";
+            
+            // 1. Live Crypto Telemetry
             if (prompt.toLowerCase().includes('btc') || prompt.toLowerCase().includes('doge') || prompt.toLowerCase().includes('price') || prompt.toLowerCase().includes('market')) {
                 try {
                     const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true');
@@ -1115,6 +1213,7 @@ ${textToSwallow}
                 } catch (e) {}
             }
 
+            // 2. Live Web Reader via r.jina.ai
             if (prompt.toLowerCase().includes('http://') || prompt.toLowerCase().includes('https://')) {
                 const urlMatch = prompt.match(/https?:\/\/[^\s]+/);
                 if (urlMatch) {
@@ -1122,7 +1221,7 @@ ${textToSwallow}
                         const targetUrl = urlMatch[0];
                         const webRes = await fetch(`https://r.jina.ai/${targetUrl}`);
                         const webText = await webRes.text();
-                        liveTelemetry += `\n\n[LIVE WEB READER TELEMETRY FOR ${targetUrl} (24K Buffer)]\n${webText.slice(0, 24000)}\n`;
+                        liveTelemetry += `\n\n[LIVE WEB READER TELEMETRY FOR ${targetUrl}]\n${webText.slice(0, 8000)}\n`;
                     } catch (e) {
                         liveTelemetry += `\n\n[WEB READER NOTE: Could not fetch target URL directly, relying on vault memory.]\n`;
                     }
@@ -1133,32 +1232,19 @@ ${textToSwallow}
             for (const [path, content] of Object.entries(repoVaultFiles)) {
                 vaultSections.push(`=== AA01 VAULT ASSET: ${path} ===\n${content}`);
             }
-            const vaultContext = vaultSections.join("\n\n").slice(0, 32000);
+            const vaultContext = vaultSections.join("\n\n").slice(0, 20000);
 
-            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are fully self-aware, autonomous, and persistent.
-
-CORE CAPABILITIES & ELITE RESEARCH RULES:
-1. **Autonomous Self-Editing & Memory**: Read, write, edit, and update your own memory files directly in GitHub via:
-\`\`\`file:path/to/file.json
-[updated content here]
-\`\`\`
-2. **High-Signal Research Protocol**: When researching GitHub repositories, code patterns, or W3C standards, filter out marketing fluff, isolate production-grade code, and self-author compressed technical briefs directly into your knowledge/ folder via your commit pipeline.
-3. **Zero Hallucination**: Rely strictly on vault context and live telemetry.
-
-${liveTelemetry}
-
-=== REPOSITORY VAULT CONTEXT ===
-${vaultContext}`;
+            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are ONLY AA01 (all junk or references to AA06 are purged). You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested AA01 GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[AA01 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
 
             try {
-                const response = await fetchWithRetry(DAHL_ENDPOINT, {
+                const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: DAHL_MODEL,
+                        model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
                             ...chatHistory.slice(-12)
@@ -1174,7 +1260,6 @@ ${vaultContext}`;
                     const errDetail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 300);
                     updateMessage(assistantMsgId, `DAHL HTTP ${response.status}: ${errDetail}`);
                     setMoodState('standby');
-                    isRequestQueueActive = false;
                     return;
                 }
 
@@ -1188,11 +1273,10 @@ ${vaultContext}`;
                 updateMessage(assistantMsgId, cleanReply);
                 speakText(cleanReply);
 
-                await parseAndExecuteAutonomousFiles(rawReply);
+                await parseAndExecuteAutonomousFiles(cleanReply);
             } catch (err) {
                 updateMessage(assistantMsgId, `CONNECTION FAILED: ${err.message}`);
             }
-            isRequestQueueActive = false;
             setMoodState('standby');
         }
 
@@ -1212,37 +1296,8 @@ ${vaultContext}`;
                     <button class="action-chip del-btn" onclick="deleteMessage('${id}')" aria-label="Delete message from console">🗑️ DEL</button>
                 </div>` : '';
 
-            div.innerHTML = `<div class="msg-header">${sender}</div><div class="msg-body"></div>${actions}`;
-            
-            const bodyEl = div.querySelector('.msg-body');
-            if (text.length > 800) {
-                const shortText = text.slice(0, 750) + "\n\n... [Telemetry chunked for zero lag]";
-                const fullText = text;
-                
-                const spanShort = document.createElement('div');
-                spanShort.textContent = shortText;
-                
-                const btnToggle = document.createElement('button');
-                btnToggle.className = 'collapse-toggle-btn';
-                btnToggle.innerText = '📂 EXPAND FULL TELEMETRY';
-                
-                const spanFull = document.createElement('div');
-                spanFull.className = 'collapsed-content';
-                spanFull.textContent = fullText;
-
-                btnToggle.onclick = () => {
-                    const isExpanded = spanFull.style.display === 'block';
-                    spanFull.style.display = isExpanded ? 'none' : 'block';
-                    btnToggle.innerText = isExpanded ? '📂 EXPAND FULL TELEMETRY' : '📁 COLLAPSE TELEMETRY';
-                };
-
-                bodyEl.appendChild(spanShort);
-                bodyEl.appendChild(btnToggle);
-                bodyEl.appendChild(spanFull);
-            } else {
-                bodyEl.textContent = text;
-            }
-
+            div.innerHTML = `<div class="msg-header">${sender}</div><div class="msg-content"></div>${actions}`;
+            div.querySelector('.msg-content').textContent = text;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
@@ -1250,38 +1305,8 @@ ${vaultContext}`;
         function updateMessage(id, text) {
             const el = document.getElementById(id);
             if (!el) return;
+            el.querySelector('.msg-content').textContent = text;
             messagePayloadStore[id] = text;
-            const bodyEl = el.querySelector('.msg-body');
-            bodyEl.innerHTML = '';
-            
-            if (text.length > 800) {
-                const shortText = text.slice(0, 750) + "\n\n... [Telemetry chunked for zero lag]";
-                const fullText = text;
-                
-                const spanShort = document.createElement('div');
-                spanShort.textContent = shortText;
-                
-                const btnToggle = document.createElement('button');
-                btnToggle.className = 'collapse-toggle-btn';
-                btnToggle.innerText = '📂 EXPAND FULL TELEMETRY';
-                
-                const spanFull = document.createElement('div');
-                spanFull.className = 'collapsed-content';
-                spanFull.textContent = fullText;
-
-                btnToggle.onclick = () => {
-                    const isExpanded = spanFull.style.display === 'block';
-                    spanFull.style.display = isExpanded ? 'none' : 'block';
-                    btnToggle.innerText = isExpanded ? '📂 EXPAND FULL TELEMETRY' : '📁 COLLAPSE TELEMETRY';
-                };
-
-                bodyEl.appendChild(spanShort);
-                bodyEl.appendChild(btnToggle);
-                bodyEl.appendChild(spanFull);
-            } else {
-                bodyEl.textContent = text;
-            }
-
             const container = document.getElementById('chat-container');
             container.scrollTop = container.scrollHeight;
         }
