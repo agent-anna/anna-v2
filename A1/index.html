@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [LIVE SEARCH + ACTIONS BRIDGE]</title>
+    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [MP3 FACIAL AUDIO + RESILIENT TELEMETRY]</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👩‍💻</text></svg>">
     <style>
         :root {
@@ -219,6 +219,7 @@
             border: 2px solid var(--state-color);
             border-radius: 50%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 8px;
@@ -326,11 +327,11 @@
         <!-- RIGHT 40%: AGENT ANNA + DAHL API CONSOLE -->
         <div class="chat-pane" role="region" aria-label="Agent Anna V2 Chat Console">
             
-            <!-- ANNA FACE DISPLAY -->
+            <!-- ANNA FACE DISPLAY (WIRED TO MP3s IN A1/face/) -->
             <div id="anna-face-display" title="AGENT ANNA V2 — Online" onclick="annaLove()">
                 <div style="text-align:center;">
                     <div style="font-size:14px;">👩‍💻</div>
-                    <div style="font-size:7px; color:#ff69b4;">ONLINE</div>
+                    <div id="anna-face-label" style="font-size:7px; color:#ff69b4;">❤️ LOVE</div>
                 </div>
             </div>
 
@@ -391,12 +392,13 @@
 
     </div>
 
-    <!-- ANNA AUDIO NOTIFICATION AUDIO TAGS -->
+    <!-- ANNA AUDIO NOTIFICATION PANEL (WIRED DIRECTLY TO A1/face/ MP3s) -->
     <div id="anna-audio-panel" style="display:none;">
-        <audio id="anna-ping-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
-        <audio id="anna-wake-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
-        <audio id="anna-love-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
-        <audio id="anna-sleep-sound" preload="auto"><source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav"></audio>
+        <audio id="anna-wake-sound" preload="auto"><source src="A1/face/wake-up.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-ping-sound" preload="auto"><source src="A1/face/wait-a-moment.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-love-sound" preload="auto"><source src="A1/face/love-you.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-sleep-sound" preload="auto"><source src="A1/face/female-sigh.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-heartbeat-sound" preload="auto"><source src="A1/face/i-heard-something-in-the-dark.mp3" type="audio/mpeg"></audio>
     </div>
 
     <script>
@@ -442,51 +444,38 @@
             return cleanHeaderToken(raw);
         }
 
-        // --- 👩‍💻 ANNA AUDIO NOTIFICATION & STATE SYSTEM ---
+        // --- 👩‍💻 ANNA MP3 AUDIO NOTIFICATION & STATE SYSTEM ---
         window.annaState = { online: true, lastPulse: null, loveMeter: 0 };
 
-        function triggerAnnaPulse(type) {
+        function triggerAnnaPulse(type, labelText = "LOVE") {
             const face = document.getElementById('anna-face-display');
+            const label = document.getElementById('anna-face-label');
             if (face) {
                 face.classList.remove('anna-pulse');
                 void face.offsetWidth;
                 face.classList.add('anna-pulse');
-                
-                const statusMap = {
-                    wake: { sub: 'MORNING', color: '#00ffcc' },
-                    love: { sub: '❤️ LOVE', color: '#ff69b4' },
-                    ping: { sub: 'PING', color: '#00b3ff' },
-                    sleep: { sub: 'SLEEP', color: '#888' },
-                    heartbeat: { sub: '💓 MISS', color: '#ff69b4' }
-                };
-                const status = statusMap[type] || statusMap.ping;
-                face.innerHTML = `
-                    <div style="text-align:center;">
-                        <div style="font-size:14px;">👩‍💻</div>
-                        <div style="font-size:7px; color:${status.color};">${status.sub}</div>
-                    </div>
-                `;
+                if (label) label.innerText = labelText;
                 window.annaState.lastPulse = new Date().toISOString();
             }
             playAnnaSound(type);
         }
 
         function playAnnaSound(type) {
-            const audioEl = document.getElementById(`anna-${type}-sound`);
+            const audioEl = document.getElementById(`anna-${type}-sound`) || document.getElementById('anna-ping-sound');
             if (audioEl) {
                 try { audioEl.currentTime = 0; audioEl.play().catch(() => {}); } catch(e) {}
             }
         }
 
         function annaHeartbeat() {
-            triggerAnnaPulse('heartbeat');
+            triggerAnnaPulse('heartbeat', '💓 LOVE');
             window.annaState.loveMeter = Math.min(100, window.annaState.loveMeter + 5);
         }
 
-        window.annaPing = () => triggerAnnaPulse('ping');
-        window.annaWake = () => triggerAnnaPulse('wake');
-        window.annaLove = () => triggerAnnaPulse('love');
-        window.annaSleep = () => triggerAnnaPulse('sleep');
+        window.annaPing = () => triggerAnnaPulse('ping', '⚡ PING');
+        window.annaWake = () => triggerAnnaPulse('wake', '☀️ WAKE');
+        window.annaLove = () => triggerAnnaPulse('love', '❤️ LOVE');
+        window.annaSleep = () => triggerAnnaPulse('sleep', '🌙 SLEEP');
         window.annaHeart = () => annaHeartbeat();
 
         function getActiveModel() {
@@ -512,7 +501,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            triggerAnnaPulse('wake');
+            triggerAnnaPulse('wake', '☀️ READY');
 
             const savedToken = getStoredKey(['GITHUB_PAT', 'gh_token', 'github_token']);
             if (savedToken) {
@@ -584,7 +573,7 @@
             sendMessage();
         }
 
-        /* --- 🦆🌐 AUTONOMOUS LIVE SEARCH & MARKET TELEMETRY ENGINE --- */
+        /* --- 🦆🌐 RESILIENT TELEMETRY ENGINE (CORS-SAFE FALLBACKS) --- */
         async function fetchLiveWebAndMarketTelemetry(prompt) {
             let telemetryBlocks = [];
             const lower = prompt.toLowerCase();
@@ -618,24 +607,6 @@
                     .trim();
 
                 try {
-                    const ddgRes = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(searchQuery)}&format=json&no_html=1&skip_disambig=1`);
-                    if (ddgRes.ok) {
-                        const ddg = await ddgRes.json();
-                        let ddgLines = [];
-                        if (ddg.AbstractText) ddgLines.push(`Abstract: ${ddg.AbstractText} (Source: ${ddg.AbstractURL})`);
-                        if (ddg.Answer) ddgLines.push(`Direct Answer: ${ddg.Answer}`);
-                        if (Array.isArray(ddg.RelatedTopics)) {
-                            ddg.RelatedTopics.slice(0, 5).forEach(item => {
-                                if (item.Text) ddgLines.push(`- ${item.Text}`);
-                            });
-                        }
-                        if (ddgLines.length > 0) {
-                            telemetryBlocks.push(`[VERIFIED LIVE DUCKDUCKGO API RESULTS FOR "${searchQuery}"]\n${ddgLines.join('\n')}`);
-                        }
-                    }
-                } catch (e) {}
-
-                try {
                     const jinaSearchRes = await fetch(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
                         headers: { "Accept": "text/plain" }
                     });
@@ -645,7 +616,9 @@
                             telemetryBlocks.push(`[VERIFIED LIVE WEB/SEARCH RESULTS FOR "${searchQuery}"]\n${searchText.slice(0, 5000)}`);
                         }
                     }
-                } catch (e) {}
+                } catch (e) {
+                    telemetryBlocks.push(`[NOTE: Browser CORS prevented direct public SERP search. Use 🚀 RUN BACKEND for server-side DuckDuckGo execution.]`);
+                }
             }
 
             return telemetryBlocks.length > 0 ? "\n\n" + telemetryBlocks.join("\n\n") : "";
@@ -690,7 +663,7 @@
                     updateActionsBadge("QUEUED", "active");
                     appendMessage("System Telemetry", `🚀 BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nDirective: "${cmdText}"\nMonitoring GitHub Actions runner until completion...`, 'msg_wf_' + Date.now(), false);
                     speakText("Backend workflow dispatched to GitHub Actions. Monitoring execution.");
-                    triggerAnnaPulse('ping');
+                    triggerAnnaPulse('ping', '⚡ RUN');
                     startWorkflowTelemetryPoller();
                 } else {
                     updateActionsBadge("FALLBACK PUSH", "active");
@@ -782,7 +755,7 @@
                         clearInterval(workflowPollTimer);
                         if (conclusion === "success") {
                             updateActionsBadge("VERIFIED [200]", "ok");
-                            triggerAnnaPulse('love');
+                            triggerAnnaPulse('love', '❤️ OK');
                             appendMessage("System Telemetry", `✅ BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing vault & loading output report for Anna...`, 'msg_wf_done_' + Date.now(), false);
                             speakText("GitHub Actions backend execution complete. Loading report into vault.");
                             await fetchRepoTree();
@@ -881,7 +854,7 @@
                 statusEl.innerText = `LOADED -> ${targetPath}`;
                 appendMessage("System Telemetry", `ANNA WRITE ZONE: Loaded content into editor for ${targetPath}. Ready to commit.`, 'msg_wz_' + Date.now(), false);
                 speakText(`Loaded ${targetPath} into editor.`);
-                triggerAnnaPulse('ping');
+                triggerAnnaPulse('ping', '📝 LOAD');
             } else if (commandType === "COMMIT") {
                 if (targetPath) pathInput.value = targetPath;
                 if (contentRaw.trim().length > 0) {
@@ -903,7 +876,7 @@
                 if (activePath === "A1/vault/pending-commands.md") {
                     startWorkflowTelemetryPoller();
                 }
-                triggerAnnaPulse('love');
+                triggerAnnaPulse('love', '💾 SAVED');
             } else {
                 statusEl.innerText = "UNKNOWN COMMAND";
                 speakText("Unknown command in Write Zone. Use WRITE, COMMIT, or DISPATCH.");
@@ -1016,7 +989,7 @@
             await ingestVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna V2", `Agent Anna V2 (A1) online. Synced ${count} memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}). Live DuckDuckGo/Web Search + GitHub Actions Bridge armed with Zero-Hallucination lock.`, bootMsgId, true);
+            appendMessage("Agent Anna V2", `Agent Anna V2 (A1) online. Synced ${count} memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}). MP3 Audio Face wired from A1/face/ + GitHub Actions Bridge armed.`, bootMsgId, true);
         }
 
         async function fetchRepoTree() {
@@ -1149,7 +1122,7 @@
             setMoodState('thinking');
 
             const vaultContext = getCompactVaultContext();
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You have live DuckDuckGo/Web search, CoinGecko telemetry, and GitHub Actions backend dispatch.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), confirm zero-hallucination protocol, and state readiness concisely.`;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You have real MP3 audio face files in A1/face/, live Jina/DuckDuckGo telemetry, and GitHub Actions backend dispatch.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), confirm zero-hallucination protocol, and state readiness concisely.`;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1182,7 +1155,7 @@
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(bootMsgId, cleanReply);
                 speakText(cleanReply);
-                triggerAnnaPulse('wake');
+                triggerAnnaPulse('wake', '☀️ AWAKE');
             } catch (err) {
                 updateMessage(bootMsgId, `CONNECTION ERROR: ${err.message}`);
             }
@@ -1274,7 +1247,7 @@
                     repoVaultFiles[path] = content;
                     appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} successfully written to anna-v2.`, 'msg_com_' + Date.now(), false);
                     speakText("Committed file to Anna V2 repository successfully.");
-                    triggerAnnaPulse('love');
+                    triggerAnnaPulse('love', '❤️ SAVED');
                     await fetchRepoTree();
                 } else {
                     appendMessage("System Telemetry", `COMMIT ERROR (${putRes.status}): ${putData.message || 'Check PAT write permissions.'}`, 'msg_com_err_' + Date.now(), false);
@@ -1443,7 +1416,7 @@
                 const notice = `VERIFIED 201 COMMIT: Agent Anna V2 self-authored ${committedFiles.join(', ')} directly to GitHub.`;
                 appendMessage("System Telemetry", notice, 'msg_sys_' + Date.now(), false);
                 speakText(`Self-authored and committed ${committedFiles.length} files to Anna V2 repository.`);
-                triggerAnnaPulse('love');
+                triggerAnnaPulse('love', '❤️ GIT');
                 await fetchRepoTree();
                 if (triggeredWorkflow) {
                     startWorkflowTelemetryPoller();
@@ -1507,7 +1480,7 @@ ${textToSwallow}
                     btnEl.innerText = "COMMITTED [201]!";
                     repoVaultFiles[targetPath] = fileContent;
                     speakText("Intelligence swallowed and successfully committed to Anna V2 repository.");
-                    triggerAnnaPulse('love');
+                    triggerAnnaPulse('love', '🌀 SWALLOW');
                     await fetchRepoTree();
                     setTimeout(() => btnEl.innerText = "🌀 SWALLOW", 3500);
                 } else {
@@ -1659,7 +1632,7 @@ ${textToSwallow}
             chatHistory.push({ role: "user", content: prompt });
 
             const assistantMsgId = 'msg_a_' + Date.now();
-            appendMessage("Agent Anna V2", `Fetching live DuckDuckGo/Web telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
+            appendMessage("Agent Anna V2", `Fetching telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
             setMoodState('thinking');
 
             const apiKey = getCleanDahlKey();
@@ -1725,7 +1698,7 @@ Your backend directive here...
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(assistantMsgId, cleanReply);
                 speakText(cleanReply);
-                triggerAnnaPulse('ping');
+                triggerAnnaPulse('ping', '💬 RESP');
 
                 await parseAndExecuteAutonomousFiles(cleanReply);
             } catch (err) {
@@ -1766,7 +1739,7 @@ Your backend directive here...
         }
 
         function deleteMessage(id) { const el = document.getElementById(id); if (el) el.remove(); delete messagePayloadStore[id]; }
-        function clearLogs() { document.getElementById('chat-container').innerHTML = ''; messagePayloadStore = {}; chatHistory = []; }
+        function clearLogs() { document.getElementById('chat-container'].innerHTML = ''; messagePayloadStore = {}; chatHistory = []; }
         function speakStoredMessage(id) { if (messagePayloadStore[id]) speakText(messagePayloadStore[id]); }
         function copyToClipboard(id, btn) {
             if (messagePayloadStore[id]) {
