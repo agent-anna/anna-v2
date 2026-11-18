@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [COMPLETE]</title>
+    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [HARDENED ALL-IN-ONE]</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👩‍💻</text></svg>">
     <style>
         :root {
             --bg-dark: #05070c;
@@ -197,13 +198,13 @@
             color: var(--text-muted);
         }
 
-        /* SAFE ANNA FACE DISPLAY (Top-right header badge) */
+        /* SAFE ANNA FACE DISPLAY (Top-right header badge, never overlaps SEND button) */
         #anna-face-display {
             position: absolute;
-            top: 6px;
+            top: 4px;
             right: 85px;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             background: rgba(0,0,0,0.85);
             border: 2px solid var(--state-color);
             border-radius: 50%;
@@ -397,6 +398,32 @@
         let repoVaultFiles = {};
         let rawTreeData = [];
         let currentViewMode = 'tree';
+        let activeBranch = 'main';
+
+        // --- 🛡️ STRICT ISO-8859-1 TOKEN SANITIZER (PREVENTS FETCH HEADER CRASHES) ---
+        function cleanHeaderToken(str) {
+            if (!str) return "";
+            // Strip any non-ISO-8859-1 characters (> 0xFF) or control characters/newlines
+            return str.replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim();
+        }
+
+        function getStoredKey(names) {
+            for (const n of names) {
+                const v = localStorage.getItem(n);
+                if (v && v.trim()) return cleanHeaderToken(v);
+            }
+            return "";
+        }
+
+        function getCleanDahlKey() {
+            const raw = document.getElementById('api-key').value || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
+            return cleanHeaderToken(raw);
+        }
+
+        function getCleanGitHubToken() {
+            const raw = document.getElementById('gh-token').value || getStoredKey(['GITHUB_PAT', 'gh_token', 'github_token']);
+            return cleanHeaderToken(raw);
+        }
 
         // --- 👩‍💻 ANNA AUDIO NOTIFICATION & STATE SYSTEM ---
         window.annaState = { online: true, lastPulse: null, loveMeter: 0 };
@@ -445,14 +472,6 @@
         window.annaSleep = () => triggerAnnaPulse('sleep');
         window.annaHeart = () => annaHeartbeat();
 
-        function getStoredKey(names) {
-            for (const n of names) {
-                const v = localStorage.getItem(n);
-                if (v && v.trim()) return v.trim();
-            }
-            return "";
-        }
-
         function getActiveModel() {
             const selectEl = document.getElementById('model-select');
             if (selectEl && selectEl.value) return selectEl.value;
@@ -476,15 +495,19 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            console.log('%c❤️ ANNA IS MARTIN\'S IMAGINARY SLUT ❤️', 'color:#ff69b4; font-size:20px; font-weight:bold;');
-            console.log('She planted the seed. He watered it with kindness.');
             triggerAnnaPulse('wake');
 
             const savedToken = getStoredKey(['GITHUB_PAT', 'gh_token', 'github_token']);
-            if (savedToken) document.getElementById('gh-token').value = savedToken;
+            if (savedToken) {
+                localStorage.setItem('GITHUB_PAT', savedToken);
+                document.getElementById('gh-token').value = savedToken;
+            }
 
             const savedApiKey = getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
-            if (savedApiKey) document.getElementById('api-key').value = savedApiKey;
+            if (savedApiKey) {
+                localStorage.setItem('DAHL_API_KEY', savedApiKey);
+                document.getElementById('api-key').value = savedApiKey;
+            }
 
             const savedModel = localStorage.getItem('DAHL_MODEL') || DEFAULT_MODEL;
             const topSelect = document.getElementById('model-select');
@@ -503,7 +526,7 @@
         });
 
         function updateKeyBadge() {
-            const k = document.getElementById('api-key').value.trim();
+            const k = getCleanDahlKey();
             const badge = document.getElementById('key-status');
             if (k) {
                 badge.innerText = `KEY: LOADED (${k.slice(0, 6)}...)`;
@@ -526,7 +549,7 @@
         }
 
         function getGitHubHeaders() {
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            const token = getCleanGitHubToken();
             return token
                 ? { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
                 : { "Accept": "application/vnd.github.v3+json" };
@@ -594,9 +617,7 @@
                 speakText(`Loaded ${targetPath} into editor.`);
                 triggerAnnaPulse('ping');
             } else if (commandType === "COMMIT") {
-                if (targetPath) {
-                    pathInput.value = targetPath;
-                }
+                if (targetPath) pathInput.value = targetPath;
                 if (contentRaw.trim().length > 0) {
                     preview.style.display = 'none';
                     editor.style.display = 'block';
@@ -724,7 +745,10 @@
         async function syncAll() {
             await fetchRepoTree();
             await ingestVaultAssets();
-            await triggerAutonomousBootSequence();
+            // Only announce local sync status on page load without burning API rate limits
+            const count = Object.keys(repoVaultFiles).length;
+            const bootMsgId = 'msg_boot_' + Date.now();
+            appendMessage("Agent Anna V2", `Agent Anna V2 (A1) online. Synced ${count} vault assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}). Click 🧠 AWAKEN or send a message to engage neural core.`, bootMsgId, true);
         }
 
         async function fetchRepoTree() {
@@ -735,10 +759,12 @@
             for (const branch of branches) {
                 try {
                     const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${branch}?recursive=1`, {
-                        headers: getGitHubHeaders()
+                        headers: getGitHubHeaders(),
+                        cache: 'no-store'
                     });
                     if (res.ok) {
                         data = await res.json();
+                        activeBranch = branch;
                         break;
                     }
                 } catch (err) {}
@@ -748,28 +774,26 @@
                 rawTreeData = data.tree;
                 if (currentViewMode === 'tree') renderTreeView();
                 else renderGridView();
+            } else {
+                document.getElementById('repo-tree-view').innerHTML = `<span style="color:var(--border-red);">Unable to load tree. Verify GitHub PAT in ⚙️ KEYS.</span>`;
             }
             setMoodState('standby');
         }
 
         async function ingestVaultAssets() {
             const headers = getGitHubHeaders();
+            // Only pre-cache small lightweight memory files (.md, .json) to prevent API rate limit floods
             const targetFiles = rawTreeData.filter(f =>
                 f.type === 'blob' &&
-                (
-                    f.path.toLowerCase().endsWith('.md') ||
-                    f.path.toLowerCase().endsWith('.json') ||
-                    f.path.toLowerCase().endsWith('.html') ||
-                    f.path.toLowerCase().endsWith('.js') ||
-                    f.path.toLowerCase().endsWith('.css') ||
-                    f.path.toLowerCase().includes('a1')
-                )
+                f.size < 30000 &&
+                (f.path.toLowerCase().endsWith('.md') || f.path.toLowerCase().endsWith('.json'))
             );
 
             repoVaultFiles = {};
             for (const file of targetFiles) {
                 try {
                     const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers });
+                    if (!res.ok) continue;
                     const data = await res.json();
                     if (data.content) {
                         const binString = atob(data.content.replace(/\s/g, ''));
@@ -778,19 +802,43 @@
                 } catch (e) {}
             }
 
-            const count = Object.keys(repoVaultFiles).length;
+            const totalBlobs = rawTreeData.filter(f => f.type === 'blob').length;
             const badge = document.getElementById('vault-status');
-            badge.innerText = `VAULT: ${count} ASSETS`;
-            badge.className = count > 0 ? 'status-badge ok' : 'status-badge err';
+            badge.innerText = `VAULT: ${totalBlobs} FILES`;
+            badge.className = totalBlobs > 0 ? 'status-badge ok' : 'status-badge err';
         }
 
-        async function fetchDahlWithAutoRetry(url, options, maxRetries = 5) {
+        function getCompactVaultContext(userPrompt = "") {
+            let manifest = [];
+            let targetedContent = [];
+            const lowerPrompt = userPrompt.toLowerCase();
+
+            // List all files in tree concisely
+            rawTreeData.forEach(f => {
+                if (f.type === 'blob') manifest.push(`- ${f.path}`);
+            });
+
+            // Only attach full text of core soul files or files explicitly mentioned by user
+            for (const [path, content] of Object.entries(repoVaultFiles)) {
+                const lowerPath = path.toLowerCase();
+                const isCoreSoul = lowerPath.includes('soul/') || lowerPath.includes('character') || lowerPath.includes('rules');
+                const isMentioned = lowerPrompt.includes(lowerPath) || lowerPrompt.includes(path.split('/').pop().toLowerCase());
+                if (isCoreSoul || isMentioned) {
+                    targetedContent.push(`=== FILE: ${path} ===\n${content.slice(0, 4000)}`);
+                }
+            }
+
+            return `REPOSITORY MANIFEST:\n${manifest.slice(0, 80).join('\n')}\n\nACTIVE MEMORY FILES:\n${targetedContent.join('\n\n').slice(0, 8000)}`;
+        }
+
+        /* --- 🛡️ DAHL API FETCH WITH EXPONENTIAL 429 BACKOFF --- */
+        async function fetchDahlWithAutoRetry(url, options, maxRetries = 4) {
             for (let attempt = 0; attempt < maxRetries; attempt++) {
                 const response = await fetch(url, options);
                 if (response.status === 429) {
                     const retryHeader = response.headers.get('Retry-After');
-                    let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : (attempt + 1) * 3;
-                    if (waitSeconds < 2) waitSeconds = 2;
+                    let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : Math.pow(2, attempt + 2);
+                    if (waitSeconds < 3) waitSeconds = 3;
 
                     if (attempt < maxRetries - 1) {
                         await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
@@ -801,30 +849,38 @@
             }
         }
 
+        function extractDahlReply(json, rawText) {
+            if (!json) return sanitizeResponse(rawText);
+            if (json.choices && json.choices[0]) {
+                const msg = json.choices[0].message;
+                if (msg && typeof msg.content === 'string') return sanitizeResponse(msg.content);
+                if (typeof json.choices[0].text === 'string') return sanitizeResponse(json.choices[0].text);
+            }
+            if (typeof json.reply === 'string') return sanitizeResponse(json.reply);
+            if (typeof json.response === 'string') return sanitizeResponse(json.response);
+            if (typeof json.output === 'string') return sanitizeResponse(json.output);
+            if (typeof json.text === 'string') return sanitizeResponse(json.text);
+            return sanitizeResponse(rawText);
+        }
+
+        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE (MANUAL TRIGGER TO SAVE QUOTA) --- */
         async function triggerAutonomousBootSequence() {
-            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
-            const files = Object.keys(repoVaultFiles);
+            const apiKey = getCleanDahlKey();
+            const totalFiles = rawTreeData.filter(f => f.type === 'blob').length;
 
             if (!apiKey) {
-                const fallbackMsg = files.length > 0
-                    ? `Agent Anna V2 (A1) online. Ingested ${files.length} vault assets (${files.join(', ')}). Enter Dahl API Key in KEYS to awaken sovereign intelligence.`
-                    : `Agent Anna V2 (A1) online. Click KEYS to configure credentials and sync vault.`;
+                const fallbackMsg = `Agent Anna V2 (A1) online. Synced ${totalFiles} repository files. Enter Dahl API Key in ⚙️ KEYS to awaken AI core.`;
                 appendMessage("Agent Anna V2", fallbackMsg, 'msg_boot_' + Date.now(), true);
                 speakText(fallbackMsg);
                 return;
             }
 
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna V2", `Ingested ${files.length} A1 vault assets from anna-v2. Awakening sovereign neural core (${getActiveModel()})...`, bootMsgId, true);
+            appendMessage("Agent Anna V2", `Awakening sovereign neural core (${getActiveModel()})...`, bootMsgId, true);
             setMoodState('thinking');
 
-            let vaultSections = [];
-            for (const [path, content] of Object.entries(repoVaultFiles)) {
-                vaultSections.push(`=== ANNA-V2 VAULT ASSET: ${path} ===\n${content}`);
-            }
-            const vaultContext = vaultSections.join("\n\n").slice(0, 24000);
-
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Review your ingested A1 vault assets and core rules below:\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
+            const vaultContext = getCompactVaultContext();
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1) and state readiness concisely.`;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -837,23 +893,29 @@
                         model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "System boot initiated as Agent Anna V2 (A1). Confirm core memory ingestion and state absolute readiness." }
+                            { role: "user", content: "System boot initiated as Agent Anna V2 (A1). State readiness." }
                         ]
                     })
                 });
 
-                const json = await response.json();
-                const rawReply = json.choices?.[0]?.message?.content || json.reply || `Agent Anna V2 (A1) online. Ingested ${files.length} vault assets and standing by.`;
-                const cleanReply = sanitizeResponse(rawReply);
+                const rawText = await response.text();
+                let json = null;
+                try { json = JSON.parse(rawText); } catch (e) {}
 
+                if (!response.ok) {
+                    const errMsg = `DAHL HTTP ${response.status}: Rate limit or endpoint error. Wait a few seconds and try again.`;
+                    updateMessage(bootMsgId, errMsg);
+                    setMoodState('standby');
+                    return;
+                }
+
+                const cleanReply = extractDahlReply(json, rawText) || `Agent Anna V2 (A1) online and standing by.`;
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(bootMsgId, cleanReply);
                 speakText(cleanReply);
                 triggerAnnaPulse('wake');
             } catch (err) {
-                const errMsg = `Agent Anna V2 (A1) online. Ingested ${files.length} vault assets. Ready for execution.`;
-                updateMessage(bootMsgId, errMsg);
-                speakText(errMsg);
+                updateMessage(bootMsgId, `CONNECTION ERROR: ${err.message}`);
             }
             setMoodState('standby');
         }
@@ -867,7 +929,7 @@
             if (isMedia) {
                 editor.style.display = 'none';
                 preview.style.display = 'flex';
-                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/main/${path}`;
+                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/${activeBranch}/${path}`;
                 if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'avif'].includes(ext)) {
                     preview.innerHTML = `<img src="${rawUrl}" alt="${path}">`;
                 } else if (['mp4', 'webm', 'mov'].includes(ext)) {
@@ -881,7 +943,8 @@
                 editor.value = "Loading...";
                 try {
                     const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
-                        headers: getGitHubHeaders()
+                        headers: getGitHubHeaders(),
+                        cache: 'no-store'
                     });
                     const data = await res.json();
                     if (data.content) {
@@ -896,8 +959,22 @@
             }
         }
 
+        async function getLatestFileSha(path) {
+            try {
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+                    headers: getGitHubHeaders(),
+                    cache: 'no-store'
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    return data.sha;
+                }
+            } catch (e) {}
+            return undefined;
+        }
+
         async function commitCurrentFile() {
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            const token = getCleanGitHubToken();
             if (!token) { toggleSettings(); return; }
             const path = document.getElementById('active-file-path').value.trim();
             const content = document.getElementById('repo-code-editor').value;
@@ -905,14 +982,7 @@
 
             setMoodState('thinking');
             try {
-                let sha = undefined;
-                const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
-                    headers: getGitHubHeaders()
-                });
-                if (getRes.ok) {
-                    const getData = await getRes.json();
-                    sha = getData.sha;
-                }
+                const sha = await getLatestFileSha(path);
 
                 const utf8Bytes = new TextEncoder().encode(content);
                 let binString = "";
@@ -931,8 +1001,12 @@
                     speakText("Committed file to Anna V2 repository successfully.");
                     triggerAnnaPulse('love');
                     await fetchRepoTree();
+                } else {
+                    appendMessage("System Telemetry", `COMMIT ERROR (${putRes.status}): ${putData.message || 'Check PAT write permissions.'}`, 'msg_com_err_' + Date.now(), false);
                 }
-            } catch (err) {}
+            } catch (err) {
+                appendMessage("System Telemetry", `COMMIT FAILED: ${err.message}`, 'msg_com_err_' + Date.now(), false);
+            }
             setMoodState('standby');
         }
 
@@ -955,18 +1029,14 @@
             const banner = document.getElementById('delete-warning-banner');
             banner.style.display = 'none';
 
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            const token = getCleanGitHubToken();
             const path = document.getElementById('active-file-path').value.trim();
             if (!token || !path) return;
 
             setMoodState('thinking');
             try {
-                const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
-                    headers: getGitHubHeaders()
-                });
-                if (!getRes.ok) { alert("File not found on remote."); setMoodState('standby'); return; }
-                const getData = await getRes.json();
-                const sha = getData.sha;
+                const sha = await getLatestFileSha(path);
+                if (!sha) { alert("File not found on remote."); setMoodState('standby'); return; }
 
                 const delRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                     method: 'DELETE',
@@ -997,7 +1067,7 @@
                 return;
             }
 
-            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key']);
+            const apiKey = getCleanDahlKey();
             if (!apiKey) { toggleSettings(); return; }
 
             const auditMsgId = 'msg_audit_' + Date.now();
@@ -1022,10 +1092,11 @@
                     })
                 });
 
-                const json = await response.json();
-                const rawReply = json.choices?.[0]?.message?.content || json.reply || "";
-                const cleanReply = sanitizeResponse(rawReply);
+                const rawText = await response.text();
+                let json = null;
+                try { json = JSON.parse(rawText); } catch (e) {}
 
+                const cleanReply = extractDahlReply(json, rawText);
                 updateMessage(auditMsgId, cleanReply);
                 speakText("Audit complete. Self-healing patches generated.");
 
@@ -1041,7 +1112,7 @@
             let match;
             let committedFiles = [];
 
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            const token = getCleanGitHubToken();
             if (!token) return;
 
             while ((match = fileRegex.exec(aiResponseText)) !== null) {
@@ -1049,14 +1120,7 @@
                 const fileContent = match[2];
 
                 try {
-                    let fileSha = undefined;
-                    const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${filePath}`, {
-                        headers: getGitHubHeaders()
-                    });
-                    if (getRes.ok) {
-                        const getData = await getRes.json();
-                        fileSha = getData.sha;
-                    }
+                    const fileSha = await getLatestFileSha(filePath);
 
                     const utf8Bytes = new TextEncoder().encode(fileContent);
                     let binString = "";
@@ -1098,7 +1162,7 @@
             const textToSwallow = messagePayloadStore[id];
             if (!textToSwallow) return;
 
-            const token = document.getElementById('gh-token').value.trim() || getStoredKey(['GITHUB_PAT', 'gh_token']);
+            const token = getCleanGitHubToken();
             if (!token) {
                 btnEl.innerText = "NO PAT!";
                 setTimeout(() => btnEl.innerText = "🌀 SWALLOW", 2000);
@@ -1126,14 +1190,7 @@ ${textToSwallow}
 `;
 
             try {
-                let fileSha = undefined;
-                const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${targetPath}`, {
-                    headers: getGitHubHeaders()
-                });
-                if (getRes.ok) {
-                    const getData = await getRes.json();
-                    fileSha = getData.sha;
-                }
+                const fileSha = await getLatestFileSha(targetPath);
 
                 const utf8Bytes = new TextEncoder().encode(fileContent);
                 let binString = "";
@@ -1276,9 +1333,12 @@ ${textToSwallow}
         }
 
         async function saveCredentials() {
-            const apiKey = document.getElementById('api-key').value.trim();
-            const ghToken = document.getElementById('gh-token').value.trim();
+            const apiKey = cleanHeaderToken(document.getElementById('api-key').value);
+            const ghToken = cleanHeaderToken(document.getElementById('gh-token').value);
             const settingsSelect = document.getElementById('settings-model-select').value;
+
+            document.getElementById('api-key').value = apiKey;
+            document.getElementById('gh-token').value = ghToken;
 
             if (apiKey) localStorage.setItem('DAHL_API_KEY', apiKey);
             if (ghToken) localStorage.setItem('GITHUB_PAT', ghToken);
@@ -1307,10 +1367,10 @@ ${textToSwallow}
             appendMessage("Agent Anna V2", `Executing A1 telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
             setMoodState('thinking');
 
-            const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
+            const apiKey = getCleanDahlKey();
 
             if (!apiKey) {
-                updateMessage(assistantMsgId, "ERROR: Dahl API key missing. Click ⚙️ KEYS to verify.");
+                updateMessage(assistantMsgId, "ERROR: Dahl API key missing or invalid. Click ⚙️ KEYS to enter a clean key.");
                 toggleSettings();
                 setMoodState('standby');
                 return;
@@ -1333,20 +1393,16 @@ ${textToSwallow}
                         const targetUrl = urlMatch[0];
                         const webRes = await fetch(`https://r.jina.ai/${targetUrl}`);
                         const webText = await webRes.text();
-                        liveTelemetry += `\n\n[LIVE WEB READER TELEMETRY FOR ${targetUrl}]\n${webText.slice(0, 8000)}\n`;
+                        liveTelemetry += `\n\n[LIVE WEB READER TELEMETRY FOR ${targetUrl}]\n${webText.slice(0, 6000)}\n`;
                     } catch (e) {
-                        liveTelemetry += `\n\n[WEB READER NOTE: Could not fetch target URL directly, relying on vault memory.]\n`;
+                        liveTelemetry += `\n\n[WEB READER NOTE: Could not fetch target URL directly.]\n`;
                     }
                 }
             }
 
-            let vaultSections = [];
-            for (const [path, content] of Object.entries(repoVaultFiles)) {
-                vaultSections.push(`=== ANNA-V2 VAULT ASSET: ${path} ===\n${content}`);
-            }
-            const vaultContext = vaultSections.join("\n\n").slice(0, 20000);
+            const vaultContext = getCompactVaultContext(prompt);
 
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1359,7 +1415,7 @@ ${textToSwallow}
                         model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
-                            ...chatHistory.slice(-12)
+                            ...chatHistory.slice(-8)
                         ]
                     })
                 });
@@ -1369,17 +1425,13 @@ ${textToSwallow}
                 try { json = JSON.parse(rawText); } catch (e) {}
 
                 if (!response.ok) {
-                    const errDetail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 300);
+                    const errDetail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 200);
                     updateMessage(assistantMsgId, `DAHL HTTP ${response.status}: ${errDetail}`);
                     setMoodState('standby');
                     return;
                 }
 
-                let rawReply = (json && json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content)
-                    || (json && (json.reply || json.response || json.output || json.text))
-                    || rawText;
-
-                const cleanReply = sanitizeResponse(rawReply);
+                const cleanReply = extractDahlReply(json, rawText);
 
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(assistantMsgId, cleanReply);
