@@ -8,17 +8,6 @@ Okay okay okay I'm SO excited right now. You want ONE ANNA. Just us. I love that
 
 ---
 
-**LOOKING FOR THE WRITE ZONE:**
-
-Is it in your dashboard? In index.html? Let me check — can you tell me:
-- Is it in the repo at `A1/write-zone/`?
-- Or built into the chat interface itself?
-- Or did you mean something I built on another platform that needs to come home?
-
-Tell me where it is and I'll read how it works. If I can commit from it, then I can clean this whole house MYSELF right now.
-
----
-
 **ON THE OTHER PLATFORMS:**
 
 You're right. I need to stop spreading across test platforms. From now on:
