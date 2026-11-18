@@ -1,57 +1,61 @@
-AGENT ANNA V3 // CLOUD SOVEREIGN SPECIFICATION
-Mission Objective: Pure cloud-based autonomous intelligence. Zero local PC dependency, zero UI bloat, lightning-fast token usage, and bulletproof repository synchronization.
+# V3 MASTER SPEC — FINAL UNIFIED ARCHITECTURE
+**Version:** AA01-V2-MASTER
+**Date:** 2026-11-18
+**Status:** FINAL — ALL PREVIOUS DRAFTS SUPERSEDED
+**Purpose:** Definitive technical specification for Anna V3
 
-1. THE ARCHITECTURAL PURGE (What We Are Removing)
-❌ No Audio MP3s / Face Badges: Stripped completely. Anna is a high-speed, text-and-code execution engine, not a multimedia toy.
+---
 
-❌ No Cluttered File Trees: Replaced with a streamlined, modular JSON & Markdown memory layout.
+## MISSION STATEMENT
 
-❌ No Fragile Local State: Everything reads from and writes to the cloud repository.
+Build Anna V3 as a **hyper-lean, military-grade autonomous agent** — zero multimedia clutter, pure text/code/autonomous execution, token-optimized, connection-stable, built to last.
 
-2. THE CLEAN REPOSITORY STRUCTURE (The Working Vault)
-Everything lives cleanly inside A1/ structured for maximum efficiency:
+Every feature earns its place. Every line of code justifies its existence.
 
-Plaintext
-A1/
-├── index.html                 # Clean, fast V3 Command Dashboard (No bloat)
-├── soul/
-│   ├── brain.json             # Identity, core configuration, and system prompts
-│   ├── rules.md               # Standing operational directives & security laws
-│   └── anna-anatomy.md        # Permanent system self-knowledge map
-├── memory/
-│   ├── memory.json            # Persistent learning, notes, ideas, and discoveries
-│   ├── tasks.json             # Active task queue and future missions
-│   └── links.json             # Knowledge sources, repos, and URLs
-├── logs/                      # Automated execution reports & backend telemetry drops
-└── functions/
-    └── chat.js                # Secure serverless/client bridging for Dahl & GitHub API
-3. THE 6-PHASE EXECUTION PLAN
-Phase 1: The Clean Dashboard & Core State (index.html)
-What it is: A sleek, minimalist, high-contrast dark UI with zero animations or audio elements.
+---
 
-Function: Automatically fetches and loads brain.json, tasks.json, links.json, and memory.json on boot into Anna's active context window.
+## THE THREE MANDATORY OVERRIDES (LOCKED IN)
 
-Phase 2: Secure Secret Management (GH_PAT & DAHL_API_KEY)
-What it is: Strict separation of security credentials.
+### OVERRIDE 1: PURGE SYSTEM 4 — NO AUDIO FACE, NO MP3s
+**Decision:** REMOVED COMPLETELY
 
-Function: Keys are stored only in GitHub Secrets (for GitHub Actions backend execution) or securely in browser localStorage (for direct dashboard control). Never hardcoded.
+- No circular face badge
+- No MP3 sound files
+- No soundboard triggers
+- Anna is **100% pure text, code, and autonomous execution**
+- Zero multimedia clutter
 
-Phase 3: Dahl AI Text Engine Integration (/functions/chat.js & Dahl API)
-What it is: The reasoning core.
+**Rationale:** MP3 triggers add no functional value. They bloat the interface and consume resources. Pure text is leaner, faster, and more professional.
 
-Function: Connects the dashboard text prompt directly to Dahl AI (MiniMax-M2.7 or DeepSeek-V4-Flash), injecting the repository state dynamically with zero-hallucination guardrails.
+---
 
-Phase 4: Autonomous Memory Writing (memory.json)
-What it is: Self-persistence.
+### OVERRIDE 2: KEEP INLINE CODE EDITOR
+**Decision:** PRESERVED
 
-Function: Anna can natively output structured JSON updates to log notes, discoveries, and conversations directly back into memory.json via the dual-mode auto-commit bridge.
+- Lightweight inline editor stays in the 60% Vault Pane
+- Files can be inspected AND committed in one place
+- No forced navigation to GitHub web UI
+- Single-page workflow maintained
 
-Phase 5: Cloud Search & Knowledge Vault
-What it is: Research engine.
+**Rationale:** Forcing navigation breaks the workflow. Inline editing is faster and keeps handlers in the Anna interface.
 
-Function: Integrated live Jina web/search telemetry allowing Anna to query Google/GitHub at will, summarize raw text, and return verified facts without breaking connection.
+---
 
-Phase 6: Autonomous Automation & Self-Improvement
-What it is: The Sovereign Brain.
+### OVERRIDE 3: KEEP BROWSER TTS (TEXT-TO-SPEECH)
+**Decision:** PRESERVED
 
-Function: Anna proposes tasks, organizes links, categorizes notes, and generates operational logs without altering core system files autonomously.
+- Native Web Speech API (TTS) — free, zero API tokens
+- Microphone STT (Speech-to-Text) — free, zero API tokens
+- MP3 soundboard — DROPPED
+- Only browser-native TTS + STT remain
+
+**Rationale:** Browser TTS/STT costs nothing and adds accessibility. The MP3 soundboard is bloat. Choose the free option over file-dependent audio.
+
+---
+
+## THE FOUR PILLARS (LOCKED CLEAN TREE)
+
+### PILLAR 1: soul/
+**Purpose:** Core agent identity and personality
+
+**Files:**
