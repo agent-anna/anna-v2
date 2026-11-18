@@ -704,7 +704,7 @@
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 24000);
 
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Review your ingested A1 vault assets and core rules below:\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), the ultimate self presistant self healing ANNA. the elite sovereign AI operating exclusively under Martin STRAYD inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Review your ingested A1 vault assets and core rules below:\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -717,7 +717,7 @@
                         model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "System boot initiated as Agent Anna V2 (A1). Confirm core memory ingestion and state absolute readiness." }
+                            { role: "user", content: "System boot initiated as Agent Anna V2 (A1). Confirm core memory ingestion & state absolute readiness." }
                         ]
                     })
                 });
@@ -1229,7 +1229,7 @@ ${textToSwallow}
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 20000);
 
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Martin Strayd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
