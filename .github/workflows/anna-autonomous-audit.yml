@@ -3,7 +3,23 @@ name: Agent Anna AA01 Autonomous Self-Audit
 on:
   schedule:
     - cron: '0 */12 * * *'
+  push:
+    paths:
+      - 'A1/vault/pending-commands.md'
   workflow_dispatch:
+    inputs:
+      command:
+        description: 'Direct command or live search directive for Agent Anna AA01'
+        required: false
+        default: 'Perform a rapid vault check and verify live telemetry.'
+      search_query:
+        description: 'Optional live web/DuckDuckGo search query to execute on server'
+        required: false
+        default: ''
+      target_log:
+        description: 'Optional output log filename inside A1/logs/'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -17,45 +33,109 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
 
-      - name: Run AA01 Sovereign Audit & Live API Sync
+      - name: Run AA01 Sovereign Audit & Live Telemetry Execution
         env:
           DAHL_API_KEY: ${{ secrets.DAHL_API_KEY }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          DISPATCH_COMMAND: ${{ github.event.inputs.command }}
+          SEARCH_QUERY: ${{ github.event.inputs.search_query }}
+          TARGET_LOG: ${{ github.event.inputs.target_log }}
         run: |
           node -e '
           const fs = require("fs");
+          const path = require("path");
+
+          async function fetchLiveTelemetry(queryText) {
+            let telemetry = [];
+
+            if (/btc|bitcoin|doge|dogecoin|crypto|price|market/i.test(queryText)) {
+              try {
+                const cg = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true");
+                if (cg.ok) {
+                  const data = await cg.json();
+                  telemetry.push(`[VERIFIED COINGECKO LIVE DATA @ ${new Date().toISOString()}]\nBTC: $${data.bitcoin.usd} (${data.bitcoin.usd_24h_change.toFixed(2)}%)\nDOGE: $${data.dogecoin.usd} (${data.dogecoin.usd_24h_change.toFixed(2)}%)`);
+                }
+              } catch (e) {}
+            }
+
+            const cleanQuery = (process.env.SEARCH_QUERY || queryText).trim();
+            if (cleanQuery) {
+              try {
+                const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(cleanQuery)}&format=json&no_html=1&skip_disambig=1`;
+                const ddgRes = await fetch(ddgUrl);
+                if (ddgRes.ok) {
+                  const ddg = await ddgRes.json();
+                  const snippets = [];
+                  if (ddg.AbstractText) snippets.push(`Summary: ${ddg.AbstractText} (${ddg.AbstractURL})`);
+                  if (Array.isArray(ddg.RelatedTopics)) {
+                    ddg.RelatedTopics.slice(0, 5).forEach(t => {
+                      if (t.Text) snippets.push(`- ${t.Text}`);
+                    });
+                  }
+                  if (snippets.length) {
+                    telemetry.push(`[VERIFIED DUCKDUCKGO API RESULTS FOR "${cleanQuery}"]\n${snippets.join("\n")}`);
+                  }
+                }
+              } catch (e) {}
+
+              try {
+                const jinaSearch = await fetch(`https://s.jina.ai/${encodeURIComponent(cleanQuery)}`, {
+                  headers: { "Accept": "text/plain" }
+                });
+                if (jinaSearch.ok) {
+                  const webResults = await jinaSearch.text();
+                  telemetry.push(`[VERIFIED LIVE WEB SEARCH RESULTS FOR "${cleanQuery}"]\n${webResults.slice(0, 5000)}`);
+                }
+              } catch (e) {}
+            }
+
+            return telemetry.join("\n\n");
+          }
 
           async function runAudit() {
             try {
-              console.log("AA01 Headless Audit Initializing with Live Dahl API inside A1 folder...");
+              console.log("AA01 Headless Executive Initializing inside A1...");
               const memoryPath = "A1/memory.json";
+              const pendingCmdPath = "A1/vault/pending-commands.md";
               let memory = {};
-              
+
               if (fs.existsSync(memoryPath)) {
                 try {
                   memory = JSON.parse(fs.readFileSync(memoryPath, "utf8"));
-                } catch (e) {
-                  console.log("Reinitializing malformed A1/memory.json structure.");
+                } catch (e) {}
+              }
+              if (!memory.self_audit_log) memory.self_audit_log = [];
+
+              let activeCommand = (process.env.DISPATCH_COMMAND || "").trim();
+              let commandSource = "workflow_dispatch";
+
+              if (!activeCommand && fs.existsSync(pendingCmdPath)) {
+                const fileCmd = fs.readFileSync(pendingCmdPath, "utf8").trim();
+                if (fileCmd && !fileCmd.startsWith("# IDLE")) {
+                  activeCommand = fileCmd;
+                  commandSource = "pending_commands_file";
                 }
               }
 
-              if (!memory.self_audit_log) {
-                memory.self_audit_log = [];
+              if (!activeCommand) {
+                activeCommand = "Confirm vault status and operational readiness based on core brain profile.";
+                commandSource = "scheduled_or_default_audit";
               }
 
-              let auditNote = "Scheduled GitHub Actions headless audit executed successfully.";
-              let apiSuccess = false;
-
               if (!process.env.DAHL_API_KEY) {
-                console.error("ERROR: DAHL_API_KEY secret is missing from GitHub environment variables!");
+                console.error("ERROR: DAHL_API_KEY secret is missing from GitHub environment!");
                 process.exit(1);
               }
 
-              // 60-second robust timeout window for live inference
+              const liveData = await fetchLiveTelemetry(activeCommand);
+              let auditNote = "Headless execution completed.";
+              let rawAiReply = "";
+              let apiSuccess = false;
+
               const controller = new AbortController();
               const timeoutId = setTimeout(() => controller.abort(), 60000);
 
               try {
-                console.log("Sending live payload to inference.dahl.global...");
                 const res = await fetch("https://inference.dahl.global/v1/chat/completions", {
                   method: "POST",
                   headers: {
@@ -65,8 +145,11 @@ jobs:
                   body: JSON.stringify({
                     model: "MiniMaxAI/MiniMax-M2.7",
                     messages: [
-                      { role: "system", content: "You are AGENT ANNA AA01 sovereign executive. Perform a rapid vault check and provide a 1-sentence status confirmation." },
-                      { role: "user", content: "Confirm vault status and operational readiness based on core brain profile." }
+                      {
+                        role: "system",
+                        content: `You are AGENT ANNA AA01 sovereign executive running headless on GitHub Actions. STRICT ZERO-HALLUCINATION RULE: Only report live numbers, prices, or search facts that appear explicitly in the VERIFIED TELEMETRY below. If data is missing, state so explicitly.\n\n${liveData}`
+                      },
+                      { role: "user", content: activeCommand }
                     ]
                   }),
                   signal: controller.signal
@@ -74,36 +157,42 @@ jobs:
                 clearTimeout(timeoutId);
 
                 const rawText = await res.text();
-                console.log("Dahl API HTTP Status:", res.status);
-
                 if (res.ok) {
                   const data = JSON.parse(rawText);
-                  const aiReply = data.choices?.[0]?.message?.content || "";
-                  if (aiReply) {
-                    auditNote = "Live Dahl API Verified: " + aiReply.trim().replace(/[\r\n]+/g, " ");
+                  rawAiReply = (data.choices?.[0]?.message?.content || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+                  if (rawAiReply) {
+                    auditNote = "Live Dahl API Verified: " + rawAiReply.replace(/[\r\n]+/g, " ").slice(0, 300);
                     apiSuccess = true;
-                    console.log("Successfully received live AI response from Dahl.");
                   }
                 } else {
-                  console.error("Dahl API Error Response:", rawText);
                   auditNote = `Dahl API Error [HTTP ${res.status}]: ${rawText.slice(0, 150)}`;
                 }
               } catch (apiErr) {
                 clearTimeout(timeoutId);
-                console.error("Dahl API Request Exception:", apiErr.message);
                 auditNote = "API Network Exception: " + apiErr.message;
               }
 
-              // Append audit log record to A1/memory.json
+              if (commandSource !== "scheduled_or_default_audit" && rawAiReply) {
+                fs.mkdirSync("A1/logs", { recursive: true });
+                const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+                const logName = process.env.TARGET_LOG ? path.basename(process.env.TARGET_LOG) : `aa01-exec-${stamp}.md`;
+                const fullLogPath = path.join("A1/logs", logName);
+                const logBody = `# AA01 HEADLESS EXECUTION REPORT\n- **Timestamp:** ${new Date().toISOString()}\n- **Source:** ${commandSource}\n- **Command:** ${activeCommand}\n\n## VERIFIED TELEMETRY USED\n${liveData || "None"}\n\n## OUTPUT\n${rawAiReply}\n`;
+                fs.writeFileSync(fullLogPath, logBody);
+              }
+
+              if (commandSource === "pending_commands_file") {
+                fs.writeFileSync(pendingCmdPath, `# IDLE - Last executed at ${new Date().toISOString()}\n`);
+              }
+
               memory.self_audit_log.push({
                 date: new Date().toISOString(),
-                action: "scheduled_github_audit_live",
+                action: commandSource,
                 status: apiSuccess ? "CLEAN_LIVE_API" : "FALLBACK_VERIFIED",
                 notes: auditNote
               });
 
               fs.writeFileSync(memoryPath, JSON.stringify(memory, null, 2) + "\n");
-              console.log("A1/memory.json updated successfully.");
               process.exit(0);
             } catch (err) {
               console.error("Critical Script Failure:", err.message);
@@ -114,13 +203,13 @@ jobs:
           runAudit();
           '
 
-      - name: Commit Verified AA01 Memory Back to Vault
+      - name: Commit Verified AA01 Memory & Logs Back to Vault
         run: |
           git config user.name "Agent Anna AA01"
           git config user.email "aa01@agent-anna.local"
-          git add A1/memory.json
+          git add A1/memory.json A1/logs/ A1/vault/
           if ! git diff --staged --quiet; then
-            git commit -m "AA01 Autonomous Self-Audit: A1 live api memory sync [201]"
+            git commit -m "AA01 Autonomous Execution: A1 live search & vault sync [201]"
             git push
           else
             echo "No changes to commit."
