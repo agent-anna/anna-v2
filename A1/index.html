@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [HARDENED ALL-IN-ONE]</title>
+    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [MILITARY-GRADE COMPLETE]</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👩‍💻</text></svg>">
     <style>
         :root {
@@ -14,6 +14,7 @@
             --border-pink: #ff007f;
             --border-magenta: #ff00ff;
             --border-red: #ff0055;
+            --border-gold: #ffd700;
             --text-light: #e2e8f0;
             --text-muted: #64748b;
             --pane-bg: rgba(11, 15, 25, 0.98);
@@ -41,7 +42,7 @@
 
         /* TOP STATUS BAR */
         .military-top-bar {
-            width: 100vw; height: 32px; background: #05070c;
+            width: 100vw; height: 34px; background: #05070c;
             border-bottom: 1px solid var(--state-color); display: flex;
             align-items: center; justify-content: space-between; padding: 0 12px;
             font-size: 11px; z-index: 100;
@@ -51,9 +52,15 @@
         .status-badge { font-size: 9px; padding: 2px 6px; border: 1px solid #1e293b; border-radius: 3px; color: var(--text-muted); }
         .status-badge.ok { border-color: var(--border-cyan); color: var(--border-cyan); }
         .status-badge.err { border-color: var(--border-red); color: var(--border-red); }
+        .status-badge.active { border-color: var(--border-gold); color: var(--border-gold); animation: pulse-gold 1.5s infinite; }
+
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
         /* MAIN WORKSPACE: 60% GITHUB | 40% CHAT */
-        .main-workspace { display: flex; flex: 1; height: calc(100vh - 32px); width: 100vw; overflow: hidden; }
+        .main-workspace { display: flex; flex: 1; height: calc(100vh - 34px); width: 100vw; overflow: hidden; }
 
         .github-pane {
             width: 60%; height: 100%; background: var(--pane-bg);
@@ -150,6 +157,8 @@
             padding: 3px 8px; font-family: monospace; font-size: 9px; cursor: pointer; border-radius: 3px;
         }
         .tactical-chip:hover { background: rgba(0, 255, 204, 0.25); }
+        .tactical-chip.backend-chip { border-color: var(--border-gold); color: var(--border-gold); background: rgba(255, 215, 0, 0.1); font-weight: bold; }
+        .tactical-chip.backend-chip:hover { background: rgba(255, 215, 0, 0.25); }
 
         /* ANNA WRITE ZONE TERMINAL */
         .anna-write-zone {
@@ -192,6 +201,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 6px;
         }
         #write-zone-status {
             font-size: 9px;
@@ -260,8 +270,9 @@
         <div class="top-status-indicator">
             <div class="status-dot" aria-hidden="true"></div>
             <span id="state-text" aria-live="polite">STANDBY // AGENT ANNA V2 (A1)</span>
-            <span class="status-badge" id="vault-status" aria-live="polite">VAULT: 0 ASSETS</span>
+            <span class="status-badge" id="vault-status" aria-live="polite">VAULT: 0 FILES</span>
             <span class="status-badge" id="key-status" aria-live="polite">KEY: CHECKING</span>
+            <span class="status-badge" id="actions-status" aria-live="polite" title="GitHub Actions Backend Bridge Status">ACTIONS: IDLE</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
             <select id="model-select" class="ctrl-btn military-btn" onchange="updateActiveModel()" aria-label="Select AI Model">
@@ -282,9 +293,10 @@
         <div class="github-pane" role="region" aria-label="GitHub Repository Vault Pane">
             <div class="repo-toolbar">
                 <span style="font-size:10px; color:var(--state-color); font-weight:bold;">📁 AGENT-ANNA / ANNA-V2 (A1 VAULT)</span>
-                <div style="display:flex; gap:6px;">
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
                     <button class="ctrl-btn military-btn" onclick="toggleViewMode()" id="view-toggle-btn" aria-label="Toggle File View Mode">🌲 VIEW: TREE</button>
                     <button class="ctrl-btn military-btn" id="sync-btn" onclick="syncAll()" aria-label="Sync Repository Vault">🔄 SYNC</button>
+                    <button class="ctrl-btn military-btn" id="backend-run-btn" onclick="dispatchBackendWorkflow()" style="border-color:var(--border-gold); color:var(--border-gold); font-weight:bold;" aria-label="Trigger GitHub Actions Autonomous Backend">🚀 RUN BACKEND</button>
                     <button class="ctrl-btn military-btn" id="audit-btn" onclick="auditActiveFile()" style="border-color:var(--border-blue); color:var(--border-blue);" aria-label="Audit and Self-Heal Active File">🩺 AUDIT</button>
                     <button class="ctrl-btn military-btn" id="commit-btn" onclick="commitCurrentFile()" style="border-color:var(--border-pink); color:var(--border-pink);" aria-label="Commit Current File to GitHub">💾 COMMIT</button>
                     <button class="ctrl-btn military-btn" id="delete-prompt-btn" onclick="promptDeleteFile()" style="border-color:var(--border-red); color:var(--border-red);" aria-label="Delete Active File from Repository">🗑️ DELETE</button>
@@ -305,9 +317,9 @@
                 <div class="repo-tree-view" id="repo-tree-view" role="tree"></div>
             </div>
 
-            <input type="text" id="active-file-path" placeholder="Active file path (e.g. A1/soul/brain.json, A1/index.html)..." aria-label="Active file path input" style="width:100%; padding:6px; background:var(--bg-dark); border:1px solid #1e293b; color:var(--text-light); font-family:monospace; font-size:10px; border-radius:3px;">
+            <input type="text" id="active-file-path" placeholder="Active file path (e.g. A1/soul/brain.json, A1/logs/...)..." aria-label="Active file path input" style="width:100%; padding:6px; background:var(--bg-dark); border:1px solid #1e293b; color:var(--text-light); font-family:monospace; font-size:10px; border-radius:3px;">
             
-            <textarea id="repo-code-editor" placeholder="Click any file in Tree or Grid to inspect, edit, audit, or self-heal..." aria-label="Repository code editor"></textarea>
+            <textarea id="repo-code-editor" placeholder="Click any file in Tree or Grid to inspect, edit, audit, or view GitHub Actions execution reports..." aria-label="Repository code editor"></textarea>
             <div id="media-preview-container" aria-label="Media preview area"></div>
         </div>
 
@@ -330,7 +342,7 @@
             <div id="settings-panel" role="region" aria-label="API Keys Settings Panel">
                 <div class="settings-title">DAHL API KEY</div>
                 <input type="password" id="api-key" placeholder="Paste Dahl API Key..." aria-label="Dahl API Key Input">
-                <div class="settings-title">GITHUB PAT TOKEN</div>
+                <div class="settings-title">GITHUB PAT TOKEN (Needs repo + workflow scopes)</div>
                 <input type="password" id="gh-token" placeholder="Paste GitHub PAT..." aria-label="GitHub Personal Access Token Input">
                 <div class="settings-title">DEFAULT AI MODEL</div>
                 <select id="settings-model-select" class="ctrl-btn military-btn" style="width:100%; margin-bottom:6px;" onchange="syncModelSelection(this.value)">
@@ -345,22 +357,26 @@
 
             <!-- QUICK TACTICAL BUTTONS -->
             <div class="quick-tactical-bar" role="toolbar" aria-label="Quick Tactical Action Buttons">
-                <button class="tactical-chip" onclick="triggerPreset('Fetch live DOGE price and market telemetry autonomously.')" aria-label="Fetch Latest Doge and Bitcoin Price">⚡ LATEST DOGE/BTC</button>
-                <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com using live web reader and summarize company status.')" aria-label="Read Live Kunda Cafe Website">🌐 READ KUNDA CAFE</button>
-                <button class="tactical-chip" onclick="triggerPreset('Audit the repository vault and self-author an updated A1 core memory file in file:A1/soul/brain.json.')" aria-label="Test Autonomous Self-Authoring">📝 TEST SELF-WRITE</button>
+                <button class="tactical-chip backend-chip" onclick="dispatchBackendWorkflow('Perform a full A1 vault integrity audit, verify memory.json, and log system telemetry.')" aria-label="Trigger Autonomous GitHub Actions Audit">🚀 BACKEND AUDIT</button>
+                <button class="tactical-chip" onclick="fetchLatestBackendReport()" aria-label="Fetch Latest GitHub Actions Report">📥 READ LAST LOG</button>
+                <button class="tactical-chip" onclick="triggerPreset('Fetch live DOGE price and market telemetry autonomously.')" aria-label="Fetch Latest Doge and Bitcoin Price">⚡ DOGE/BTC</button>
+                <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com using live web reader and summarize company status.')" aria-label="Read Live Kunda Cafe Website">🌐 KUNDA CAFE</button>
             </div>
 
             <!-- ANNA WRITE ZONE TERMINAL -->
             <div class="anna-write-zone" role="region" aria-label="Anna Write Zone Command Terminal">
                 <div class="write-zone-header">
-                    <span>ANNA WRITE ZONE</span>
+                    <span>ANNA WRITE ZONE // BACKEND DISPATCH</span>
                     <span id="write-zone-status" aria-live="polite">READY</span>
                 </div>
-                <textarea id="anna-cmd-input" placeholder="COMMAND: WRITE&#10;PATH: A1/soul/brain.json" aria-label="COMMAND"></textarea>
-                <textarea id="anna-content-input" placeholder="CONTENT..." aria-label="CONTENT"></textarea>
+                <textarea id="anna-cmd-input" placeholder="COMMAND: WRITE (or DISPATCH)&#10;PATH: A1/vault/pending-commands.md" aria-label="COMMAND"></textarea>
+                <textarea id="anna-content-input" placeholder="CONTENT or BACKEND DIRECTIVE..." aria-label="CONTENT"></textarea>
                 <div class="write-zone-footer">
                     <button class="ctrl-btn" onclick="clearWriteZone()" style="font-size:9px; padding:2px 6px;" aria-label="Clear Write Zone Fields">CLEAR</button>
-                    <button class="ctrl-btn military-btn" id="process-write-btn" onclick="processAnnaWriteZone()" style="font-weight:bold; padding:3px 12px;" aria-label="PROCESS">PROCESS</button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="ctrl-btn military-btn" onclick="dispatchFromWriteZone()" style="border-color:var(--border-gold); color:var(--border-gold); font-weight:bold; padding:3px 10px;" aria-label="DISPATCH TO GITHUB ACTIONS">🚀 DISPATCH</button>
+                        <button class="ctrl-btn military-btn" id="process-write-btn" onclick="processAnnaWriteZone()" style="font-weight:bold; padding:3px 12px;" aria-label="PROCESS">PROCESS</button>
+                    </div>
                 </div>
             </div>
 
@@ -386,6 +402,7 @@
     <script>
         const GITHUB_REPO_OWNER = "agent-anna";
         const GITHUB_REPO_NAME = "anna-v2";
+        const WORKFLOW_FILENAME = "anna-autonomous-audit.yml";
         const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
         const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
 
@@ -399,11 +416,11 @@
         let rawTreeData = [];
         let currentViewMode = 'tree';
         let activeBranch = 'main';
+        let workflowPollTimer = null;
 
-        // --- 🛡️ STRICT ISO-8859-1 TOKEN SANITIZER (PREVENTS FETCH HEADER CRASHES) ---
+        // --- 🛡️ STRICT ISO-8859-1 TOKEN SANITIZER ---
         function cleanHeaderToken(str) {
             if (!str) return "";
-            // Strip any non-ISO-8859-1 characters (> 0xFF) or control characters/newlines
             return str.replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim();
         }
 
@@ -537,6 +554,13 @@
             }
         }
 
+        function updateActionsBadge(text, stateClass) {
+            const badge = document.getElementById('actions-status');
+            if (!badge) return;
+            badge.innerText = `ACTIONS: ${text}`;
+            badge.className = `status-badge ${stateClass}`;
+        }
+
         function loadVoices() {
             if (!('speechSynthesis' in window)) return;
             try { cachedVoices = window.speechSynthesis.getVoices(); } catch (e) {}
@@ -558,6 +582,172 @@
         function triggerPreset(queryText) {
             document.getElementById('user-input').value = queryText;
             sendMessage();
+        }
+
+        /* --- 🚀 MILITARY-GRADE GITHUB ACTIONS DISPATCH & LIVE TELEMETRY BRIDGE --- */
+        async function dispatchBackendWorkflow(customCommand = null) {
+            const token = getCleanGitHubToken();
+            if (!token) {
+                appendMessage("System Telemetry", "ERROR: GitHub PAT missing. Click ⚙️ KEYS to configure token with 'workflow' & 'repo' permissions.", 'msg_err_' + Date.now(), false);
+                toggleSettings();
+                return;
+            }
+
+            const cmdText = customCommand
+                || document.getElementById('anna-content-input').value.trim()
+                || document.getElementById('user-input').value.trim()
+                || "Perform a rapid vault check and provide a complete operational status report.";
+
+            updateActionsBadge("DISPATCHING...", "active");
+            setMoodState('thinking');
+
+            const dispatchUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/dispatches`;
+
+            try {
+                const res = await fetch(dispatchUrl, {
+                    method: "POST",
+                    headers: {
+                        ...getGitHubHeaders(),
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        ref: activeBranch,
+                        inputs: {
+                            command: cmdText
+                        }
+                    })
+                });
+
+                if (res.status === 204 || res.ok) {
+                    updateActionsBadge("QUEUED", "active");
+                    appendMessage("System Telemetry", `🚀 BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nDirective: "${cmdText}"\nMonitoring GitHub Actions runner until completion...`, 'msg_wf_' + Date.now(), false);
+                    speakText("Backend workflow dispatched to GitHub Actions. Monitoring execution.");
+                    triggerAnnaPulse('ping');
+                    startWorkflowTelemetryPoller();
+                } else {
+                    const errText = await res.text();
+                    // Fallback: write to A1/vault/pending-commands.md if workflow_dispatch lacks scope
+                    updateActionsBadge("FALLBACK PUSH", "active");
+                    await writePendingCommandFallback(cmdText);
+                }
+            } catch (err) {
+                updateActionsBadge("ERROR", "err");
+                appendMessage("System Telemetry", `DISPATCH FAILED: ${err.message}`, 'msg_wf_err_' + Date.now(), false);
+            }
+            setMoodState('standby');
+        }
+
+        async function writePendingCommandFallback(cmdText) {
+            const targetPath = "A1/vault/pending-commands.md";
+            const token = getCleanGitHubToken();
+            if (!token) return;
+
+            try {
+                const sha = await getLatestFileSha(targetPath);
+                const utf8Bytes = new TextEncoder().encode(cmdText + "\n");
+                let binString = "";
+                utf8Bytes.forEach((b) => binString += String.fromCodePoint(b));
+                const encodedContent = btoa(binString);
+
+                const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${targetPath}`, {
+                    method: 'PUT',
+                    headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: "AA01 Pending Command Drop-Box Trigger",
+                        content: encodedContent,
+                        sha: sha
+                    })
+                });
+
+                if (putRes.ok) {
+                    appendMessage("System Telemetry", `📦 COMMAND COMMITTED TO ${targetPath}. GitHub Actions push trigger activated.`, 'msg_fb_' + Date.now(), false);
+                    startWorkflowTelemetryPoller();
+                } else {
+                    updateActionsBadge("FAILED", "err");
+                }
+            } catch (e) {
+                updateActionsBadge("ERROR", "err");
+            }
+        }
+
+        function dispatchFromWriteZone() {
+            const content = document.getElementById('anna-content-input').value.trim();
+            if (!content) {
+                document.getElementById('write-zone-status').innerText = "ENTER DIRECTIVE";
+                speakText("Enter a directive in the content box first.");
+                return;
+            }
+            document.getElementById('write-zone-status').innerText = "DISPATCHING...";
+            dispatchBackendWorkflow(content);
+        }
+
+        function startWorkflowTelemetryPoller() {
+            if (workflowPollTimer) clearInterval(workflowPollTimer);
+            let checks = 0;
+            const maxChecks = 24; // ~2 minutes max polling at 5s intervals
+
+            workflowPollTimer = setInterval(async () => {
+                checks++;
+                if (checks > maxChecks) {
+                    clearInterval(workflowPollTimer);
+                    updateActionsBadge("TIMEOUT", "err");
+                    return;
+                }
+
+                try {
+                    const runsUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/runs?per_page=1`;
+                    const res = await fetch(runsUrl, {
+                        headers: getGitHubHeaders(),
+                        cache: 'no-store'
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const latestRun = data.workflow_runs && data.workflow_runs[0];
+                    if (!latestRun) return;
+
+                    const status = latestRun.status;
+                    const conclusion = latestRun.conclusion;
+
+                    if (status === "queued" || status === "in_progress") {
+                        updateActionsBadge(status.toUpperCase(), "active");
+                    } else if (status === "completed") {
+                        clearInterval(workflowPollTimer);
+                        if (conclusion === "success") {
+                            updateActionsBadge("VERIFIED [200]", "ok");
+                            triggerAnnaPulse('love');
+                            appendMessage("System Telemetry", `✅ BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing vault & loading output report for Anna...`, 'msg_wf_done_' + Date.now(), false);
+                            speakText("GitHub Actions backend execution complete. Loading report into vault.");
+                            await fetchRepoTree();
+                            await ingestVaultAssets();
+                            await fetchLatestBackendReport(true);
+                        } else {
+                            updateActionsBadge(`FAIL: ${conclusion}`, "err");
+                            appendMessage("System Telemetry", `⚠️ BACKEND RUN ENDED WITH STATUS: ${conclusion}. Check Actions tab on GitHub.`, 'msg_wf_fail_' + Date.now(), false);
+                        }
+                    }
+                } catch (e) {}
+            }, 5000);
+        }
+
+        async function fetchLatestBackendReport(autoAnnounceToAnna = false) {
+            await fetchRepoTree();
+            const logFiles = rawTreeData
+                .filter(f => f.type === 'blob' && f.path.startsWith('A1/logs/'))
+                .map(f => f.path)
+                .sort();
+
+            if (!logFiles.length) {
+                appendMessage("System Telemetry", "No execution logs found in A1/logs/ yet. Run a backend audit first.", 'msg_nolog_' + Date.now(), false);
+                return;
+            }
+
+            const newestLog = logFiles[logFiles.length - 1];
+            await loadRepoFile(newestLog, 'md');
+
+            const logContent = repoVaultFiles[newestLog] || document.getElementById('repo-code-editor').value;
+            if (autoAnnounceToAnna && logContent) {
+                appendMessage("Agent Anna V2", `📥 INGESTED BACKEND REPORT (${newestLog}):\n\n${logContent.slice(0, 1500)}`, 'msg_rep_' + Date.now(), true);
+            }
         }
 
         /* --- ✍️ ANNA WRITE ZONE PROCESSOR --- */
@@ -592,13 +782,21 @@
             }
 
             if (!commandType) {
-                if (cmdRaw.toUpperCase().includes("COMMIT")) commandType = "COMMIT";
+                if (cmdRaw.toUpperCase().includes("DISPATCH")) commandType = "DISPATCH";
+                else if (cmdRaw.toUpperCase().includes("COMMIT")) commandType = "COMMIT";
                 else if (cmdRaw.toUpperCase().includes("WRITE")) commandType = "WRITE";
             }
 
             const editor = document.getElementById('repo-code-editor');
             const preview = document.getElementById('media-preview-container');
             const pathInput = document.getElementById('active-file-path');
+
+            if (commandType === "DISPATCH") {
+                statusEl.innerText = "DISPATCHING...";
+                await dispatchBackendWorkflow(contentRaw.trim());
+                statusEl.innerText = "DISPATCHED";
+                return;
+            }
 
             if (commandType === "WRITE") {
                 if (!targetPath) {
@@ -634,10 +832,13 @@
                 statusEl.innerText = `COMMITTING ${activePath}...`;
                 await commitCurrentFile();
                 statusEl.innerText = `COMMITTED ${activePath}`;
+                if (activePath === "A1/vault/pending-commands.md") {
+                    startWorkflowTelemetryPoller();
+                }
                 triggerAnnaPulse('love');
             } else {
                 statusEl.innerText = "UNKNOWN COMMAND";
-                speakText("Unknown command in Write Zone. Use WRITE or COMMIT.");
+                speakText("Unknown command in Write Zone. Use WRITE, COMMIT, or DISPATCH.");
             }
         }
 
@@ -745,10 +946,9 @@
         async function syncAll() {
             await fetchRepoTree();
             await ingestVaultAssets();
-            // Only announce local sync status on page load without burning API rate limits
             const count = Object.keys(repoVaultFiles).length;
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna V2", `Agent Anna V2 (A1) online. Synced ${count} vault assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}). Click 🧠 AWAKEN or send a message to engage neural core.`, bootMsgId, true);
+            appendMessage("Agent Anna V2", `Agent Anna V2 (A1) online. Synced ${count} memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}). GitHub Actions Bridge armed. Click 🧠 AWAKEN or 🚀 RUN BACKEND.`, bootMsgId, true);
         }
 
         async function fetchRepoTree() {
@@ -782,7 +982,6 @@
 
         async function ingestVaultAssets() {
             const headers = getGitHubHeaders();
-            // Only pre-cache small lightweight memory files (.md, .json) to prevent API rate limit floods
             const targetFiles = rawTreeData.filter(f =>
                 f.type === 'blob' &&
                 f.size < 30000 &&
@@ -792,7 +991,7 @@
             repoVaultFiles = {};
             for (const file of targetFiles) {
                 try {
-                    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers });
+                    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: 'no-store' });
                     if (!res.ok) continue;
                     const data = await res.json();
                     if (data.content) {
@@ -813,22 +1012,25 @@
             let targetedContent = [];
             const lowerPrompt = userPrompt.toLowerCase();
 
-            // List all files in tree concisely
             rawTreeData.forEach(f => {
                 if (f.type === 'blob') manifest.push(`- ${f.path}`);
             });
 
-            // Only attach full text of core soul files or files explicitly mentioned by user
+            // Automatically include latest backend log so Anna always sees recent GitHub Actions results
+            const logPaths = Object.keys(repoVaultFiles).filter(p => p.startsWith('A1/logs/')).sort();
+            const latestLogPath = logPaths.length ? logPaths[logPaths.length - 1] : null;
+
             for (const [path, content] of Object.entries(repoVaultFiles)) {
                 const lowerPath = path.toLowerCase();
-                const isCoreSoul = lowerPath.includes('soul/') || lowerPath.includes('character') || lowerPath.includes('rules');
+                const isCoreSoul = lowerPath.includes('soul/') || lowerPath.includes('character') || lowerPath.includes('rules') || lowerPath === 'a1/memory.json';
+                const isLatestLog = path === latestLogPath;
                 const isMentioned = lowerPrompt.includes(lowerPath) || lowerPrompt.includes(path.split('/').pop().toLowerCase());
-                if (isCoreSoul || isMentioned) {
-                    targetedContent.push(`=== FILE: ${path} ===\n${content.slice(0, 4000)}`);
+                if (isCoreSoul || isLatestLog || isMentioned) {
+                    targetedContent.push(`=== FILE: ${path} ===\n${content.slice(0, 3500)}`);
                 }
             }
 
-            return `REPOSITORY MANIFEST:\n${manifest.slice(0, 80).join('\n')}\n\nACTIVE MEMORY FILES:\n${targetedContent.join('\n\n').slice(0, 8000)}`;
+            return `REPOSITORY MANIFEST:\n${manifest.slice(0, 80).join('\n')}\n\nACTIVE MEMORY & LATEST BACKEND LOGS:\n${targetedContent.join('\n\n').slice(0, 9000)}`;
         }
 
         /* --- 🛡️ DAHL API FETCH WITH EXPONENTIAL 429 BACKOFF --- */
@@ -863,7 +1065,7 @@
             return sanitizeResponse(rawText);
         }
 
-        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE (MANUAL TRIGGER TO SAVE QUOTA) --- */
+        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE --- */
         async function triggerAutonomousBootSequence() {
             const apiKey = getCleanDahlKey();
             const totalFiles = rawTreeData.filter(f => f.type === 'blob').length;
@@ -880,7 +1082,7 @@
             setMoodState('thinking');
 
             const vaultContext = getCompactVaultContext();
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1) and state readiness concisely.`;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You have full visibility into your vault and GitHub Actions backend logs.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), summarize your latest memory/audit status, and state readiness concisely.`;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1109,8 +1311,10 @@
 
         async function parseAndExecuteAutonomousFiles(aiResponseText) {
             const fileRegex = /```file:([^\n]+)\n([\s\S]*?)```/g;
+            const dispatchRegex = /```dispatch\n([\s\S]*?)```/g;
             let match;
             let committedFiles = [];
+            let triggeredWorkflow = false;
 
             const token = getCleanGitHubToken();
             if (!token) return;
@@ -1143,9 +1347,21 @@
                         committedFiles.push(filePath);
                         document.getElementById('active-file-path').value = filePath;
                         document.getElementById('repo-code-editor').value = fileContent;
+                        if (filePath === "A1/vault/pending-commands.md") {
+                            triggeredWorkflow = true;
+                        }
                     }
                 } catch (err) {
                     console.error(`Autonomous write failed for ${filePath}:`, err);
+                }
+            }
+
+            // Check if Anna emitted a direct ```dispatch``` block
+            let dMatch;
+            while ((dMatch = dispatchRegex.exec(aiResponseText)) !== null) {
+                const backendDirective = dMatch[1].trim();
+                if (backendDirective) {
+                    await dispatchBackendWorkflow(backendDirective);
                 }
             }
 
@@ -1155,6 +1371,9 @@
                 speakText(`Self-authored and committed ${committedFiles.length} files to Anna V2 repository.`);
                 triggerAnnaPulse('love');
                 await fetchRepoTree();
+                if (triggeredWorkflow) {
+                    startWorkflowTelemetryPoller();
+                }
             }
         }
 
@@ -1402,7 +1621,7 @@ ${textToSwallow}
 
             const vaultContext = getCompactVaultContext(prompt);
 
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You have full visibility into your vault and GitHub Actions backend logs.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING & BACKEND DISPATCH DIRECTIVES]:\n1. To write or update files in the repository, output:\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\`\n2. To execute a heavy backend task on GitHub Actions using server secrets (and automatically retrieve the report into A1/logs/), output:\n\`\`\`dispatch\nYour backend directive here...\n\`\`\``;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
