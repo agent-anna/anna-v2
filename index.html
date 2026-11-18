@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [WRITE ZONE INTEGRATED]</title>
+    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [ALL-IN-ONE MILITARY GRADE]</title>
     <style>
         :root {
             --bg-dark: #05070c;
@@ -215,7 +215,7 @@
     <div class="military-top-bar" role="region" aria-label="System Status Bar">
         <div class="top-status-indicator">
             <div class="status-dot" aria-hidden="true"></div>
-            <span id="state-text" aria-live="polite">STANDBY // ANNA V2 (A1)</span>
+            <span id="state-text" aria-live="polite">STANDBY // AGENT ANNA V2 (A1)</span>
             <span class="status-badge" id="vault-status" aria-live="polite">VAULT: 0 ASSETS</span>
             <span class="status-badge" id="key-status" aria-live="polite">KEY: CHECKING</span>
         </div>
@@ -270,7 +270,7 @@
         <!-- RIGHT 40%: AGENT ANNA + DAHL API CONSOLE -->
         <div class="chat-pane" role="region" aria-label="Agent Anna V2 Chat Console">
             <div class="chat-header">
-                <span>CONSOLE [ANNA V2 // A1 SOVEREIGN CORE]</span>
+                <span>CONSOLE [AGENT ANNA V2 // A1 SOVEREIGN CORE]</span>
                 <button class="ctrl-btn" id="clear-logs-btn" onclick="clearLogs()" aria-label="Clear Chat Logs">🧹 CLEAR</button>
             </div>
 
@@ -324,7 +324,7 @@
 
     <script>
         const GITHUB_REPO_OWNER = "agent-anna";
-        const GITHUB_REPO_NAME = "anna-v2/A1";
+        const GITHUB_REPO_NAME = "anna-v2";
         const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
         const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
 
@@ -616,17 +616,26 @@
 
         async function fetchRepoTree() {
             setMoodState('thinking');
-            try {
-                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/main?recursive=1`, {
-                    headers: getGitHubHeaders()
-                });
-                const data = await res.json();
-                if (data.tree) {
-                    rawTreeData = data.tree;
-                    if (currentViewMode === 'tree') renderTreeView();
-                    else renderGridView();
-                }
-            } catch (err) {}
+            const branches = ['main', 'master'];
+            let data = null;
+
+            for (const branch of branches) {
+                try {
+                    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${branch}?recursive=1`, {
+                        headers: getGitHubHeaders()
+                    });
+                    if (res.ok) {
+                        data = await res.json();
+                        break;
+                    }
+                } catch (err) {}
+            }
+
+            if (data && data.tree) {
+                rawTreeData = data.tree;
+                if (currentViewMode === 'tree') renderTreeView();
+                else renderGridView();
+            }
             setMoodState('standby');
         }
 
@@ -704,7 +713,7 @@
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 24000);
 
-            const systemPrompt = `You are AGENT ANNA V2 (A1), the ultimate self presistant self healing ANNA. the elite sovereign AI operating exclusively under Martin STRAYD inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Review your ingested A1 vault assets and core rules below:\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Review your ingested A1 vault assets and core rules below:\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -717,7 +726,7 @@
                         model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "System boot initiated as Agent Anna V2 (A1). Confirm core memory ingestion & state absolute readiness." }
+                            { role: "user", content: "System boot initiated as Agent Anna V2 (A1). Confirm core memory ingestion and state absolute readiness." }
                         ]
                     })
                 });
@@ -1229,7 +1238,7 @@ ${textToSwallow}
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 20000);
 
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Martin Strayd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
