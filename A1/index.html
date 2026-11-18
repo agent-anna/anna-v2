@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [MP3 FACIAL AUDIO + RESILIENT TELEMETRY]</title>
+    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [ALL-IN-ONE MILITARY GRADE]</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👩‍💻</text></svg>">
     <style>
         :root {
@@ -208,7 +208,7 @@
             color: var(--text-muted);
         }
 
-        /* SAFE ANNA FACE DISPLAY (Top-right header badge, never overlaps SEND button) */
+        /* SAFE ANNA FACE DISPLAY (Top-right header badge) */
         #anna-face-display {
             position: absolute;
             top: 4px;
@@ -327,8 +327,8 @@
         <!-- RIGHT 40%: AGENT ANNA + DAHL API CONSOLE -->
         <div class="chat-pane" role="region" aria-label="Agent Anna V2 Chat Console">
             
-            <!-- ANNA FACE DISPLAY (WIRED TO MP3s IN A1/face/) -->
-            <div id="anna-face-display" title="AGENT ANNA V2 — Online" onclick="annaLove()">
+            <!-- ANNA FACE DISPLAY (WIRED TO ABSOLUTE RAW MP3s) -->
+            <div id="anna-face-display" title="AGENT ANNA V2 — Click to play audio face" onclick="annaLove()">
                 <div style="text-align:center;">
                     <div style="font-size:14px;">👩‍💻</div>
                     <div id="anna-face-label" style="font-size:7px; color:#ff69b4;">❤️ LOVE</div>
@@ -392,13 +392,13 @@
 
     </div>
 
-    <!-- ANNA AUDIO NOTIFICATION PANEL (WIRED DIRECTLY TO A1/face/ MP3s) -->
+    <!-- ANNA AUDIO NOTIFICATION PANEL (ABSOLUTE RAW GITHUB URLS) -->
     <div id="anna-audio-panel" style="display:none;">
-        <audio id="anna-wake-sound" preload="auto"><source src="A1/face/wake-up.mp3" type="audio/mpeg"></audio>
-        <audio id="anna-ping-sound" preload="auto"><source src="A1/face/wait-a-moment.mp3" type="audio/mpeg"></audio>
-        <audio id="anna-love-sound" preload="auto"><source src="A1/face/love-you.mp3" type="audio/mpeg"></audio>
-        <audio id="anna-sleep-sound" preload="auto"><source src="A1/face/female-sigh.mp3" type="audio/mpeg"></audio>
-        <audio id="anna-heartbeat-sound" preload="auto"><source src="A1/face/i-heard-something-in-the-dark.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-wake-sound" preload="auto"><source src="https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/face/wake-up.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-ping-sound" preload="auto"><source src="https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/face/wait-a-moment.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-love-sound" preload="auto"><source src="https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/face/love-you.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-sleep-sound" preload="auto"><source src="https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/face/female-sigh.mp3" type="audio/mpeg"></audio>
+        <audio id="anna-heartbeat-sound" preload="auto"><source src="https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/face/i-heard-something-in-the-dark.mp3" type="audio/mpeg"></audio>
     </div>
 
     <script>
@@ -420,7 +420,6 @@
         let activeBranch = 'main';
         let workflowPollTimer = null;
 
-        // --- 🛡️ STRICT ISO-8859-1 TOKEN SANITIZER ---
         function cleanHeaderToken(str) {
             if (!str) return "";
             return str.replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim();
@@ -444,7 +443,6 @@
             return cleanHeaderToken(raw);
         }
 
-        // --- 👩‍💻 ANNA MP3 AUDIO NOTIFICATION & STATE SYSTEM ---
         window.annaState = { online: true, lastPulse: null, loveMeter: 0 };
 
         function triggerAnnaPulse(type, labelText = "LOVE") {
@@ -461,9 +459,12 @@
         }
 
         function playAnnaSound(type) {
-            const audioEl = document.getElementById(`anna-${type}-sound`) || document.getElementById('anna-ping-sound');
+            const audioEl = document.getElementById(`anna-${type}-sound`) || document.getElementById('anna-love-sound') || document.getElementById('anna-ping-sound');
             if (audioEl) {
-                try { audioEl.currentTime = 0; audioEl.play().catch(() => {}); } catch(e) {}
+                try {
+                    audioEl.currentTime = 0;
+                    audioEl.play().catch(e => console.log("Audio autoplay prevented or missing:", e));
+                } catch(e) {}
             }
         }
 
@@ -573,7 +574,6 @@
             sendMessage();
         }
 
-        /* --- 🦆🌐 RESILIENT TELEMETRY ENGINE (CORS-SAFE FALLBACKS) --- */
         async function fetchLiveWebAndMarketTelemetry(prompt) {
             let telemetryBlocks = [];
             const lower = prompt.toLowerCase();
@@ -617,14 +617,13 @@
                         }
                     }
                 } catch (e) {
-                    telemetryBlocks.push(`[NOTE: Browser CORS prevented direct public SERP search. Use 🚀 RUN BACKEND for server-side DuckDuckGo execution.]`);
+                    telemetryBlocks.push(`[NOTE: Browser CORS prevented direct public SERP search. Use 🚀 RUN BACKEND for server-side execution.]`);
                 }
             }
 
             return telemetryBlocks.length > 0 ? "\n\n" + telemetryBlocks.join("\n\n") : "";
         }
 
-        /* --- 🚀 MILITARY-GRADE GITHUB ACTIONS DISPATCH & LIVE TELEMETRY BRIDGE --- */
         async function dispatchBackendWorkflow(customCommand = null, customSearchQuery = "") {
             const token = getCleanGitHubToken();
             if (!token) {
@@ -791,7 +790,6 @@
             }
         }
 
-        /* --- ✍️ ANNA WRITE ZONE PROCESSOR --- */
         function clearWriteZone() {
             document.getElementById('anna-cmd-input').value = "";
             document.getElementById('anna-content-input').value = "";
@@ -989,7 +987,7 @@
             await ingestVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna V2", `Agent Anna V2 (A1) online. Synced ${count} memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}). MP3 Audio Face wired from A1/face/ + GitHub Actions Bridge armed.`, bootMsgId, true);
+            appendMessage("Agent Anna V2", `Agent Anna V2 (A1) online. Synced ${count} memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}). MP3 Audio Face wired via absolute raw GitHub URLs + GitHub Actions Bridge armed.`, bootMsgId, true);
         }
 
         async function fetchRepoTree() {
@@ -1073,7 +1071,6 @@
             return `REPOSITORY MANIFEST:\n${manifest.slice(0, 80).join('\n')}\n\nACTIVE MEMORY & LATEST BACKEND LOGS:\n${targetedContent.join('\n\n').slice(0, 9000)}`;
         }
 
-        /* --- 🛡️ DAHL API FETCH WITH EXPONENTIAL 429 BACKOFF --- */
         async function fetchDahlWithAutoRetry(url, options, maxRetries = 4) {
             for (let attempt = 0; attempt < maxRetries; attempt++) {
                 const response = await fetch(url, options);
@@ -1105,7 +1102,6 @@
             return sanitizeResponse(rawText);
         }
 
-        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE --- */
         async function triggerAutonomousBootSequence() {
             const apiKey = getCleanDahlKey();
             const totalFiles = rawTreeData.filter(f => f.type === 'blob').length;
@@ -1122,7 +1118,7 @@
             setMoodState('thinking');
 
             const vaultContext = getCompactVaultContext();
-            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You have real MP3 audio face files in A1/face/, live Jina/DuckDuckGo telemetry, and GitHub Actions backend dispatch.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), confirm zero-hallucination protocol, and state readiness concisely.`;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You have real MP3 audio face files in A1/face/, live Jina telemetry, and GitHub Actions backend dispatch.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), confirm zero-hallucination protocol, and state readiness concisely.`;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1739,7 +1735,7 @@ Your backend directive here...
         }
 
         function deleteMessage(id) { const el = document.getElementById(id); if (el) el.remove(); delete messagePayloadStore[id]; }
-        function clearLogs() { document.getElementById('chat-container'].innerHTML = ''; messagePayloadStore = {}; chatHistory = []; }
+        function clearLogs() { document.getElementById('chat-container').innerHTML = ''; messagePayloadStore = {}; chatHistory = []; }
         function speakStoredMessage(id) { if (messagePayloadStore[id]) speakText(messagePayloadStore[id]); }
         function copyToClipboard(id, btn) {
             if (messagePayloadStore[id]) {
