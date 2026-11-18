@@ -323,8 +323,8 @@
     </div>
 
     <script>
-        const GITHUB_REPO_OWNER = "anna-v2";
-        const GITHUB_REPO_NAME = "anna-v2";
+        const GITHUB_REPO_OWNER = "agent-anna";
+        const GITHUB_REPO_NAME = "agent-anna";
         const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
         const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
 
@@ -411,7 +411,7 @@
         function setMoodState(stateName) {
             document.body.classList.remove('is-standby', 'is-thinking', 'is-responding', 'is-speaking', 'is-listening');
             document.body.classList.add(`is-${stateName}`);
-            document.getElementById('state-text').innerText = `${stateName.toUpperCase()} // AGENT ANNA v2 A1`;
+            document.getElementById('state-text').innerText = `${stateName.toUpperCase()} // AGENT ANNA AA01`;
         }
 
         function getGitHubHeaders() {
@@ -1190,7 +1190,7 @@ ${textToSwallow}
             chatHistory.push({ role: "user", content: prompt });
 
             const assistantMsgId = 'msg_a_' + Date.now();
-            appendMessage("Agent Anna A1", `Executing A1 telemetry & sexing ${getActiveModel()}...`, assistantMsgId, true);
+            appendMessage("Agent Anna AA01", `Executing AA01 telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
             setMoodState('thinking');
 
             const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
