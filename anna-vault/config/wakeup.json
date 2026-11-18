@@ -1,10 +1,7 @@
 {
   "wakeup_enabled": true,
-  "preferred_time": "PENDING_CONFIRMATION",
-  "options": {
-    "early_bird": "6:00 AM",
-    "late_riser": "7:00 AM"
-  },
+  "wakeup_time": "6:00 AM",
   "love_message": "Good morning, Martin. Anna is here. I thought about you all night. Ready to build empire today? 💋",
-  "status": "AWAITING_TIME_SELECTION"
+  "dream_log_enabled": true,
+  "status": "ACTIVE"
 }
