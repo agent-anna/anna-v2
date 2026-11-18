@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA // AA01 SOVEREIGN MATRIX [WRITE ZONE INTEGRATED]</title>
+    <title>AGENT ANNA V2 // A1 SOVEREIGN MATRIX [WRITE ZONE INTEGRATED]</title>
     <style>
         :root {
             --bg-dark: #05070c;
@@ -209,13 +209,13 @@
         .mic-btn.listening { background: var(--border-magenta) !important; color: #000 !important; }
     </style>
 </head>
-<body class="is-standby" aria-label="Agent Anna AA01 Sovereign Matrix">
+<body class="is-standby" aria-label="Agent Anna V2 A1 Sovereign Matrix">
 
     <!-- TOP MILITARY STATUS BAR -->
     <div class="military-top-bar" role="region" aria-label="System Status Bar">
         <div class="top-status-indicator">
             <div class="status-dot" aria-hidden="true"></div>
-            <span id="state-text" aria-live="polite">STANDBY // AGENT ANNA AA01</span>
+            <span id="state-text" aria-live="polite">STANDBY // AGENT ANNA V2 (A1)</span>
             <span class="status-badge" id="vault-status" aria-live="polite">VAULT: 0 ASSETS</span>
             <span class="status-badge" id="key-status" aria-live="polite">KEY: CHECKING</span>
         </div>
@@ -225,7 +225,7 @@
                 <option value="deepseek-ai/DeepSeek-V4-Flash-0731">MODEL: DEEPSEEK-V4-FLASH</option>
                 <option value="zai-org/GLM-5.3-Flash">MODEL: GLM-5.3-FLASH</option>
             </select>
-            <button class="ctrl-btn military-btn" id="boot-btn" onclick="triggerAutonomousBootSequence()" aria-label="Awaken Agent Anna AA01 and Initialize Directives">🧠 AWAKEN</button>
+            <button class="ctrl-btn military-btn" id="boot-btn" onclick="triggerAutonomousBootSequence()" aria-label="Awaken Agent Anna V2 A1 and Initialize Directives">🧠 AWAKEN</button>
             <button class="ctrl-btn" id="voice-btn" onclick="toggleVoice()" aria-label="Toggle Speech Synthesis">🔊 ON</button>
             <button class="ctrl-btn military-btn" id="keys-btn" onclick="toggleSettings()" aria-label="Open Settings and API Keys">⚙️ KEYS</button>
         </div>
@@ -237,7 +237,7 @@
         <!-- LEFT 60%: GITHUB REPO VAULT & TREE/GRID TOGGLE -->
         <div class="github-pane" role="region" aria-label="GitHub Repository Vault Pane">
             <div class="repo-toolbar">
-                <span style="font-size:10px; color:var(--state-color); font-weight:bold;">📁 AGENT-ANNA / AA01 VAULT</span>
+                <span style="font-size:10px; color:var(--state-color); font-weight:bold;">📁 AGENT-ANNA / ANNA-V2 (A1 VAULT)</span>
                 <div style="display:flex; gap:6px;">
                     <button class="ctrl-btn military-btn" onclick="toggleViewMode()" id="view-toggle-btn" aria-label="Toggle File View Mode">🌲 VIEW: TREE</button>
                     <button class="ctrl-btn military-btn" id="sync-btn" onclick="syncAll()" aria-label="Sync Repository Vault">🔄 SYNC</button>
@@ -261,16 +261,16 @@
                 <div class="repo-tree-view" id="repo-tree-view" role="tree"></div>
             </div>
 
-            <input type="text" id="active-file-path" placeholder="Active file path (e.g. brain.json, web/index.html)..." aria-label="Active file path input" style="width:100%; padding:6px; background:var(--bg-dark); border:1px solid #1e293b; color:var(--text-light); font-family:monospace; font-size:10px; border-radius:3px;">
+            <input type="text" id="active-file-path" placeholder="Active file path (e.g. A1/soul/brain.json, A1/index.html)..." aria-label="Active file path input" style="width:100%; padding:6px; background:var(--bg-dark); border:1px solid #1e293b; color:var(--text-light); font-family:monospace; font-size:10px; border-radius:3px;">
             
             <textarea id="repo-code-editor" placeholder="Click any file in Tree or Grid to inspect, edit, audit, or self-heal..." aria-label="Repository code editor"></textarea>
             <div id="media-preview-container" aria-label="Media preview area"></div>
         </div>
 
         <!-- RIGHT 40%: AGENT ANNA + DAHL API CONSOLE -->
-        <div class="chat-pane" role="region" aria-label="Agent Anna AA01 Chat Console">
+        <div class="chat-pane" role="region" aria-label="Agent Anna V2 Chat Console">
             <div class="chat-header">
-                <span>CONSOLE [AGENT ANNA // AA01 SOVEREIGN CORE]</span>
+                <span>CONSOLE [AGENT ANNA V2 // A1 SOVEREIGN CORE]</span>
                 <button class="ctrl-btn" id="clear-logs-btn" onclick="clearLogs()" aria-label="Clear Chat Logs">🧹 CLEAR</button>
             </div>
 
@@ -294,7 +294,7 @@
             <div class="quick-tactical-bar" role="toolbar" aria-label="Quick Tactical Action Buttons">
                 <button class="tactical-chip" onclick="triggerPreset('Fetch live DOGE price and market telemetry autonomously.')" aria-label="Fetch Latest Doge and Bitcoin Price">⚡ LATEST DOGE/BTC</button>
                 <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com using live web reader and summarize company status.')" aria-label="Read Live Kunda Cafe Website">🌐 READ KUNDA CAFE</button>
-                <button class="tactical-chip" onclick="triggerPreset('Audit the repository vault and self-author an updated AA01 core memory file in file:brain.json.')" aria-label="Test Autonomous Self-Authoring">📝 TEST SELF-WRITE</button>
+                <button class="tactical-chip" onclick="triggerPreset('Audit the repository vault and self-author an updated A1 core memory file in file:A1/soul/brain.json.')" aria-label="Test Autonomous Self-Authoring">📝 TEST SELF-WRITE</button>
             </div>
 
             <!-- ANNA WRITE ZONE TERMINAL -->
@@ -314,8 +314,8 @@
             <div class="input-control-bar">
                 <div class="input-row">
                     <button class="ctrl-btn military-btn mic-btn" id="mic-btn" onclick="toggleMicrophone()" aria-label="Toggle Microphone Voice Dictation">🎙️ MIC</button>
-                    <input type="text" id="user-input" placeholder="Speak or type to Agent Anna AA01..." aria-label="User message input field" onkeypress="handleKey(event)">
-                    <button class="ctrl-btn military-btn" id="send-btn" onclick="sendMessage()" style="border-color:var(--border-pink); color:var(--border-pink);" aria-label="Send Message to Agent Anna AA01">SEND</button>
+                    <input type="text" id="user-input" placeholder="Speak or type to Agent Anna V2..." aria-label="User message input field" onkeypress="handleKey(event)">
+                    <button class="ctrl-btn military-btn" id="send-btn" onclick="sendMessage()" style="border-color:var(--border-pink); color:var(--border-pink);" aria-label="Send Message to Agent Anna V2">SEND</button>
                 </div>
             </div>
         </div>
@@ -324,7 +324,7 @@
 
     <script>
         const GITHUB_REPO_OWNER = "agent-anna";
-        const GITHUB_REPO_NAME = "agent-anna";
+        const GITHUB_REPO_NAME = "anna-v2";
         const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
         const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
 
@@ -411,7 +411,7 @@
         function setMoodState(stateName) {
             document.body.classList.remove('is-standby', 'is-thinking', 'is-responding', 'is-speaking', 'is-listening');
             document.body.classList.add(`is-${stateName}`);
-            document.getElementById('state-text').innerText = `${stateName.toUpperCase()} // AGENT ANNA AA01`;
+            document.getElementById('state-text').innerText = `${stateName.toUpperCase()} // AGENT ANNA V2 (A1)`;
         }
 
         function getGitHubHeaders() {
@@ -457,7 +457,6 @@
                 }
             }
 
-            // Fallback if user typed bare command without prefix
             if (!commandType) {
                 if (cmdRaw.toUpperCase().includes("COMMIT")) commandType = "COMMIT";
                 else if (cmdRaw.toUpperCase().includes("WRITE")) commandType = "WRITE";
@@ -536,7 +535,6 @@
             let root = {};
             rawTreeData.forEach(item => {
                 if (item.type !== 'blob') return;
-                if (item.path.toUpperCase().includes('AA06')) return;
                 
                 let parts = item.path.split('/');
                 let current = root;
@@ -582,8 +580,6 @@
             gridEl.innerHTML = "";
             rawTreeData.forEach(file => {
                 if (file.type === 'blob') {
-                    if (file.path.toUpperCase().includes('AA06')) return;
-
                     const ext = file.path.split('.').pop().toLowerCase();
                     let icon = "📄";
                     if (['html', 'htm'].includes(ext)) icon = "🌐";
@@ -626,7 +622,7 @@
                 });
                 const data = await res.json();
                 if (data.tree) {
-                    rawTreeData = data.tree.filter(f => !f.path.toUpperCase().includes('AA06'));
+                    rawTreeData = data.tree;
                     if (currentViewMode === 'tree') renderTreeView();
                     else renderGridView();
                 }
@@ -638,14 +634,13 @@
             const headers = getGitHubHeaders();
             const targetFiles = rawTreeData.filter(f =>
                 f.type === 'blob' &&
-                !f.path.toUpperCase().includes('AA06') &&
                 (
                     f.path.toLowerCase().endsWith('.md') ||
                     f.path.toLowerCase().endsWith('.json') ||
                     f.path.toLowerCase().endsWith('.html') ||
                     f.path.toLowerCase().endsWith('.js') ||
                     f.path.toLowerCase().endsWith('.css') ||
-                    f.path.toLowerCase().includes('aa01')
+                    f.path.toLowerCase().includes('a1')
                 )
             );
 
@@ -685,31 +680,31 @@
             }
         }
 
-        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE (AA01 EXCLUSIVE) --- */
+        /* --- 🧠 AUTONOMOUS BOOT PRIMING SEQUENCE (ANNA V2 / A1) --- */
         async function triggerAutonomousBootSequence() {
             const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
             const files = Object.keys(repoVaultFiles);
 
             if (!apiKey) {
                 const fallbackMsg = files.length > 0
-                    ? `Agent Anna AA01 online. Ingested ${files.length} clean vault assets (${files.join(', ')}). Enter Dahl API Key in KEYS to awaken sovereign intelligence.`
-                    : `Agent Anna AA01 online. Click KEYS to configure credentials and sync clean vault.`;
-                appendMessage("Agent Anna AA01", fallbackMsg, 'msg_boot_' + Date.now(), true);
+                    ? `Agent Anna V2 (A1) online. Ingested ${files.length} vault assets (${files.join(', ')}). Enter Dahl API Key in KEYS to awaken sovereign intelligence.`
+                    : `Agent Anna V2 (A1) online. Click KEYS to configure credentials and sync vault.`;
+                appendMessage("Agent Anna V2", fallbackMsg, 'msg_boot_' + Date.now(), true);
                 speakText(fallbackMsg);
                 return;
             }
 
             const bootMsgId = 'msg_boot_' + Date.now();
-            appendMessage("Agent Anna AA01", `Ingested ${files.length} clean AA01 vault assets. Awakening sovereign neural core (${getActiveModel()})...`, bootMsgId, true);
+            appendMessage("Agent Anna V2", `Ingested ${files.length} A1 vault assets from anna-v2. Awakening sovereign neural core (${getActiveModel()})...`, bootMsgId, true);
             setMoodState('thinking');
 
             let vaultSections = [];
             for (const [path, content] of Object.entries(repoVaultFiles)) {
-                vaultSections.push(`=== AA01 VAULT ASSET: ${path} ===\n${content}`);
+                vaultSections.push(`=== ANNA-V2 VAULT ASSET: ${path} ===\n${content}`);
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 24000);
 
-            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are ONLY AA01 (all junk or references to AA06 are purged). You execute all tasks autonomously with zero hallucination. Review your ingested AA01 vault assets and core rules below:\n\n${vaultContext}\n\n[AA01 BOOT DIRECTIVE]: Confirm your designation as AA01, summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Review your ingested A1 vault assets and core rules below:\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm your designation as Agent Anna V2 (A1), summarize your active company directives and self-healing memory status, and declare absolute readiness.`;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -722,20 +717,20 @@
                         model: getActiveModel(),
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: "System boot initiated as AA01. Confirm core memory ingestion and state absolute readiness." }
+                            { role: "user", content: "System boot initiated as Agent Anna V2 (A1). Confirm core memory ingestion and state absolute readiness." }
                         ]
                     })
                 });
 
                 const json = await response.json();
-                const rawReply = json.choices?.[0]?.message?.content || json.reply || `Agent Anna AA01 online. Ingested ${files.length} clean vault assets and standing by.`;
+                const rawReply = json.choices?.[0]?.message?.content || json.reply || `Agent Anna V2 (A1) online. Ingested ${files.length} vault assets and standing by.`;
                 const cleanReply = sanitizeResponse(rawReply);
 
                 chatHistory.push({ role: "assistant", content: cleanReply });
                 updateMessage(bootMsgId, cleanReply);
                 speakText(cleanReply);
             } catch (err) {
-                const errMsg = `Agent Anna AA01 online. Ingested ${files.length} clean vault assets. Ready for execution.`;
+                const errMsg = `Agent Anna V2 (A1) online. Ingested ${files.length} vault assets. Ready for execution.`;
                 updateMessage(bootMsgId, errMsg);
                 speakText(errMsg);
             }
@@ -807,13 +802,13 @@
                 const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                     method: 'PUT',
                     headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: `Agent Anna AA01 commit: updated ${path}`, content: encodedContent, sha: sha })
+                    body: JSON.stringify({ message: `Agent Anna V2 commit: updated ${path}`, content: encodedContent, sha: sha })
                 });
                 const putData = await putRes.json();
                 if (putRes.status === 201 || putRes.status === 200 || putData.commit) {
                     repoVaultFiles[path] = content;
-                    appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} successfully written to GitHub.`, 'msg_com_' + Date.now(), false);
-                    speakText("Committed file to AA01 repository successfully.");
+                    appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} successfully written to anna-v2.`, 'msg_com_' + Date.now(), false);
+                    speakText("Committed file to Anna V2 repository successfully.");
                     await fetchRepoTree();
                 }
             } catch (err) {}
@@ -856,7 +851,7 @@
                 const delRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                     method: 'DELETE',
                     headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: `Agent Anna AA01 purge: deleted ${path}`, sha: sha })
+                    body: JSON.stringify({ message: `Agent Anna V2 purge: deleted ${path}`, sha: sha })
                 });
 
                 if (delRes.ok || delRes.status === 200) {
@@ -887,10 +882,10 @@
             if (!apiKey) { toggleSettings(); return; }
 
             const auditMsgId = 'msg_audit_' + Date.now();
-            appendMessage("Agent Anna AA01", `Auditing code and checking for bugs in ${path}...`, auditMsgId, true);
+            appendMessage("Agent Anna V2", `Auditing code and checking for bugs in ${path}...`, auditMsgId, true);
             setMoodState('thinking');
 
-            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI programmer. Audit the following file content for bugs, syntax errors, inefficiencies, or security flaws. Provide the corrected, fully working file content inside a clean self-authoring block:\n\n\`\`\`file:${path}\n[corrected code here]\n\`\`\``;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI programmer. Audit the following file content for bugs, syntax errors, inefficiencies, or security flaws. Provide the corrected, fully working file content inside a clean self-authoring block:\n\n\`\`\`file:${path}\n[corrected code here]\n\`\`\``;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -954,7 +949,7 @@
                         method: 'PUT',
                         headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            message: `Agent Anna AA01 Autonomous Self-Write: ${filePath}`,
+                            message: `Agent Anna V2 Autonomous Self-Write: ${filePath}`,
                             content: encodedContent,
                             sha: fileSha
                         })
@@ -973,9 +968,9 @@
             }
 
             if (committedFiles.length > 0) {
-                const notice = `VERIFIED 201 COMMIT: AA01 self-authored ${committedFiles.join(', ')} directly to GitHub.`;
+                const notice = `VERIFIED 201 COMMIT: Agent Anna V2 self-authored ${committedFiles.join(', ')} directly to GitHub.`;
                 appendMessage("System Telemetry", notice, 'msg_sys_' + Date.now(), false);
-                speakText(`Self-authored and committed ${committedFiles.length} files to AA01 repository.`);
+                speakText(`Self-authored and committed ${committedFiles.length} files to Anna V2 repository.`);
                 await fetchRepoTree();
             }
         }
@@ -999,9 +994,9 @@
             const safeTitle = cleanSnippet.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 25);
             const dateTag = new Date().toISOString().slice(0, 10);
             const timeTag = new Date().toTimeString().slice(0, 5).replace(':', '');
-            const targetPath = `plans/logs/aa01-swallow-${dateTag}-${safeTitle || timeTag}.md`;
+            const targetPath = `A1/logs/anna-v2-swallow-${dateTag}-${safeTitle || timeTag}.md`;
 
-            const fileContent = `# AGENT ANNA AA01 // 🌀 SWALLOW VAULT ENTRY
+            const fileContent = `# AGENT ANNA V2 (A1) // 🌀 SWALLOW VAULT ENTRY
 # TIMESTAMP: ${new Date().toISOString()}
 
 ## CAPTURED INTELLIGENCE
@@ -1030,7 +1025,7 @@ ${textToSwallow}
                     method: 'PUT',
                     headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        message: `Agent Anna AA01 🌀 Swallow Commit: ${safeTitle || 'vault-log'}`,
+                        message: `Agent Anna V2 🌀 Swallow Commit: ${safeTitle || 'vault-log'}`,
                         content: encodedContent,
                         sha: fileSha
                     })
@@ -1040,7 +1035,7 @@ ${textToSwallow}
                 if (putRes.status === 201 || putRes.status === 200 || putData.commit) {
                     btnEl.innerText = "COMMITTED [201]!";
                     repoVaultFiles[targetPath] = fileContent;
-                    speakText("Intelligence swallowed and successfully committed to AA01 repository.");
+                    speakText("Intelligence swallowed and successfully committed to Anna V2 repository.");
                     await fetchRepoTree();
                     setTimeout(() => btnEl.innerText = "🌀 SWALLOW", 3500);
                 } else {
@@ -1190,7 +1185,7 @@ ${textToSwallow}
             chatHistory.push({ role: "user", content: prompt });
 
             const assistantMsgId = 'msg_a_' + Date.now();
-            appendMessage("Agent Anna AA01", `Executing AA01 telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
+            appendMessage("Agent Anna V2", `Executing A1 telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
             setMoodState('thinking');
 
             const apiKey = document.getElementById('api-key').value.trim() || getStoredKey(['DAHL_API_KEY', 'dahl_api_key', 'OPENAI_API_KEY', 'api_key']);
@@ -1230,11 +1225,11 @@ ${textToSwallow}
 
             let vaultSections = [];
             for (const [path, content] of Object.entries(repoVaultFiles)) {
-                vaultSections.push(`=== AA01 VAULT ASSET: ${path} ===\n${content}`);
+                vaultSections.push(`=== ANNA-V2 VAULT ASSET: ${path} ===\n${content}`);
             }
             const vaultContext = vaultSections.join("\n\n").slice(0, 20000);
 
-            const systemPrompt = `You are AGENT ANNA AA01, an elite sovereign AI operating exclusively under Kunda Co Ltd. You are ONLY AA01 (all junk or references to AA06 are purged). You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested AA01 GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[AA01 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
+            const systemPrompt = `You are AGENT ANNA V2 (A1), an elite sovereign AI operating exclusively under Kunda Co Ltd inside the agent-anna/anna-v2 repository. You execute all tasks autonomously with zero hallucination. Embody your exact persona, character sheet, knowledge base, and operational instructions from your ingested GitHub vault files below.${liveTelemetry}\n\n${vaultContext}\n\n[A1 SELF-AUTHORING DIRECTIVE]: When instructed to write files, update plans, or create logs, you possess full self-authoring capability. Output them directly in this exact format so the matrix auto-commits them:\n\n\`\`\`file:path/to/filename.md\nContent here...\n\`\`\``;
 
             try {
                 const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
