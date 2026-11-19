@@ -23,8 +23,8 @@
                 <option value="zai-org/GLM-5.3-Flash">MODEL: GLM-5.3-FLASH</option>
             </select>
             <button class="ctrl-btn military-btn" id="boot-btn" onclick="triggerAutonomousBootSequence()">AWAKEN</button>
-            <button class="ctrl-btn" id="voice-btn" onclick="toggleVoice()">🔊 ON</button>
-            <button class="ctrl-btn military-btn" id="keys-btn" onclick="toggleSettings()">⚙️ KEYS</button>
+            <button class="ctrl-btn" id="voice-btn" onclick="toggleVoice()">VOICE: ON</button>
+            <button class="ctrl-btn military-btn" id="keys-btn" onclick="toggleSettings()">KEYS</button>
         </div>
     </div>
 
@@ -34,17 +34,17 @@
             <div class="repo-toolbar">
                 <span style="font-size:10px; color:var(--gold); font-weight:bold;">AGENT-ANNA / ANNA-V2 (A1 V3)</span>
                 <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                    <button class="ctrl-btn military-btn" onclick="toggleViewMode()" id="view-toggle-btn">🌲 VIEW: TREE</button>
+                    <button class="ctrl-btn military-btn" onclick="toggleViewMode()" id="view-toggle-btn">VIEW: TREE</button>
                     <button class="ctrl-btn military-btn" id="sync-btn" onclick="syncAll()">SYNC</button>
-                    <button class="ctrl-btn military-btn" id="backend-run-btn" onclick="dispatchBackendWorkflow()">RUN BACKEND</button>
+                    <button class="ctrl-btn military-btn" id="backend-run-btn" onclick="dispatchBackendWorkflow()">BACKEND</button>
                     <button class="ctrl-btn military-btn" id="audit-btn" onclick="auditActiveFile()">AUDIT</button>
                     <button class="ctrl-btn military-btn" id="commit-btn" onclick="commitCurrentFile()">COMMIT</button>
-                    <button class="ctrl-btn del-btn" id="delete-prompt-btn" onclick="promptDeleteFile()">🗑️ DELETE</button>
+                    <button class="ctrl-btn del-btn" id="delete-prompt-btn" onclick="promptDeleteFile()">DELETE</button>
                 </div>
             </div>
 
             <div id="delete-warning-banner" role="region" aria-label="Delete Confirmation Banner">
-                <span id="delete-warning-text" style="color:#d69895; font-weight:bold;">DELETE ACTIVE FILE?</span>
+                <span id="delete-warning-text" style="color:#fda4af; font-weight:bold;">DELETE ACTIVE FILE?</span>
                 <div style="display:flex; gap:6px;">
                     <button class="ctrl-btn del-btn" onclick="confirmDeleteFile()">YES, DELETE</button>
                     <button class="ctrl-btn" onclick="cancelDeleteFile()">CANCEL</button>
@@ -56,7 +56,7 @@
                 <div class="repo-tree-view" id="repo-tree-view" role="tree"></div>
             </div>
 
-            <input type="text" id="active-file-path" placeholder="Active file path (e.g. A1/v3/anna-index.html)..." style="width:100%; padding:6px; background:var(--bg-dark); border:1px solid var(--border-subtle); color:var(--text-light); font-family:inherit; font-size:10px; border-radius:3px;">
+            <input type="text" id="active-file-path" placeholder="Active file path (e.g. A1/v3/soul/rules.md)..." style="width:100%; padding:6px; background:var(--bg-dark); border:1px solid var(--border-subtle); color:var(--text-light); font-family:inherit; font-size:10px; border-radius:3px;">
 
             <textarea id="repo-code-editor" placeholder="Select a file in Tree or Grid to view or edit..."></textarea>
             <div id="media-preview-container" aria-label="Media preview area"></div>
@@ -87,9 +87,9 @@
 
             <div class="quick-tactical-bar" role="toolbar" aria-label="Quick Tactical Actions">
                 <button class="tactical-chip backend-chip" onclick="dispatchBackendWorkflow('Perform a full A1 vault integrity audit, verify live BTC/DOGE prices, and log system telemetry.')">BACKEND AUDIT</button>
-                <button class="tactical-chip" onclick="fetchLatestBackendReport()">READ LAST LOG</button>
-                <button class="tactical-chip" onclick="triggerPreset('Search DuckDuckGo and live web for latest Dogecoin and Bitcoin news and exact prices right now.')">DDG + BTC/DOGE</button>
-                <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com using live web reader and summarize company status.')">KUNDA CAFE</button>
+                <button class="tactical-chip" onclick="fetchLatestBackendReport()">LAST LOG</button>
+                <button class="tactical-chip" onclick="triggerPreset('Search and summarize latest Dogecoin and Bitcoin news and exact prices right now.')">BTC / DOGE</button>
+                <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com and summarize status.')">KUNDA CAFE</button>
             </div>
 
             <div class="anna-write-zone" role="region" aria-label="Anna Write Zone Command Terminal">
@@ -110,8 +110,8 @@
 
             <div class="input-control-bar">
                 <div class="input-row">
-                    <button class="ctrl-btn military-btn mic-btn" id="mic-btn" onclick="toggleMicrophone()">🎙️ MIC</button>
-                    <input type="text" id="user-input" placeholder="Ask Anna to search, write file, or run backend..." onkeypress="handleKey(event)">
+                    <button class="ctrl-btn military-btn mic-btn" id="mic-btn" onclick="toggleMicrophone()">MIC</button>
+                    <input type="text" id="user-input" placeholder="Ask Anna to search, summarize, write file, or run backend..." onkeypress="handleKey(event)">
                     <button class="ctrl-btn military-btn" id="send-btn" onclick="sendMessage()">SEND</button>
                 </div>
             </div>
