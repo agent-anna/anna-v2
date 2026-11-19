@@ -298,6 +298,16 @@
             : { Accept: "application/vnd.github.v3+json" };
     }
 
+    async function fetchWithTimeout(url, opts, ms) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), ms || 15000);
+        try {
+            return await fetch(url, { ...(opts || {}), signal: ctrl.signal });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
     function toggleMessageCollapse(id) {
         const el = document.getElementById(id);
         if (!el) return;
@@ -409,7 +419,7 @@
 
         if (/btc|bitcoin|doge|dogecoin|crypto|price|market|rate/.test(lower)) {
             try {
-                const cryptoRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true");
+                const cryptoRes = await fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true", {}, 8000);
                 if (cryptoRes.ok) {
                     const cryptoData = await cryptoRes.json();
                     telemetryBlocks.push(`[VERIFIED LIVE COINGECKO TELEMETRY @ ${new Date().toISOString()}]\n- Bitcoin (BTC): $${cryptoData.bitcoin.usd} (24h Change: ${cryptoData.bitcoin.usd_24h_change.toFixed(2)}%)\n- Dogecoin (DOGE): $${cryptoData.dogecoin.usd} (24h Change: ${cryptoData.dogecoin.usd_24h_change.toFixed(2)}%)`);
@@ -421,7 +431,7 @@
         if (urlMatch) {
             try {
                 const targetUrl = urlMatch[0];
-                const webRes = await fetch(`https://r.jina.ai/${targetUrl}`);
+                const webRes = await fetchWithTimeout(`https://r.jina.ai/${targetUrl}`, {}, 10000);
                 if (webRes.ok) {
                     const webText = await webRes.text();
                     telemetryBlocks.push(`[VERIFIED LIVE WEB READER FOR ${targetUrl}]\n${webText.slice(0, 5000)}`);
@@ -440,9 +450,9 @@
             let gotSearchData = false;
 
             try {
-                const jinaSearchRes = await fetch(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
+                const jinaSearchRes = await fetchWithTimeout(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
                     headers: { Accept: "text/plain" }
-                });
+                }, 10000);
                 if (jinaSearchRes.ok) {
                     const searchText = await jinaSearchRes.text();
                     if (searchText && searchText.trim().length > 30) {
@@ -455,7 +465,7 @@
             if (!gotSearchData) {
                 try {
                     const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
-                    const ddgRes = await fetch(`https://r.jina.ai/${ddgUrl}`);
+                    const ddgRes = await fetchWithTimeout(`https://r.jina.ai/${ddgUrl}`, {}, 10000);
                     if (ddgRes.ok) {
                         const ddgText = await ddgRes.text();
                         if (ddgText && ddgText.trim().length > 30) {
@@ -480,10 +490,10 @@
 
     async function getLatestFileSha(path) {
         try {
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+            const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                 headers: getGitHubHeaders(),
                 cache: "no-store"
-            });
+            }, 8000);
             if (res.ok) {
                 const data = await res.json();
                 return data.sha;
@@ -506,11 +516,11 @@
         const encodedContent = btoa(binString);
         const payload = { message: commitMessage, content: encodedContent };
         if (sha) payload.sha = sha;
-        const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+        const putRes = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
             method: "PUT",
             headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
             body: JSON.stringify(payload)
-        });
+        }, 12000);
         const putData = await putRes.json();
         return putRes.status === 201 || putRes.status === 200 || Boolean(putData && putData.commit);
     }
@@ -532,14 +542,14 @@
         setMoodState("thinking");
 
         try {
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/dispatches`, {
+            const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/dispatches`, {
                 method: "POST",
                 headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ref: activeBranch,
                     inputs: { command: cmdText, search_query: customSearchQuery || "" }
                 })
-            });
+            }, 10000);
 
             if (res.status === 204 || res.ok) {
                 updateActionsBadge("QUEUED", "active");
@@ -583,10 +593,10 @@
                 return;
             }
             try {
-                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/runs?per_page=1`, {
+                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/runs?per_page=1`, {
                     headers: getGitHubHeaders(),
                     cache: "no-store"
-                });
+                }, 8000);
                 if (!res.ok) return;
                 const data = await res.json();
                 const latestRun = data.workflow_runs && data.workflow_runs[0];
@@ -625,7 +635,9 @@
             .sort();
 
         if (!logFiles.length) {
-            appendMessage("Agent Anna V3", "No log files found under any logs/ folder in the repository yet. Click 🌀 SWALLOW on any message to write a log entry.", "msg_nolog_" + Date.now(), true);
+            const msg = "No log files found under any logs/ folder in the repository yet.";
+            appendMessage("Agent Anna V3", msg, "msg_nolog_" + Date.now(), true);
+            if (autoAnnounceToAnna !== false) speakText(msg);
             return;
         }
         const newestLog = logFiles[logFiles.length - 1];
@@ -635,6 +647,7 @@
         const logContent = repoVaultFiles[newestLog] || (editor ? editor.value : "");
         if (autoAnnounceToAnna !== false && logContent) {
             appendMessage("Agent Anna V3", `LATEST LOG (${newestLog}):\n\n${logContent.slice(0, 1800)}`, "msg_rep_" + Date.now(), true);
+            speakText(`Latest log is ${newestLog}. ${logContent.slice(0, 350)}`);
         }
     }
 
@@ -743,10 +756,10 @@
         let data = null;
         for (const branch of ["main", "master"]) {
             try {
-                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${branch}?recursive=1`, {
+                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${branch}?recursive=1`, {
                     headers: getGitHubHeaders(),
                     cache: "no-store"
-                });
+                }, 10000);
                 if (res.ok) {
                     data = await res.json();
                     activeBranch = branch;
@@ -777,7 +790,7 @@
         repoVaultFiles = {};
         for (const file of coreFiles) {
             try {
-                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" });
+                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" }, 8000);
                 if (!res.ok) continue;
                 const data = await res.json();
                 if (data.content) {
@@ -841,13 +854,13 @@
     }
 
     async function fetchDahlWithAutoRetry(url, options, maxRetries) {
-        const retries = maxRetries || 4;
+        const retries = maxRetries || 3;
         for (let attempt = 0; attempt < retries; attempt++) {
-            const response = await fetch(url, options);
+            const response = await fetchWithTimeout(url, options, 18000);
             if (response.status === 429) {
                 const retryHeader = response.headers.get("Retry-After");
-                let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : Math.pow(2, attempt + 2);
-                if (waitSeconds < 3) waitSeconds = 3;
+                let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : Math.pow(2, attempt + 1);
+                if (waitSeconds < 2) waitSeconds = 2;
                 if (attempt < retries - 1) {
                     await new Promise((resolve) => setTimeout(resolve, waitSeconds * 1000));
                     continue;
@@ -906,7 +919,9 @@
             try { json = JSON.parse(rawText); } catch (e) {}
 
             if (!response.ok) {
-                updateMessage(bootMsgId, `DAHL HTTP ${response.status}: Rate limit or endpoint error.`);
+                const errMsg = `DAHL HTTP ${response.status}: Rate limit or endpoint error.`;
+                updateMessage(bootMsgId, errMsg);
+                speakText(errMsg);
                 setMoodState("error");
                 return;
             }
@@ -916,7 +931,9 @@
             updateMessage(bootMsgId, cleanReply);
             speakText(cleanReply);
         } catch (err) {
-            updateMessage(bootMsgId, `CONNECTION ERROR: ${err.message}`);
+            const errMsg = err.name === "AbortError" ? "BOOT TIMED OUT after 18s. Try again or switch model." : `CONNECTION ERROR: ${err.message}`;
+            updateMessage(bootMsgId, errMsg);
+            speakText(errMsg);
             setMoodState("error");
             return;
         }
@@ -928,16 +945,17 @@
         if (pathEl) pathEl.value = path;
         const editor = document.getElementById("repo-code-editor");
         const preview = document.getElementById("media-preview-container");
-        const isMedia = ["png", "jpg", "jpeg", "gif", "svg", "avif", "mp4", "webm", "mov", "mp3", "wav"].includes(ext);
+        const fileExt = String(ext || path.split(".").pop() || "").toLowerCase();
+        const isMedia = ["png", "jpg", "jpeg", "gif", "svg", "avif", "mp4", "webm", "mov", "mp3", "wav"].includes(fileExt);
 
         if (isMedia) {
             if (editor) editor.style.display = "none";
             if (preview) {
                 preview.style.display = "flex";
                 const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/${activeBranch}/${path}`;
-                if (["png", "jpg", "jpeg", "gif", "svg", "avif"].includes(ext)) {
+                if (["png", "jpg", "jpeg", "gif", "svg", "avif"].includes(fileExt)) {
                     preview.innerHTML = `<img src="${rawUrl}" alt="${path}">`;
-                } else if (["mp4", "webm", "mov"].includes(ext)) {
+                } else if (["mp4", "webm", "mov"].includes(fileExt)) {
                     preview.innerHTML = `<video controls autoplay loop src="${rawUrl}"></video>`;
                 } else {
                     preview.innerHTML = `<audio controls autoplay src="${rawUrl}"></audio>`;
@@ -949,10 +967,10 @@
                 editor.style.display = "block";
                 editor.value = "Loading...";
                 try {
-                    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+                    const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                         headers: getGitHubHeaders(),
                         cache: "no-store"
-                    });
+                    }, 8000);
                     const data = await res.json();
                     if (data.content) {
                         const binString = atob(data.content.replace(/\s/g, ""));
@@ -1026,11 +1044,11 @@
         try {
             const sha = await getLatestFileSha(path);
             if (!sha) { setMoodState("standby"); return; }
-            const delRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+            const delRes = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                 method: "DELETE",
                 headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
                 body: JSON.stringify({ message: `Agent Anna V3 purge: deleted ${path}`, sha })
-            });
+            }, 10000);
             if (delRes.ok || delRes.status === 200) {
                 delete repoVaultFiles[path];
                 if (pathEl) pathEl.value = "";
@@ -1074,6 +1092,7 @@
             try { json = JSON.parse(rawText); } catch (e) {}
             const cleanReply = extractDahlReply(json, rawText);
             updateMessage(auditMsgId, cleanReply);
+            speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
             updateMessage(auditMsgId, `Audit failed: ${err.message}`);
@@ -1349,7 +1368,9 @@
 
             if (!response.ok) {
                 const errDetail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 200);
-                updateMessage(assistantMsgId, `DAHL HTTP ${response.status}: ${errDetail}`);
+                const errMsg = `DAHL HTTP ${response.status}: ${errDetail}`;
+                updateMessage(assistantMsgId, errMsg);
+                speakText(errMsg);
                 setMoodState("error");
                 return;
             }
@@ -1360,7 +1381,9 @@
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            updateMessage(assistantMsgId, `CONNECTION FAILED: ${err.message}`);
+            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 18s. Try again or switch model." : `CONNECTION FAILED: ${err.message}`;
+            updateMessage(assistantMsgId, errMsg);
+            speakText(errMsg);
             setMoodState("error");
             return;
         }
