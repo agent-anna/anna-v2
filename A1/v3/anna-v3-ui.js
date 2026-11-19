@@ -21,6 +21,8 @@
     let workflowPollTimer = null;
     let ttsKeepAliveTimer = null;
     let isSyncing = false;
+    let lastWorkflowDispatchMs = 0;
+    let knownV3LogsBeforeRun = new Set();
 
     function isSoulOrLoveLetterPath(path) {
         const p = String(path || "").toLowerCase();
@@ -444,7 +446,7 @@
     function hasScoutedToday() {
         const today = new Date().toISOString().slice(0, 10);
         const memoryText = Object.entries(repoVaultFiles)
-            .filter(([p]) => !isSoulOrLoveLetterPath(p) && (p.toLowerCase().includes("memory.json") || p.toLowerCase().includes("logs/")))
+            .filter(([p]) => !isSoulOrLoveLetterPath(p) && (p.toLowerCase().includes("memory.json") || p.toLowerCase().includes("a1/v3/logs/")))
             .map(([, c]) => c)
             .join("\n");
         return memoryText.includes(`scout_date:${today}`) || memoryText.includes(today);
@@ -467,7 +469,7 @@
         const urlMatches = text.match(/https?:\/\/[^\s"'<>)]+/gi) || [];
         for (const rawUrl of urlMatches.slice(0, 2)) {
             try {
-                const res = await fetchWithTimeout(rawUrl, { cache: "no-store" }, 7000);
+                const res = await fetchWithTimeout(rawUrl, { cache: "no-store" }, 5000);
                 if (res.ok) {
                     const bodyText = await res.text();
                     const snippet = extractPlainTextSnippet(bodyText);
@@ -487,7 +489,7 @@
                 const cryptoRes = await fetchWithTimeout(
                     "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true",
                     { cache: "no-store" },
-                    6000
+                    5000
                 );
                 if (cryptoRes.ok) {
                     const cryptoData = await cryptoRes.json();
@@ -542,6 +544,13 @@
         return putRes.status === 201 || putRes.status === 200 || Boolean(putData && putData.commit);
     }
 
+    function snapshotCurrentV3Logs() {
+        const paths = rawTreeData
+            .filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && f.path.toLowerCase().startsWith("a1/v3/logs/"))
+            .map((f) => f.path);
+        knownV3LogsBeforeRun = new Set(paths);
+    }
+
     async function dispatchBackendWorkflow(customCommand, customSearchQuery) {
         const token = getCleanGitHubToken();
         if (!token) {
@@ -557,6 +566,7 @@
 
         updateActionsBadge("DISPATCHING...", "active");
         setMoodState("thinking");
+        snapshotCurrentV3Logs();
 
         try {
             const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/dispatches`, {
@@ -566,9 +576,10 @@
                     ref: activeBranch,
                     inputs: { command: cmdText, search_query: customSearchQuery || "" }
                 })
-            }, 12000);
+            }, 10000);
 
             if (res.status === 204 || res.ok) {
+                lastWorkflowDispatchMs = Date.now();
                 updateActionsBadge("QUEUED", "active");
                 appendMessage("System Telemetry", `BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nWorkspace: ${WORKSPACE_ROOT}\nDirective: "${cmdText}"`, "msg_wf_" + Date.now(), false);
                 speakText("Backend workflow dispatched.");
@@ -589,6 +600,7 @@
 
     async function writePendingCommandFallback(cmdText) {
         const targetPath = `${WORKSPACE_ROOT}/pending-commands.md`;
+        lastWorkflowDispatchMs = Date.now();
         const ok = await writeFileToGitHub(targetPath, cmdText + "\n", `AA01 Pending Command Trigger (${WORKSPACE_ROOT})`);
         if (ok) {
             appendMessage("System Telemetry", `COMMAND COMMITTED TO ${targetPath}. Backend push trigger activated.`, "msg_fb_" + Date.now(), false);
@@ -630,10 +642,10 @@
                     clearInterval(workflowPollTimer);
                     if (latestRun.conclusion === "success") {
                         updateActionsBadge("VERIFIED [200]", "ok");
-                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing ${WORKSPACE_ROOT} vault & loading report...`, "msg_wf_done_" + Date.now(), false);
+                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing ${WORKSPACE_ROOT} vault...`, "msg_wf_done_" + Date.now(), false);
                         await fetchRepoTree();
                         await ingestCoreVaultAssets();
-                        await fetchLatestBackendReport(true);
+                        await fetchLatestBackendReport(true, true);
                     } else {
                         updateActionsBadge(`FAIL: ${latestRun.conclusion}`, "err");
                         appendMessage("System Telemetry", `BACKEND RUN ENDED WITH STATUS: ${latestRun.conclusion}.`, "msg_wf_fail_" + Date.now(), false);
@@ -643,33 +655,41 @@
         }, 5000);
     }
 
-    async function fetchLatestBackendReport(autoAnnounceToAnna) {
+    async function fetchLatestBackendReport(autoAnnounceToAnna, onlyNewAfterRun) {
         if (!rawTreeData.length) {
             await fetchRepoTree();
         }
-        const logFiles = rawTreeData
+        const v3LogFiles = rawTreeData
             .filter((f) => {
                 if (f.type !== "blob" || isSoulOrLoveLetterPath(f.path)) return false;
                 const p = f.path.toLowerCase();
-                return p.startsWith("a1/v3/logs/") || p.includes("/a1/v3/logs/");
+                return p.startsWith("a1/v3/logs/");
             })
             .map((f) => f.path)
             .sort();
 
-        if (!logFiles.length) {
-            const msg = `No log files found under ${WORKSPACE_ROOT}/logs/ yet.`;
+        const newFiles = v3LogFiles.filter((p) => !knownV3LogsBeforeRun.has(p));
+        const candidateList = onlyNewAfterRun && lastWorkflowDispatchMs > 0 ? newFiles : v3LogFiles;
+
+        if (!candidateList.length) {
+            const msg = onlyNewAfterRun
+                ? `Run finished with no new log created in ${WORKSPACE_ROOT}/logs/.`
+                : `No log files found under ${WORKSPACE_ROOT}/logs/ yet.`;
             appendMessage("Agent Anna V3", msg, "msg_nolog_" + Date.now(), true);
             if (autoAnnounceToAnna !== false) speakText(msg);
             return;
         }
-        const newestLog = logFiles[logFiles.length - 1];
+
+        const newestLog = candidateList[candidateList.length - 1];
+        knownV3LogsBeforeRun.add(newestLog);
         const ext = newestLog.split(".").pop().toLowerCase();
         await loadRepoFile(newestLog, ext);
         const editor = document.getElementById("repo-code-editor");
         const logContent = repoVaultFiles[newestLog] || (editor ? editor.value : "");
+
         if (autoAnnounceToAnna !== false && logContent) {
-            appendMessage("Agent Anna V3", `LATEST LOG (${newestLog}):\n\n${logContent.slice(0, 1800)}`, "msg_rep_" + Date.now(), true);
-            speakText(`Latest log is ${newestLog}. ${logContent.slice(0, 350)}`);
+            appendMessage("Agent Anna V3", `LATEST V3 LOG (${newestLog}):\n\n${logContent.slice(0, 1800)}`, "msg_rep_" + Date.now(), true);
+            speakText(`Latest V3 log is ${newestLog.split("/").pop()}. ${logContent.slice(0, 350)}`);
         }
     }
 
@@ -786,6 +806,7 @@
         try {
             await fetchRepoTree();
             await ingestCoreVaultAssets();
+            snapshotCurrentV3Logs();
             const count = Object.keys(repoVaultFiles).length;
             const totalTreeFiles = rawTreeData.filter((f) => f.type === "blob").length;
             appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. Loaded ${totalTreeFiles} total repository files in tree (${count} V3 / character / knowledge / memory files active in context) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
@@ -1089,7 +1110,7 @@
                         { role: "user", content }
                     ]
                 })
-            }, 20000);
+            }, 8000);
             const rawText = await response.text();
             let json = null;
             try { json = JSON.parse(rawText); } catch (e) {}
@@ -1194,6 +1215,7 @@
         if (ok) {
             if (btnEl) btnEl.innerText = "COMMITTED [201]!";
             repoVaultFiles[targetPath] = fileContent;
+            knownV3LogsBeforeRun.add(targetPath);
             speakText("Saved to log.");
             await fetchRepoTree();
         } else {
@@ -1374,7 +1396,7 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
                         ...chatHistory.slice(-4)
                     ]
                 })
-            }, 20000);
+            }, 5000);
 
             const rawText = await response.text();
             let json = null;
@@ -1397,12 +1419,12 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
             const origin = window.location && window.location.origin ? window.location.origin : "browser";
-            const reason = err && err.name === "AbortError" ? "Request timed out after 20s" : err.message;
+            const reason = err && err.name === "AbortError" ? "Timed out after 5s" : err.message;
             setMoodState("error");
-            updateMessage(assistantMsgId, `CONNECTION FAILED (${origin} -> inference.dahl.global): ${reason}. Attempting GitHub backend dispatch if PAT is set...`);
+            updateMessage(assistantMsgId, `DIRECT DAHL TIMEOUT (${origin}): ${reason}. Routing to ${WORKFLOW_FILENAME} in ${WORKSPACE_ROOT}...`);
             const dispatched = await dispatchBackendWorkflow(prompt, prompt);
             if (!dispatched) {
-                speakText("Connection failed.");
+                speakText("Connection failed and backend dispatch unavailable.");
             }
             return;
         }
