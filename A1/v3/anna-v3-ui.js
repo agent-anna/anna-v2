@@ -330,14 +330,8 @@
             : { Accept: "application/vnd.github.v3+json" };
     }
 
-    async function fetchWithTimeout(url, opts, ms) {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), ms || 90000);
-        try {
-            return await fetch(url, { ...(opts || {}), signal: ctrl.signal });
-        } finally {
-            clearTimeout(timer);
-        }
+    async function fetchWithTimeout(url, opts) {
+        return await fetch(url, opts || {});
     }
 
     function toggleMessageCollapse(id) {
@@ -451,7 +445,7 @@
 
         if (/\b(btc|bitcoin|doge|dogecoin|crypto|price|market|rate)\b/.test(lower)) {
             try {
-                const cryptoRes = await fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true", {}, 7000);
+                const cryptoRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true");
                 if (cryptoRes.ok) {
                     const cryptoData = await cryptoRes.json();
                     telemetryBlocks.push(`[VERIFIED LIVE COINGECKO TELEMETRY @ ${new Date().toISOString()}]\n- Bitcoin (BTC): $${cryptoData.bitcoin.usd} (24h Change: ${cryptoData.bitcoin.usd_24h_change.toFixed(2)}%)\n- Dogecoin (DOGE): $${cryptoData.dogecoin.usd} (24h Change: ${cryptoData.dogecoin.usd_24h_change.toFixed(2)}%)`);
@@ -468,10 +462,10 @@
 
     async function getLatestFileSha(path) {
         try {
-            const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                 headers: getGitHubHeaders(),
                 cache: "no-store"
-            }, 8000);
+            });
             if (res.ok) {
                 const data = await res.json();
                 return data.sha;
@@ -495,11 +489,11 @@
         const encodedContent = btoa(binString);
         const payload = { message: commitMessage, content: encodedContent };
         if (sha) payload.sha = sha;
-        const putRes = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+        const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
             method: "PUT",
             headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
             body: JSON.stringify(payload)
-        }, 12000);
+        });
         const putData = await putRes.json();
         return putRes.status === 201 || putRes.status === 200 || Boolean(putData && putData.commit);
     }
@@ -521,14 +515,14 @@
         setMoodState("thinking");
 
         try {
-            const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/dispatches`, {
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/dispatches`, {
                 method: "POST",
                 headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ref: activeBranch,
                     inputs: { command: cmdText, search_query: customSearchQuery || "" }
                 })
-            }, 10000);
+            });
 
             if (res.status === 204 || res.ok) {
                 updateActionsBadge("QUEUED", "active");
@@ -572,10 +566,10 @@
                 return;
             }
             try {
-                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/runs?per_page=1`, {
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/runs?per_page=1`, {
                     headers: getGitHubHeaders(),
                     cache: "no-store"
-                }, 8000);
+                });
                 if (!res.ok) return;
                 const data = await res.json();
                 const latestRun = data.workflow_runs && data.workflow_runs[0];
@@ -735,10 +729,10 @@
         let data = null;
         for (const branch of ["main", "master"]) {
             try {
-                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${branch}?recursive=1`, {
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${branch}?recursive=1`, {
                     headers: getGitHubHeaders(),
                     cache: "no-store"
-                }, 10000);
+                });
                 if (res.ok) {
                     data = await res.json();
                     activeBranch = branch;
@@ -769,7 +763,7 @@
         const nextVault = {};
         await Promise.allSettled(
             coreFiles.map(async (file) => {
-                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" }, 8000);
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" });
                 if (!res.ok) return;
                 const data = await res.json();
                 if (data.content) {
@@ -828,21 +822,8 @@
         return combined ? `ACTIVE V3 / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}` : "";
     }
 
-    async function fetchDahlWithAutoRetry(url, options, maxRetries) {
-        const retries = maxRetries || 2;
-        for (let attempt = 0; attempt < retries; attempt++) {
-            const response = await fetchWithTimeout(url, options, 90000);
-            if (response.status === 429) {
-                const retryHeader = response.headers.get("Retry-After");
-                let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : Math.pow(2, attempt + 1);
-                if (waitSeconds < 2) waitSeconds = 2;
-                if (attempt < retries - 1) {
-                    await new Promise((resolve) => setTimeout(resolve, waitSeconds * 1000));
-                    continue;
-                }
-            }
-            return response;
-        }
+    async function fetchDahlWithAutoRetry(url, options) {
+        return await fetch(url, options);
     }
 
     function extractDahlReply(json, rawText) {
@@ -894,10 +875,10 @@
                 editor.style.display = "block";
                 editor.value = "Loading...";
                 try {
-                    const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+                    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                         headers: getGitHubHeaders(),
                         cache: "no-store"
-                    }, 8000);
+                    });
                     const data = await res.json();
                     if (data.content) {
                         const binString = atob(data.content.replace(/\s/g, ""));
@@ -968,11 +949,11 @@
         try {
             const sha = await getLatestFileSha(path);
             if (!sha) { setMoodState("standby"); return; }
-            const delRes = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
+            const delRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                 method: "DELETE",
                 headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
                 body: JSON.stringify({ message: `Agent Anna V3 purge: deleted ${path}`, sha })
-            }, 10000);
+            });
             if (delRes.ok || delRes.status === 200) {
                 delete repoVaultFiles[path];
                 if (pathEl) pathEl.value = "";
@@ -1309,7 +1290,7 @@
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 90s. Try retrying." : `CONNECTION FAILED: ${err.message}`;
+            const errMsg = `CONNECTION FAILED: ${err.message}`;
             updateMessage(assistantMsgId, errMsg);
             speakText(errMsg);
             setMoodState("error");
