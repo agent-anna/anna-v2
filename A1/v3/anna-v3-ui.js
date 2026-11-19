@@ -4,10 +4,9 @@
     const GITHUB_REPO_OWNER = "agent-anna";
     const GITHUB_REPO_NAME = "anna-v2";
     const WORKSPACE_ROOT = "A1/v3";
-    const WORKFLOW_FILENAME = "anna-autonomous-audit.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
-    const DAHL_TIMEOUT_MS = 20000;
+    const DAHL_TIMEOUT_MS = 25000;
 
     let isVoiceEnabled = true;
     const messagePayloadStore = {};
@@ -19,20 +18,28 @@
     let rawTreeData = [];
     let currentViewMode = "tree";
     let activeBranch = "main";
-    let workflowPollTimer = null;
     let ttsKeepAliveTimer = null;
     let isSyncing = false;
-    let lastWorkflowDispatchMs = 0;
-    let knownV3LogsBeforeRun = new Set();
 
     function stripModelStrings(text) {
         if (!text) return "";
         return String(text)
             .replace(/\s*\bon\s+MiniMaxAI\/MiniMax-M2\.7\.?/gi, "")
             .replace(/\bMiniMaxAI\/MiniMax-M2\.7\.?/gi, "")
-            .replace(/\bMiniMax-M2\.7\.?/gi, "")
             .replace(/ {2,}/g, " ")
             .replace(/\s+([.,!?;:])/g, "$1")
+            .trim();
+    }
+
+    function stripCodeForSpeech(text) {
+        if (!text) return "";
+        return String(text)
+            .replace(/```[\s\S]*?```/g, " Code omitted from speech. ")
+            .replace(/`[^`]*`/g, " ")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/[{}\[\];=><\\\/|]/g, " ")
+            .replace(/\b(function|const|let|var|async|await|return|import|export|class|if|else|for|while|switch|case|try|catch|new|typeof|document|window|fetch|require|module)\b/g, " ")
+            .replace(/\s+/g, " ")
             .trim();
     }
 
@@ -243,8 +250,8 @@
 
     function speakText(text) {
         if (!isVoiceEnabled) return;
-        const clean = stripModelStrings(formatReadableMessage(sanitizeResponse(text)))
-            .replace(/[*_#`~\[\]()]/g, "")
+        const clean = stripModelStrings(stripCodeForSpeech(sanitizeResponse(text)))
+            .replace(/[*_#~]/g, "")
             .replace(/\s+/g, " ")
             .trim();
         if (!clean) return;
@@ -489,150 +496,26 @@
         return putRes.status === 201 || putRes.status === 200 || Boolean(putData && putData.commit);
     }
 
-    function snapshotCurrentV3Logs() {
-        const paths = rawTreeData
-            .filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && f.path.toLowerCase().startsWith("a1/v3/logs/"))
-            .map((f) => f.path);
-        knownV3LogsBeforeRun = new Set(paths);
-    }
-
-    async function dispatchBackendWorkflow(customCommand, customSearchQuery) {
-        const token = getCleanGitHubToken();
-        if (!token) {
-            appendMessage("System Telemetry", "ERROR: GitHub PAT missing. Click KEYS to configure token with 'workflow' & 'repo' permissions.", "msg_err_" + Date.now(), false);
-            toggleSettings();
-            return false;
-        }
-
-        const userEl = document.getElementById("user-input");
-        const cmdText = customCommand
-            || (userEl && userEl.value.trim())
-            || `Perform a full ${WORKSPACE_ROOT} vault integrity audit, verify live BTC/DOGE prices, and log system telemetry under ${WORKSPACE_ROOT}/logs.`;
-
-        const targetLogName = `aa01-v3-${Date.now()}.md`;
-
-        updateActionsBadge("DISPATCHING...", "active");
-        setMoodState("thinking");
-        snapshotCurrentV3Logs();
-
-        try {
-            const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/dispatches`, {
-                method: "POST",
-                headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ref: activeBranch,
-                    inputs: {
-                        command: cmdText,
-                        search_query: customSearchQuery || "",
-                        target_log: targetLogName
-                    }
-                })
-            }, 10000);
-
-            if (res.status === 204 || res.ok) {
-                lastWorkflowDispatchMs = Date.now();
-                updateActionsBadge("QUEUED", "active");
-                appendMessage("System Telemetry", `BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nWorkspace: ${WORKSPACE_ROOT}\nDirective: "${cmdText}"`, "msg_wf_" + Date.now(), false);
-                speakText("Backend workflow dispatched.");
-                startWorkflowTelemetryPoller();
-                setMoodState("standby");
-                return true;
-            } else {
-                updateActionsBadge("FALLBACK PUSH", "active");
-                return await writePendingCommandFallback(cmdText);
-            }
-        } catch (err) {
-            updateActionsBadge("ERROR", "err");
-            setMoodState("error");
-            appendMessage("System Telemetry", `DISPATCH FAILED: ${err.message}`, "msg_wf_err_" + Date.now(), false);
-            return false;
-        }
-    }
-
-    async function writePendingCommandFallback(cmdText) {
-        const targetPath = `${WORKSPACE_ROOT}/vault/pending-commands.md`;
-        lastWorkflowDispatchMs = Date.now();
-        const ok = await writeFileToGitHub(targetPath, cmdText + "\n", `AA01 Pending Command Trigger (${WORKSPACE_ROOT})`);
-        if (ok) {
-            appendMessage("System Telemetry", `COMMAND COMMITTED TO ${targetPath}. Backend push trigger activated.`, "msg_fb_" + Date.now(), false);
-            startWorkflowTelemetryPoller();
-            setMoodState("standby");
-            return true;
-        } else {
-            updateActionsBadge("FAILED", "err");
-            setMoodState("error");
-            return false;
-        }
-    }
-
-    function startWorkflowTelemetryPoller() {
-        if (workflowPollTimer) clearInterval(workflowPollTimer);
-        let checks = 0;
-        const maxChecks = 24;
-
-        workflowPollTimer = setInterval(async () => {
-            checks++;
-            if (checks > maxChecks) {
-                clearInterval(workflowPollTimer);
-                updateActionsBadge("TIMEOUT", "err");
-                return;
-            }
-            try {
-                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${WORKFLOW_FILENAME}/runs?per_page=1`, {
-                    headers: getGitHubHeaders(),
-                    cache: "no-store"
-                }, 10000);
-                if (!res.ok) return;
-                const data = await res.json();
-                const latestRun = data.workflow_runs && data.workflow_runs[0];
-                if (!latestRun) return;
-
-                if (latestRun.status === "queued" || latestRun.status === "in_progress") {
-                    updateActionsBadge(latestRun.status.toUpperCase(), "active");
-                } else if (latestRun.status === "completed") {
-                    clearInterval(workflowPollTimer);
-                    if (latestRun.conclusion === "success") {
-                        updateActionsBadge("VERIFIED [200]", "ok");
-                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing ${WORKSPACE_ROOT} vault...`, "msg_wf_done_" + Date.now(), false);
-                        await fetchRepoTree();
-                        await ingestCoreVaultAssets();
-                        await fetchLatestBackendReport(true, true);
-                    } else {
-                        updateActionsBadge(`FAIL: ${latestRun.conclusion}`, "err");
-                        appendMessage("System Telemetry", `BACKEND RUN ENDED WITH STATUS: ${latestRun.conclusion}.`, "msg_wf_fail_" + Date.now(), false);
-                    }
-                }
-            } catch (e) {}
-        }, 5000);
-    }
-
-    async function fetchLatestBackendReport(autoAnnounceToAnna, onlyNewAfterRun) {
+    async function fetchLatestBackendReport(autoAnnounceToAnna) {
         if (!rawTreeData.length) {
             await fetchRepoTree();
         }
         const v3LogFiles = rawTreeData
             .filter((f) => {
                 if (f.type !== "blob" || isSoulOrLoveLetterPath(f.path)) return false;
-                const p = f.path.toLowerCase();
-                return p.startsWith("a1/v3/logs/");
+                return f.path.toLowerCase().startsWith("a1/v3/logs/");
             })
             .map((f) => f.path)
             .sort();
 
-        const newFiles = v3LogFiles.filter((p) => !knownV3LogsBeforeRun.has(p));
-        const candidateList = onlyNewAfterRun && lastWorkflowDispatchMs > 0 ? newFiles : v3LogFiles;
-
-        if (!candidateList.length) {
-            const msg = onlyNewAfterRun
-                ? `Run finished with no new log created in ${WORKSPACE_ROOT}/logs/.`
-                : `No log files found under ${WORKSPACE_ROOT}/logs/ yet.`;
+        if (!v3LogFiles.length) {
+            const msg = `No log files found under ${WORKSPACE_ROOT}/logs/ yet.`;
             appendMessage("Agent Anna V3", msg, "msg_nolog_" + Date.now(), true);
             if (autoAnnounceToAnna !== false) speakText(msg);
             return;
         }
 
-        const newestLog = candidateList[candidateList.length - 1];
-        knownV3LogsBeforeRun.add(newestLog);
+        const newestLog = v3LogFiles[v3LogFiles.length - 1];
         const ext = newestLog.split(".").pop().toLowerCase();
         await loadRepoFile(newestLog, ext);
         const editor = document.getElementById("repo-code-editor");
@@ -640,7 +523,7 @@
 
         if (autoAnnounceToAnna !== false && logContent) {
             appendMessage("Agent Anna V3", `LATEST V3 LOG (${newestLog}):\n\n${logContent.slice(0, 1800)}`, "msg_rep_" + Date.now(), true);
-            speakText(`Latest V3 log is ${newestLog.split("/").pop()}. ${logContent.slice(0, 350)}`);
+            speakText(`Latest V3 log is ${newestLog.split("/").pop()}.`);
         }
     }
 
@@ -770,7 +653,6 @@
         try {
             await fetchRepoTree();
             await ingestCoreVaultAssets();
-            snapshotCurrentV3Logs();
             const count = Object.keys(repoVaultFiles).length;
             const totalTreeFiles = rawTreeData.filter((f) => f.type === "blob").length;
             appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. Loaded ${totalTreeFiles} total repository files in tree (${count} V3 / character / knowledge / memory files active in context) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
@@ -905,6 +787,49 @@
         const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Active Workspace Root: ${WORKSPACE_ROOT}/\n- Loaded V3 files in context: ${loadedList}\n- Active ${WORKSPACE_ROOT} tree paths: ${treeSample}`;
         const combined = memoryBlocks.concat(characterBlocks, knowledgeBlocks).join("\n\n").slice(0, 6500);
         return `${header}\n\nACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}`;
+    }
+
+    async function gatherLiveWebContext(prompt) {
+        const tel = window.Telemetry;
+        if (!tel || !prompt) return "";
+
+        const blocks = [];
+        const urlMatches = prompt.match(/https?:\/\/[^\s"'<>]+/gi) || [];
+
+        if (urlMatches.length > 0 && typeof tel.fetchUrl === "function") {
+            const urlResults = await Promise.allSettled(
+                urlMatches.slice(0, 2).map((u) => tel.fetchUrl(u, 650))
+            );
+            urlResults.forEach((res, idx) => {
+                if (res.status === "fulfilled" && res.value) {
+                    blocks.push(`[WEB PAGE: ${urlMatches[idx]}]\n${String(res.value).slice(0, 2200)}`);
+                }
+            });
+        }
+
+        if (/\b(btc|bitcoin|doge|dogecoin|crypto|price)\b/i.test(prompt) && typeof tel.getCryptoPrices === "function") {
+            try {
+                const prices = await tel.getCryptoPrices();
+                if (prices) {
+                    blocks.push(`[LIVE CRYPTO PRICES]\n${JSON.stringify(prices)}`);
+                }
+            } catch (e) {}
+        }
+
+        const needsSearch =
+            /\b(search|news|latest|today|current|lookup|find|check|who is|what is|website|site|artist|strayd|kunda)\b/i.test(prompt) &&
+            urlMatches.length === 0;
+
+        if (needsSearch && typeof tel.searchWeb === "function") {
+            try {
+                const searchText = await tel.searchWeb(prompt, 650);
+                if (searchText) {
+                    blocks.push(`[WEB SEARCH RESULTS]\n${String(searchText).slice(0, 2200)}`);
+                }
+            } catch (e) {}
+        }
+
+        return blocks.join("\n\n").slice(0, 4500);
     }
 
     async function triggerAutonomousBootSequence() {
@@ -1093,11 +1018,9 @@
 
     async function parseAndExecuteAutonomousFiles(aiResponseText) {
         const fileRegex = /```file:([^\n]+)\n([\s\S]*?)```/g;
-        const dispatchRegex = /```dispatch\n([\s\S]*?)```/g;
         let match;
         const committedFiles = [];
         const skippedSoulWrites = [];
-        let triggeredWorkflow = false;
 
         while ((match = fileRegex.exec(aiResponseText)) !== null) {
             const filePath = match[1].trim();
@@ -1115,9 +1038,6 @@
                 const edEl = document.getElementById("repo-code-editor");
                 if (pathEl) pathEl.value = filePath;
                 if (edEl) edEl.value = fileContent;
-                if (filePath === `${WORKSPACE_ROOT}/vault/pending-commands.md`) triggeredWorkflow = true;
-            } else {
-                await dispatchBackendWorkflow(`Write this file to ${filePath}:\n${fileContent}`, "");
             }
         }
 
@@ -1145,12 +1065,6 @@
             } catch (e) {}
         }
 
-        let dMatch;
-        while ((dMatch = dispatchRegex.exec(aiResponseText)) !== null) {
-            const backendDirective = dMatch[1].trim();
-            if (backendDirective) await dispatchBackendWorkflow(backendDirective, backendDirective);
-        }
-
         if (skippedSoulWrites.length > 0) {
             appendMessage("System Telemetry", `GUARDRAIL: Blocked auto-write into soul/archive path(s): ${skippedSoulWrites.join(", ")}.`, "msg_soul_guard_" + Date.now(), false);
         }
@@ -1158,7 +1072,6 @@
         if (committedFiles.length > 0) {
             appendMessage("System Telemetry", `VERIFIED 201 COMMIT: ${committedFiles.join(", ")}`, "msg_sys_" + Date.now(), false);
             await fetchRepoTree();
-            if (triggeredWorkflow) startWorkflowTelemetryPoller();
         }
     }
 
@@ -1179,12 +1092,10 @@
         if (ok) {
             if (btnEl) btnEl.innerText = "COMMITTED [201]!";
             repoVaultFiles[targetPath] = fileContent;
-            knownV3LogsBeforeRun.add(targetPath);
             speakText("Saved to log.");
             await fetchRepoTree();
         } else {
-            await dispatchBackendWorkflow(`Write this swallowed intelligence to ${targetPath}:\n${fileContent}`);
-            if (btnEl) btnEl.innerText = "DISPATCHED!";
+            if (btnEl) btnEl.innerText = "COMMIT FAILED";
         }
         setMoodState("standby");
         if (btnEl) setTimeout(() => { btnEl.innerText = "🌀 SWALLOW"; }, 3000);
@@ -1343,31 +1254,45 @@
             return;
         }
 
-        const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.
-STRICT LANGUAGE RULE: Respond in natural, clear English ONLY. Never output Chinese characters or non-English words in your replies.
-OUTPUT FORMAT RULE: Never print model names, provider tags, or model IDs in your response text.
-LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSPACE_ROOT}/ tree right now. Put new/updated files under ${WORKSPACE_ROOT}/ unless instructed otherwise. Never claim a file was written unless you include a \`\`\`file:<path>\n...\n\`\`\` block for the dashboard to commit. Be concise and easy to hear aloud.\n\n${vaultContext}`;
-
         try {
-            const response = await fetchWithTimeout(DAHL_ENDPOINT, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-                body: JSON.stringify({
-                    model: getActiveModel(),
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        ...chatHistory.slice(-4)
-                    ]
-                })
-            }, DAHL_TIMEOUT_MS);
+            const [vaultContext, liveWebContext] = await Promise.all([
+                Promise.resolve(getCompactVaultContext(prompt)),
+                gatherLiveWebContext(prompt)
+            ]);
+
+            const webSection = liveWebContext ? `\n\nLIVE WEB & TELEMETRY DATA:\n${liveWebContext}` : "";
+            const systemPrompt =
+                `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.\n` +
+                `Respond in clear English only. Never read code blocks aloud. Use LIVE WEB & TELEMETRY DATA when present.\n\n` +
+                `${vaultContext}${webSection}`;
+
+            const response = await fetchWithTimeout(
+                DAHL_ENDPOINT,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: getActiveModel(),
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            ...chatHistory.slice(-4)
+                        ]
+                    })
+                },
+                DAHL_TIMEOUT_MS
+            );
 
             const rawText = await response.text();
             let json = null;
             try { json = JSON.parse(rawText); } catch (e) {}
 
             if (!response.ok) {
-                const errDetail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 200);
+                const errDetail = json && json.error
+                    ? (json.error.message || JSON.stringify(json.error))
+                    : rawText.slice(0, 200);
                 const errMsg = stripModelStrings(`DAHL HTTP ${response.status}: ${errDetail}`);
                 updateMessage(assistantMsgId, errMsg);
                 speakText(errMsg);
@@ -1382,16 +1307,17 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            const origin = window.location && window.location.origin ? window.location.origin : "browser";
-            const reason = err && err.name === "AbortError" ? `Request timed out after ${Math.round(DAHL_TIMEOUT_MS / 1000)}s` : err.message;
+            const reason = err && err.name === "AbortError"
+                ? `Request timed out after ${Math.round(DAHL_TIMEOUT_MS / 1000)}s`
+                : err.message;
+            const failMsg = `DAHL CONNECTION ERROR: ${reason}.`;
             setMoodState("error");
-            updateMessage(assistantMsgId, `CONNECTION FAILED (${origin} -> inference.dahl.global): ${reason}. Routing to ${WORKFLOW_FILENAME} in ${WORKSPACE_ROOT}...`);
-            const dispatched = await dispatchBackendWorkflow(prompt, prompt);
-            if (!dispatched) {
-                speakText("Connection failed and backend dispatch unavailable.");
-            }
+            updateMessage(assistantMsgId, failMsg);
+            speakText("Connection error.");
             return;
         }
+
+        updateActionsBadge("IDLE", "");
         setMoodState("standby");
     }
 
@@ -1433,7 +1359,6 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
     window.saveCredentials = saveCredentials;
     window.toggleViewMode = toggleViewMode;
     window.syncAll = syncAll;
-    window.dispatchBackendWorkflow = dispatchBackendWorkflow;
     window.fetchLatestBackendReport = fetchLatestBackendReport;
     window.triggerPreset = triggerPreset;
     window.auditActiveFile = auditActiveFile;
