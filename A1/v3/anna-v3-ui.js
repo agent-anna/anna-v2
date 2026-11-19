@@ -153,12 +153,37 @@
         return String(text).replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
     }
 
+    function formatReadableMessage(rawText) {
+        if (!rawText) return "";
+        const text = String(rawText).trim();
+        const jsonMatch = text.match(/```json\s*([\s\S]*?)```/i) || text.match(/^(\{[\s\S]*\})$/);
+        if (jsonMatch) {
+            try {
+                const parsed = JSON.parse(jsonMatch[1]);
+                if (parsed && typeof parsed.content === "string") {
+                    const unescaped = parsed.content
+                        .replace(/\\r\\n/g, "\n")
+                        .replace(/\\n/g, "\n")
+                        .replace(/\\t/g, "  ");
+                    const headerNote = parsed.path ? `[TARGET: ${parsed.path}]\n\n` : "";
+                    return (headerNote + unescaped).trim();
+                }
+            } catch (e) {}
+        }
+        return text
+            .replace(/\\r\\n/g, "\n")
+            .replace(/\\n/g, "\n");
+    }
+
     function speakText(text) {
         if (!isVoiceEnabled || !("speechSynthesis" in window)) return;
         try {
             clearTtsKeepAlive();
             window.speechSynthesis.cancel();
-            const clean = sanitizeResponse(text).replace(/[*_#`~\[\]()]/g, "").replace(/\s+/g, " ").trim();
+            const clean = formatReadableMessage(sanitizeResponse(text))
+                .replace(/[*_#`~\[\]()]/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
             if (!clean) return;
 
             const chunks = [];
@@ -252,10 +277,11 @@
     function appendMessage(sender, text, id, isAssistant) {
         const container = document.getElementById("chat-container");
         if (!container) return;
+        const readableText = isAssistant ? formatReadableMessage(text) : text;
         const div = document.createElement("div");
         div.className = `message ${isAssistant ? "assistant" : "user"}`;
         div.id = id;
-        messagePayloadStore[id] = text;
+        messagePayloadStore[id] = readableText;
 
         const header = document.createElement("div");
         header.className = "msg-header";
@@ -269,10 +295,9 @@
 
         const body = document.createElement("div");
         body.className = "msg-content";
-        body.textContent = text;
+        body.textContent = readableText;
 
         div.appendChild(header);
-        div.appendChild(body);
 
         if (isAssistant) {
             const temp = document.createElement("div");
@@ -287,6 +312,7 @@
             while (temp.firstChild) div.appendChild(temp.firstChild);
         }
 
+        div.appendChild(body);
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;
     }
@@ -294,9 +320,10 @@
     function updateMessage(id, text) {
         const el = document.getElementById(id);
         if (!el) return;
+        const readableText = formatReadableMessage(text);
         const body = el.querySelector(".msg-content");
-        if (body) body.textContent = text;
-        messagePayloadStore[id] = text;
+        if (body) body.textContent = readableText;
+        messagePayloadStore[id] = readableText;
         const container = document.getElementById("chat-container");
         if (container) container.scrollTop = container.scrollHeight;
     }
@@ -329,6 +356,11 @@
                 }
             }).catch(() => {});
         }
+    }
+
+    function toggleWriteZone() {
+        const wz = document.getElementById("anna-write-zone");
+        if (wz) wz.classList.toggle("open");
     }
 
     async function fetchLiveWebAndMarketTelemetry(prompt) {
@@ -874,7 +906,7 @@
         setMoodState("thinking");
 
         const vaultContext = getCompactVaultContext("brain memory links tasks soul rules laws love-letters");
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Preserve your character, rules, laws, soul, love-letters, and knowledge vault.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, knowledge vault status, and zero-hallucination rule concisely.`;
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable plain text or Markdown with real line breaks (never raw escaped \\n strings). Preserve your character, rules, laws, soul, love-letters, and knowledge vault.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, knowledge vault status, and zero-hallucination rule concisely.`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -900,7 +932,7 @@
             }
 
             const cleanReply = extractDahlReply(json, rawText) || "Agent Anna V3 (A1) online and standing by.";
-            chatHistory.push({ role: "assistant", content: cleanReply });
+            chatHistory.push({ role: "assistant", content: formatReadableMessage(cleanReply) });
             updateMessage(bootMsgId, cleanReply);
             speakText(cleanReply);
         } catch (err) {
@@ -1089,6 +1121,24 @@
             }
         }
 
+        const jsonMatch = String(aiResponseText || "").match(/```json\s*([\s\S]*?)```/i) || String(aiResponseText || "").trim().match(/^(\{[\s\S]*\})$/);
+        if (jsonMatch) {
+            try {
+                const parsed = JSON.parse(jsonMatch[1]);
+                if (parsed && parsed.path && typeof parsed.content === "string") {
+                    const unescaped = parsed.content
+                        .replace(/\\r\\n/g, "\n")
+                        .replace(/\\n/g, "\n")
+                        .replace(/\\t/g, "  ");
+                    const ok = await writeFileToGitHub(parsed.path.trim(), unescaped, `Agent Anna V3 Write: ${parsed.path.trim()}`);
+                    if (ok) {
+                        repoVaultFiles[parsed.path.trim()] = unescaped;
+                        committedFiles.push(parsed.path.trim());
+                    }
+                }
+            } catch (e) {}
+        }
+
         let dMatch;
         while ((dMatch = dispatchRegex.exec(aiResponseText)) !== null) {
             const backendDirective = dMatch[1].trim();
@@ -1263,7 +1313,7 @@
 
         const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Preserve character, rules, laws, soul, and love-letters. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Preserve character, rules, laws, soul, and love-letters. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1290,7 +1340,7 @@
             }
 
             const cleanReply = extractDahlReply(json, rawText);
-            chatHistory.push({ role: "assistant", content: cleanReply });
+            chatHistory.push({ role: "assistant", content: formatReadableMessage(cleanReply) });
             updateMessage(assistantMsgId, cleanReply);
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
@@ -1355,6 +1405,7 @@
     window.confirmDeleteFile = confirmDeleteFile;
     window.cancelDeleteFile = cancelDeleteFile;
     window.loadRepoFile = loadRepoFile;
+    window.toggleWriteZone = toggleWriteZone;
     window.clearWriteZone = clearWriteZone;
     window.dispatchFromWriteZone = dispatchFromWriteZone;
     window.processAnnaWriteZone = processAnnaWriteZone;
