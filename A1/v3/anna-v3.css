@@ -1,18 +1,18 @@
 :root {
-    --bg-dark: #090908;
-    --bg-surface: #12110e;
-    --bg-elevated: #191713;
-    --border-subtle: #27231a;
-    --gold: #c9a84c;
-    --gold-dim: #7b642c;
-    --standby: #4f796e;
-    --thinking: #4e6b8a;
-    --responding: #5a7d58;
-    --saving: #8a7339;
-    --error: #8c4a47;
-    --text-light: #d8ceba;
-    --text-muted: #766e5c;
-    --pane-bg: #11100d;
+    --bg-dark: #06080d;
+    --bg-surface: #0d121c;
+    --bg-elevated: #141b29;
+    --border-subtle: #222d42;
+    --gold: #f0c44d;
+    --gold-dim: #9a7b2c;
+    --standby: #00e5c3;
+    --thinking: #3b82f6;
+    --responding: #22c55e;
+    --saving: #f59e0b;
+    --error: #f43f5e;
+    --text-light: #eef2f7;
+    --text-muted: #7c8aa3;
+    --pane-bg: #0a0e17;
     --state-color: var(--standby);
 }
 
@@ -53,19 +53,15 @@ body.is-error { --state-color: var(--error); }
 }
 
 *::-webkit-scrollbar-thumb {
-    background: var(--gold-dim);
+    background: var(--state-color);
     border-radius: 3px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-    background: var(--gold);
 }
 
 .military-top-bar {
     width: 100vw;
-    min-height: 36px;
+    min-height: 38px;
     background: var(--bg-surface);
-    border-bottom: 1px solid var(--state-color);
+    border-bottom: 2px solid var(--state-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -74,29 +70,31 @@ body.is-error { --state-color: var(--error); }
     flex-wrap: wrap;
     font-size: 11px;
     z-index: 100;
-    transition: border-color 0.25s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 14px color-mix(in srgb, var(--state-color) 28%, transparent);
 }
 
 .top-status-indicator {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--gold);
+    color: var(--state-color);
     font-weight: bold;
     flex-wrap: wrap;
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: var(--state-color);
-    transition: background-color 0.25s ease;
+    box-shadow: 0 0 10px var(--state-color);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .status-badge {
     font-size: 9px;
-    padding: 2px 6px;
+    padding: 2px 7px;
     border: 1px solid var(--border-subtle);
     background: var(--bg-elevated);
     border-radius: 3px;
@@ -105,23 +103,23 @@ body.is-error { --state-color: var(--error); }
 
 .status-badge.ok {
     border-color: var(--standby);
-    color: var(--text-light);
+    color: var(--standby);
 }
 
 .status-badge.err {
     border-color: var(--error);
-    color: #d69895;
+    color: #fda4af;
 }
 
 .status-badge.active {
     border-color: var(--saving);
-    color: var(--gold);
+    color: var(--saving);
 }
 
 .main-workspace {
     display: flex;
     flex: 1;
-    height: calc(100vh - 36px);
+    height: calc(100vh - 38px);
     width: 100vw;
     overflow: hidden;
 }
@@ -130,12 +128,13 @@ body.is-error { --state-color: var(--error); }
     width: 58%;
     height: 100%;
     background: var(--pane-bg);
-    border-right: 1px solid var(--border-subtle);
+    border-right: 2px solid var(--state-color);
     display: flex;
     flex-direction: column;
     padding: 10px;
     gap: 8px;
     overflow: hidden;
+    transition: border-color 0.2s ease;
 }
 
 .chat-pane {
@@ -187,7 +186,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 .repo-file-card:hover, .repo-file-card:focus {
-    border-color: var(--gold);
+    border-color: var(--state-color);
     background: var(--bg-elevated);
     outline: none;
 }
@@ -225,7 +224,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 .tree-folder-row:hover, .tree-folder-row:focus {
-    color: var(--text-light);
+    color: var(--state-color);
     outline: none;
 }
 
@@ -248,14 +247,14 @@ body.is-error { --state-color: var(--error); }
 }
 
 .tree-file:hover, .tree-file:focus {
-    color: var(--gold);
+    color: var(--state-color);
     background: var(--bg-elevated);
     outline: none;
 }
 
 #delete-warning-banner {
     display: none;
-    background: #231312;
+    background: #2b1118;
     border: 1px solid var(--error);
     padding: 8px;
     border-radius: 3px;
@@ -280,7 +279,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 #repo-code-editor:focus {
-    border-color: var(--gold-dim);
+    border-color: var(--state-color);
     outline: none;
 }
 
@@ -307,7 +306,7 @@ body.is-error { --state-color: var(--error); }
 .chat-header {
     padding: 8px 12px;
     background: var(--bg-surface);
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--state-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -319,7 +318,7 @@ body.is-error { --state-color: var(--error); }
 #settings-panel {
     padding: 10px;
     background: var(--bg-surface);
-    border-bottom: 1px solid var(--gold-dim);
+    border-bottom: 1px solid var(--gold);
     display: none;
     flex-shrink: 0;
 }
@@ -363,7 +362,7 @@ body.is-error { --state-color: var(--error); }
 .message.user {
     align-self: flex-end;
     background: var(--bg-elevated);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid #354766;
 }
 
 .message.assistant {
@@ -376,7 +375,7 @@ body.is-error { --state-color: var(--error); }
     font-size: 9px;
     color: var(--gold);
     padding: 5px 10px;
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.03);
     border-bottom: 1px solid var(--border-subtle);
     font-weight: bold;
     cursor: pointer;
@@ -415,19 +414,19 @@ body.is-error { --state-color: var(--error); }
 }
 
 .action-chip:hover {
-    border-color: var(--gold);
-    color: var(--gold);
+    border-color: var(--state-color);
+    color: var(--state-color);
 }
 
 .swallow-btn {
     border-color: var(--standby) !important;
-    color: var(--gold) !important;
+    color: var(--standby) !important;
     font-weight: bold;
 }
 
 .del-btn {
     border-color: var(--error) !important;
-    color: #d69895 !important;
+    color: #fda4af !important;
 }
 
 .quick-tactical-bar {
@@ -452,12 +451,12 @@ body.is-error { --state-color: var(--error); }
 }
 
 .tactical-chip:hover {
-    border-color: var(--gold);
-    color: var(--gold);
+    border-color: var(--state-color);
+    color: var(--state-color);
 }
 
 .tactical-chip.backend-chip {
-    border-color: var(--gold-dim);
+    border-color: var(--gold);
     color: var(--gold);
     font-weight: bold;
 }
@@ -496,17 +495,17 @@ body.is-error { --state-color: var(--error); }
 }
 
 .anna-write-zone textarea:focus {
-    border-color: var(--gold-dim);
+    border-color: var(--state-color);
     outline: none;
 }
 
 #anna-cmd-input {
-    height: 36px;
+    height: 34px;
     color: var(--gold);
 }
 
 #anna-content-input {
-    height: 44px;
+    height: 42px;
 }
 
 .write-zone-footer {
@@ -549,7 +548,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 #user-input:focus {
-    border-color: var(--gold-dim);
+    border-color: var(--state-color);
     outline: none;
 }
 
@@ -565,8 +564,8 @@ body.is-error { --state-color: var(--error); }
 }
 
 .ctrl-btn:hover, .ctrl-btn:focus {
-    border-color: var(--gold);
-    color: var(--gold);
+    border-color: var(--state-color);
+    color: var(--state-color);
     outline: none;
 }
 
@@ -576,7 +575,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 .mic-btn.listening {
-    background: #2b1a19 !important;
-    border-color: var(--error) !important;
-    color: #e4a5a2 !important;
+    background: #132c21 !important;
+    border-color: var(--responding) !important;
+    color: var(--responding) !important;
 }
