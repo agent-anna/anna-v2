@@ -32,17 +32,20 @@
         );
     }
 
-    function isCoreStartupFile(path) {
+    function isV3CoreFile(path) {
         if (!path || isSoulOrLoveLetterPath(path)) return false;
         const lower = path.toLowerCase();
         if (!/\.(md|json|txt)$/i.test(lower)) return false;
         const base = lower.split("/").pop();
         return (
+            lower.includes("/v3/") ||
+            lower.startsWith("v3/") ||
+            base.includes("anna-v3") ||
+            base.startsWith("aa01") ||
             base === "brain.json" ||
             base === "memory.json" ||
             base === "links.json" ||
             base === "tasks.json" ||
-            base.startsWith("aa01") ||
             base.includes("character") ||
             lower.includes("/character/") ||
             lower.startsWith("character/") ||
@@ -89,7 +92,7 @@
         document.body.classList.remove("is-standby", "is-thinking", "is-responding", "is-saving", "is-error", "is-speaking", "is-listening");
         document.body.classList.add(`is-${target}`);
         const stEl = document.getElementById("state-text");
-        if (stEl) stEl.innerText = `${target.toUpperCase()} // AGENT ANNA V3 (A1)`;
+        if (stEl) stEl.innerText = `${target.toUpperCase()} // AGENT ANNA V3`;
         if (window.Brain && typeof window.Brain.setState === "function") {
             try { window.Brain.setState(target.toUpperCase()); } catch (e) {}
         }
@@ -113,6 +116,26 @@
         if (!badge) return;
         badge.innerText = `ACTIONS: ${text}`;
         badge.className = `status-badge ${stateClass || ""}`;
+    }
+
+    function playToneCue(freq, durationMs) {
+        if (!isVoiceEnabled) return;
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            const ctx = new AudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = freq || 660;
+            gain.gain.value = 0.04;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            setTimeout(() => {
+                try { osc.stop(); ctx.close(); } catch (e) {}
+            }, durationMs || 140);
+        } catch (e) {}
     }
 
     function loadVoices() {
@@ -168,8 +191,7 @@
             return score;
         };
 
-        const sorted = list.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a));
-        return sorted[0] || null;
+        return list.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
     }
 
     function clearTtsKeepAlive() {
@@ -201,21 +223,30 @@
                 }
             } catch (e) {}
         }
-        return text
-            .replace(/\\r\\n/g, "\n")
-            .replace(/\\n/g, "\n");
+        return text.replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n");
     }
 
     function speakText(text) {
-        if (!isVoiceEnabled || !("speechSynthesis" in window)) return;
+        if (!isVoiceEnabled) return;
+        const clean = formatReadableMessage(sanitizeResponse(text))
+            .replace(/[*_#`~\[\]()]/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+        if (!clean) return;
+
+        if (!("speechSynthesis" in window)) {
+            playToneCue(720, 160);
+            return;
+        }
+
         try {
             clearTtsKeepAlive();
             window.speechSynthesis.cancel();
-            const clean = formatReadableMessage(sanitizeResponse(text))
-                .replace(/[*_#`~\[\]()]/g, "")
-                .replace(/\s+/g, " ")
-                .trim();
-            if (!clean) return;
+            loadVoices();
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices || !voices.length) {
+                playToneCue(720, 160);
+            }
 
             const chunks = [];
             const sentences = clean.match(/[^.!?]+[.!?]*|[^.!?]+$/g) || [clean];
@@ -233,8 +264,7 @@
             if (buf.trim()) chunks.push(buf.trim());
             if (!chunks.length) return;
 
-            loadVoices();
-            const chosenVoice = pickFemaleEnglishVoice(window.speechSynthesis.getVoices());
+            const chosenVoice = pickFemaleEnglishVoice(voices);
             setMoodState("responding");
 
             let idx = 0;
@@ -248,7 +278,7 @@
                 if (chosenVoice) utterance.voice = chosenVoice;
                 utterance.lang = (chosenVoice && chosenVoice.lang) || "en-US";
                 utterance.pitch = 1.08;
-                utterance.rate = 1.0;
+                utterance.rate = 1.02;
                 utterance.onend = () => {
                     if (idx < chunks.length) speakNext();
                     else {
@@ -258,6 +288,7 @@
                 };
                 utterance.onerror = () => {
                     clearTtsKeepAlive();
+                    playToneCue(440, 180);
                     setMoodState("standby");
                 };
                 window.speechSynthesis.speak(utterance);
@@ -270,9 +301,10 @@
                 } else if (!window.speechSynthesis.speaking) {
                     clearTtsKeepAlive();
                 }
-            }, 4000);
+            }, 3000);
         } catch (e) {
             clearTtsKeepAlive();
+            playToneCue(440, 180);
             setMoodState("standby");
         }
     }
@@ -300,7 +332,7 @@
 
     async function fetchWithTimeout(url, opts, ms) {
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), ms || 15000);
+        const timer = setTimeout(() => ctrl.abort(), ms || 25000);
         try {
             return await fetch(url, { ...(opts || {}), signal: ctrl.signal });
         } finally {
@@ -434,12 +466,12 @@
                 const webRes = await fetchWithTimeout(`https://r.jina.ai/${targetUrl}`, {}, 10000);
                 if (webRes.ok) {
                     const webText = await webRes.text();
-                    telemetryBlocks.push(`[VERIFIED LIVE WEB READER FOR ${targetUrl}]\n${webText.slice(0, 5000)}`);
+                    telemetryBlocks.push(`[VERIFIED LIVE WEB READER FOR ${targetUrl}]\n${webText.slice(0, 4000)}`);
                 }
             } catch (e) {}
         }
 
-        const wantsSearch = /search|duckduckgo|ddg|google|find|lookup|look up|news|weather|latest|today|current|who is|what is|summarize|research|open.?source|github|w3c|social.?media|automation/.test(lower);
+        const wantsSearch = /search|duckduckgo|ddg|google|find|lookup|look up|news|weather|latest|today|current|who is|what is|summarize|research|open.?source|github|w3c|social.?media|automation|doge|btc|bitcoin|dogecoin/.test(lower);
         if (wantsSearch) {
             const rawQuery = String(prompt || "")
                 .replace(/^(search|google|duckduckgo|ddg|find|look up|lookup|summarize|research)\s+(for|about)?/i, "")
@@ -456,7 +488,7 @@
                 if (jinaSearchRes.ok) {
                     const searchText = await jinaSearchRes.text();
                     if (searchText && searchText.trim().length > 30) {
-                        telemetryBlocks.push(`[VERIFIED LIVE WEB/SEARCH RESULTS FOR "${searchQuery}"]\n${searchText.slice(0, 5000)}`);
+                        telemetryBlocks.push(`[VERIFIED LIVE WEB/SEARCH RESULTS FOR "${searchQuery}"]\n${searchText.slice(0, 4000)}`);
                         gotSearchData = true;
                     }
                 }
@@ -469,7 +501,7 @@
                     if (ddgRes.ok) {
                         const ddgText = await ddgRes.text();
                         if (ddgText && ddgText.trim().length > 30) {
-                            telemetryBlocks.push(`[VERIFIED LIVE DUCKDUCKGO RESULTS FOR "${searchQuery}"]\n${ddgText.slice(0, 5000)}`);
+                            telemetryBlocks.push(`[VERIFIED LIVE DUCKDUCKGO RESULTS FOR "${searchQuery}"]\n${ddgText.slice(0, 4000)}`);
                             gotSearchData = true;
                         }
                     }
@@ -503,6 +535,7 @@
     }
 
     async function writeFileToGitHub(path, content, commitMessage) {
+        if (isSoulOrLoveLetterPath(path)) return false;
         if (window.GitHub && typeof window.GitHub.upsert === "function") {
             try {
                 const r = await window.GitHub.upsert(path, content, commitMessage);
@@ -536,7 +569,7 @@
         const userEl = document.getElementById("user-input");
         const cmdText = customCommand
             || (userEl && userEl.value.trim())
-            || "Perform a full A1 vault integrity audit, verify live BTC/DOGE prices, and log system telemetry.";
+            || "Perform a full V3 vault integrity audit, verify live BTC/DOGE prices, and log system telemetry.";
 
         updateActionsBadge("DISPATCHING...", "active");
         setMoodState("thinking");
@@ -608,7 +641,7 @@
                     clearInterval(workflowPollTimer);
                     if (latestRun.conclusion === "success") {
                         updateActionsBadge("VERIFIED [200]", "ok");
-                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing core vault & loading report...`, "msg_wf_done_" + Date.now(), false);
+                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing V3 vault & loading report...`, "msg_wf_done_" + Date.now(), false);
                         await fetchRepoTree();
                         await ingestCoreVaultAssets();
                         await fetchLatestBackendReport(true);
@@ -671,13 +704,13 @@
     function renderTreeView() {
         const treeEl = document.getElementById("repo-tree-view");
         if (!treeEl) return;
-        if (!rawTreeData.length) {
-            treeEl.innerHTML = `<span style="color:var(--text-muted);">No repo data loaded. Click SYNC.</span>`;
+        const v3Items = rawTreeData.filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && isV3CoreFile(f.path));
+        if (!v3Items.length) {
+            treeEl.innerHTML = `<span style="color:var(--text-muted);">No V3/character/knowledge files loaded. Click SYNC.</span>`;
             return;
         }
         const root = {};
-        rawTreeData.forEach((item) => {
-            if (item.type !== "blob") return;
+        v3Items.forEach((item) => {
             const parts = item.path.split("/");
             let current = root;
             parts.forEach((part, idx) => {
@@ -712,10 +745,10 @@
 
     function renderGridView() {
         const gridEl = document.getElementById("repo-file-grid");
-        if (!gridEl || !rawTreeData.length) return;
+        if (!gridEl) return;
+        const v3Items = rawTreeData.filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && isV3CoreFile(f.path));
         gridEl.innerHTML = "";
-        rawTreeData.forEach((file) => {
-            if (file.type !== "blob") return;
+        v3Items.forEach((file) => {
             const ext = file.path.split(".").pop().toLowerCase();
             let icon = "📄";
             if (["html", "htm"].includes(ext)) icon = "🌐";
@@ -745,7 +778,7 @@
             await fetchRepoTree();
             await ingestCoreVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
-            appendMessage("Agent Anna V3", `Agent Anna V3 (A1) online. Loaded ${count} core files (brain/memory/character/knowledge/AA01) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+            appendMessage("Agent Anna V3", `Agent Anna V3 online. Loaded ${count} V3 / character / knowledge files from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
         } finally {
             isSyncing = false;
         }
@@ -784,7 +817,7 @@
         const coreFiles = rawTreeData.filter((f) =>
             f.type === "blob" &&
             f.size < 65000 &&
-            isCoreStartupFile(f.path)
+            isV3CoreFile(f.path)
         );
 
         repoVaultFiles = {};
@@ -800,31 +833,26 @@
             } catch (e) {}
         }
 
-        const totalBlobs = rawTreeData.filter((f) => f.type === "blob").length;
+        const count = Object.keys(repoVaultFiles).length;
         const badge = document.getElementById("vault-status");
         if (badge) {
-            badge.innerText = `CORE: ${Object.keys(repoVaultFiles).length} / ${totalBlobs}`;
-            badge.className = totalBlobs > 0 ? "status-badge ok" : "status-badge err";
+            badge.innerText = `V3 FILES: ${count}`;
+            badge.className = count > 0 ? "status-badge ok" : "status-badge err";
         }
     }
 
     function getCompactVaultContext(userPrompt) {
-        const manifest = [];
         const spineBlocks = [];
         const knowledgeBlocks = [];
         const lowerPrompt = String(userPrompt || "").toLowerCase();
         const terms = lowerPrompt.split(/[^a-z0-9_-]+/).filter((w) => w.length > 2);
 
-        rawTreeData.forEach((f) => {
-            if (f.type === "blob") manifest.push(`- ${f.path}`);
-        });
-
         for (const [path, content] of Object.entries(repoVaultFiles)) {
-            if (isSoulOrLoveLetterPath(path)) continue;
+            if (isSoulOrLoveLetterPath(path) || !isV3CoreFile(path)) continue;
 
             const lowerPath = path.toLowerCase();
             const baseName = path.split("/").pop().toLowerCase();
-            const isConsolidatedMaster = baseName.startsWith("aa01");
+            const isConsolidatedMaster = baseName.startsWith("aa01") || baseName.includes("anna-v3");
             const isSpine = (
                 baseName === "brain.json" ||
                 baseName === "memory.json" ||
@@ -841,22 +869,22 @@
             const isTermMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
 
             if (isConsolidatedMaster) {
-                spineBlocks.unshift(`=== CONSOLIDATED AA01 [${path}] ===\n${content.slice(0, 3200)}`);
+                spineBlocks.unshift(`=== V3 MASTER [${path}] ===\n${content.slice(0, 1800)}`);
             } else if (isSpine) {
-                spineBlocks.push(`=== SPINE [${path}] ===\n${content.slice(0, 1800)}`);
+                spineBlocks.push(`=== CHARACTER / CORE [${path}] ===\n${content.slice(0, 1200)}`);
             } else if (isKnowledge || isTermMatch) {
-                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 1800)}`);
+                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 1200)}`);
             }
         }
 
-        const combined = spineBlocks.concat(knowledgeBlocks).join("\n\n").slice(0, 13000);
-        return `REPOSITORY MANIFEST:\n${manifest.slice(0, 90).join("\n")}\n\nCORE BRAIN / MEMORY / CHARACTER / KNOWLEDGE:\n${combined}`;
+        const combined = spineBlocks.concat(knowledgeBlocks).join("\n\n").slice(0, 5500);
+        return combined ? `ACTIVE V3 / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}` : "";
     }
 
     async function fetchDahlWithAutoRetry(url, options, maxRetries) {
         const retries = maxRetries || 3;
         for (let attempt = 0; attempt < retries; attempt++) {
-            const response = await fetchWithTimeout(url, options, 18000);
+            const response = await fetchWithTimeout(url, options, 30000);
             if (response.status === 429) {
                 const retryHeader = response.headers.get("Retry-After");
                 let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : Math.pow(2, attempt + 1);
@@ -871,72 +899,24 @@
     }
 
     function extractDahlReply(json, rawText) {
-        if (!json) return sanitizeResponse(rawText);
+        const clean = (s) => String(s || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        if (!json) return clean(rawText);
         if (json.choices && json.choices[0]) {
             const msg = json.choices[0].message;
-            if (msg && typeof msg.content === "string") return sanitizeResponse(msg.content);
-            if (typeof json.choices[0].text === "string") return sanitizeResponse(json.choices[0].text);
+            if (msg && typeof msg.content === "string") return clean(msg.content);
+            if (typeof json.choices[0].text === "string") return clean(json.choices[0].text);
         }
-        for (const key of ["reply", "response", "output", "text"]) {
-            if (typeof json[key] === "string") return sanitizeResponse(json[key]);
+        for (const k of ["reply", "response", "output", "text"]) {
+            if (typeof json[k] === "string") return clean(json[k]);
         }
-        return sanitizeResponse(rawText);
+        return clean(rawText);
     }
 
     async function triggerAutonomousBootSequence() {
-        const apiKey = getCleanDahlKey();
         const coreCount = Object.keys(repoVaultFiles).length;
-
-        if (!apiKey) {
-            const fallbackMsg = `Agent Anna V3 (A1) awakened with ${coreCount} core files loaded. Enter Dahl API Key in KEYS to connect neural core.`;
-            appendMessage("Agent Anna V3", fallbackMsg, "msg_boot_" + Date.now(), true);
-            speakText(fallbackMsg);
-            return;
-        }
-
-        const bootMsgId = "msg_boot_" + Date.now();
-        appendMessage("Agent Anna V3", `Awakening Agent Anna V3 (${getActiveModel()})...`, bootMsgId, true);
-        setMoodState("thinking");
-
-        const vaultContext = getCompactVaultContext("aa01 character brain memory links tasks knowledge");
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory persistent across browser refreshes and reconnects. Never write OS logs or facts into soul/, and treat love letters in soul/ as archived recollection only.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, core vault status, and zero-hallucination rule concisely.`;
-
-        try {
-            const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-                body: JSON.stringify({
-                    model: getActiveModel(),
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: "Boot Agent Anna V3 (A1) and confirm character, core knowledge, and readiness." }
-                    ]
-                })
-            });
-
-            const rawText = await response.text();
-            let json = null;
-            try { json = JSON.parse(rawText); } catch (e) {}
-
-            if (!response.ok) {
-                const errMsg = `DAHL HTTP ${response.status}: Rate limit or endpoint error.`;
-                updateMessage(bootMsgId, errMsg);
-                speakText(errMsg);
-                setMoodState("error");
-                return;
-            }
-
-            const cleanReply = extractDahlReply(json, rawText) || "Agent Anna V3 (A1) online and standing by.";
-            chatHistory.push({ role: "assistant", content: formatReadableMessage(cleanReply) });
-            updateMessage(bootMsgId, cleanReply);
-            speakText(cleanReply);
-        } catch (err) {
-            const errMsg = err.name === "AbortError" ? "BOOT TIMED OUT after 18s. Try again or switch model." : `CONNECTION ERROR: ${err.message}`;
-            updateMessage(bootMsgId, errMsg);
-            speakText(errMsg);
-            setMoodState("error");
-            return;
-        }
+        const msg = `Agent Anna V3 online. ${coreCount} V3, character, and knowledge files loaded on ${getActiveModel()}.`;
+        appendMessage("Agent Anna V3", msg, "msg_boot_" + Date.now(), true);
+        speakText(msg);
         setMoodState("standby");
     }
 
@@ -994,17 +974,15 @@
         const edEl = document.getElementById("repo-code-editor");
         const path = pathEl ? pathEl.value.trim() : "";
         const content = edEl ? edEl.value : "";
-        if (!path) return;
+        if (!path || isSoulOrLoveLetterPath(path)) return;
 
         setMoodState("saving");
         try {
             const ok = await writeFileToGitHub(path, content, `Agent Anna V3 commit: updated ${path}`);
             if (ok) {
-                if (!isSoulOrLoveLetterPath(path)) {
-                    repoVaultFiles[path] = content;
-                }
+                repoVaultFiles[path] = content;
                 appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} written to ${GITHUB_REPO_NAME}.`, "msg_com_" + Date.now(), false);
-                speakText("Committed file successfully.");
+                speakText(`Committed ${path.split("/").pop()}.`);
                 await fetchRepoTree();
             } else {
                 appendMessage("System Telemetry", "COMMIT ERROR: Check GitHub PAT write permissions.", "msg_com_err_" + Date.now(), false);
@@ -1033,12 +1011,11 @@
     }
 
     async function confirmDeleteFile() {
-        const banner = document.getElementById("delete-warning-banner");
-        if (banner) banner.style.display = "none";
+        cancelDeleteFile();
         const token = getCleanGitHubToken();
         const pathEl = document.getElementById("active-file-path");
         const path = pathEl ? pathEl.value.trim() : "";
-        if (!token || !path) return;
+        if (!token || !path || isSoulOrLoveLetterPath(path)) return;
 
         setMoodState("saving");
         try {
@@ -1054,7 +1031,7 @@
                 if (pathEl) pathEl.value = "";
                 const edEl = document.getElementById("repo-code-editor");
                 if (edEl) edEl.value = "";
-                speakText(`Deleted ${path} from repository.`);
+                speakText(`Deleted ${path.split("/").pop()}.`);
                 await fetchRepoTree();
             }
         } catch (e) {}
@@ -1180,12 +1157,13 @@
         const dateTag = new Date().toISOString().slice(0, 10);
         const timeTag = new Date().toTimeString().slice(0, 5).replace(":", "");
         const targetPath = `A1/logs/anna-v3-swallow-${dateTag}-${safeTitle || timeTag}.md`;
-        const fileContent = `# AGENT ANNA V3 (A1) // OPERATIONAL SWALLOW LOG\n# TIMESTAMP: ${new Date().toISOString()}\n# scout_date:${dateTag}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
+        const fileContent = `# AGENT ANNA V3 // OPERATIONAL SWALLOW LOG\n# TIMESTAMP: ${new Date().toISOString()}\n# scout_date:${dateTag}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
 
         const ok = await writeFileToGitHub(targetPath, fileContent, `Agent Anna V3 Swallow Commit: ${safeTitle || "vault-log"}`);
         if (ok) {
             if (btnEl) btnEl.innerText = "COMMITTED [201]!";
             repoVaultFiles[targetPath] = fileContent;
+            speakText("Saved to log.");
             await fetchRepoTree();
         } else {
             await dispatchBackendWorkflow(`Write this swallowed intelligence to ${targetPath}:\n${fileContent}`);
@@ -1282,6 +1260,7 @@
         const btn = document.getElementById("voice-btn");
         if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF";
         if (!isVoiceEnabled) executeStfuProtocol();
+        else speakText("Voice on.");
     }
 
     function toggleSettings() {
@@ -1339,7 +1318,9 @@
 
         const apiKey = getCleanDahlKey();
         if (!apiKey) {
-            updateMessage(assistantMsgId, "ERROR: Dahl API key missing. Click KEYS to configure.");
+            const errMsg = "ERROR: Dahl API key missing. Click KEYS to configure.";
+            updateMessage(assistantMsgId, errMsg);
+            speakText(errMsg);
             toggleSettings();
             setMoodState("standby");
             return;
@@ -1347,7 +1328,7 @@
 
         const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory active across refreshes and reconnects. Never write OS logs or operational facts into soul/, and treat love letters in soul/ as archived past notes/recollection only. When [VERIFIED LIVE ...] blocks are provided, summarize and answer directly from those live results instead of claiming you cannot fetch live web/news/prices. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
+        const systemPrompt = `You are AGENT ANNA V3 for ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Use only V3, character, and knowledge context provided here—never reference old V1/V2 repo clutter or soul/ love letters. Be concise, clear, and easy to hear aloud. Answer directly from any [VERIFIED LIVE ...] results provided.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1357,7 +1338,7 @@
                     model: getActiveModel(),
                     messages: [
                         { role: "system", content: systemPrompt },
-                        ...chatHistory.slice(-8)
+                        ...chatHistory.slice(-6)
                     ]
                 })
             });
@@ -1375,13 +1356,13 @@
                 return;
             }
 
-            const cleanReply = extractDahlReply(json, rawText);
+            const cleanReply = extractDahlReply(json, rawText) || "Ready.";
             chatHistory.push({ role: "assistant", content: formatReadableMessage(cleanReply) });
             updateMessage(assistantMsgId, cleanReply);
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 18s. Try again or switch model." : `CONNECTION FAILED: ${err.message}`;
+            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 30s. Try switching model or retrying." : `CONNECTION FAILED: ${err.message}`;
             updateMessage(assistantMsgId, errMsg);
             speakText(errMsg);
             setMoodState("error");
