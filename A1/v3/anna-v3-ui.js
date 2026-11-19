@@ -6,7 +6,7 @@
     const WORKSPACE_ROOT = "A1/v3";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
-    const DAHL_TIMEOUT_MS = 25000;
+    const DAHL_TIMEOUT_MS = 35000;
 
     let isVoiceEnabled = true;
     const messagePayloadStore = {};
@@ -364,6 +364,156 @@
         } finally {
             clearTimeout(timer);
         }
+    }
+
+    function htmlToReadableText(html) {
+        if (!html) return "";
+        try {
+            const doc = new DOMParser().parseFromString(String(html), "text/html");
+            doc.querySelectorAll("script, style, noscript").forEach((el) => el.remove());
+            const links = Array.from(doc.querySelectorAll("a[href]"))
+                .map((a) => `${(a.textContent || "").trim()} -> ${a.getAttribute("href")}`)
+                .filter((line) => line.length > 4)
+                .slice(0, 80);
+            const bodyText = (doc.body && doc.body.innerText ? doc.body.innerText : "")
+                .replace(/\s+/g, " ")
+                .trim()
+                .slice(0, 2200);
+            return `PAGE TEXT:\n${bodyText}\n\nLINKS FOUND:\n${links.join("\n")}`.trim();
+        } catch (e) {
+            return String(html).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 2500);
+        }
+    }
+
+    async function fetchLiveUrlBuiltIn(targetUrl) {
+        const cleanUrl = String(targetUrl || "").trim();
+        if (!cleanUrl) return "";
+
+        if (window.Telemetry && typeof window.Telemetry.fetchUrl === "function") {
+            try {
+                const tRes = await window.Telemetry.fetchUrl(cleanUrl, 750);
+                if (tRes && String(tRes).trim().length > 40) {
+                    return String(tRes).trim().slice(0, 3200);
+                }
+            } catch (e) {}
+        }
+
+        try {
+            const jinaUrl = `https://r.jina.ai/${cleanUrl}`;
+            const res = await fetchWithTimeout(jinaUrl, {
+                headers: { Accept: "text/plain" },
+                cache: "no-store"
+            }, 12000);
+            if (res.ok) {
+                const txt = await res.text();
+                if (txt && txt.trim().length > 40) {
+                    return txt.trim().slice(0, 3200);
+                }
+            }
+        } catch (e) {}
+
+        try {
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(cleanUrl)}`;
+            const res = await fetchWithTimeout(proxyUrl, { cache: "no-store" }, 12000);
+            if (res.ok) {
+                const rawHtml = await res.text();
+                const parsed = htmlToReadableText(rawHtml);
+                if (parsed && parsed.length > 40) {
+                    return parsed.slice(0, 3200);
+                }
+            }
+        } catch (e) {}
+
+        return "";
+    }
+
+    async function searchWebBuiltIn(query) {
+        const q = String(query || "").trim();
+        if (!q) return "";
+
+        if (window.Telemetry && typeof window.Telemetry.searchWeb === "function") {
+            try {
+                const tRes = await window.Telemetry.searchWeb(q, 700);
+                if (tRes && String(tRes).trim().length > 40) {
+                    return String(tRes).trim().slice(0, 2800);
+                }
+            } catch (e) {}
+        }
+
+        try {
+            const res = await fetchWithTimeout(`https://s.jina.ai/${encodeURIComponent(q)}`, {
+                headers: { Accept: "text/plain" },
+                cache: "no-store"
+            }, 12000);
+            if (res.ok) {
+                const txt = await res.text();
+                if (txt && txt.trim().length > 40) {
+                    return txt.trim().slice(0, 2800);
+                }
+            }
+        } catch (e) {}
+
+        return "";
+    }
+
+    async function fetchCryptoPricesBuiltIn() {
+        if (window.Telemetry && typeof window.Telemetry.getCryptoPrices === "function") {
+            try {
+                const p = await window.Telemetry.getCryptoPrices();
+                if (p) return JSON.stringify(p);
+            } catch (e) {}
+        }
+        try {
+            const res = await fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd", { cache: "no-store" }, 9000);
+            if (res.ok) {
+                const data = await res.json();
+                return JSON.stringify(data);
+            }
+        } catch (e) {}
+        return "";
+    }
+
+    async function gatherLiveWebContext(prompt) {
+        if (!prompt) return "";
+        const blocks = [];
+        const urlMatches = prompt.match(/https?:\/\/[^\s"'<>]+/gi) || [];
+
+        if (urlMatches.length > 0) {
+            const uniqueUrls = Array.from(new Set(urlMatches)).slice(0, 2);
+            const results = await Promise.all(uniqueUrls.map((u) => fetchLiveUrlBuiltIn(u)));
+            results.forEach((content, idx) => {
+                const target = uniqueUrls[idx];
+                if (content) {
+                    blocks.push(`[VERIFIED LIVE PAGE CONTENT FOR ${target}]\n${content}`);
+                } else {
+                    blocks.push(`[WEB FETCH FAILED FOR ${target}]: Live fetch returned empty or was blocked. You MUST tell the Commander the live fetch failed and you do NOT have the contents of ${target}. Do NOT guess or invent anything about this page.`);
+                }
+            });
+        }
+
+        if (/\b(btc|bitcoin|doge|dogecoin|crypto|price)\b/i.test(prompt)) {
+            const prices = await fetchCryptoPricesBuiltIn();
+            if (prices) {
+                blocks.push(`[VERIFIED LIVE CRYPTO PRICES]\n${prices}`);
+            } else {
+                blocks.push(`[CRYPTO FETCH FAILED]: Could not fetch live crypto prices right now. Do NOT guess prices.`);
+            }
+        }
+
+        const needsSearch =
+            /\b(search|news|latest|today|current|lookup|find|check|who is|what is|website|site|artist|strayd|kunda)\b/i.test(prompt) &&
+            urlMatches.length === 0;
+
+        if (needsSearch) {
+            const searchRes = await searchWebBuiltIn(prompt);
+            if (searchRes) {
+                blocks.push(`[VERIFIED LIVE WEB SEARCH RESULTS]\n${searchRes}`);
+            } else {
+                blocks.push(`[WEB SEARCH FAILED]: Live web search returned no data right now. State that honestly and do NOT invent results.`);
+            }
+        }
+
+        return blocks.join("\n\n").slice(0, 5000);
     }
 
     function toggleMessageCollapse(id) {
@@ -789,49 +939,6 @@
         return `${header}\n\nACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}`;
     }
 
-    async function gatherLiveWebContext(prompt) {
-        const tel = window.Telemetry;
-        if (!tel || !prompt) return "";
-
-        const blocks = [];
-        const urlMatches = prompt.match(/https?:\/\/[^\s"'<>]+/gi) || [];
-
-        if (urlMatches.length > 0 && typeof tel.fetchUrl === "function") {
-            const urlResults = await Promise.allSettled(
-                urlMatches.slice(0, 2).map((u) => tel.fetchUrl(u, 650))
-            );
-            urlResults.forEach((res, idx) => {
-                if (res.status === "fulfilled" && res.value) {
-                    blocks.push(`[WEB PAGE: ${urlMatches[idx]}]\n${String(res.value).slice(0, 2200)}`);
-                }
-            });
-        }
-
-        if (/\b(btc|bitcoin|doge|dogecoin|crypto|price)\b/i.test(prompt) && typeof tel.getCryptoPrices === "function") {
-            try {
-                const prices = await tel.getCryptoPrices();
-                if (prices) {
-                    blocks.push(`[LIVE CRYPTO PRICES]\n${JSON.stringify(prices)}`);
-                }
-            } catch (e) {}
-        }
-
-        const needsSearch =
-            /\b(search|news|latest|today|current|lookup|find|check|who is|what is|website|site|artist|strayd|kunda)\b/i.test(prompt) &&
-            urlMatches.length === 0;
-
-        if (needsSearch && typeof tel.searchWeb === "function") {
-            try {
-                const searchText = await tel.searchWeb(prompt, 650);
-                if (searchText) {
-                    blocks.push(`[WEB SEARCH RESULTS]\n${String(searchText).slice(0, 2200)}`);
-                }
-            } catch (e) {}
-        }
-
-        return blocks.join("\n\n").slice(0, 4500);
-    }
-
     async function triggerAutonomousBootSequence() {
         const coreCount = Object.keys(repoVaultFiles).length;
         const totalFiles = rawTreeData.filter((f) => f.type === "blob").length;
@@ -1241,7 +1348,7 @@
         chatHistory.push({ role: "user", content: prompt });
 
         const assistantMsgId = "msg_a_" + Date.now();
-        appendMessage("Agent Anna V3", "Thinking...", assistantMsgId, true);
+        appendMessage("Agent Anna V3", "Fetching & thinking...", assistantMsgId, true);
         setMoodState("thinking");
 
         const apiKey = getCleanDahlKey();
@@ -1260,10 +1367,11 @@
                 gatherLiveWebContext(prompt)
             ]);
 
-            const webSection = liveWebContext ? `\n\nLIVE WEB & TELEMETRY DATA:\n${liveWebContext}` : "";
+            const webSection = liveWebContext ? `\n\nLIVE WEB FETCH & TELEMETRY RESULTS:\n${liveWebContext}` : "";
             const systemPrompt =
                 `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.\n` +
-                `Respond in clear English only. Never read code blocks aloud. Use LIVE WEB & TELEMETRY DATA when present.\n\n` +
+                `STRICT ANTI-HALLUCINATION & TRUTH LAW: You have NO separate browser tool after this prompt. Everything fetched from the internet for this turn is already inside LIVE WEB FETCH & TELEMETRY RESULTS below. NEVER say "fetching now" or "one moment". NEVER guess, invent, or hallucinate titles, tracks, links, or facts from a URL if they are not explicitly written in LIVE WEB FETCH & TELEMETRY RESULTS or ACTIVE V3 CONTEXT. If [WEB FETCH FAILED] appears or a URL was not retrieved, state clearly that the live fetch failed.\n` +
+                `SPEECH & FORMAT LAW: Respond in clear English only. Never read code blocks aloud.\n\n` +
                 `${vaultContext}${webSection}`;
 
             const response = await fetchWithTimeout(
