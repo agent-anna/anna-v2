@@ -644,13 +644,13 @@
     function renderTreeView() {
         const treeEl = document.getElementById("repo-tree-view");
         if (!treeEl) return;
-        const v3Items = rawTreeData.filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && isV3CoreFile(f.path));
-        if (!v3Items.length) {
-            treeEl.innerHTML = `<span style="color:var(--text-muted);">No V3/character/knowledge files loaded. Click SYNC.</span>`;
+        const treeItems = rawTreeData.filter((f) => f.type === "blob");
+        if (!treeItems.length) {
+            treeEl.innerHTML = `<span style="color:var(--text-muted);">No repository files loaded. Click SYNC.</span>`;
             return;
         }
         const root = {};
-        v3Items.forEach((item) => {
+        treeItems.forEach((item) => {
             const parts = item.path.split("/");
             let current = root;
             parts.forEach((part, idx) => {
@@ -686,9 +686,9 @@
     function renderGridView() {
         const gridEl = document.getElementById("repo-file-grid");
         if (!gridEl) return;
-        const v3Items = rawTreeData.filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && isV3CoreFile(f.path));
+        const gridItems = rawTreeData.filter((f) => f.type === "blob");
         gridEl.innerHTML = "";
-        v3Items.forEach((file) => {
+        gridItems.forEach((file) => {
             const ext = file.path.split(".").pop().toLowerCase();
             let icon = "📄";
             if (["html", "htm"].includes(ext)) icon = "🌐";
@@ -718,7 +718,8 @@
             await fetchRepoTree();
             await ingestCoreVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
-            appendMessage("Agent Anna V3", `Agent Anna V3 online. Loaded ${count} V3 / character / knowledge files from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+            const totalTreeFiles = rawTreeData.filter((f) => f.type === "blob").length;
+            appendMessage("Agent Anna V3", `Agent Anna V3 online. Loaded ${count} V3 / character / knowledge files (${totalTreeFiles} total repository files in tree) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
         } finally {
             isSyncing = false;
         }
