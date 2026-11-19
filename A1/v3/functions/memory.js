@@ -53,11 +53,24 @@ const Memory = {
       return this.config.cache[key];
     }
     const path = this.config.files[key];
-    const data = await GitHub.get(path);
-    const decoded = this.decode(data);
-    const parsed = Utils.safeParse(decoded, key === 'memory' ? {} : []);
-    this.config.cache[key] = parsed;
-    return parsed;
+    try {
+      const data = await GitHub.get(path);
+      const decoded = this.decode(data);
+      // memory.json returns object, tasks/links return array
+      const parsed = key === 'memory'
+        ? Utils.safeParse(decoded, { notes: [] })
+        : Utils.safeParse(decoded, []);
+      this.config.cache[key] = parsed;
+      return parsed;
+    } catch (error) {
+      // First boot: file doesn't exist yet — return safe defaults
+      if (error.status === 404) {
+        const fallback = key === 'memory' ? { notes: [] } : [];
+        this.config.cache[key] = fallback;
+        return fallback;
+      }
+      throw error;
+    }
   },
 
   /**
@@ -96,7 +109,7 @@ const Memory = {
     const id = Utils.uid();
     const entry = {
       id,
-      text: note,
+      text: Utils.sanitize(note),
       timestamp: Utils.timestamp(),
     };
     mem.notes = mem.notes || [];
@@ -115,7 +128,7 @@ const Memory = {
     const id = Utils.uid();
     const entry = {
       id,
-      text: task,
+      text: Utils.sanitize(task),
       status: 'open',
       created: Utils.timestamp(),
     };
@@ -149,7 +162,8 @@ const Memory = {
     const id = Utils.uid();
     const entry = {
       id,
-      url: Utils.sanitize(link.url),
+      // Keep URL raw — strip null bytes only, preserve query strings
+      url: (link.url || '').replace(/\x00/g, '').trim(),
       label: Utils.sanitize(link.label || link.url),
       tags: Array.isArray(link.tags) ? link.tags : [],
       added: Utils.timestamp(),
@@ -175,8 +189,8 @@ const Memory = {
     );
     const qLinks = (links || []).filter(l =>
       Utils.sanitize(l.label, { lower: true }).includes(q) ||
-      Utils.sanitize(l.url, { lower: true }).includes(q) ||
-      l.tags.some(tag => Utils.sanitize(tag, { lower: true }).includes(q))
+      l.url.toLowerCase().includes(q) ||
+      (l.tags || []).some(tag => Utils.sanitize(tag, { lower: true }).includes(q))
     );
     return { notes: qNotes, tasks: qTasks, links: qLinks };
   },
