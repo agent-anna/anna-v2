@@ -18,6 +18,7 @@
     let currentViewMode = "tree";
     let activeBranch = "main";
     let workflowPollTimer = null;
+    let ttsKeepAliveTimer = null;
 
     function cleanHeaderToken(str) {
         if (!str) return "";
@@ -85,14 +86,66 @@
 
     function loadVoices() {
         if (!("speechSynthesis" in window)) return;
-        try { cachedVoices = window.speechSynthesis.getVoices(); } catch (e) {}
+        try {
+            const v = window.speechSynthesis.getVoices();
+            if (v && v.length) cachedVoices = v;
+        } catch (e) {}
     }
 
-    function getGitHubHeaders() {
-        const token = getCleanGitHubToken();
-        return token
-            ? { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" }
-            : { Accept: "application/vnd.github.v3+json" };
+    function pickFemaleEnglishVoice(voices) {
+        const list = (voices && voices.length ? voices : cachedVoices) || [];
+        if (!list.length) return null;
+
+        const femaleHints = [
+            "google uk english female",
+            "google us english",
+            "microsoft zira",
+            "microsoft aria",
+            "microsoft jenny",
+            "microsoft sonia",
+            "samantha",
+            "victoria",
+            "karen",
+            "moira",
+            "fiona",
+            "tessa",
+            "female"
+        ];
+        const maleOrRoboticHints = [
+            "david",
+            "mark",
+            "george",
+            "daniel",
+            "arthur",
+            "ryan",
+            "guy",
+            "alex",
+            "fred",
+            "espeak",
+            "male"
+        ];
+
+        const scoreVoice = (v) => {
+            const name = String(v.name || "").toLowerCase();
+            const lang = String(v.lang || "").toLowerCase();
+            let score = 0;
+            if (lang.startsWith("en")) score += 20;
+            if (/en[-_](us|gb)/.test(lang)) score += 10;
+            if (femaleHints.some((h) => name.includes(h))) score += 50;
+            if (v.localService) score += 5;
+            if (maleOrRoboticHints.some((h) => name.includes(h))) score -= 60;
+            return score;
+        };
+
+        const sorted = list.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a));
+        return sorted[0] || null;
+    }
+
+    function clearTtsKeepAlive() {
+        if (ttsKeepAliveTimer) {
+            clearInterval(ttsKeepAliveTimer);
+            ttsKeepAliveTimer = null;
+        }
     }
 
     function sanitizeResponse(text) {
@@ -103,32 +156,73 @@
     function speakText(text) {
         if (!isVoiceEnabled || !("speechSynthesis" in window)) return;
         try {
+            clearTtsKeepAlive();
             window.speechSynthesis.cancel();
-            const clean = sanitizeResponse(text).replace(/[*_#`~\[\]()]/g, "").trim();
+            const clean = sanitizeResponse(text).replace(/[*_#`~\[\]()]/g, "").replace(/\s+/g, " ").trim();
             if (!clean) return;
 
+            const chunks = [];
+            const sentences = clean.match(/[^.!?]+[.!?]*|[^.!?]+$/g) || [clean];
+            let buf = "";
+            for (const s of sentences) {
+                const part = s.trim();
+                if (!part) continue;
+                if ((buf + " " + part).length > 260 && buf) {
+                    chunks.push(buf.trim());
+                    buf = part;
+                } else {
+                    buf = buf ? buf + " " + part : part;
+                }
+            }
+            if (buf.trim()) chunks.push(buf.trim());
+            if (!chunks.length) return;
+
+            loadVoices();
+            const chosenVoice = pickFemaleEnglishVoice(window.speechSynthesis.getVoices());
             setMoodState("responding");
-            let voices = window.speechSynthesis.getVoices();
-            if (!voices.length) voices = cachedVoices;
 
-            const voice = voices.find((v) =>
-                v.lang && v.lang.toLowerCase().startsWith("en") &&
-                (/en[-_](us|gb)/i.test(v.lang) || /female|victoria|samantha|karen|zira|google uk english female/i.test(v.name))
-            ) || voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("en")) || voices[0];
+            let idx = 0;
+            const speakNext = () => {
+                if (idx >= chunks.length || !isVoiceEnabled) {
+                    clearTtsKeepAlive();
+                    setMoodState("standby");
+                    return;
+                }
+                const utterance = new SpeechSynthesisUtterance(chunks[idx++]);
+                if (chosenVoice) utterance.voice = chosenVoice;
+                utterance.lang = (chosenVoice && chosenVoice.lang) || "en-US";
+                utterance.pitch = 1.08;
+                utterance.rate = 1.0;
+                utterance.onend = () => {
+                    if (idx < chunks.length) speakNext();
+                    else {
+                        clearTtsKeepAlive();
+                        setMoodState("standby");
+                    }
+                };
+                utterance.onerror = () => {
+                    clearTtsKeepAlive();
+                    setMoodState("standby");
+                };
+                window.speechSynthesis.speak(utterance);
+            };
 
-            const utterance = new SpeechSynthesisUtterance(clean);
-            if (voice) utterance.voice = voice;
-            utterance.pitch = 1.04;
-            utterance.rate = 0.98;
-            utterance.onend = () => setMoodState("standby");
-            utterance.onerror = () => setMoodState("standby");
-            window.speechSynthesis.speak(utterance);
+            speakNext();
+            ttsKeepAliveTimer = setInterval(() => {
+                if (window.speechSynthesis.speaking && window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                } else if (!window.speechSynthesis.speaking) {
+                    clearTtsKeepAlive();
+                }
+            }, 4000);
         } catch (e) {
+            clearTtsKeepAlive();
             setMoodState("standby");
         }
     }
 
     function executeStfuProtocol() {
+        clearTtsKeepAlive();
         if ("speechSynthesis" in window) {
             try { window.speechSynthesis.cancel(); } catch (e) {}
         }
@@ -139,6 +233,13 @@
         const micBtn = document.getElementById("mic-btn");
         if (micBtn) micBtn.classList.remove("listening");
         setMoodState("standby");
+    }
+
+    function getGitHubHeaders() {
+        const token = getCleanGitHubToken();
+        return token
+            ? { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" }
+            : { Accept: "application/vnd.github.v3+json" };
     }
 
     function toggleMessageCollapse(id) {
@@ -156,15 +257,6 @@
         div.id = id;
         messagePayloadStore[id] = text;
 
-        const actions = isAssistant ? `
-            <div class="action-row">
-                <button class="action-chip" onclick="window.speakStoredMessage('${id}')">SPEAK</button>
-                <button class="action-chip" onclick="window.copyToClipboard('${id}', this)">COPY</button>
-                <button class="action-chip swallow-btn" onclick="window.autonomousSwallowAndCommit('${id}', this)">🌀 SWALLOW</button>
-                <button class="action-chip del-btn" onclick="window.executeStfuProtocol()">🛑 STFU</button>
-                <button class="action-chip del-btn" onclick="window.deleteMessage('${id}')">🗑️ DEL</button>
-            </div>` : "";
-
         const header = document.createElement("div");
         header.className = "msg-header";
         header.onclick = () => toggleMessageCollapse(id);
@@ -181,9 +273,17 @@
 
         div.appendChild(header);
         div.appendChild(body);
-        if (actions) {
+
+        if (isAssistant) {
             const temp = document.createElement("div");
-            temp.innerHTML = actions;
+            temp.innerHTML = `
+                <div class="action-row">
+                    <button class="action-chip" onclick="window.speakStoredMessage('${id}')">SPEAK</button>
+                    <button class="action-chip" onclick="window.copyToClipboard('${id}', this)">COPY</button>
+                    <button class="action-chip swallow-btn" onclick="window.autonomousSwallowAndCommit('${id}', this)">🌀 SWALLOW</button>
+                    <button class="action-chip del-btn" onclick="window.executeStfuProtocol()">🛑 STFU</button>
+                    <button class="action-chip del-btn" onclick="window.deleteMessage('${id}')">🗑️ DEL</button>
+                </div>`;
             while (temp.firstChild) div.appendChild(temp.firstChild);
         }
 
@@ -225,7 +325,7 @@
                 if (btn) {
                     const prev = btn.innerText;
                     btn.innerText = "COPIED!";
-                    setTimeout(() => { btn.innerText = prev || "COPY"; }, 2000);
+                    setTimeout(() => { btn.innerText = prev || "COPY"; }, 1800);
                 }
             }).catch(() => {});
         }
@@ -257,10 +357,10 @@
             } catch (e) {}
         }
 
-        const wantsSearch = /search|duckduckgo|ddg|google|find|lookup|look up|news|weather|latest|today|current|who is|what is/.test(lower);
+        const wantsSearch = /search|duckduckgo|ddg|google|find|lookup|look up|news|weather|latest|today|current|who is|what is|summarize|research/.test(lower);
         if (wantsSearch) {
             const searchQuery = String(prompt || "")
-                .replace(/^(search|google|duckduckgo|ddg|find|look up|lookup)\s+(for|about)?/i, "")
+                .replace(/^(search|google|duckduckgo|ddg|find|look up|lookup|summarize|research)\s+(for|about)?/i, "")
                 .trim();
             try {
                 const jinaSearchRes = await fetch(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
@@ -273,7 +373,7 @@
                     }
                 }
             } catch (e) {
-                telemetryBlocks.push("[NOTE: Browser CORS prevented direct public SERP search. Use 🚀 RUN BACKEND for server-side execution.]");
+                telemetryBlocks.push("[NOTE: Live search request did not return in-browser; use BACKEND for server-side execution.]");
             }
         }
 
@@ -320,7 +420,7 @@
     async function dispatchBackendWorkflow(customCommand, customSearchQuery) {
         const token = getCleanGitHubToken();
         if (!token) {
-            appendMessage("System Telemetry", "ERROR: GitHub PAT missing. Click ⚙️ KEYS to configure token with 'workflow' & 'repo' permissions.", "msg_err_" + Date.now(), false);
+            appendMessage("System Telemetry", "ERROR: GitHub PAT missing. Click KEYS to configure token with 'workflow' & 'repo' permissions.", "msg_err_" + Date.now(), false);
             toggleSettings();
             return;
         }
@@ -330,7 +430,7 @@
         const cmdText = customCommand
             || (contentEl && contentEl.value.trim())
             || (userEl && userEl.value.trim())
-            || "Perform a rapid vault check and provide a complete operational status report.";
+            || "Perform a full A1 vault integrity audit, verify live BTC/DOGE prices, and log system telemetry.";
 
         updateActionsBadge("DISPATCHING...", "active");
         setMoodState("thinking");
@@ -347,8 +447,8 @@
 
             if (res.status === 204 || res.ok) {
                 updateActionsBadge("QUEUED", "active");
-                appendMessage("System Telemetry", `🚀 BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nDirective: "${cmdText}"\nMonitoring GitHub Actions runner until completion...`, "msg_wf_" + Date.now(), false);
-                speakText("Backend workflow dispatched to GitHub Actions.");
+                appendMessage("System Telemetry", `BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nDirective: "${cmdText}"`, "msg_wf_" + Date.now(), false);
+                speakText("Backend workflow dispatched.");
                 startWorkflowTelemetryPoller();
             } else {
                 updateActionsBadge("FALLBACK PUSH", "active");
@@ -367,7 +467,7 @@
         const targetPath = "A1/vault/pending-commands.md";
         const ok = await writeFileToGitHub(targetPath, cmdText + "\n", "AA01 Pending Command Drop-Box Trigger");
         if (ok) {
-            appendMessage("System Telemetry", `📦 COMMAND COMMITTED TO ${targetPath}. GitHub Actions push trigger activated.`, "msg_fb_" + Date.now(), false);
+            appendMessage("System Telemetry", `COMMAND COMMITTED TO ${targetPath}. Backend push trigger activated.`, "msg_fb_" + Date.now(), false);
             startWorkflowTelemetryPoller();
         } else {
             updateActionsBadge("FAILED", "err");
@@ -416,13 +516,13 @@
                     clearInterval(workflowPollTimer);
                     if (latestRun.conclusion === "success") {
                         updateActionsBadge("VERIFIED [200]", "ok");
-                        appendMessage("System Telemetry", `✅ BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing vault & loading report...`, "msg_wf_done_" + Date.now(), false);
+                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing vault & loading report...`, "msg_wf_done_" + Date.now(), false);
                         await fetchRepoTree();
                         await ingestVaultAssets();
                         await fetchLatestBackendReport(true);
                     } else {
                         updateActionsBadge(`FAIL: ${latestRun.conclusion}`, "err");
-                        appendMessage("System Telemetry", `⚠️ BACKEND RUN ENDED WITH STATUS: ${latestRun.conclusion}.`, "msg_wf_fail_" + Date.now(), false);
+                        appendMessage("System Telemetry", `BACKEND RUN ENDED WITH STATUS: ${latestRun.conclusion}.`, "msg_wf_fail_" + Date.now(), false);
                     }
                 }
             } catch (e) {}
@@ -437,7 +537,7 @@
             .sort();
 
         if (!logFiles.length) {
-            appendMessage("System Telemetry", "No execution logs found in A1/logs/ yet. Run a backend audit first.", "msg_nolog_" + Date.now(), false);
+            appendMessage("System Telemetry", "No execution logs found in A1/logs/ yet. Run BACKEND first.", "msg_nolog_" + Date.now(), false);
             return;
         }
         const newestLog = logFiles[logFiles.length - 1];
@@ -445,7 +545,7 @@
         const editor = document.getElementById("repo-code-editor");
         const logContent = repoVaultFiles[newestLog] || (editor ? editor.value : "");
         if (autoAnnounceToAnna && logContent) {
-            appendMessage("Agent Anna V3", `📥 INGESTED BACKEND REPORT (${newestLog}):\n\n${logContent.slice(0, 1500)}`, "msg_rep_" + Date.now(), true);
+            appendMessage("Agent Anna V3", `INGESTED BACKEND REPORT (${newestLog}):\n\n${logContent.slice(0, 1500)}`, "msg_rep_" + Date.now(), true);
         }
     }
 
@@ -508,7 +608,7 @@
             }
             if (pathInput) pathInput.value = targetPath;
             if (stEl) stEl.innerText = `LOADED -> ${targetPath}`;
-            appendMessage("System Telemetry", `ANNA WRITE ZONE: Loaded content into editor for ${targetPath}. Ready to commit.`, "msg_wz_" + Date.now(), false);
+            appendMessage("System Telemetry", `WRITE ZONE: Loaded content into editor for ${targetPath}. Click COMMIT to save.`, "msg_wz_" + Date.now(), false);
         } else if (commandType === "COMMIT") {
             if (targetPath && pathInput) pathInput.value = targetPath;
             if (contentRaw.trim().length > 0 && editor) {
@@ -533,7 +633,7 @@
     function toggleViewMode() {
         currentViewMode = currentViewMode === "tree" ? "grid" : "tree";
         const btn = document.getElementById("view-toggle-btn");
-        if (btn) btn.innerText = currentViewMode === "tree" ? "🌲 VIEW: TREE" : "🟦 VIEW: GRID";
+        if (btn) btn.innerText = currentViewMode === "tree" ? "VIEW: TREE" : "VIEW: GRID";
         const gridEl = document.getElementById("repo-file-grid");
         const treeEl = document.getElementById("repo-tree-view");
         if (currentViewMode === "tree") {
@@ -621,7 +721,7 @@
         await fetchRepoTree();
         await ingestVaultAssets();
         const count = Object.keys(repoVaultFiles).length;
-        appendMessage("Agent Anna V3", `Agent Anna V3 (A1) online. Synced ${count} memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+        appendMessage("Agent Anna V3", `Agent Anna V3 (A1) online. Synced ${count} knowledge & memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
     }
 
     async function fetchRepoTree() {
@@ -647,7 +747,7 @@
             else renderGridView();
         } else {
             const treeEl = document.getElementById("repo-tree-view");
-            if (treeEl) treeEl.innerHTML = `<span style="color:#d69895;">Unable to load tree. Verify GitHub PAT in ⚙️ KEYS.</span>`;
+            if (treeEl) treeEl.innerHTML = `<span style="color:#fda4af;">Unable to load tree. Verify GitHub PAT in KEYS.</span>`;
         }
         setMoodState("standby");
     }
@@ -656,8 +756,8 @@
         const headers = getGitHubHeaders();
         const targetFiles = rawTreeData.filter((f) =>
             f.type === "blob" &&
-            f.size < 30000 &&
-            (f.path.toLowerCase().endsWith(".md") || f.path.toLowerCase().endsWith(".json"))
+            f.size < 45000 &&
+            (f.path.toLowerCase().endsWith(".md") || f.path.toLowerCase().endsWith(".json") || f.path.toLowerCase().endsWith(".txt"))
         );
 
         repoVaultFiles = {};
@@ -683,27 +783,49 @@
 
     function getCompactVaultContext(userPrompt) {
         const manifest = [];
-        const targetedContent = [];
+        const priorityBlocks = [];
+        const matchedBlocks = [];
         const lowerPrompt = String(userPrompt || "").toLowerCase();
+        const terms = lowerPrompt.split(/[^a-z0-9_-]+/).filter((w) => w.length > 2);
 
         rawTreeData.forEach((f) => {
             if (f.type === "blob") manifest.push(`- ${f.path}`);
         });
 
-        const logPaths = Object.keys(repoVaultFiles).filter((p) => p.startsWith("A1/logs/")).sort();
+        const logPaths = Object.keys(repoVaultFiles).filter((p) => p.includes("/logs/") || p.startsWith("A1/logs/")).sort();
         const latestLogPath = logPaths.length ? logPaths[logPaths.length - 1] : null;
 
         for (const [path, content] of Object.entries(repoVaultFiles)) {
             const lowerPath = path.toLowerCase();
-            const isCoreSoul = lowerPath.includes("soul/") || lowerPath.includes("character") || lowerPath.includes("rules") || lowerPath === "a1/memory.json";
+            const baseName = path.split("/").pop().toLowerCase();
+            const isCoreKnowledge = (
+                baseName === "brain.json" ||
+                baseName === "memory.json" ||
+                baseName === "links.json" ||
+                baseName === "tasks.json" ||
+                lowerPath.includes("/soul/") ||
+                lowerPath.startsWith("soul/") ||
+                lowerPath.includes("/rules/") ||
+                lowerPath.startsWith("rules/") ||
+                lowerPath.includes("/laws/") ||
+                lowerPath.startsWith("laws/") ||
+                lowerPath.includes("/knowledge/") ||
+                lowerPath.startsWith("knowledge/") ||
+                lowerPath.includes("love-letter") ||
+                lowerPath.includes("character")
+            );
             const isLatestLog = path === latestLogPath;
-            const isMentioned = lowerPrompt.includes(lowerPath) || lowerPrompt.includes(path.split("/").pop().toLowerCase());
-            if (isCoreSoul || isLatestLog || isMentioned) {
-                targetedContent.push(`=== FILE: ${path} ===\n${content.slice(0, 3500)}`);
+            const isMatched = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
+
+            if (isCoreKnowledge || isLatestLog) {
+                priorityBlocks.push(`=== CORE KNOWLEDGE [${path}] ===\n${content.slice(0, 2200)}`);
+            } else if (isMatched) {
+                matchedBlocks.push(`=== VAULT MATCH [${path}] ===\n${content.slice(0, 1800)}`);
             }
         }
 
-        return `REPOSITORY MANIFEST:\n${manifest.slice(0, 80).join("\n")}\n\nACTIVE MEMORY & LATEST BACKEND LOGS:\n${targetedContent.join("\n\n").slice(0, 9000)}`;
+        const combined = priorityBlocks.concat(matchedBlocks).join("\n\n").slice(0, 12000);
+        return `REPOSITORY MANIFEST:\n${manifest.slice(0, 90).join("\n")}\n\nKNOWLEDGE VAULT (BRAIN / MEMORY / LINKS / TASKS / SOUL / RULES / LAWS / LOVE-LETTERS):\n${combined}`;
     }
 
     async function fetchDahlWithAutoRetry(url, options, maxRetries) {
@@ -741,18 +863,18 @@
         const totalFiles = rawTreeData.filter((f) => f.type === "blob").length;
 
         if (!apiKey) {
-            const fallbackMsg = `Agent Anna V3 (A1) awakened. Synced ${totalFiles} repository files. Enter Dahl API Key in ⚙️ KEYS to connect neural core.`;
+            const fallbackMsg = `Agent Anna V3 (A1) awakened. Synced ${totalFiles} repository files. Enter Dahl API Key in KEYS to connect neural core.`;
             appendMessage("Agent Anna V3", fallbackMsg, "msg_boot_" + Date.now(), true);
             speakText(fallbackMsg);
             return;
         }
 
         const bootMsgId = "msg_boot_" + Date.now();
-        appendMessage("Agent Anna V3", `Awakening sovereign neural core (${getActiveModel()})...`, bootMsgId, true);
+        appendMessage("Agent Anna V3", `Awakening Agent Anna V3 (${getActiveModel()}) & loading knowledge vault...`, bootMsgId, true);
         setMoodState("thinking");
 
-        const vaultContext = getCompactVaultContext();
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside the agent-anna/anna-v2 repository.\n\n${vaultContext}\n\n[A1 BOOT DIRECTIVE]: Confirm designation as Agent Anna V3 (A1), zero-hallucination protocol, and readiness concisely.`;
+        const vaultContext = getCompactVaultContext("brain memory links tasks soul rules laws love-letters");
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Preserve your character, rules, laws, soul, love-letters, and knowledge vault.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, knowledge vault status, and zero-hallucination rule concisely.`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -762,7 +884,7 @@
                     model: getActiveModel(),
                     messages: [
                         { role: "system", content: systemPrompt },
-                        { role: "user", content: "System boot initiated as Agent Anna V3 (A1). State readiness." }
+                        { role: "user", content: "Boot Agent Anna V3 (A1) and confirm knowledge & readiness." }
                     ]
                 })
             });
@@ -847,8 +969,8 @@
             const ok = await writeFileToGitHub(path, content, `Agent Anna V3 commit: updated ${path}`);
             if (ok) {
                 repoVaultFiles[path] = content;
-                appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} successfully written to ${GITHUB_REPO_NAME}.`, "msg_com_" + Date.now(), false);
-                speakText("Committed file to repository successfully.");
+                appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} written to ${GITHUB_REPO_NAME}.`, "msg_com_" + Date.now(), false);
+                speakText("Committed file successfully.");
                 await fetchRepoTree();
             } else {
                 appendMessage("System Telemetry", "COMMIT ERROR: Check GitHub PAT write permissions.", "msg_com_err_" + Date.now(), false);
@@ -867,7 +989,7 @@
         if (!path) return;
         const banner = document.getElementById("delete-warning-banner");
         const warnText = document.getElementById("delete-warning-text");
-        if (warnText) warnText.innerText = `⚠️ DELETE "${path}" PERMANENTLY?`;
+        if (warnText) warnText.innerText = `DELETE "${path}" PERMANENTLY?`;
         if (banner) banner.style.display = "flex";
     }
 
@@ -898,7 +1020,7 @@
                 if (pathEl) pathEl.value = "";
                 const edEl = document.getElementById("repo-code-editor");
                 if (edEl) edEl.value = "";
-                speakText(`Deleted ${path} from repository vault.`);
+                speakText(`Deleted ${path} from repository.`);
                 await fetchRepoTree();
             }
         } catch (e) {}
@@ -926,7 +1048,7 @@
                 body: JSON.stringify({
                     model: getActiveModel(),
                     messages: [
-                        { role: "system", content: `Audit ${path} for bugs or issues and return a corrected block:\n\`\`\`file:${path}\n...\n\`\`\`` },
+                        { role: "system", content: `Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
                         { role: "user", content }
                     ]
                 })
@@ -991,9 +1113,9 @@
         const dateTag = new Date().toISOString().slice(0, 10);
         const timeTag = new Date().toTimeString().slice(0, 5).replace(":", "");
         const targetPath = `A1/logs/anna-v3-swallow-${dateTag}-${safeTitle || timeTag}.md`;
-        const fileContent = `# AGENT ANNA V3 (A1) // 🌀 SWALLOW VAULT ENTRY\n# TIMESTAMP: ${new Date().toISOString()}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
+        const fileContent = `# AGENT ANNA V3 (A1) // SWALLOW VAULT ENTRY\n# TIMESTAMP: ${new Date().toISOString()}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
 
-        const ok = await writeFileToGitHub(targetPath, fileContent, `Agent Anna V3 🌀 Swallow Commit: ${safeTitle || "vault-log"}`);
+        const ok = await writeFileToGitHub(targetPath, fileContent, `Agent Anna V3 Swallow Commit: ${safeTitle || "vault-log"}`);
         if (ok) {
             if (btnEl) btnEl.innerText = "COMMITTED [201]!";
             repoVaultFiles[targetPath] = fileContent;
@@ -1062,7 +1184,7 @@
     function toggleVoice() {
         isVoiceEnabled = !isVoiceEnabled;
         const btn = document.getElementById("voice-btn");
-        if (btn) btn.innerText = isVoiceEnabled ? "🔊 ON" : "🔇 OFF";
+        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF";
         if (!isVoiceEnabled) executeStfuProtocol();
     }
 
@@ -1133,7 +1255,7 @@
 
         const apiKey = getCleanDahlKey();
         if (!apiKey) {
-            updateMessage(assistantMsgId, "ERROR: Dahl API key missing. Click ⚙️ KEYS to configure.");
+            updateMessage(assistantMsgId, "ERROR: Dahl API key missing. Click KEYS to configure.");
             toggleSettings();
             setMoodState("standby");
             return;
@@ -1141,7 +1263,7 @@
 
         const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside agent-anna/anna-v2.\nONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Preserve character, rules, laws, soul, and love-letters. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
