@@ -268,7 +268,7 @@
             if (!chunks.length) return;
 
             const chosenVoice = pickFemaleEnglishVoice(voices);
-            setMoodState("responding");
+            setMoodState("speaking");
 
             let idx = 0;
             const speakNext = () => {
@@ -493,6 +493,7 @@
 
     async function writeFileToGitHub(path, content, commitMessage) {
         if (isSoulOrLoveLetterPath(path)) return false;
+        setMoodState("saving");
         if (window.GitHub && typeof window.GitHub.upsert === "function") {
             try {
                 const r = await window.GitHub.upsert(path, content, commitMessage);
@@ -520,7 +521,7 @@
         if (!token) {
             appendMessage("System Telemetry", "ERROR: GitHub PAT missing. Click KEYS to configure token with 'workflow' & 'repo' permissions.", "msg_err_" + Date.now(), false);
             toggleSettings();
-            return;
+            return false;
         }
 
         const userEl = document.getElementById("user-input");
@@ -546,17 +547,18 @@
                 appendMessage("System Telemetry", `BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nDirective: "${cmdText}"`, "msg_wf_" + Date.now(), false);
                 speakText("Backend workflow dispatched.");
                 startWorkflowTelemetryPoller();
+                setMoodState("standby");
+                return true;
             } else {
                 updateActionsBadge("FALLBACK PUSH", "active");
-                await writePendingCommandFallback(cmdText);
+                return await writePendingCommandFallback(cmdText);
             }
         } catch (err) {
             updateActionsBadge("ERROR", "err");
             setMoodState("error");
             appendMessage("System Telemetry", `DISPATCH FAILED: ${err.message}`, "msg_wf_err_" + Date.now(), false);
-            return;
+            return false;
         }
-        setMoodState("standby");
     }
 
     async function writePendingCommandFallback(cmdText) {
@@ -565,8 +567,12 @@
         if (ok) {
             appendMessage("System Telemetry", `COMMAND COMMITTED TO ${targetPath}. Backend push trigger activated.`, "msg_fb_" + Date.now(), false);
             startWorkflowTelemetryPoller();
+            setMoodState("standby");
+            return true;
         } else {
             updateActionsBadge("FAILED", "err");
+            setMoodState("error");
+            return false;
         }
     }
 
@@ -1062,11 +1068,14 @@
             let json = null;
             try { json = JSON.parse(rawText); } catch (e) {}
             const cleanReply = extractDahlReply(json, rawText);
+            setMoodState("responding");
             updateMessage(auditMsgId, cleanReply);
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
+            setMoodState("error");
             updateMessage(auditMsgId, `Audit failed: ${err.message}`);
+            return;
         }
         setMoodState("standby");
     }
@@ -1182,7 +1191,7 @@
 
         rec.onstart = () => {
             isListening = true;
-            setMoodState("responding");
+            setMoodState("listening");
             const micBtn = document.getElementById("mic-btn");
             if (micBtn) micBtn.classList.add("listening");
         };
@@ -1246,7 +1255,7 @@
         isListening = false;
         const micBtn = document.getElementById("mic-btn");
         if (micBtn) micBtn.classList.remove("listening");
-        if (document.body.classList.contains("is-responding")) {
+        if (document.body.classList.contains("is-listening") || document.body.classList.contains("is-responding")) {
             setMoodState("standby");
         }
     }
@@ -1355,6 +1364,7 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and repo tre
             }
 
             const cleanReply = extractDahlReply(json, rawText) || "Ready.";
+            setMoodState("responding");
             chatHistory.push({ role: "assistant", content: formatReadableMessage(cleanReply) });
             updateMessage(assistantMsgId, cleanReply);
             speakText(cleanReply);
@@ -1362,10 +1372,12 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and repo tre
         } catch (err) {
             const origin = window.location && window.location.origin ? window.location.origin : "browser";
             const reason = err && err.name === "AbortError" ? "Request timed out after 20s" : err.message;
-            const errMsg = `CONNECTION FAILED (${origin} -> inference.dahl.global): ${reason}.`;
-            updateMessage(assistantMsgId, errMsg);
-            speakText("Connection failed.");
             setMoodState("error");
+            updateMessage(assistantMsgId, `CONNECTION FAILED (${origin} -> inference.dahl.global): ${reason}. Attempting GitHub backend dispatch if PAT is set...`);
+            const dispatched = await dispatchBackendWorkflow(prompt, prompt);
+            if (!dispatched) {
+                speakText("Connection failed.");
+            }
             return;
         }
         setMoodState("standby");
