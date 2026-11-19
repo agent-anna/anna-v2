@@ -52,7 +52,7 @@ const Chat = {
   },
 
   /**
-   * Send a message and get a streaming-compatible response
+   * Send a message and get a response
    * @param {string} userMessage - User input
    * @param {string} role - Optional role override (default: 'user')
    * @returns {Promise<string>} Assistant reply text
@@ -65,19 +65,19 @@ const Chat = {
     // Build system prompt fresh each time (lightweight)
     const systemPrompt = await this._buildSystemPrompt();
 
+    // Track history index before pushing so we can pop on failure
+    const preSendLength = this._history.length;
+
     // Push to rolling history
     this._history.push({ role, content: String(userMessage) });
     this._trimHistory();
 
-    // Assemble messages array
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...this._history,
-    ];
-
     const body = {
       model: this.config.model,
-      messages,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...this._history,
+      ],
       temperature: 0.7,
     };
 
@@ -85,6 +85,8 @@ const Chat = {
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     let response;
+    let reply = '';
+
     try {
       response = await Utils.retry(
         async () => {
@@ -98,7 +100,6 @@ const Chat = {
             signal: controller.signal,
           });
 
-          // Pass through non-retryable failures
           if (res.status === 429 || res.status >= 500) {
             const err = new Error(`HTTP ${res.status}`);
             err.status = res.status;
@@ -115,33 +116,34 @@ const Chat = {
 
           return res;
         },
-        {
-          retries: 3,
-          delay: 2000,
-          onRetry: (err, attempt) => {
-            if (err.retryable) {
-              console.warn(`[Chat] retry ${attempt} — ${err.message}`);
-            }
-          },
-        }
+        { maxRetries: 3, baseDelay: 2000 }
       );
+
+      const data = await response.json();
+
+      reply =
+        data.choices?.[0]?.message?.content ||
+        data.choices?.[0]?.text ||
+        '';
+
+      // Add assistant turn to history
+      this._history.push({ role: 'assistant', content: reply });
+      this._trimHistory();
+
+      return reply;
+    } catch (error) {
+      // Roll back: remove the user message we just added
+      if (this._history.length > preSendLength) {
+        this._history.splice(preSendLength);
+      }
+
+      if (error.name === 'AbortError') {
+        throw new Error('Chat request timeout after 30s');
+      }
+      throw error;
     } finally {
       clearTimeout(timeoutId);
     }
-
-    const data = await response.json();
-
-    // Extract assistant reply
-    const reply =
-      data.choices?.[0]?.message?.content ||
-      data.choices?.[0]?.text ||
-      '';
-
-    // Add assistant turn to history
-    this._history.push({ role: 'assistant', content: reply });
-    this._trimHistory();
-
-    return reply;
   },
 
   /**
@@ -161,7 +163,7 @@ const Chat = {
   },
 
   /**
-   * Get current history count (useful for debugging)
+   * Get current history count
    * @returns {number}
    */
   getHistoryCount() {
