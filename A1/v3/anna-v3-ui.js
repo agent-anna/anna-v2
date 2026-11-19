@@ -332,7 +332,7 @@
 
     async function fetchWithTimeout(url, opts, ms) {
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), ms || 75000);
+        const timer = setTimeout(() => ctrl.abort(), ms || 90000);
         try {
             return await fetch(url, { ...(opts || {}), signal: ctrl.signal });
         } finally {
@@ -457,60 +457,6 @@
                     telemetryBlocks.push(`[VERIFIED LIVE COINGECKO TELEMETRY @ ${new Date().toISOString()}]\n- Bitcoin (BTC): $${cryptoData.bitcoin.usd} (24h Change: ${cryptoData.bitcoin.usd_24h_change.toFixed(2)}%)\n- Dogecoin (DOGE): $${cryptoData.dogecoin.usd} (24h Change: ${cryptoData.dogecoin.usd_24h_change.toFixed(2)}%)`);
                 }
             } catch (e) {}
-        }
-
-        const urlMatch = String(prompt || "").match(/https?:\/\/[^\s]+/);
-        if (urlMatch) {
-            try {
-                const targetUrl = urlMatch[0];
-                const webRes = await fetchWithTimeout(`https://r.jina.ai/${targetUrl}`, {}, 8000);
-                if (webRes.ok) {
-                    const webText = await webRes.text();
-                    telemetryBlocks.push(`[VERIFIED LIVE WEB READER FOR ${targetUrl}]\n${webText.slice(0, 3000)}`);
-                }
-            } catch (e) {}
-        }
-
-        const wantsSearch = /\b(search|duckduckgo|ddg|google|find|lookup|news|weather|latest|today|current|research|open.?source|github|w3c)\b/.test(lower);
-        if (wantsSearch) {
-            const rawQuery = String(prompt || "")
-                .replace(/^(search|google|duckduckgo|ddg|find|look up|lookup|summarize|research)\s+(for|about)?/i, "")
-                .trim();
-            const searchQuery = wantsOpenSourceScout(lower)
-                ? `${rawQuery} github open source`.trim()
-                : rawQuery;
-            let gotSearchData = false;
-
-            try {
-                const jinaSearchRes = await fetchWithTimeout(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
-                    headers: { Accept: "text/plain" }
-                }, 8000);
-                if (jinaSearchRes.ok) {
-                    const searchText = await jinaSearchRes.text();
-                    if (searchText && searchText.trim().length > 30) {
-                        telemetryBlocks.push(`[VERIFIED LIVE WEB/SEARCH RESULTS FOR "${searchQuery}"]\n${searchText.slice(0, 3000)}`);
-                        gotSearchData = true;
-                    }
-                }
-            } catch (e) {}
-
-            if (!gotSearchData) {
-                try {
-                    const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
-                    const ddgRes = await fetchWithTimeout(`https://r.jina.ai/${ddgUrl}`, {}, 8000);
-                    if (ddgRes.ok) {
-                        const ddgText = await ddgRes.text();
-                        if (ddgText && ddgText.trim().length > 30) {
-                            telemetryBlocks.push(`[VERIFIED LIVE DUCKDUCKGO RESULTS FOR "${searchQuery}"]\n${ddgText.slice(0, 3000)}`);
-                            gotSearchData = true;
-                        }
-                    }
-                } catch (e) {}
-            }
-
-            if (!gotSearchData) {
-                telemetryBlocks.push(`[LIVE SEARCH STATUS FOR "${searchQuery}"]: No live search payload was returned in this browser request.`);
-            }
         }
 
         if (wantsOpenSourceScout(lower)) {
@@ -885,7 +831,7 @@
     async function fetchDahlWithAutoRetry(url, options, maxRetries) {
         const retries = maxRetries || 2;
         for (let attempt = 0; attempt < retries; attempt++) {
-            const response = await fetchWithTimeout(url, options, 75000);
+            const response = await fetchWithTimeout(url, options, 90000);
             if (response.status === 429) {
                 const retryHeader = response.headers.get("Retry-After");
                 let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : Math.pow(2, attempt + 1);
@@ -1363,7 +1309,7 @@
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 75s. Try retrying." : `CONNECTION FAILED: ${err.message}`;
+            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 90s. Try retrying." : `CONNECTION FAILED: ${err.message}`;
             updateMessage(assistantMsgId, errMsg);
             speakText(errMsg);
             setMoodState("error");
