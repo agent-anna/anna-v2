@@ -46,6 +46,7 @@
             base === "memory.json" ||
             base === "links.json" ||
             base === "tasks.json" ||
+            base === "sessions.md" ||
             base.includes("character") ||
             lower.includes("/character/") ||
             lower.startsWith("character/") ||
@@ -839,7 +840,8 @@
                 baseName === "memory.json" ||
                 baseName === "tasks.json" ||
                 baseName === "links.json" ||
-                baseName === "brain.json"
+                baseName === "brain.json" ||
+                baseName === "sessions.md"
             );
             const isCharacterFile = (
                 lowerPath.includes("/character/") ||
@@ -862,8 +864,16 @@
             }
         }
 
+        const loadedList = Object.keys(repoVaultFiles).join(", ") || "none";
+        const treeSample = rawTreeData
+            .filter((f) => f.type === "blob")
+            .map((f) => f.path)
+            .slice(0, 40)
+            .join(", ");
+
+        const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Loaded V3 files in context: ${loadedList}\n- Sample repo tree paths: ${treeSample}`;
         const combined = memoryBlocks.concat(characterBlocks, knowledgeBlocks).join("\n\n").slice(0, 6500);
-        return combined ? `ACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}` : "";
+        return `${header}\n\nACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}`;
     }
 
     async function fetchDahlWithAutoRetry(url, options) {
@@ -951,10 +961,11 @@
 
         setMoodState("saving");
         try {
-            const ok = await writeFileToGitHub(path, content, `Agent Anna V3 commit: updated ${path}`);
+            const stamp = new Date().toISOString();
+            const ok = await writeFileToGitHub(path, content, `Agent Anna V3 commit [${stamp}]: updated ${path}`);
             if (ok) {
                 repoVaultFiles[path] = content;
-                appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} written to ${GITHUB_REPO_NAME}.`, "msg_com_" + Date.now(), false);
+                appendMessage("System Telemetry", `VERIFIED COMMIT [${stamp}]: ${path} written to ${GITHUB_REPO_NAME}.`, "msg_com_" + Date.now(), false);
                 speakText(`Committed ${path.split("/").pop()}.`);
                 await fetchRepoTree();
             } else {
@@ -1032,7 +1043,7 @@
                 body: JSON.stringify({
                     model: getActiveModel(),
                     messages: [
-                        { role: "system", content: `Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
+                        { role: "system", content: `Respond in English only. Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
                         { role: "user", content }
                     ]
                 })
@@ -1065,7 +1076,8 @@
                 skippedSoulWrites.push(filePath);
                 continue;
             }
-            const ok = await writeFileToGitHub(filePath, fileContent, `Agent Anna V3 Self-Write: ${filePath}`);
+            const stamp = new Date().toISOString();
+            const ok = await writeFileToGitHub(filePath, fileContent, `Agent Anna V3 Self-Write [${stamp}]: ${filePath}`);
             if (ok) {
                 repoVaultFiles[filePath] = fileContent;
                 committedFiles.push(filePath);
@@ -1092,7 +1104,8 @@
                             .replace(/\\r\\n/g, "\n")
                             .replace(/\\n/g, "\n")
                             .replace(/\\t/g, "  ");
-                        const ok = await writeFileToGitHub(targetPath, unescaped, `Agent Anna V3 Write: ${targetPath}`);
+                        const stamp = new Date().toISOString();
+                        const ok = await writeFileToGitHub(targetPath, unescaped, `Agent Anna V3 Write [${stamp}]: ${targetPath}`);
                         if (ok) {
                             repoVaultFiles[targetPath] = unescaped;
                             committedFiles.push(targetPath);
@@ -1301,7 +1314,9 @@
 
         const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 for ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Use only V3, memory, character, and knowledge context provided here—never reference old V1/V2 repo clutter or soul/ love letters. Never claim to have a local PC hard drive or confess to lying; state clearly what is in the dashboard context and what GitHub action is needed. Be concise, clear, and easy to hear aloud. Answer directly from any [VERIFIED LIVE ...] results provided.${liveTelemetry}\n\n${vaultContext}`;
+        const systemPrompt = `You are AGENT ANNA V3 for ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.
+STRICT LANGUAGE RULE: Respond in natural, clear English ONLY. Never output Chinese characters or non-English words in your replies.
+LOCATION & TRUTH RULE: State clearly what is in your loaded context and repo tree right now. Never claim a file was written unless you include a \`\`\`file:<path>\n...\n\`\`\` block for the dashboard to commit. Never claim to have a local PC hard drive. Be concise and easy to hear aloud.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1336,9 +1351,9 @@
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
             const origin = window.location && window.location.origin ? window.location.origin : "browser";
-            const errMsg = `CONNECTION FAILED (${origin} -> inference.dahl.global): Browser blocked or dropped direct fetch (${err.message}). If this is CORS on Dahl's endpoint, direct browser calls from GitHub Pages require Dahl to allow ${origin} or a CORS-enabled proxy/workflow.`;
+            const errMsg = `CONNECTION FAILED (${origin} -> inference.dahl.global): Browser blocked or dropped direct fetch (${err.message}).`;
             updateMessage(assistantMsgId, errMsg);
-            speakText("Connection failed due to browser network or CORS block.");
+            speakText("Connection failed.");
             setMoodState("error");
             return;
         }
