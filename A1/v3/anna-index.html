@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANNA V3 — Workbench</title>
+  <style>
+    :root {
+      --bg:       #0c0b0a;
+      --surface:  #141210;
+      --border:   #2e2a22;
+      --gold:     #c9a84c;
+      --gold-dim: #7a6330;
+      --gold-bg:  #1a1710;
+      --text:     #d8ccb8;
+      --muted:    #6b6050;
+      --pass:     #4caf50;
+      --fail:     #e57373;
+      --mono:     "Courier New", "Lucida Console", monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    #header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    #header h1 {
+      font-size: 15px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    #header .subtitle {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .spacer { flex: 1; }
+
+    /* ── Grid: config + output ────────────────────────── */
+    #grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* ── Config Panel ─────────────────────────────────── */
+    #config {
+      border-right: 1px solid var(--border);
+      padding: 14px 14px 10px;
+      overflow-y: auto;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .config-section { display: flex; flex-direction: column; gap: 6px; }
+    .config-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+      margin-bottom: 2px;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      font-size: 10px;
+      color: var(--muted);
+      gap: 3px;
+    }
+    input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 5px 8px;
+      border-radius: 2px;
+      outline: none;
+      width: 100%;
+    }
+    input:focus { border-color: var(--gold-dim); }
+    input[type="password"] { letter-spacing: 2px; }
+
+    /* ── Action Buttons ──────────────────────────────── */
+    .actions { display: flex; flex-direction: column; gap: 6px; }
+    button {
+      background: var(--gold-bg);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 7px 10px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button:hover {
+      background: var(--gold);
+      color: var(--bg);
+    }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Output Panel ─────────────────────────────────── */
+    #output-panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* ── Chat Input Bar ────────────────────────────────── */
+    #input-bar {
+      display: flex;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    #chat-input {
+      flex: 1;
+      background: var(--bg);
+      border: none;
+      border-right: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 10px 12px;
+      outline: none;
+      resize: none;
+    }
+    #chat-input::placeholder { color: var(--muted); }
+    #send-btn {
+      background: var(--gold-bg);
+      border: none;
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 0 20px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: background 0.15s;
+    }
+    #send-btn:hover { background: var(--gold); color: var(--bg); }
+
+    /* ── Console Output ────────────────────────────────── */
+    #console {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      font-size: 12px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 0;
+    }
+    .line { display: block; }
+    .line.log   { color: var(--text); }
+    .line.pass  { color: var(--pass); }
+    .line.fail  { color: var(--fail); }
+    .line.gold  { color: var(--gold); }
+    .line.muted { color: var(--muted); }
+    .line.info  { color: #80cbc4; }
+    .line.error { color: var(--fail); }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ───────────────────────────────────────── -->
+  <div id="header">
+    <h1>ANNA V3</h1>
+    <span class="subtitle">Workbench — No writes to index.html</span>
+    <span class="spacer"></span>
+  </div>
+
+  <!-- ── Grid ────────────────────────────────────────── -->
+  <div id="grid">
+
+    <!-- ── Config Panel ──────────────────────────────── -->
+    <div id="config">
+
+      <div class="config-section">
+        <div class="config-title">GitHub</div>
+        <label>
+          Owner
+          <input id="gh-owner"   type="text"   placeholder="agent-anna"   autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Repo
+          <input id="gh-repo"    type="text"   placeholder="anna-v2"        autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Branch
+          <input id="gh-branch"  type="text"   placeholder="main"          autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Token
+          <input id="gh-token"   type="password" placeholder="ghp_••••••" autocomplete="off" spellcheck="false" />
+        </label>
+      </div>
+
+      <div class="config-section">
+        <div class="config-title">Dahl API</div>
+        <label>
+          Endpoint
+          <input id="dahl-endpoint" type="text" placeholder="https://api.dahl.ai/v1/chat/completions" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Model
+          <input id="dahl-model" type="text" placeholder="gpt-4o" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          API Key
+          <input id="dahl-apikey" type="password" placeholder="sk-••••••" autocomplete="off" spellcheck="false" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="btn-smoke">▶ Smoke Test</button>
+        <button id="btn-clear">⌧ Clear Output</button>
+      </div>
+
+    </div><!-- /config -->
+
+    <!-- ── Output Panel ─────────────────────────────── -->
+    <div id="output-panel">
+      <div id="console"></div>
+      <div id="input-bar">
+        <textarea id="chat-input" placeholder="Type a message… ENTER to send" rows="1" spellcheck="false"></textarea>
+        <button id="send-btn">SEND</button>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+  <!-- ── Scripts: exact dependency order ───────────── -->
+  <script src="./functions/utils.js"></script>
+  <script src="./functions/github.js"></script>
+  <script src="./functions/memory.js"></script>
+  <script src="./functions/telemetry.js"></script>
+  <script src="./functions/brain.js"></script>
+  <script src="./functions/chat.js"></script>
+  <script src="./smoke-test.js"></script>
+
+  <script>
+    /* ─────────────────────────────────────────────────────
+       ANNA V3 Workbench — UI Logic
+       No values written to repo files. All session only.
+    ───────────────────────────────────────────────────── */
+    const console$ = document.getElementById('console');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn   = document.getElementById('send-btn');
+    const btnSmoke  = document.getElementById('btn-smoke');
+    const btnClear  = document.getElementById('btn-clear');
+
+    /* ── Output helpers ─────────────────────────────── */
+    function out(text, cls = 'log') {
+      const line = document.createElement('span');
+      line.className = `line ${cls}`;
+      line.textContent = text;
+      console$.appendChild(line);
+      console$.appendChild(document.createElement('br'));
+      console$.scrollTop = console$.scrollHeight;
+    }
+
+    function log   (t) { out(t, 'log'); }
+    function pass  (t) { out('✅ ' + t, 'pass'); }
+    function fail  (t) { out('❌ ' + t, 'fail'); }
+    function info  (t) { out('ℹ ' + t, 'info'); }
+    function gold  (t) { out(t, 'gold'); }
+    function error (t) { out(t, 'error'); }
+    function muted (t) { out(t, 'muted'); }
+
+    /* ── Build config from inputs (session only) ───── */
+    function buildGitHubConfig() {
+      return {
+        owner:  document.getElementById('gh-owner').value.trim(),
+        repo:   document.getElementById('gh-repo').value.trim(),
+        branch: document.getElementById('gh-branch').value.trim() || 'main',
+        token:  document.getElementById('gh-token').value.trim(),
+      };
+    }
+    function buildChatConfig() {
+      return {
+        endpoint: document.getElementById('dahl-endpoint').value.trim(),
+        model:    document.getElementById('dahl-model').value.trim() || 'gpt-4o',
+        apiKey:   document.getElementById('dahl-apikey').value.trim(),
+      };
+    }
+
+    /* ── Smoke Test ─────────────────────────────────── */
+    btnSmoke.addEventListener('click', async () => {
+      const gh = buildGitHubConfig();
+      info('Starting smoke test…');
+      btnSmoke.disabled = true;
+      try {
+        const report = await smokeTest.runSmokeTest({ githubConfig: gh });
+        report.results.forEach(r => {
+          if (r.status === 'pass') pass(r.msg);
+          else fail(r.msg);
+        });
+        log('');
+        log(`📊 ${report.passed} passed, ${report.failed} failed`);
+      } catch (e) {
+        error('Smoke test threw: ' + e.message);
+      } finally {
+        btnSmoke.disabled = false;
+      }
+    });
+
+    /* ── Clear Output ───────────────────────────────── */
+    btnClear.addEventListener('click', () => {
+      console$.innerHTML = '';
+      gold('ANNA V3 Workbench ready.');
+    });
+
+    /* ── Chat Send ──────────────────────────────────── */
+    function doSend() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      log('> ' + text);
+      chatInput.value = '';
+
+      // Echo placeholder (replace with Chat.send in full integration)
+      muted('Chat.send() not wired — implement in chat.js');
+    }
+
+    sendBtn.addEventListener('click', doSend);
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        doSend();
+      }
+    });
+
+    /* ── Banner ─────────────────────────────────────── */
+    (() => {
+      gold('╔══════════════════════════════════════╗');
+      gold('║   ANNA V3 — Workbench Initialized    ║');
+      gold('╚══════════════════════════════════════╝');
+      muted('Loaded: utils · github · memory · telemetry · brain · chat · smoke-test');
+      log('');
+      muted('GitHub + Dahl config held in session only. No writes to repo.');
+      log('');
+    })();
+  </script>
+</body>
+</html>
