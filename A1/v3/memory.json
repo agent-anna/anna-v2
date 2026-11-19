@@ -7,8 +7,16 @@
       "status": "FALLBACK_VERIFIED",
       "log_file": "A1/v3/logs/aa01-v3-exec-2026-11-19T15-12-48-175Z.md",
       "notes": "Dahl API Error [HTTP 429]: {\"error\":{\"code\":\"model_concurrency\",\"message\":\"This model is at concurrency capacity. Paid accounts are admitted first. Top up at https://inference.d"
+    },
+    {
+      "date": "2026-11-19T15:13:00.099Z",
+      "workspace": "A1/v3",
+      "action": "scheduled_or_default_audit",
+      "status": "FALLBACK_VERIFIED",
+      "log_file": "A1/v3/logs/aa01-v3-exec-2026-11-19T15-13-00-086Z.md",
+      "notes": "Dahl API Error [HTTP 429]: {\"error\":{\"code\":\"model_concurrency\",\"message\":\"This model is at concurrency capacity. Paid accounts are admitted first. Top up at https://inference.d"
     }
   ],
   "workspace": "A1/v3",
-  "last_updated": "2026-11-19T15:12:48.175Z"
+  "last_updated": "2026-11-19T15:13:00.099Z"
 }
