@@ -43,13 +43,14 @@ const smokeTest = (() => {
   const verifyGitHub = () => {
     assertObj("GitHub", typeof GitHub !== "undefined" ? GitHub : null);
     assertFn("GitHub", { get: typeof GitHub !== "undefined" ? GitHub.get : null }, "get");
+    assertFn("GitHub", { configure: typeof GitHub !== "undefined" ? GitHub.configure : null }, "configure");
   };
 
   // ── Verify Memory ──────────────────────────────────────────
   const verifyMemory = () => {
     assertObj("Memory", typeof Memory !== "undefined" ? Memory : null);
     assertFn("Memory", { loadAll: typeof Memory !== "undefined" ? Memory.loadAll : null }, "loadAll");
-    assertFn("Memory", { get: typeof Memory !== "undefined" ? Memory.get : null }, "get");
+    assertFn("Memory", { load: typeof Memory !== "undefined" ? Memory.load : null }, "load");
     assertFn("Memory", { addNote: typeof Memory !== "undefined" ? Memory.addNote : null }, "addNote");
     assertFn("Memory", { addLink: typeof Memory !== "undefined" ? Memory.addLink : null }, "addLink");
   };
@@ -88,13 +89,23 @@ const smokeTest = (() => {
   };
 
   // ── Live Functional Test ──────────────────────────────────
-  const runLiveTests = async ({ githubConfig, chatConfig } = {}) => {
+  const runLiveTests = async ({ githubConfig } = {}) => {
     console.log("\n🚀 Running Live Tests...\n" + "─".repeat(40));
+
+    // Configure GitHub if config provided
+    if (githubConfig && typeof GitHub !== "undefined" && GitHub.configure) {
+      try {
+        GitHub.configure(githubConfig);
+        pass("GitHub.configure() applied");
+      } catch (e) {
+        fail(`GitHub.configure() — ${e.message}`);
+      }
+    }
 
     // Test Brain.load()
     if (typeof Brain !== "undefined" && Brain.load) {
       try {
-        await Brain.load(githubConfig);
+        await Brain.load();
         pass("Brain.load() completed");
       } catch (e) {
         fail(`Brain.load() — ${e.message}`);
@@ -106,7 +117,7 @@ const smokeTest = (() => {
     // Test Memory.loadAll()
     if (typeof Memory !== "undefined" && Memory.loadAll) {
       try {
-        await Memory.loadAll(githubConfig);
+        await Memory.loadAll();
         pass("Memory.loadAll() completed");
       } catch (e) {
         fail(`Memory.loadAll() — ${e.message}`);
@@ -143,9 +154,10 @@ const smokeTest = (() => {
   };
 
   return {
-    runSmokeTest: async (config) => {
+    runSmokeTest: async ({ githubConfig } = {}) => {
+      results.length = 0;
       verifyModules();
-      await runLiveTests(config);
+      await runLiveTests({ githubConfig });
       return getReport();
     },
     verifyModules,
