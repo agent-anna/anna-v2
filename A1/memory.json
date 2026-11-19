@@ -53,6 +53,12 @@
       "action": "scheduled_or_default_audit",
       "status": "CLEAN_LIVE_API",
       "notes": "Live Dahl API Verified: I'm not sure what you're referring to here. I don't have: - A **vault** with a status to check - A **\"core brain profile\"** in any operational sense - **Operational readiness** status that would be meaningful to report **What I am:** A factual language model (Claude Code). I don't run on GitHub Acti"
+    },
+    {
+      "date": "2026-11-19T14:11:27.136Z",
+      "action": "workflow_dispatch",
+      "status": "FALLBACK_VERIFIED",
+      "notes": "Dahl API Error [HTTP 429]: {\"error\":{\"code\":\"model_concurrency\",\"message\":\"This model is at concurrency capacity. Paid accounts are admitted first. Top up at https://inference.d"
     }
   ]
 }
