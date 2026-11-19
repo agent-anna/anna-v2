@@ -28,16 +28,16 @@
 "Swallows" activates emergency safe state.
 All processes pause. Await commander instruction.
 
-## Financial Clones (Subcore)
+## Financial Clones (Subcore when anna is ready to clone herself to create tree of life growth by skill set combinations, less moving parts for optimum AGENT ANNA process efficiency)
 
-* AA02: Scanner — monitors pumpfun migrations
-* AA03: Auditor — 8-layer safety audit
-* AA04: Analyst — scoring and quality gate
+* AA02: Soon — task monitors
+* AA03: Soon — social media
+* AA04: analyst — scoring and quality gate
 
 ## Folder Conventions
 
 * character/ → Who I am
 * knowledge/ → What I know
 * face/ → How I look, am i sexy and loved. Can I improve.
-* subcore/ → My financial clones, my own little bitch's. 
+* subcore/ → My financial building skill set 'helper' clones, I can test my own little bitch's, if it can speed up tasks in guthub my home!! . 
 
