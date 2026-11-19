@@ -48,7 +48,8 @@ jobs:
 
           const WORKSPACE = "A1/v3";
           const MEMORY_PATH = path.join(WORKSPACE, "memory.json");
-          const PENDING_CMD_PATH = path.join(WORKSPACE, "vault", "pending-commands.md");
+          const VAULT_DIR = path.join(WORKSPACE, "vault");
+          const PENDING_CMD_PATH = path.join(VAULT_DIR, "pending-commands.md");
           const LOGS_DIR = path.join(WORKSPACE, "logs");
 
           function stripModelNames(str) {
@@ -137,6 +138,12 @@ jobs:
               process.exit(1);
             }
 
+            fs.mkdirSync(VAULT_DIR, { recursive: true });
+            fs.mkdirSync(LOGS_DIR, { recursive: true });
+            if (!fs.existsSync(PENDING_CMD_PATH)) {
+              fs.writeFileSync(PENDING_CMD_PATH, `# IDLE - Initialized at ${new Date().toISOString()}\n`, "utf8");
+            }
+
             let memory = {};
             if (fs.existsSync(MEMORY_PATH)) {
               try {
@@ -217,7 +224,6 @@ jobs:
               auditNote = "API Network Exception: " + apiErr.message;
             }
 
-            fs.mkdirSync(LOGS_DIR, { recursive: true });
             const stamp = new Date().toISOString().replace(/[:.]/g, "-");
             const rawTarget = (process.env.TARGET_LOG || "").trim();
             const logName = rawTarget ? path.basename(rawTarget) : `aa01-v3-exec-${stamp}.md`;
@@ -233,7 +239,6 @@ jobs:
             fs.writeFileSync(fullLogPath, reportBody, "utf8");
 
             if (commandSource === "pending_commands_file") {
-              fs.mkdirSync(path.dirname(PENDING_CMD_PATH), { recursive: true });
               fs.writeFileSync(PENDING_CMD_PATH, `# IDLE - Last executed at ${new Date().toISOString()}\n`, "utf8");
             }
 
@@ -266,7 +271,7 @@ jobs:
         run: |
           git config user.name "Agent Anna V3"
           git config user.email "aa01-v3@agent-anna.local"
-          git add A1/v3/memory.json A1/v3/logs/ A1/v3/vault/
+          git add -A A1/v3/memory.json A1/v3/logs/ A1/v3/vault/
           if ! git diff --staged --quiet; then
             git commit -m "AA01 V3 Autonomous Execution: vault & log sync [201]"
             git pull --rebase origin main
