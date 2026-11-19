@@ -332,7 +332,7 @@
 
     async function fetchWithTimeout(url, opts, ms) {
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), ms || 25000);
+        const timer = setTimeout(() => ctrl.abort(), ms || 75000);
         try {
             return await fetch(url, { ...(opts || {}), signal: ctrl.signal });
         } finally {
@@ -449,9 +449,9 @@
         const telemetryBlocks = [];
         const lower = String(prompt || "").toLowerCase();
 
-        if (/btc|bitcoin|doge|dogecoin|crypto|price|market|rate/.test(lower)) {
+        if (/\b(btc|bitcoin|doge|dogecoin|crypto|price|market|rate)\b/.test(lower)) {
             try {
-                const cryptoRes = await fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true", {}, 8000);
+                const cryptoRes = await fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true", {}, 7000);
                 if (cryptoRes.ok) {
                     const cryptoData = await cryptoRes.json();
                     telemetryBlocks.push(`[VERIFIED LIVE COINGECKO TELEMETRY @ ${new Date().toISOString()}]\n- Bitcoin (BTC): $${cryptoData.bitcoin.usd} (24h Change: ${cryptoData.bitcoin.usd_24h_change.toFixed(2)}%)\n- Dogecoin (DOGE): $${cryptoData.dogecoin.usd} (24h Change: ${cryptoData.dogecoin.usd_24h_change.toFixed(2)}%)`);
@@ -463,15 +463,15 @@
         if (urlMatch) {
             try {
                 const targetUrl = urlMatch[0];
-                const webRes = await fetchWithTimeout(`https://r.jina.ai/${targetUrl}`, {}, 10000);
+                const webRes = await fetchWithTimeout(`https://r.jina.ai/${targetUrl}`, {}, 8000);
                 if (webRes.ok) {
                     const webText = await webRes.text();
-                    telemetryBlocks.push(`[VERIFIED LIVE WEB READER FOR ${targetUrl}]\n${webText.slice(0, 4000)}`);
+                    telemetryBlocks.push(`[VERIFIED LIVE WEB READER FOR ${targetUrl}]\n${webText.slice(0, 3000)}`);
                 }
             } catch (e) {}
         }
 
-        const wantsSearch = /search|duckduckgo|ddg|google|find|lookup|look up|news|weather|latest|today|current|who is|what is|summarize|research|open.?source|github|w3c|social.?media|automation|doge|btc|bitcoin|dogecoin/.test(lower);
+        const wantsSearch = /\b(search|duckduckgo|ddg|google|find|lookup|news|weather|latest|today|current|research|open.?source|github|w3c)\b/.test(lower);
         if (wantsSearch) {
             const rawQuery = String(prompt || "")
                 .replace(/^(search|google|duckduckgo|ddg|find|look up|lookup|summarize|research)\s+(for|about)?/i, "")
@@ -484,11 +484,11 @@
             try {
                 const jinaSearchRes = await fetchWithTimeout(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
                     headers: { Accept: "text/plain" }
-                }, 10000);
+                }, 8000);
                 if (jinaSearchRes.ok) {
                     const searchText = await jinaSearchRes.text();
                     if (searchText && searchText.trim().length > 30) {
-                        telemetryBlocks.push(`[VERIFIED LIVE WEB/SEARCH RESULTS FOR "${searchQuery}"]\n${searchText.slice(0, 4000)}`);
+                        telemetryBlocks.push(`[VERIFIED LIVE WEB/SEARCH RESULTS FOR "${searchQuery}"]\n${searchText.slice(0, 3000)}`);
                         gotSearchData = true;
                     }
                 }
@@ -497,11 +497,11 @@
             if (!gotSearchData) {
                 try {
                     const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
-                    const ddgRes = await fetchWithTimeout(`https://r.jina.ai/${ddgUrl}`, {}, 10000);
+                    const ddgRes = await fetchWithTimeout(`https://r.jina.ai/${ddgUrl}`, {}, 8000);
                     if (ddgRes.ok) {
                         const ddgText = await ddgRes.text();
                         if (ddgText && ddgText.trim().length > 30) {
-                            telemetryBlocks.push(`[VERIFIED LIVE DUCKDUCKGO RESULTS FOR "${searchQuery}"]\n${ddgText.slice(0, 4000)}`);
+                            telemetryBlocks.push(`[VERIFIED LIVE DUCKDUCKGO RESULTS FOR "${searchQuery}"]\n${ddgText.slice(0, 3000)}`);
                             gotSearchData = true;
                         }
                     }
@@ -820,18 +820,19 @@
             isV3CoreFile(f.path)
         );
 
-        repoVaultFiles = {};
-        for (const file of coreFiles) {
-            try {
+        const nextVault = {};
+        await Promise.allSettled(
+            coreFiles.map(async (file) => {
                 const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" }, 8000);
-                if (!res.ok) continue;
+                if (!res.ok) return;
                 const data = await res.json();
                 if (data.content) {
                     const binString = atob(data.content.replace(/\s/g, ""));
-                    repoVaultFiles[file.path] = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
+                    nextVault[file.path] = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
                 }
-            } catch (e) {}
-        }
+            })
+        );
+        repoVaultFiles = nextVault;
 
         const count = Object.keys(repoVaultFiles).length;
         const badge = document.getElementById("vault-status");
@@ -869,22 +870,22 @@
             const isTermMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
 
             if (isConsolidatedMaster) {
-                spineBlocks.unshift(`=== V3 MASTER [${path}] ===\n${content.slice(0, 1800)}`);
+                spineBlocks.unshift(`=== V3 MASTER [${path}] ===\n${content.slice(0, 1200)}`);
             } else if (isSpine) {
-                spineBlocks.push(`=== CHARACTER / CORE [${path}] ===\n${content.slice(0, 1200)}`);
+                spineBlocks.push(`=== CHARACTER / CORE [${path}] ===\n${content.slice(0, 900)}`);
             } else if (isKnowledge || isTermMatch) {
-                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 1200)}`);
+                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 900)}`);
             }
         }
 
-        const combined = spineBlocks.concat(knowledgeBlocks).join("\n\n").slice(0, 5500);
+        const combined = spineBlocks.concat(knowledgeBlocks).join("\n\n").slice(0, 3200);
         return combined ? `ACTIVE V3 / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}` : "";
     }
 
     async function fetchDahlWithAutoRetry(url, options, maxRetries) {
-        const retries = maxRetries || 3;
+        const retries = maxRetries || 2;
         for (let attempt = 0; attempt < retries; attempt++) {
-            const response = await fetchWithTimeout(url, options, 30000);
+            const response = await fetchWithTimeout(url, options, 75000);
             if (response.status === 429) {
                 const retryHeader = response.headers.get("Retry-After");
                 let waitSeconds = retryHeader && !isNaN(parseInt(retryHeader, 10)) ? parseInt(retryHeader, 10) : Math.pow(2, attempt + 1);
@@ -1313,7 +1314,7 @@
         chatHistory.push({ role: "user", content: prompt });
 
         const assistantMsgId = "msg_a_" + Date.now();
-        appendMessage("Agent Anna V3", `Fetching live telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
+        appendMessage("Agent Anna V3", `Thinking on ${getActiveModel()}...`, assistantMsgId, true);
         setMoodState("thinking");
 
         const apiKey = getCleanDahlKey();
@@ -1338,7 +1339,7 @@
                     model: getActiveModel(),
                     messages: [
                         { role: "system", content: systemPrompt },
-                        ...chatHistory.slice(-6)
+                        ...chatHistory.slice(-4)
                     ]
                 })
             });
@@ -1362,7 +1363,7 @@
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 30s. Try switching model or retrying." : `CONNECTION FAILED: ${err.message}`;
+            const errMsg = err.name === "AbortError" ? "REQUEST TIMED OUT after 75s. Try retrying." : `CONNECTION FAILED: ${err.message}`;
             updateMessage(assistantMsgId, errMsg);
             speakText(errMsg);
             setMoodState("error");
