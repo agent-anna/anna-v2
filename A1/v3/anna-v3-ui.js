@@ -7,10 +7,9 @@
     const WORKFLOW_FILENAME = "anna-autonomous-audit.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
-    const DAHL_TIMEOUT_MS = 5000;
+    const DAHL_TIMEOUT_MS = 20000;
 
     let isVoiceEnabled = true;
-    let isPseudoFullScreen = false;
     const messagePayloadStore = {};
     let chatHistory = [];
     let cachedVoices = [];
@@ -30,9 +29,8 @@
         if (!text) return "";
         return String(text)
             .replace(/\s*\bon\s+MiniMaxAI\/MiniMax-M2\.7\.?/gi, "")
-            .replace(/\bMiniMaxAI\/MiniMax-M2\.7\b/gi, "")
             .replace(/\bMiniMaxAI\/MiniMax-M2\.7\.?/gi, "")
-            .replace(/\bMiniMax-M2\.7\b/gi, "")
+            .replace(/\bMiniMax-M2\.7\.?/gi, "")
             .replace(/ {2,}/g, " ")
             .replace(/\s+([.,!?;:])/g, "$1")
             .trim();
@@ -100,110 +98,6 @@
         const selectEl = document.getElementById("model-select");
         if (selectEl && selectEl.value) return selectEl.value;
         return localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
-    }
-
-    function isAnyFullScreenActive() {
-        return Boolean(document.fullscreenElement || document.webkitFullscreenElement || isPseudoFullScreen);
-    }
-
-    function syncFullScreenButtonLabel() {
-        const btn = document.getElementById("fullscreen-btn");
-        if (!btn) return;
-        btn.innerText = isAnyFullScreenActive() ? "EXIT FULL SCREEN" : "FULL SCREEN";
-    }
-
-    function injectFullScreenStylesAndButton() {
-        if (!document.getElementById("anna-v3-fs-style")) {
-            const style = document.createElement("style");
-            style.id = "anna-v3-fs-style";
-            style.textContent = `
-                body.anna-pseudo-fullscreen {
-                    position: fixed !important;
-                    inset: 0 !important;
-                    width: 100vw !important;
-                    height: 100vh !important;
-                    max-width: 100vw !important;
-                    max-height: 100vh !important;
-                    margin: 0 !important;
-                    z-index: 99999 !important;
-                    overflow: auto !important;
-                }
-                :fullscreen,
-                :-webkit-full-screen {
-                    width: 100vw !important;
-                    height: 100vh !important;
-                    max-width: 100vw !important;
-                    max-height: 100vh !important;
-                    overflow: auto !important;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-
-        if (!document.getElementById("fullscreen-btn")) {
-            const btn = document.createElement("button");
-            btn.id = "fullscreen-btn";
-            btn.type = "button";
-            btn.className = "action-chip";
-            btn.innerText = "FULL SCREEN";
-            btn.onclick = () => toggleFullScreen();
-
-            const keysBtn = document.querySelector("[onclick*='toggleSettings']");
-            const voiceBtn = document.getElementById("voice-btn");
-            const anchor = keysBtn || voiceBtn;
-
-            if (anchor && anchor.parentElement) {
-                anchor.insertAdjacentElement("afterend", btn);
-            } else {
-                btn.style.position = "fixed";
-                btn.style.top = "10px";
-                btn.style.right = "12px";
-                btn.style.zIndex = "100000";
-                document.body.appendChild(btn);
-            }
-        }
-        syncFullScreenButtonLabel();
-    }
-
-    async function toggleFullScreen() {
-        injectFullScreenStylesAndButton();
-        const fsTarget = document.documentElement;
-        const currentlyFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
-
-        if (currentlyFs) {
-            isPseudoFullScreen = false;
-            document.body.classList.remove("anna-pseudo-fullscreen");
-            try {
-                if (document.exitFullscreen) await document.exitFullscreen();
-                else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
-            } catch (e) {}
-            syncFullScreenButtonLabel();
-            return;
-        }
-
-        if (isPseudoFullScreen) {
-            isPseudoFullScreen = false;
-            document.body.classList.remove("anna-pseudo-fullscreen");
-            syncFullScreenButtonLabel();
-            return;
-        }
-
-        try {
-            if (fsTarget && fsTarget.requestFullscreen) {
-                await fsTarget.requestFullscreen();
-                syncFullScreenButtonLabel();
-                return;
-            }
-            if (fsTarget && fsTarget.webkitRequestFullscreen) {
-                await fsTarget.webkitRequestFullscreen();
-                syncFullScreenButtonLabel();
-                return;
-            }
-        } catch (e) {}
-
-        isPseudoFullScreen = true;
-        document.body.classList.add("anna-pseudo-fullscreen");
-        syncFullScreenButtonLabel();
     }
 
     function setMoodState(stateName) {
@@ -496,6 +390,7 @@
         body.textContent = readableText;
 
         div.appendChild(header);
+        div.appendChild(body);
 
         if (isAssistant) {
             const temp = document.createElement("div");
@@ -510,7 +405,6 @@
             while (temp.firstChild) div.appendChild(temp.firstChild);
         }
 
-        div.appendChild(body);
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;
     }
@@ -554,73 +448,6 @@
                 }
             }).catch(() => {});
         }
-    }
-
-    function wantsOpenSourceScout(prompt) {
-        const lower = String(prompt || "").toLowerCase();
-        return /open.?source|borrow|github|repo|scout|social.?media|automation|w3c|architecture|bot|agent/.test(lower);
-    }
-
-    function hasScoutedToday() {
-        const today = new Date().toISOString().slice(0, 10);
-        const memoryText = Object.entries(repoVaultFiles)
-            .filter(([p]) => !isSoulOrLoveLetterPath(p) && (p.toLowerCase().includes("memory.json") || p.toLowerCase().includes("a1/v3/logs/")))
-            .map(([, c]) => c)
-            .join("\n");
-        return memoryText.includes(`scout_date:${today}`) || memoryText.includes(today);
-    }
-
-    function extractPlainTextSnippet(rawHtmlOrText) {
-        const str = String(rawHtmlOrText || "");
-        const withoutScripts = str
-            .replace(/<script[\s\S]*?<\/script>/gi, " ")
-            .replace(/<style[\s\S]*?<\/style>/gi, " ");
-        const stripped = withoutScripts.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-        return stripped.slice(0, 1800);
-    }
-
-    async function fetchLiveWebAndMarketTelemetry(prompt) {
-        const telemetryBlocks = [];
-        const text = String(prompt || "");
-        const lower = text.toLowerCase();
-
-        const urlMatches = text.match(/https?:\/\/[^\s"'<>)]+/gi) || [];
-        for (const rawUrl of urlMatches.slice(0, 2)) {
-            try {
-                const res = await fetchWithTimeout(rawUrl, { cache: "no-store" }, 5000);
-                if (res.ok) {
-                    const bodyText = await res.text();
-                    const snippet = extractPlainTextSnippet(bodyText);
-                    if (snippet) {
-                        telemetryBlocks.push(`[BROWSER FETCHED URL: ${rawUrl} @ ${new Date().toISOString()}]\n${snippet}`);
-                    }
-                } else {
-                    telemetryBlocks.push(`[BROWSER FETCHED URL: ${rawUrl}]\nHTTP ${res.status} (${res.statusText || "Error"})`);
-                }
-            } catch (err) {
-                telemetryBlocks.push(`[BROWSER FETCH URL BLOCKED/FAILED: ${rawUrl}]\nReason: ${err.message} (likely CORS or network block).`);
-            }
-        }
-
-        if (/\b(btc|bitcoin|doge|dogecoin|price|market)\b/.test(lower)) {
-            try {
-                const cryptoRes = await fetchWithTimeout(
-                    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd&include_24hr_change=true",
-                    { cache: "no-store" },
-                    5000
-                );
-                if (cryptoRes.ok) {
-                    const cryptoData = await cryptoRes.json();
-                    telemetryBlocks.push(`[VERIFIED LIVE COINGECKO TELEMETRY @ ${new Date().toISOString()}]\n- Bitcoin (BTC): $${cryptoData.bitcoin.usd} (24h Change: ${cryptoData.bitcoin.usd_24h_change.toFixed(2)}%)\n- Dogecoin (DOGE): $${cryptoData.dogecoin.usd} (24h Change: ${cryptoData.dogecoin.usd_24h_change.toFixed(2)}%)`);
-                }
-            } catch (e) {}
-        }
-
-        if (wantsOpenSourceScout(lower)) {
-            telemetryBlocks.push(`[DAILY OPEN-SOURCE SCOUT STATUS]\n- Date: ${new Date().toISOString().slice(0, 10)}\n- Logged today in ${WORKSPACE_ROOT}/memory or ${WORKSPACE_ROOT}/logs: ${hasScoutedToday() ? "yes" : "no"}\n- Rule: Only recommend open-source tools/repos that help build, music, marketing, or social reach, and require review before borrowing.`);
-        }
-
-        return telemetryBlocks.length > 0 ? "\n\n" + telemetryBlocks.join("\n\n") : "";
     }
 
     async function getLatestFileSha(path) {
@@ -682,6 +509,8 @@
             || (userEl && userEl.value.trim())
             || `Perform a full ${WORKSPACE_ROOT} vault integrity audit, verify live BTC/DOGE prices, and log system telemetry under ${WORKSPACE_ROOT}/logs.`;
 
+        const targetLogName = `aa01-v3-${Date.now()}.md`;
+
         updateActionsBadge("DISPATCHING...", "active");
         setMoodState("thinking");
         snapshotCurrentV3Logs();
@@ -692,7 +521,11 @@
                 headers: { ...getGitHubHeaders(), "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ref: activeBranch,
-                    inputs: { command: cmdText, search_query: customSearchQuery || "" }
+                    inputs: {
+                        command: cmdText,
+                        search_query: customSearchQuery || "",
+                        target_log: targetLogName
+                    }
                 })
             }, 10000);
 
@@ -717,7 +550,7 @@
     }
 
     async function writePendingCommandFallback(cmdText) {
-        const targetPath = `${WORKSPACE_ROOT}/pending-commands.md`;
+        const targetPath = `${WORKSPACE_ROOT}/vault/pending-commands.md`;
         lastWorkflowDispatchMs = Date.now();
         const ok = await writeFileToGitHub(targetPath, cmdText + "\n", `AA01 Pending Command Trigger (${WORKSPACE_ROOT})`);
         if (ok) {
@@ -832,12 +665,12 @@
         if (!rowEl) return;
         const childrenEl = rowEl.nextElementSibling;
         if (!childrenEl) return;
-        const isClosed = childrenEl.style.display === "none";
-        childrenEl.style.display = isClosed ? "block" : "none";
-        childrenEl.classList.toggle("collapsed", !isClosed);
+        const currentlyHidden = window.getComputedStyle(childrenEl).display === "none";
+        childrenEl.style.setProperty("display", currentlyHidden ? "block" : "none", "important");
+        childrenEl.classList.toggle("collapsed", !currentlyHidden);
         const arrowEl = rowEl.querySelector(".tree-arrow");
         if (arrowEl) {
-            arrowEl.textContent = isClosed ? "▾" : "▸";
+            arrowEl.textContent = currentlyHidden ? "▾" : "▸";
         }
     }
 
@@ -1282,7 +1115,7 @@
                 const edEl = document.getElementById("repo-code-editor");
                 if (pathEl) pathEl.value = filePath;
                 if (edEl) edEl.value = fileContent;
-                if (filePath === `${WORKSPACE_ROOT}/pending-commands.md`) triggeredWorkflow = true;
+                if (filePath === `${WORKSPACE_ROOT}/vault/pending-commands.md`) triggeredWorkflow = true;
             } else {
                 await dispatchBackendWorkflow(`Write this file to ${filePath}:\n${fileContent}`, "");
             }
@@ -1510,12 +1343,11 @@
             return;
         }
 
-        const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
         const systemPrompt = `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.
 STRICT LANGUAGE RULE: Respond in natural, clear English ONLY. Never output Chinese characters or non-English words in your replies.
 OUTPUT FORMAT RULE: Never print model names, provider tags, or model IDs in your response text.
-LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSPACE_ROOT}/ tree right now. Put new/updated files under ${WORKSPACE_ROOT}/ unless instructed otherwise. Never claim a file was written unless you include a \`\`\`file:<path>\n...\n\`\`\` block for the dashboard to commit. Never claim to have a local PC hard drive. Be concise and easy to hear aloud.${liveTelemetry}\n\n${vaultContext}`;
+LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSPACE_ROOT}/ tree right now. Put new/updated files under ${WORKSPACE_ROOT}/ unless instructed otherwise. Never claim a file was written unless you include a \`\`\`file:<path>\n...\n\`\`\` block for the dashboard to commit. Be concise and easy to hear aloud.\n\n${vaultContext}`;
 
         try {
             const response = await fetchWithTimeout(DAHL_ENDPOINT, {
@@ -1551,9 +1383,9 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
             const origin = window.location && window.location.origin ? window.location.origin : "browser";
-            const reason = err && err.name === "AbortError" ? "Timed out after 5s" : err.message;
+            const reason = err && err.name === "AbortError" ? `Request timed out after ${Math.round(DAHL_TIMEOUT_MS / 1000)}s` : err.message;
             setMoodState("error");
-            updateMessage(assistantMsgId, `DIRECT DAHL TIMEOUT (${origin}): ${reason}. Routing to ${WORKFLOW_FILENAME} in ${WORKSPACE_ROOT}...`);
+            updateMessage(assistantMsgId, `CONNECTION FAILED (${origin} -> inference.dahl.global): ${reason}. Routing to ${WORKFLOW_FILENAME} in ${WORKSPACE_ROOT}...`);
             const dispatched = await dispatchBackendWorkflow(prompt, prompt);
             if (!dispatched) {
                 speakText("Connection failed and backend dispatch unavailable.");
@@ -1564,10 +1396,6 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
-        injectFullScreenStylesAndButton();
-        document.addEventListener("fullscreenchange", syncFullScreenButtonLabel);
-        document.addEventListener("webkitfullscreenchange", syncFullScreenButtonLabel);
-
         const savedToken = getStoredKey(["GITHUB_PAT", "gh_token", "github_token"]);
         const ghEl = document.getElementById("gh-token");
         if (savedToken && ghEl) {
@@ -1599,7 +1427,6 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
     window.setMoodState = setMoodState;
     window.updateActiveModel = updateActiveModel;
     window.triggerAutonomousBootSequence = triggerAutonomousBootSequence;
-    window.toggleFullScreen = toggleFullScreen;
     window.toggleFolderRowEl = toggleFolderRowEl;
     window.toggleVoice = toggleVoice;
     window.toggleSettings = toggleSettings;
