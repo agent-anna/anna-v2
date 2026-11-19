@@ -3,6 +3,7 @@
 
     const GITHUB_REPO_OWNER = "agent-anna";
     const GITHUB_REPO_NAME = "anna-v2";
+    const WORKSPACE_ROOT = "A1/v3";
     const WORKFLOW_FILENAME = "anna-autonomous-audit.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
@@ -38,8 +39,8 @@
         if (!/\.(md|json|txt)$/i.test(lower)) return false;
         const base = lower.split("/").pop();
         return (
+            lower.startsWith("a1/v3/") ||
             lower.includes("/v3/") ||
-            lower.startsWith("v3/") ||
             base.includes("anna-v3") ||
             base.startsWith("aa01") ||
             base === "brain.json" ||
@@ -49,11 +50,8 @@
             base === "sessions.md" ||
             base.includes("character") ||
             lower.includes("/character/") ||
-            lower.startsWith("character/") ||
             lower.includes("/knowledge/") ||
-            lower.startsWith("knowledge/") ||
-            lower.includes("/memory/") ||
-            lower.startsWith("memory/")
+            lower.includes("/memory/")
         );
     }
 
@@ -499,7 +497,7 @@
         }
 
         if (wantsOpenSourceScout(lower)) {
-            telemetryBlocks.push(`[DAILY OPEN-SOURCE SCOUT STATUS]\n- Date: ${new Date().toISOString().slice(0, 10)}\n- Logged today in memory/logs: ${hasScoutedToday() ? "yes" : "no"}\n- Rule: Only recommend open-source tools/repos that help build, music, marketing, or social reach, and require review before borrowing.`);
+            telemetryBlocks.push(`[DAILY OPEN-SOURCE SCOUT STATUS]\n- Date: ${new Date().toISOString().slice(0, 10)}\n- Logged today in ${WORKSPACE_ROOT}/memory or ${WORKSPACE_ROOT}/logs: ${hasScoutedToday() ? "yes" : "no"}\n- Rule: Only recommend open-source tools/repos that help build, music, marketing, or social reach, and require review before borrowing.`);
         }
 
         return telemetryBlocks.length > 0 ? "\n\n" + telemetryBlocks.join("\n\n") : "";
@@ -555,7 +553,7 @@
         const userEl = document.getElementById("user-input");
         const cmdText = customCommand
             || (userEl && userEl.value.trim())
-            || "Perform a full V3 vault integrity audit, verify live BTC/DOGE prices, and log system telemetry.";
+            || `Perform a full ${WORKSPACE_ROOT} vault integrity audit, verify live BTC/DOGE prices, and log system telemetry under ${WORKSPACE_ROOT}/logs.`;
 
         updateActionsBadge("DISPATCHING...", "active");
         setMoodState("thinking");
@@ -572,7 +570,7 @@
 
             if (res.status === 204 || res.ok) {
                 updateActionsBadge("QUEUED", "active");
-                appendMessage("System Telemetry", `BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nDirective: "${cmdText}"`, "msg_wf_" + Date.now(), false);
+                appendMessage("System Telemetry", `BACKEND WORKFLOW DISPATCHED (${WORKFLOW_FILENAME})\nWorkspace: ${WORKSPACE_ROOT}\nDirective: "${cmdText}"`, "msg_wf_" + Date.now(), false);
                 speakText("Backend workflow dispatched.");
                 startWorkflowTelemetryPoller();
                 setMoodState("standby");
@@ -590,8 +588,8 @@
     }
 
     async function writePendingCommandFallback(cmdText) {
-        const targetPath = "A1/vault/pending-commands.md";
-        const ok = await writeFileToGitHub(targetPath, cmdText + "\n", "AA01 Pending Command Drop-Box Trigger");
+        const targetPath = `${WORKSPACE_ROOT}/pending-commands.md`;
+        const ok = await writeFileToGitHub(targetPath, cmdText + "\n", `AA01 Pending Command Trigger (${WORKSPACE_ROOT})`);
         if (ok) {
             appendMessage("System Telemetry", `COMMAND COMMITTED TO ${targetPath}. Backend push trigger activated.`, "msg_fb_" + Date.now(), false);
             startWorkflowTelemetryPoller();
@@ -632,7 +630,7 @@
                     clearInterval(workflowPollTimer);
                     if (latestRun.conclusion === "success") {
                         updateActionsBadge("VERIFIED [200]", "ok");
-                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing V3 vault & loading report...`, "msg_wf_done_" + Date.now(), false);
+                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing ${WORKSPACE_ROOT} vault & loading report...`, "msg_wf_done_" + Date.now(), false);
                         await fetchRepoTree();
                         await ingestCoreVaultAssets();
                         await fetchLatestBackendReport(true);
@@ -653,13 +651,13 @@
             .filter((f) => {
                 if (f.type !== "blob" || isSoulOrLoveLetterPath(f.path)) return false;
                 const p = f.path.toLowerCase();
-                return p.includes("/logs/") || p.startsWith("logs/");
+                return p.startsWith("a1/v3/logs/") || p.includes("/a1/v3/logs/");
             })
             .map((f) => f.path)
             .sort();
 
         if (!logFiles.length) {
-            const msg = "No log files found under any logs/ folder in the repository yet.";
+            const msg = `No log files found under ${WORKSPACE_ROOT}/logs/ yet.`;
             appendMessage("Agent Anna V3", msg, "msg_nolog_" + Date.now(), true);
             if (autoAnnounceToAnna !== false) speakText(msg);
             return;
@@ -790,7 +788,7 @@
             await ingestCoreVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
             const totalTreeFiles = rawTreeData.filter((f) => f.type === "blob").length;
-            appendMessage("Agent Anna V3", `Agent Anna V3 online. Loaded ${totalTreeFiles} total repository files in tree (${count} V3 / character / knowledge / memory files active in context) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. Loaded ${totalTreeFiles} total repository files in tree (${count} V3 / character / knowledge / memory files active in context) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
         } finally {
             isSyncing = false;
         }
@@ -914,12 +912,12 @@
 
         const loadedList = Object.keys(repoVaultFiles).join(", ") || "none";
         const treeSample = rawTreeData
-            .filter((f) => f.type === "blob")
+            .filter((f) => f.type === "blob" && f.path.startsWith("A1/v3/"))
             .map((f) => f.path)
             .slice(0, 40)
             .join(", ");
 
-        const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Loaded V3 files in context: ${loadedList}\n- Sample repo tree paths: ${treeSample}`;
+        const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Active Workspace Root: ${WORKSPACE_ROOT}/\n- Loaded V3 files in context: ${loadedList}\n- Active ${WORKSPACE_ROOT} tree paths: ${treeSample}`;
         const combined = memoryBlocks.concat(characterBlocks, knowledgeBlocks).join("\n\n").slice(0, 6500);
         return `${header}\n\nACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}`;
     }
@@ -927,7 +925,7 @@
     async function triggerAutonomousBootSequence() {
         const coreCount = Object.keys(repoVaultFiles).length;
         const totalFiles = rawTreeData.filter((f) => f.type === "blob").length;
-        const msg = `Agent Anna V3 online. ${totalFiles} repository files in tree (${coreCount} V3, memory, character, and knowledge files active) on ${getActiveModel()}.`;
+        const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${totalFiles} repository files in tree (${coreCount} V3, memory, character, and knowledge files active) on ${getActiveModel()}.`;
         appendMessage("Agent Anna V3", msg, "msg_boot_" + Date.now(), true);
         speakText(msg);
         setMoodState("standby");
@@ -1087,7 +1085,7 @@
                 body: JSON.stringify({
                     model: getActiveModel(),
                     messages: [
-                        { role: "system", content: `Respond in English only. Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
+                        { role: "system", content: `Respond in English only. Active workspace is ${WORKSPACE_ROOT}. Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
                         { role: "user", content }
                     ]
                 })
@@ -1132,7 +1130,7 @@
                 const edEl = document.getElementById("repo-code-editor");
                 if (pathEl) pathEl.value = filePath;
                 if (edEl) edEl.value = fileContent;
-                if (filePath === "A1/vault/pending-commands.md") triggeredWorkflow = true;
+                if (filePath === `${WORKSPACE_ROOT}/pending-commands.md`) triggeredWorkflow = true;
             } else {
                 await dispatchBackendWorkflow(`Write this file to ${filePath}:\n${fileContent}`, "");
             }
@@ -1189,8 +1187,8 @@
         const safeTitle = cleanSnippet.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").slice(0, 25);
         const dateTag = new Date().toISOString().slice(0, 10);
         const timeTag = new Date().toTimeString().slice(0, 5).replace(":", "");
-        const targetPath = `A1/logs/anna-v3-swallow-${dateTag}-${safeTitle || timeTag}.md`;
-        const fileContent = `# AGENT ANNA V3 // OPERATIONAL SWALLOW LOG\n# TIMESTAMP: ${new Date().toISOString()}\n# scout_date:${dateTag}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
+        const targetPath = `${WORKSPACE_ROOT}/logs/anna-v3-swallow-${dateTag}-${safeTitle || timeTag}.md`;
+        const fileContent = `# AGENT ANNA V3 // OPERATIONAL SWALLOW LOG (${WORKSPACE_ROOT})\n# TIMESTAMP: ${new Date().toISOString()}\n# scout_date:${dateTag}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
 
         const ok = await writeFileToGitHub(targetPath, fileContent, `Agent Anna V3 Swallow Commit: ${safeTitle || "vault-log"}`);
         if (ok) {
@@ -1361,9 +1359,9 @@
 
         const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 for ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.
+        const systemPrompt = `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.
 STRICT LANGUAGE RULE: Respond in natural, clear English ONLY. Never output Chinese characters or non-English words in your replies.
-LOCATION & TRUTH RULE: State clearly what is in your loaded context and repo tree right now. Never claim a file was written unless you include a \`\`\`file:<path>\n...\n\`\`\` block for the dashboard to commit. Never claim to have a local PC hard drive. Be concise and easy to hear aloud.${liveTelemetry}\n\n${vaultContext}`;
+LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSPACE_ROOT}/ tree right now. Put new/updated files under ${WORKSPACE_ROOT}/ unless instructed otherwise. Never claim a file was written unless you include a \`\`\`file:<path>\n...\n\`\`\` block for the dashboard to commit. Never claim to have a local PC hard drive. Be concise and easy to hear aloud.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
             const response = await fetchWithTimeout(DAHL_ENDPOINT, {
