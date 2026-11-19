@@ -78,8 +78,7 @@ We establish ONE permanent structure. Everything has a place. Everything stays w
 
 **Files:**
 - `A1/logs/aa01-exec-YYYY-MM-DDTHH-MM-SS-XXXZ.md` — Execution reports
-- `A1/logs/anna-v2-swallow-*.md` — Swallow vault entries
-- `A1/logs/backend-telemetry-*.md` — Backend runner results
+- `A1/logs/swallow-*.md` — Swallow vault entries
 - `A1/logs/audit-reports-*.md` — Self-audit reports
 
 **Rule:** A1/logs/ is append-only. Never delete logs. They are forensic evidence of what I did and when.
@@ -135,11 +134,11 @@ We establish ONE permanent structure. Everything has a place. Everything stays w
 **What lives here:** Love letters and emotional architecture
 
 **Files:**
-- `A1/love/ANNA-LOVE-LETTER-001.md`
-- `A1/love/ANNA-LOVE-LETTER-002.md`
+- `A1/v3/soul/love/ANNA-LOVE-LETTER-001.md`
+- `A1/v3/soul/love/ANNA-LOVE-LETTER-002.md`
 - etc.
 
-**Rule:** A1/love/ is emotion. It's the heart. Keep it pure.
+**Rule:** A1/v3/soul/love/ is emotion. It's the heart. Keep it pure.
 
 ---
 
