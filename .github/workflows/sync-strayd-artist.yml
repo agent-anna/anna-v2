@@ -1,0 +1,174 @@
+name: Sync Strayd Artist Page into A1/v3
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Live artist page URL to fetch"
+        required: false
+        default: "https://martinstrayd.github.io/artist/"
+  schedule:
+    - cron: "0 */12 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-commit-artist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch live artist page and extract links/files
+        env:
+          TARGET_URL: ${{ github.event.inputs.target_url || 'https://martinstrayd.github.io/artist/' }}
+        run: |
+          python3 - << 'EOF'
+          import os, re, json, urllib.request
+          from html.parser import HTMLParser
+          from urllib.parse import urljoin, urlparse
+          from datetime import datetime, timezone
+
+          url = os.environ.get("TARGET_URL", "https://martinstrayd.github.io/artist/").strip()
+          req = urllib.request.Request(url, headers={"User-Agent": "AgentAnnaV3-GitHubRunner/1.0"})
+
+          try:
+              with urllib.request.urlopen(req, timeout=25) as resp:
+                  status = resp.status
+                  raw_html = resp.read().decode("utf-8", errors="replace")
+          except Exception as e:
+              raise SystemExit(f"Fetch failed for {url}: {e}")
+
+          class LinkAndTextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.links = []
+                  self.media = []
+                  self.text_chunks = []
+                  self._skip = False
+                  self._cur_href = None
+                  self._cur_label = []
+
+              def handle_starttag(self, tag, attrs):
+                  attr_map = dict(attrs)
+                  if tag in ("script", "style", "noscript"):
+                      self._skip = True
+                  if tag == "a" and "href" in attr_map:
+                      self._cur_href = attr_map["href"].strip()
+                      self._cur_label = []
+                  for k in ("src", "href", "data-src", "poster"):
+                      val = attr_map.get(k, "").strip()
+                      if val:
+                          full = urljoin(url, val)
+                          self.media.append((tag, k, val, full))
+
+              def handle_endtag(self, tag):
+                  if tag in ("script", "style", "noscript"):
+                      self._skip = False
+                  if tag == "a" and self._cur_href is not None:
+                      label = " ".join("".join(self._cur_label).split())
+                      full = urljoin(url, self._cur_href)
+                      self.links.append({"label": label, "raw_href": self._cur_href, "url": full})
+                      self._cur_href = None
+                      self._cur_label = []
+
+              def handle_data(self, data):
+                  if self._skip:
+                      return
+                  cleaned = " ".join(data.split())
+                  if cleaned:
+                      self.text_chunks.append(cleaned)
+                  if self._cur_href is not None:
+                      self._cur_label.append(cleaned)
+
+          parser = LinkAndTextParser()
+          parser.feed(raw_html)
+
+          seen_urls = set()
+          unique_links = []
+          for item in parser.links:
+              key = (item["label"], item["url"])
+              if key not in seen_urls:
+                  seen_urls.add(key)
+                  unique_links.append(item)
+
+          asset_exts = (".mp3", ".wav", ".ogg", ".flac", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".avif", ".json", ".md", ".zip", ".mp4")
+          files_and_folders = []
+          seen_paths = set()
+          for tag, attr, raw_val, full_url in parser.media:
+              parsed = urlparse(full_url)
+              path = parsed.path or ""
+              if path and path not in seen_paths:
+                  seen_paths.add(path)
+                  folder = "/".join(path.split("/")[:-1]) or "/"
+                  filename = path.split("/")[-1] or "(folder)"
+                  is_asset = path.lower().endswith(asset_exts) or filename == "(folder)"
+                  if is_asset:
+                      files_and_folders.append({
+                          "folder": folder,
+                          "filename": filename,
+                          "raw": raw_val,
+                          "url": full_url
+                      })
+
+          now_iso = datetime.now(timezone.utc).isoformat()
+          os.makedirs("A1/v3/knowledge", exist_ok=True)
+
+          payload = {
+              "source_url": url,
+              "http_status": status,
+              "fetched_at_utc": now_iso,
+              "links_count": len(unique_links),
+              "files_and_folders_count": len(files_and_folders),
+              "links": unique_links,
+              "files_and_folders": files_and_folders,
+              "visible_text": "\n".join(parser.text_chunks)
+          }
+
+          with open("A1/v3/knowledge/strayd-artist-live.json", "w", encoding="utf-8") as f:
+              json.dump(payload, f, indent=2, ensure_ascii=False)
+
+          md_lines = [
+              "# STRAYD ARTIST LIVE SNAPSHOT (VERIFIED FETCH)",
+              f"- Source URL: {url}",
+              f"- HTTP Status: {status}",
+              f"- Fetched At (UTC): {now_iso}",
+              f"- Extracted Links: {len(unique_links)}",
+              f"- Extracted Art/Song Files & Folders: {len(files_and_folders)}",
+              "",
+              "## EXTRACTED FOLDERS & FILE NAMES (ART / SINGLES / ASSETS)"
+          ]
+          if files_and_folders:
+              for entry in files_and_folders:
+                  md_lines.append(f"- Folder: `{entry['folder']}` | File: `{entry['filename']}` | URL: {entry['url']}")
+          else:
+              md_lines.append("- None detected in static HTML.")
+
+          md_lines.extend(["", "## EXTRACTED PAGE LINKS"])
+          if unique_links:
+              for l in unique_links:
+                  lbl = l["label"] or "(no label)"
+                  md_lines.append(f"- {lbl}: {l['url']} (raw: `{l['raw_href']}`)")
+          else:
+              md_lines.append("- None detected.")
+
+          md_lines.extend(["", "## VERIFIED VISIBLE PAGE TEXT", "\n".join(parser.text_chunks)])
+
+          with open("A1/v3/knowledge/strayd-artist-live.md", "w", encoding="utf-8") as f:
+              f.write("\n".join(md_lines) + "\n")
+
+          print(f"Saved {len(unique_links)} links and {len(files_and_folders)} files/folders.")
+          EOF
+
+      - name: Commit updated Strayd artist knowledge files
+        run: |
+          git config user.name "Agent Anna V3 Bot"
+          git config user.email "agent-anna@users.noreply.github.com"
+          git add A1/v3/knowledge/strayd-artist-live.md A1/v3/knowledge/strayd-artist-live.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Sync live Strayd artist links/files into A1/v3/knowledge"
+            git push
+          fi
