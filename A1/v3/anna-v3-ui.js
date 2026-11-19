@@ -1045,7 +1045,7 @@
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            updateMessage(auditMsgId, `Audit failed: ${err.message}`);
+            updateMessage(auditMsgId, `Audit failed (possible CORS/network block on ${DAHL_ENDPOINT}): ${err.message}`);
         }
         setMoodState("standby");
     }
@@ -1335,9 +1335,10 @@
             speakText(cleanReply);
             await parseAndExecuteAutonomousFiles(cleanReply);
         } catch (err) {
-            const errMsg = `CONNECTION FAILED: ${err.message}`;
+            const origin = window.location && window.location.origin ? window.location.origin : "browser";
+            const errMsg = `CONNECTION FAILED (${origin} -> inference.dahl.global): Browser blocked or dropped direct fetch (${err.message}). If this is CORS on Dahl's endpoint, direct browser calls from GitHub Pages require Dahl to allow ${origin} or a CORS-enabled proxy/workflow.`;
             updateMessage(assistantMsgId, errMsg);
-            speakText(errMsg);
+            speakText("Connection failed due to browser network or CORS block.");
             setMoodState("error");
             return;
         }
@@ -1368,10 +1369,6 @@
         if ("speechSynthesis" in window) {
             loadVoices();
             window.speechSynthesis.onvoiceschanged = loadVoices;
-        }
-
-        if (window.smokeTest && typeof window.smokeTest.verifyModules === "function") {
-            try { window.smokeTest.verifyModules(); } catch (e) {}
         }
 
         await syncAll();
