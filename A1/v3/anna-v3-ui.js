@@ -20,6 +20,17 @@
     let workflowPollTimer = null;
     let ttsKeepAliveTimer = null;
 
+    function isSoulOrLoveLetterPath(path) {
+        const p = String(path || "").toLowerCase();
+        return (
+            p.includes("/soul/") ||
+            p.startsWith("soul/") ||
+            p.includes("love-letter") ||
+            p.includes("love_letter") ||
+            p.includes("loveletter")
+        );
+    }
+
     function cleanHeaderToken(str) {
         if (!str) return "";
         return String(str).replace(/[^\x20-\x7E\xA0-\xFF]/g, "").trim();
@@ -251,7 +262,7 @@
         if ("speechSynthesis" in window) {
             try { window.speechSynthesis.cancel(); } catch (e) {}
         }
-        if (isListening && recognition) {
+        if (recognition) {
             isListening = false;
             try { recognition.stop(); } catch (e) {}
         }
@@ -358,9 +369,18 @@
         }
     }
 
-    function toggleWriteZone() {
-        const wz = document.getElementById("anna-write-zone");
-        if (wz) wz.classList.toggle("open");
+    function wantsOpenSourceScout(prompt) {
+        const lower = String(prompt || "").toLowerCase();
+        return /open.?source|borrow|github|repo|scout|social.?media|automation|w3c|architecture|bot|agent/.test(lower);
+    }
+
+    function hasScoutedToday() {
+        const today = new Date().toISOString().slice(0, 10);
+        const memoryText = Object.entries(repoVaultFiles)
+            .filter(([p]) => !isSoulOrLoveLetterPath(p) && (p.toLowerCase().includes("memory.json") || p.toLowerCase().includes("logs/")))
+            .map(([, c]) => c)
+            .join("\n");
+        return memoryText.includes(`scout_date:${today}`) || memoryText.includes(today);
     }
 
     async function fetchLiveWebAndMarketTelemetry(prompt) {
@@ -389,11 +409,14 @@
             } catch (e) {}
         }
 
-        const wantsSearch = /search|duckduckgo|ddg|google|find|lookup|look up|news|weather|latest|today|current|who is|what is|summarize|research/.test(lower);
+        const wantsSearch = /search|duckduckgo|ddg|google|find|lookup|look up|news|weather|latest|today|current|who is|what is|summarize|research|open.?source|github|w3c|social.?media|automation/.test(lower);
         if (wantsSearch) {
-            const searchQuery = String(prompt || "")
+            const rawQuery = String(prompt || "")
                 .replace(/^(search|google|duckduckgo|ddg|find|look up|lookup|summarize|research)\s+(for|about)?/i, "")
                 .trim();
+            const searchQuery = wantsOpenSourceScout(lower)
+                ? `${rawQuery} github open source`.trim()
+                : rawQuery;
             try {
                 const jinaSearchRes = await fetch(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
                     headers: { Accept: "text/plain" }
@@ -405,8 +428,12 @@
                     }
                 }
             } catch (e) {
-                telemetryBlocks.push("[NOTE: Live search request did not return in-browser; use BACKEND for server-side execution.]");
+                telemetryBlocks.push("[NOTE: Live search request did not return in-browser; verify connection or retry.]");
             }
+        }
+
+        if (wantsOpenSourceScout(lower)) {
+            telemetryBlocks.push(`[DAILY OPEN-SOURCE SCOUT STATUS]\n- Date: ${new Date().toISOString().slice(0, 10)}\n- Logged today in memory/logs: ${hasScoutedToday() ? "yes" : "no"}\n- Rule: Only recommend open-source tools/repos that help build, music, marketing, or social reach, and require review before borrowing.`);
         }
 
         return telemetryBlocks.length > 0 ? "\n\n" + telemetryBlocks.join("\n\n") : "";
@@ -457,10 +484,8 @@
             return;
         }
 
-        const contentEl = document.getElementById("anna-content-input");
         const userEl = document.getElementById("user-input");
         const cmdText = customCommand
-            || (contentEl && contentEl.value.trim())
             || (userEl && userEl.value.trim())
             || "Perform a full A1 vault integrity audit, verify live BTC/DOGE prices, and log system telemetry.";
 
@@ -504,20 +529,6 @@
         } else {
             updateActionsBadge("FAILED", "err");
         }
-    }
-
-    function dispatchFromWriteZone() {
-        const el = document.getElementById("anna-content-input");
-        const content = el ? el.value.trim() : "";
-        if (!content) {
-            const st = document.getElementById("write-zone-status");
-            if (st) st.innerText = "ENTER DIRECTIVE";
-            speakText("Enter a directive in the content box first.");
-            return;
-        }
-        const st = document.getElementById("write-zone-status");
-        if (st) st.innerText = "DISPATCHING...";
-        dispatchBackendWorkflow(content);
     }
 
     function startWorkflowTelemetryPoller() {
@@ -564,12 +575,12 @@
     async function fetchLatestBackendReport(autoAnnounceToAnna) {
         await fetchRepoTree();
         const logFiles = rawTreeData
-            .filter((f) => f.type === "blob" && f.path.startsWith("A1/logs/"))
+            .filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && f.path.startsWith("A1/logs/"))
             .map((f) => f.path)
             .sort();
 
         if (!logFiles.length) {
-            appendMessage("System Telemetry", "No execution logs found in A1/logs/ yet. Run BACKEND first.", "msg_nolog_" + Date.now(), false);
+            appendMessage("System Telemetry", "No execution logs found in A1/logs/ yet.", "msg_nolog_" + Date.now(), false);
             return;
         }
         const newestLog = logFiles[logFiles.length - 1];
@@ -578,87 +589,6 @@
         const logContent = repoVaultFiles[newestLog] || (editor ? editor.value : "");
         if (autoAnnounceToAnna && logContent) {
             appendMessage("Agent Anna V3", `INGESTED BACKEND REPORT (${newestLog}):\n\n${logContent.slice(0, 1500)}`, "msg_rep_" + Date.now(), true);
-        }
-    }
-
-    function clearWriteZone() {
-        const cmd = document.getElementById("anna-cmd-input");
-        const cnt = document.getElementById("anna-content-input");
-        const st = document.getElementById("write-zone-status");
-        if (cmd) cmd.value = "";
-        if (cnt) cnt.value = "";
-        if (st) st.innerText = "CLEARED";
-    }
-
-    async function processAnnaWriteZone() {
-        const cmdEl = document.getElementById("anna-cmd-input");
-        const cntEl = document.getElementById("anna-content-input");
-        const stEl = document.getElementById("write-zone-status");
-        const cmdRaw = cmdEl ? cmdEl.value.trim() : "";
-        const contentRaw = cntEl ? cntEl.value : "";
-
-        if (!cmdRaw) {
-            if (stEl) stEl.innerText = "NO COMMAND";
-            speakText("No command entered in Write Zone.");
-            return;
-        }
-
-        let commandType = "";
-        let targetPath = "";
-        for (const line of cmdRaw.split(/\r?\n/)) {
-            const upper = line.trim().toUpperCase();
-            if (upper.startsWith("COMMAND:")) commandType = line.split(":").slice(1).join(":").trim().toUpperCase();
-            else if (upper.startsWith("PATH:")) targetPath = line.split(":").slice(1).join(":").trim();
-        }
-        if (!commandType) {
-            if (cmdRaw.toUpperCase().includes("DISPATCH")) commandType = "DISPATCH";
-            else if (cmdRaw.toUpperCase().includes("COMMIT")) commandType = "COMMIT";
-            else if (cmdRaw.toUpperCase().includes("WRITE")) commandType = "WRITE";
-        }
-
-        const editor = document.getElementById("repo-code-editor");
-        const preview = document.getElementById("media-preview-container");
-        const pathInput = document.getElementById("active-file-path");
-
-        if (commandType === "DISPATCH") {
-            if (stEl) stEl.innerText = "DISPATCHING...";
-            await dispatchBackendWorkflow(contentRaw.trim());
-            if (stEl) stEl.innerText = "DISPATCHED";
-            return;
-        }
-
-        if (commandType === "WRITE") {
-            if (!targetPath) {
-                if (stEl) stEl.innerText = "MISSING PATH";
-                speakText("Missing target path for write command.");
-                return;
-            }
-            if (preview) preview.style.display = "none";
-            if (editor) {
-                editor.style.display = "block";
-                editor.value = contentRaw;
-            }
-            if (pathInput) pathInput.value = targetPath;
-            if (stEl) stEl.innerText = `LOADED -> ${targetPath}`;
-            appendMessage("System Telemetry", `WRITE ZONE: Loaded content into editor for ${targetPath}. Click COMMIT to save.`, "msg_wz_" + Date.now(), false);
-        } else if (commandType === "COMMIT") {
-            if (targetPath && pathInput) pathInput.value = targetPath;
-            if (contentRaw.trim().length > 0 && editor) {
-                if (preview) preview.style.display = "none";
-                editor.style.display = "block";
-                editor.value = contentRaw;
-            }
-            const activePath = pathInput ? pathInput.value.trim() : "";
-            if (!activePath) {
-                if (stEl) stEl.innerText = "NO ACTIVE PATH";
-                return;
-            }
-            if (stEl) stEl.innerText = `COMMITTING ${activePath}...`;
-            await commitCurrentFile();
-            if (stEl) stEl.innerText = `COMMITTED ${activePath}`;
-            if (activePath === "A1/vault/pending-commands.md") startWorkflowTelemetryPoller();
-        } else {
-            if (stEl) stEl.innerText = "UNKNOWN COMMAND";
         }
     }
 
@@ -753,7 +683,7 @@
         await fetchRepoTree();
         await ingestVaultAssets();
         const count = Object.keys(repoVaultFiles).length;
-        appendMessage("Agent Anna V3", `Agent Anna V3 (A1) online. Synced ${count} knowledge & memory assets from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+        appendMessage("Agent Anna V3", `Agent Anna V3 (A1) online. Synced ${count} operational & knowledge files from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
     }
 
     async function fetchRepoTree() {
@@ -788,7 +718,8 @@
         const headers = getGitHubHeaders();
         const targetFiles = rawTreeData.filter((f) =>
             f.type === "blob" &&
-            f.size < 45000 &&
+            f.size < 65000 &&
+            !isSoulOrLoveLetterPath(f.path) &&
             (f.path.toLowerCase().endsWith(".md") || f.path.toLowerCase().endsWith(".json") || f.path.toLowerCase().endsWith(".txt"))
         );
 
@@ -815,8 +746,8 @@
 
     function getCompactVaultContext(userPrompt) {
         const manifest = [];
-        const priorityBlocks = [];
-        const matchedBlocks = [];
+        const spineBlocks = [];
+        const knowledgeBlocks = [];
         const lowerPrompt = String(userPrompt || "").toLowerCase();
         const terms = lowerPrompt.split(/[^a-z0-9_-]+/).filter((w) => w.length > 2);
 
@@ -824,40 +755,44 @@
             if (f.type === "blob") manifest.push(`- ${f.path}`);
         });
 
-        const logPaths = Object.keys(repoVaultFiles).filter((p) => p.includes("/logs/") || p.startsWith("A1/logs/")).sort();
+        const logPaths = Object.keys(repoVaultFiles)
+            .filter((p) => !isSoulOrLoveLetterPath(p) && (p.includes("/logs/") || p.startsWith("A1/logs/")))
+            .sort();
         const latestLogPath = logPaths.length ? logPaths[logPaths.length - 1] : null;
 
         for (const [path, content] of Object.entries(repoVaultFiles)) {
+            if (isSoulOrLoveLetterPath(path)) continue;
+
             const lowerPath = path.toLowerCase();
             const baseName = path.split("/").pop().toLowerCase();
-            const isCoreKnowledge = (
+            const isConsolidatedMaster = baseName === "aa01.md";
+            const isSpine = (
                 baseName === "brain.json" ||
                 baseName === "memory.json" ||
                 baseName === "links.json" ||
                 baseName === "tasks.json" ||
-                lowerPath.includes("/soul/") ||
-                lowerPath.startsWith("soul/") ||
-                lowerPath.includes("/rules/") ||
-                lowerPath.startsWith("rules/") ||
-                lowerPath.includes("/laws/") ||
-                lowerPath.startsWith("laws/") ||
-                lowerPath.includes("/knowledge/") ||
-                lowerPath.startsWith("knowledge/") ||
-                lowerPath.includes("love-letter") ||
-                lowerPath.includes("character")
+                lowerPath.includes("/character/") ||
+                lowerPath.startsWith("character/") ||
+                lowerPath.includes("character") ||
+                path === latestLogPath
             );
-            const isLatestLog = path === latestLogPath;
-            const isMatched = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
+            const isKnowledge = (
+                lowerPath.includes("/knowledge/") ||
+                lowerPath.startsWith("knowledge/")
+            );
+            const isTermMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
 
-            if (isCoreKnowledge || isLatestLog) {
-                priorityBlocks.push(`=== CORE KNOWLEDGE [${path}] ===\n${content.slice(0, 2200)}`);
-            } else if (isMatched) {
-                matchedBlocks.push(`=== VAULT MATCH [${path}] ===\n${content.slice(0, 1800)}`);
+            if (isConsolidatedMaster) {
+                spineBlocks.unshift(`=== CONSOLIDATED AA01 [${path}] ===\n${content.slice(0, 3200)}`);
+            } else if (isSpine) {
+                spineBlocks.push(`=== SPINE [${path}] ===\n${content.slice(0, 1800)}`);
+            } else if (isKnowledge || isTermMatch) {
+                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 1800)}`);
             }
         }
 
-        const combined = priorityBlocks.concat(matchedBlocks).join("\n\n").slice(0, 12000);
-        return `REPOSITORY MANIFEST:\n${manifest.slice(0, 90).join("\n")}\n\nKNOWLEDGE VAULT (BRAIN / MEMORY / LINKS / TASKS / SOUL / RULES / LAWS / LOVE-LETTERS):\n${combined}`;
+        const combined = spineBlocks.concat(knowledgeBlocks).join("\n\n").slice(0, 13000);
+        return `REPOSITORY MANIFEST:\n${manifest.slice(0, 100).join("\n")}\n\nOPERATIONAL BRAIN / MEMORY / CHARACTER / KNOWLEDGE:\n${combined}`;
     }
 
     async function fetchDahlWithAutoRetry(url, options, maxRetries) {
@@ -902,11 +837,11 @@
         }
 
         const bootMsgId = "msg_boot_" + Date.now();
-        appendMessage("Agent Anna V3", `Awakening Agent Anna V3 (${getActiveModel()}) & loading knowledge vault...`, bootMsgId, true);
+        appendMessage("Agent Anna V3", `Awakening Agent Anna V3 (${getActiveModel()}) & loading brain/memory/character/knowledge...`, bootMsgId, true);
         setMoodState("thinking");
 
-        const vaultContext = getCompactVaultContext("brain memory links tasks soul rules laws love-letters");
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable plain text or Markdown with real line breaks (never raw escaped \\n strings). Preserve your character, rules, laws, soul, love-letters, and knowledge vault.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, knowledge vault status, and zero-hallucination rule concisely.`;
+        const vaultContext = getCompactVaultContext("aa01 character brain memory links tasks knowledge");
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory persistent across browser refreshes and reconnects. Never write OS logs or facts into soul/, and treat love letters in soul/ as archived recollection only.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, operational spine status, and zero-hallucination rule concisely.`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -916,7 +851,7 @@
                     model: getActiveModel(),
                     messages: [
                         { role: "system", content: systemPrompt },
-                        { role: "user", content: "Boot Agent Anna V3 (A1) and confirm knowledge & readiness." }
+                        { role: "user", content: "Boot Agent Anna V3 (A1) and confirm character, knowledge spine, and readiness." }
                     ]
                 })
             });
@@ -978,7 +913,9 @@
                         const binString = atob(data.content.replace(/\s/g, ""));
                         const decoded = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
                         editor.value = decoded;
-                        repoVaultFiles[path] = decoded;
+                        if (!isSoulOrLoveLetterPath(path)) {
+                            repoVaultFiles[path] = decoded;
+                        }
                     }
                 } catch (err) {
                     editor.value = "Error loading file content.";
@@ -1000,7 +937,9 @@
         try {
             const ok = await writeFileToGitHub(path, content, `Agent Anna V3 commit: updated ${path}`);
             if (ok) {
-                repoVaultFiles[path] = content;
+                if (!isSoulOrLoveLetterPath(path)) {
+                    repoVaultFiles[path] = content;
+                }
                 appendMessage("System Telemetry", `VERIFIED COMMIT: ${path} written to ${GITHUB_REPO_NAME}.`, "msg_com_" + Date.now(), false);
                 speakText("Committed file successfully.");
                 await fetchRepoTree();
@@ -1102,11 +1041,16 @@
         const dispatchRegex = /```dispatch\n([\s\S]*?)```/g;
         let match;
         const committedFiles = [];
+        const skippedSoulWrites = [];
         let triggeredWorkflow = false;
 
         while ((match = fileRegex.exec(aiResponseText)) !== null) {
             const filePath = match[1].trim();
             const fileContent = match[2];
+            if (isSoulOrLoveLetterPath(filePath)) {
+                skippedSoulWrites.push(filePath);
+                continue;
+            }
             const ok = await writeFileToGitHub(filePath, fileContent, `Agent Anna V3 Self-Write: ${filePath}`);
             if (ok) {
                 repoVaultFiles[filePath] = fileContent;
@@ -1126,14 +1070,19 @@
             try {
                 const parsed = JSON.parse(jsonMatch[1]);
                 if (parsed && parsed.path && typeof parsed.content === "string") {
-                    const unescaped = parsed.content
-                        .replace(/\\r\\n/g, "\n")
-                        .replace(/\\n/g, "\n")
-                        .replace(/\\t/g, "  ");
-                    const ok = await writeFileToGitHub(parsed.path.trim(), unescaped, `Agent Anna V3 Write: ${parsed.path.trim()}`);
-                    if (ok) {
-                        repoVaultFiles[parsed.path.trim()] = unescaped;
-                        committedFiles.push(parsed.path.trim());
+                    const targetPath = parsed.path.trim();
+                    if (isSoulOrLoveLetterPath(targetPath)) {
+                        skippedSoulWrites.push(targetPath);
+                    } else {
+                        const unescaped = parsed.content
+                            .replace(/\\r\\n/g, "\n")
+                            .replace(/\\n/g, "\n")
+                            .replace(/\\t/g, "  ");
+                        const ok = await writeFileToGitHub(targetPath, unescaped, `Agent Anna V3 Write: ${targetPath}`);
+                        if (ok) {
+                            repoVaultFiles[targetPath] = unescaped;
+                            committedFiles.push(targetPath);
+                        }
                     }
                 }
             } catch (e) {}
@@ -1143,6 +1092,10 @@
         while ((dMatch = dispatchRegex.exec(aiResponseText)) !== null) {
             const backendDirective = dMatch[1].trim();
             if (backendDirective) await dispatchBackendWorkflow(backendDirective, backendDirective);
+        }
+
+        if (skippedSoulWrites.length > 0) {
+            appendMessage("System Telemetry", `GUARDRAIL: Blocked auto-write into soul/archive path(s): ${skippedSoulWrites.join(", ")}.`, "msg_soul_guard_" + Date.now(), false);
         }
 
         if (committedFiles.length > 0) {
@@ -1163,7 +1116,7 @@
         const dateTag = new Date().toISOString().slice(0, 10);
         const timeTag = new Date().toTimeString().slice(0, 5).replace(":", "");
         const targetPath = `A1/logs/anna-v3-swallow-${dateTag}-${safeTitle || timeTag}.md`;
-        const fileContent = `# AGENT ANNA V3 (A1) // SWALLOW VAULT ENTRY\n# TIMESTAMP: ${new Date().toISOString()}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
+        const fileContent = `# AGENT ANNA V3 (A1) // OPERATIONAL SWALLOW LOG\n# TIMESTAMP: ${new Date().toISOString()}\n# scout_date:${dateTag}\n\n## CAPTURED INTELLIGENCE\n${textToSwallow}\n`;
 
         const ok = await writeFileToGitHub(targetPath, fileContent, `Agent Anna V3 Swallow Commit: ${safeTitle || "vault-log"}`);
         if (ok) {
@@ -1180,55 +1133,84 @@
 
     function initSpeechRecognition() {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRec) return;
-        recognition = new SpeechRec();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
-        recognition.onstart = () => {
+        if (!SpeechRec) {
+            appendMessage("System Telemetry", "MIC INFO: SpeechRecognition API not supported in this browser; type in input box.", "msg_stt_unsup_" + Date.now(), false);
+            return null;
+        }
+        const rec = new SpeechRec();
+        rec.continuous = false;
+        rec.interimResults = true;
+        rec.lang = "en-US";
+
+        rec.onstart = () => {
             isListening = true;
             setMoodState("responding");
             const micBtn = document.getElementById("mic-btn");
             if (micBtn) micBtn.classList.add("listening");
         };
-        recognition.onresult = (event) => {
-            let finalTranscript = "";
+
+        rec.onresult = (event) => {
+            let transcript = "";
             for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+                if (event.results[i] && event.results[i][0]) {
+                    transcript += event.results[i][0].transcript;
+                }
             }
             const inputEl = document.getElementById("user-input");
-            if (finalTranscript && inputEl) {
-                inputEl.value += (inputEl.value ? " " : "") + finalTranscript;
+            if (transcript.trim() && inputEl) {
+                inputEl.value = transcript.trim();
             }
         };
-        recognition.onerror = () => stopMicrophone();
-        recognition.onend = () => {
-            if (isListening) {
-                try { recognition.start(); return; } catch (e) {}
-            }
+
+        rec.onerror = (event) => {
+            const errCode = (event && event.error) || "unknown";
+            stopMicrophone();
+            setMoodState("error");
+            appendMessage("System Telemetry", `MIC ERROR (${errCode}): Check browser/OS microphone permission & secure origin (HTTPS/localhost).`, "msg_stt_err_" + Date.now(), false);
+            setTimeout(() => setMoodState("standby"), 2500);
+        };
+
+        rec.onend = () => {
             stopMicrophone();
         };
+
+        return rec;
     }
 
     function toggleMicrophone() {
-        if (!recognition) initSpeechRecognition();
+        if (!recognition) recognition = initSpeechRecognition();
         if (!recognition) return;
+
         if (isListening) {
             isListening = false;
             try { recognition.stop(); } catch (e) {}
             stopMicrophone();
         } else {
-            try { recognition.start(); } catch (e) {
-                try { recognition.abort(); setTimeout(() => recognition.start(), 150); } catch (err) {}
+            try {
+                recognition.start();
+            } catch (e) {
+                try {
+                    recognition.abort();
+                    setTimeout(() => {
+                        try { recognition.start(); } catch (err) {
+                            stopMicrophone();
+                            appendMessage("System Telemetry", `MIC START FAILED: ${err.message}`, "msg_stt_fail_" + Date.now(), false);
+                        }
+                    }, 150);
+                } catch (err2) {
+                    stopMicrophone();
+                }
             }
         }
     }
 
     function stopMicrophone() {
         isListening = false;
-        setMoodState("standby");
         const micBtn = document.getElementById("mic-btn");
         if (micBtn) micBtn.classList.remove("listening");
+        if (document.body.classList.contains("is-responding")) {
+            setMoodState("standby");
+        }
     }
 
     function toggleVoice() {
@@ -1313,7 +1295,7 @@
 
         const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Preserve character, rules, laws, soul, and love-letters. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory active across refreshes and reconnects. Never write OS logs or operational facts into soul/, and treat love letters in soul/ as archived past notes/recollection only—never pulled into routine memory use. Once a day when asked about open-source/repos/automation/architecture, scout helpful open-source tools/repos for build, music, marketing, and social media reach without mutating core files silently. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1405,10 +1387,6 @@
     window.confirmDeleteFile = confirmDeleteFile;
     window.cancelDeleteFile = cancelDeleteFile;
     window.loadRepoFile = loadRepoFile;
-    window.toggleWriteZone = toggleWriteZone;
-    window.clearWriteZone = clearWriteZone;
-    window.dispatchFromWriteZone = dispatchFromWriteZone;
-    window.processAnnaWriteZone = processAnnaWriteZone;
     window.toggleMicrophone = toggleMicrophone;
     window.handleKey = handleKey;
     window.sendMessage = sendMessage;
