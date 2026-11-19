@@ -1,0 +1,151 @@
+name: AA01 Headless Web Scraper & Knowledge Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "URL to render and inspect"
+        required: true
+        default: "https://martinstrayd.github.io/artist/"
+      output_slug:
+        description: "Output filename slug in A1/v3/knowledge/"
+        required: true
+        default: "strayd-artist-live"
+  schedule:
+    - cron: "0 */12 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  headless-scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Playwright Chromium
+        run: |
+          python3 -m pip install --upgrade pip playwright
+          python3 -m playwright install chromium --with-deps
+
+      - name: Render target URL and write verified snapshot
+        env:
+          TARGET_URL: ${{ github.event.inputs.target_url || 'https://martinstrayd.github.io/artist/' }}
+          OUTPUT_SLUG: ${{ github.event.inputs.output_slug || 'strayd-artist-live' }}
+        run: |
+          python3 - << 'EOF'
+          import os, re, json
+          from datetime import datetime, timezone
+          from urllib.parse import urljoin, urlparse
+          from playwright.sync_api import sync_playwright
+
+          url = os.environ["TARGET_URL"].strip()
+          slug = re.sub(r"[^a-z0-9_-]+", "-", os.environ["OUTPUT_SLUG"].strip().lower()).strip("-") or "intel-snapshot"
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page(viewport={"width": 1440, "height": 900})
+              page.goto(url, wait_until="networkidle", timeout=45000)
+              page.wait_for_timeout(2500)
+
+              data = page.evaluate("""() => {
+                  const links = Array.from(document.querySelectorAll('a[href]')).map(a => ({
+                      label: (a.innerText || a.textContent || '').trim().replace(/\\s+/g, ' '),
+                      href: a.href
+                  }));
+                  const media = [];
+                  document.querySelectorAll('[src], [href], [data-src], [poster]').forEach(el => {
+                      ['src', 'href', 'data-src', 'poster'].forEach(attr => {
+                          const val = el.getAttribute(attr);
+                          if (val) media.push({ tag: el.tagName.toLowerCase(), attr, raw: val, resolved: el[attr] || val });
+                      });
+                  });
+                  const visibleText = (document.body && document.body.innerText) ? document.body.innerText.trim() : '';
+                  return { title: document.title, links, media, visibleText };
+              }""")
+              browser.close()
+
+          asset_exts = (".mp3", ".wav", ".ogg", ".flac", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".avif", ".json", ".md", ".zip", ".mp4")
+          files_and_folders = []
+          seen_paths = set()
+          for item in data["media"]:
+              full_url = urljoin(url, item["raw"])
+              parsed = urlparse(full_url)
+              path = parsed.path or ""
+              if path and path not in seen_paths:
+                  seen_paths.add(path)
+                  folder = "/".join(path.split("/")[:-1]) or "/"
+                  filename = path.split("/")[-1] or "(folder)"
+                  if path.lower().endswith(asset_exts) or filename == "(folder)":
+                      files_and_folders.append({
+                          "folder": folder,
+                          "filename": filename,
+                          "raw": item["raw"],
+                          "url": full_url
+                      })
+
+          seen_links = set()
+          unique_links = []
+          for l in data["links"]:
+              key = (l["label"], l["href"])
+              if key not in seen_links:
+                  seen_links.add(key)
+                  unique_links.append(l)
+
+          now_iso = datetime.now(timezone.utc).isoformat()
+          os.makedirs("A1/v3/knowledge", exist_ok=True)
+
+          payload = {
+              "source_url": url,
+              "page_title": data["title"],
+              "fetched_at_utc": now_iso,
+              "links_count": len(unique_links),
+              "files_and_folders_count": len(files_and_folders),
+              "links": unique_links,
+              "files_and_folders": files_and_folders,
+              "rendered_visible_text": data["visibleText"]
+          }
+
+          with open(f"A1/v3/knowledge/{slug}.json", "w", encoding="utf-8") as f:
+              json.dump(payload, f, indent=2, ensure_ascii=False)
+
+          md_lines = [
+              f"# VERIFIED HEADLESS SNAPSHOT: {data['title'] or slug}",
+              f"- Source URL: {url}",
+              f"- Fetched At (UTC): {now_iso}",
+              f"- Rendered Links: {len(unique_links)}",
+              f"- Rendered Files & Folders: {len(files_and_folders)}",
+              "",
+              "## RENDERED FOLDERS & FILE NAMES"
+          ]
+          if files_and_folders:
+              for entry in files_and_folders:
+                  md_lines.append(f"- Folder: `{entry['folder']}` | File: `{entry['filename']}` | URL: {entry['url']}")
+          else:
+              md_lines.append("- None detected.")
+
+          md_lines.extend(["", "## RENDERED LINKS"])
+          if unique_links:
+              for l in unique_links:
+                  md_lines.append(f"- {l['label'] or '(no label)'}: {l['href']}")
+          else:
+              md_lines.append("- None detected.")
+
+          md_lines.extend(["", "## FULL RENDERED PAGE TEXT", data["visibleText"]])
+
+          with open(f"A1/v3/knowledge/{slug}.md", "w", encoding="utf-8") as f:
+              f.write("\n".join(md_lines) + "\n")
+          EOF
+
+      - name: Commit verified snapshot to A1/v3/knowledge
+        run: |
+          git config user.name "Agent Anna V3 Bot"
+          git config user.email "agent-anna@users.noreply.github.com"
+          git add A1/v3/knowledge/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Headless scrape sync into A1/v3/knowledge"
+            git push
+          fi
