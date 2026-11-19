@@ -74,19 +74,13 @@
                 <input type="password" id="api-key" placeholder="Paste Dahl API Key...">
                 <div class="settings-title">GITHUB PAT TOKEN (repo + workflow scopes)</div>
                 <input type="password" id="gh-token" placeholder="Paste GitHub PAT...">
-                <div class="settings-title">DEFAULT AI MODEL</div>
-                <select id="settings-model-select" class="ctrl-btn military-btn" style="width:100%; margin-bottom:6px;" onchange="syncModelSelection(this.value)">
-                    <option value="MiniMaxAI/MiniMax-M2.7" selected>MiniMax-M2.7</option>
-                    <option value="deepseek-ai/DeepSeek-V4-Flash-0731">DeepSeek-V4-Flash-0731</option>
-                    <option value="zai-org/GLM-5.3-Flash">GLM-5.3-Flash</option>
-                </select>
                 <button class="ctrl-btn military-btn" id="save-creds-btn" onclick="saveCredentials()" style="width:100%;">APPLY & RE-SYNC</button>
             </div>
 
             <div id="chat-container" role="log" aria-live="polite" aria-label="Chat Message History"></div>
 
             <div class="quick-tactical-bar" role="toolbar" aria-label="Quick Tactical Actions">
-                <button class="tactical-chip" onclick="fetchLatestBackendReport()">READ LAST LOG</button>
+                <button class="tactical-chip" onclick="fetchLatestBackendReport(true)">READ LAST LOG</button>
                 <button class="tactical-chip" onclick="triggerPreset('Search and summarize latest Dogecoin and Bitcoin news and exact prices right now.')">BTC / DOGE</button>
                 <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com and summarize status.')">KUNDA CAFE</button>
             </div>
