@@ -452,9 +452,37 @@
         return memoryText.includes(`scout_date:${today}`) || memoryText.includes(today);
     }
 
+    function extractPlainTextSnippet(rawHtmlOrText) {
+        const str = String(rawHtmlOrText || "");
+        const withoutScripts = str
+            .replace(/<script[\s\S]*?<\/script>/gi, " ")
+            .replace(/<style[\s\S]*?<\/style>/gi, " ");
+        const stripped = withoutScripts.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+        return stripped.slice(0, 1800);
+    }
+
     async function fetchLiveWebAndMarketTelemetry(prompt) {
         const telemetryBlocks = [];
-        const lower = String(prompt || "").toLowerCase();
+        const text = String(prompt || "");
+        const lower = text.toLowerCase();
+
+        const urlMatches = text.match(/https?:\/\/[^\s"'<>)]+/gi) || [];
+        for (const rawUrl of urlMatches.slice(0, 2)) {
+            try {
+                const res = await fetchWithTimeout(rawUrl, { cache: "no-store" }, 7000);
+                if (res.ok) {
+                    const bodyText = await res.text();
+                    const snippet = extractPlainTextSnippet(bodyText);
+                    if (snippet) {
+                        telemetryBlocks.push(`[BROWSER FETCHED URL: ${rawUrl} @ ${new Date().toISOString()}]\n${snippet}`);
+                    }
+                } else {
+                    telemetryBlocks.push(`[BROWSER FETCHED URL: ${rawUrl}]\nHTTP ${res.status} (${res.statusText || "Error"})`);
+                }
+            } catch (err) {
+                telemetryBlocks.push(`[BROWSER FETCH URL BLOCKED/FAILED: ${rawUrl}]\nReason: ${err.message} (likely CORS or network block).`);
+            }
+        }
 
         if (/\b(btc|bitcoin|doge|dogecoin|price|market)\b/.test(lower)) {
             try {
