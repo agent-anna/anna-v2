@@ -7,8 +7,10 @@
     const WORKFLOW_FILENAME = "anna-autonomous-audit.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
+    const DAHL_TIMEOUT_MS = 5000;
 
     let isVoiceEnabled = true;
+    let isPseudoFullScreen = false;
     const messagePayloadStore = {};
     let chatHistory = [];
     let cachedVoices = [];
@@ -23,6 +25,17 @@
     let isSyncing = false;
     let lastWorkflowDispatchMs = 0;
     let knownV3LogsBeforeRun = new Set();
+
+    function stripModelStrings(text) {
+        if (!text) return "";
+        return String(text)
+            .replace(/\s*\bon\s+MiniMaxAI\/MiniMax-M2\.7\.?/gi, "")
+            .replace(/\bMiniMaxAI\/MiniMax-M2\.7\b/gi, "")
+            .replace(/\bMiniMax-M2\.7\b/gi, "")
+            .replace(/ {2,}/g, " ")
+            .replace(/\s+([.,!?;:])/g, "$1")
+            .trim();
+    }
 
     function isSoulOrLoveLetterPath(path) {
         const p = String(path || "").toLowerCase();
@@ -86,6 +99,110 @@
         const selectEl = document.getElementById("model-select");
         if (selectEl && selectEl.value) return selectEl.value;
         return localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
+    }
+
+    function isAnyFullScreenActive() {
+        return Boolean(document.fullscreenElement || document.webkitFullscreenElement || isPseudoFullScreen);
+    }
+
+    function syncFullScreenButtonLabel() {
+        const btn = document.getElementById("fullscreen-btn");
+        if (!btn) return;
+        btn.innerText = isAnyFullScreenActive() ? "EXIT FULL SCREEN" : "FULL SCREEN";
+    }
+
+    function injectFullScreenStylesAndButton() {
+        if (!document.getElementById("anna-v3-fs-style")) {
+            const style = document.createElement("style");
+            style.id = "anna-v3-fs-style";
+            style.textContent = `
+                body.anna-pseudo-fullscreen {
+                    position: fixed !important;
+                    inset: 0 !important;
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    max-width: 100vw !important;
+                    max-height: 100vh !important;
+                    margin: 0 !important;
+                    z-index: 99999 !important;
+                    overflow: auto !important;
+                }
+                :fullscreen,
+                :-webkit-full-screen {
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    max-width: 100vw !important;
+                    max-height: 100vh !important;
+                    overflow: auto !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        if (!document.getElementById("fullscreen-btn")) {
+            const btn = document.createElement("button");
+            btn.id = "fullscreen-btn";
+            btn.type = "button";
+            btn.className = "action-chip";
+            btn.innerText = "FULL SCREEN";
+            btn.onclick = () => toggleFullScreen();
+
+            const keysBtn = document.querySelector("[onclick*='toggleSettings']");
+            const voiceBtn = document.getElementById("voice-btn");
+            const anchor = keysBtn || voiceBtn;
+
+            if (anchor && anchor.parentElement) {
+                anchor.insertAdjacentElement("afterend", btn);
+            } else {
+                btn.style.position = "fixed";
+                btn.style.top = "10px";
+                btn.style.right = "12px";
+                btn.style.zIndex = "100000";
+                document.body.appendChild(btn);
+            }
+        }
+        syncFullScreenButtonLabel();
+    }
+
+    async function toggleFullScreen() {
+        injectFullScreenStylesAndButton();
+        const fsTarget = document.documentElement;
+        const currentlyFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+
+        if (currentlyFs) {
+            isPseudoFullScreen = false;
+            document.body.classList.remove("anna-pseudo-fullscreen");
+            try {
+                if (document.exitFullscreen) await document.exitFullscreen();
+                else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+            } catch (e) {}
+            syncFullScreenButtonLabel();
+            return;
+        }
+
+        if (isPseudoFullScreen) {
+            isPseudoFullScreen = false;
+            document.body.classList.remove("anna-pseudo-fullscreen");
+            syncFullScreenButtonLabel();
+            return;
+        }
+
+        try {
+            if (fsTarget && fsTarget.requestFullscreen) {
+                await fsTarget.requestFullscreen();
+                syncFullScreenButtonLabel();
+                return;
+            }
+            if (fsTarget && fsTarget.webkitRequestFullscreen) {
+                await fsTarget.webkitRequestFullscreen();
+                syncFullScreenButtonLabel();
+                return;
+            }
+        } catch (e) {}
+
+        isPseudoFullScreen = true;
+        document.body.classList.add("anna-pseudo-fullscreen");
+        syncFullScreenButtonLabel();
     }
 
     function setMoodState(stateName) {
@@ -206,7 +323,7 @@
 
     function sanitizeResponse(text) {
         if (!text) return "";
-        return String(text).replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        return stripModelStrings(String(text).replace(/<think>[\s\S]*?<\/think>/gi, "").trim());
     }
 
     function formatReadableMessage(rawText) {
@@ -222,16 +339,16 @@
                         .replace(/\\n/g, "\n")
                         .replace(/\\t/g, "  ");
                     const headerNote = parsed.path ? `[TARGET: ${parsed.path}]\n\n` : "";
-                    return (headerNote + unescaped).trim();
+                    return stripModelStrings((headerNote + unescaped).trim());
                 }
             } catch (e) {}
         }
-        return text.replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n");
+        return stripModelStrings(text.replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n"));
     }
 
     function speakText(text) {
         if (!isVoiceEnabled) return;
-        const clean = formatReadableMessage(sanitizeResponse(text))
+        const clean = stripModelStrings(formatReadableMessage(sanitizeResponse(text)))
             .replace(/[*_#`~\[\]()]/g, "")
             .replace(/\s+/g, " ")
             .trim();
@@ -357,7 +474,7 @@
     function appendMessage(sender, text, id, isAssistant) {
         const container = document.getElementById("chat-container");
         if (!container) return;
-        const readableText = isAssistant ? formatReadableMessage(text) : text;
+        const readableText = isAssistant ? formatReadableMessage(text) : stripModelStrings(text);
         const div = document.createElement("div");
         div.className = `message ${isAssistant ? "assistant" : "user"}`;
         div.id = id;
@@ -946,7 +1063,7 @@
     async function triggerAutonomousBootSequence() {
         const coreCount = Object.keys(repoVaultFiles).length;
         const totalFiles = rawTreeData.filter((f) => f.type === "blob").length;
-        const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${totalFiles} repository files in tree (${coreCount} V3, memory, character, and knowledge files active) on ${getActiveModel()}.`;
+        const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${totalFiles} repository files in tree (${coreCount} V3, memory, character, and knowledge files active).`;
         appendMessage("Agent Anna V3", msg, "msg_boot_" + Date.now(), true);
         speakText(msg);
         setMoodState("standby");
@@ -1072,7 +1189,7 @@
     }
 
     function extractDahlReply(json, rawText) {
-        const clean = (s) => String(s || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        const clean = (s) => stripModelStrings(String(s || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim());
         if (!json) return clean(rawText);
         if (json.choices && json.choices[0]) {
             const msg = json.choices[0].message;
@@ -1106,11 +1223,11 @@
                 body: JSON.stringify({
                     model: getActiveModel(),
                     messages: [
-                        { role: "system", content: `Respond in English only. Active workspace is ${WORKSPACE_ROOT}. Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
+                        { role: "system", content: `Respond in English only. Active workspace is ${WORKSPACE_ROOT}. Do not mention model names in prose. Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
                         { role: "user", content }
                     ]
                 })
-            }, 8000);
+            }, DAHL_TIMEOUT_MS);
             const rawText = await response.text();
             let json = null;
             try { json = JSON.parse(rawText); } catch (e) {}
@@ -1366,7 +1483,7 @@
         chatHistory.push({ role: "user", content: prompt });
 
         const assistantMsgId = "msg_a_" + Date.now();
-        appendMessage("Agent Anna V3", `Thinking on ${getActiveModel()}...`, assistantMsgId, true);
+        appendMessage("Agent Anna V3", "Thinking...", assistantMsgId, true);
         setMoodState("thinking");
 
         const apiKey = getCleanDahlKey();
@@ -1383,6 +1500,7 @@
         const vaultContext = getCompactVaultContext(prompt);
         const systemPrompt = `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.
 STRICT LANGUAGE RULE: Respond in natural, clear English ONLY. Never output Chinese characters or non-English words in your replies.
+OUTPUT FORMAT RULE: Never print model names, provider tags, or model IDs in your response text.
 LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSPACE_ROOT}/ tree right now. Put new/updated files under ${WORKSPACE_ROOT}/ unless instructed otherwise. Never claim a file was written unless you include a \`\`\`file:<path>\n...\n\`\`\` block for the dashboard to commit. Never claim to have a local PC hard drive. Be concise and easy to hear aloud.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
@@ -1396,7 +1514,7 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
                         ...chatHistory.slice(-4)
                     ]
                 })
-            }, 5000);
+            }, DAHL_TIMEOUT_MS);
 
             const rawText = await response.text();
             let json = null;
@@ -1404,7 +1522,7 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
 
             if (!response.ok) {
                 const errDetail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 200);
-                const errMsg = `DAHL HTTP ${response.status}: ${errDetail}`;
+                const errMsg = stripModelStrings(`DAHL HTTP ${response.status}: ${errDetail}`);
                 updateMessage(assistantMsgId, errMsg);
                 speakText(errMsg);
                 setMoodState("error");
@@ -1432,6 +1550,10 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
+        injectFullScreenStylesAndButton();
+        document.addEventListener("fullscreenchange", syncFullScreenButtonLabel);
+        document.addEventListener("webkitfullscreenchange", syncFullScreenButtonLabel);
+
         const savedToken = getStoredKey(["GITHUB_PAT", "gh_token", "github_token"]);
         const ghEl = document.getElementById("gh-token");
         if (savedToken && ghEl) {
@@ -1463,6 +1585,7 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
     window.setMoodState = setMoodState;
     window.updateActiveModel = updateActiveModel;
     window.triggerAutonomousBootSequence = triggerAutonomousBootSequence;
+    window.toggleFullScreen = toggleFullScreen;
     window.toggleVoice = toggleVoice;
     window.toggleSettings = toggleSettings;
     window.saveCredentials = saveCredentials;
