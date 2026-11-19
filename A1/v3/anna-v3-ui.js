@@ -19,6 +19,7 @@
     let activeBranch = "main";
     let workflowPollTimer = null;
     let ttsKeepAliveTimer = null;
+    let isSyncing = false;
 
     function isSoulOrLoveLetterPath(path) {
         const p = String(path || "").toLowerCase();
@@ -28,6 +29,25 @@
             p.includes("love-letter") ||
             p.includes("love_letter") ||
             p.includes("loveletter")
+        );
+    }
+
+    function isCoreStartupFile(path) {
+        if (!path || isSoulOrLoveLetterPath(path)) return false;
+        const lower = path.toLowerCase();
+        if (!/\.(md|json|txt)$/i.test(lower)) return false;
+        const base = lower.split("/").pop();
+        return (
+            base === "brain.json" ||
+            base === "memory.json" ||
+            base === "links.json" ||
+            base === "tasks.json" ||
+            base.startsWith("aa01") ||
+            base.includes("character") ||
+            lower.includes("/character/") ||
+            lower.startsWith("character/") ||
+            lower.includes("/knowledge/") ||
+            lower.startsWith("knowledge/")
         );
     }
 
@@ -417,18 +437,37 @@
             const searchQuery = wantsOpenSourceScout(lower)
                 ? `${rawQuery} github open source`.trim()
                 : rawQuery;
+            let gotSearchData = false;
+
             try {
                 const jinaSearchRes = await fetch(`https://s.jina.ai/${encodeURIComponent(searchQuery)}`, {
                     headers: { Accept: "text/plain" }
                 });
                 if (jinaSearchRes.ok) {
                     const searchText = await jinaSearchRes.text();
-                    if (searchText && searchText.trim().length > 20) {
+                    if (searchText && searchText.trim().length > 30) {
                         telemetryBlocks.push(`[VERIFIED LIVE WEB/SEARCH RESULTS FOR "${searchQuery}"]\n${searchText.slice(0, 5000)}`);
+                        gotSearchData = true;
                     }
                 }
-            } catch (e) {
-                telemetryBlocks.push("[NOTE: Live search request did not return in-browser; verify connection or retry.]");
+            } catch (e) {}
+
+            if (!gotSearchData) {
+                try {
+                    const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
+                    const ddgRes = await fetch(`https://r.jina.ai/${ddgUrl}`);
+                    if (ddgRes.ok) {
+                        const ddgText = await ddgRes.text();
+                        if (ddgText && ddgText.trim().length > 30) {
+                            telemetryBlocks.push(`[VERIFIED LIVE DUCKDUCKGO RESULTS FOR "${searchQuery}"]\n${ddgText.slice(0, 5000)}`);
+                            gotSearchData = true;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            if (!gotSearchData) {
+                telemetryBlocks.push(`[LIVE SEARCH STATUS FOR "${searchQuery}"]: No live search payload was returned in this browser request.`);
             }
         }
 
@@ -559,9 +598,9 @@
                     clearInterval(workflowPollTimer);
                     if (latestRun.conclusion === "success") {
                         updateActionsBadge("VERIFIED [200]", "ok");
-                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing vault & loading report...`, "msg_wf_done_" + Date.now(), false);
+                        appendMessage("System Telemetry", `BACKEND RUN COMPLETED (#${latestRun.run_number}). Refreshing core vault & loading report...`, "msg_wf_done_" + Date.now(), false);
                         await fetchRepoTree();
-                        await ingestVaultAssets();
+                        await ingestCoreVaultAssets();
                         await fetchLatestBackendReport(true);
                     } else {
                         updateActionsBadge(`FAIL: ${latestRun.conclusion}`, "err");
@@ -573,22 +612,29 @@
     }
 
     async function fetchLatestBackendReport(autoAnnounceToAnna) {
-        await fetchRepoTree();
+        if (!rawTreeData.length) {
+            await fetchRepoTree();
+        }
         const logFiles = rawTreeData
-            .filter((f) => f.type === "blob" && !isSoulOrLoveLetterPath(f.path) && f.path.startsWith("A1/logs/"))
+            .filter((f) => {
+                if (f.type !== "blob" || isSoulOrLoveLetterPath(f.path)) return false;
+                const p = f.path.toLowerCase();
+                return p.includes("/logs/") || p.startsWith("logs/");
+            })
             .map((f) => f.path)
             .sort();
 
         if (!logFiles.length) {
-            appendMessage("System Telemetry", "No execution logs found in A1/logs/ yet.", "msg_nolog_" + Date.now(), false);
+            appendMessage("Agent Anna V3", "No log files found under any logs/ folder in the repository yet. Click 🌀 SWALLOW on any message to write a log entry.", "msg_nolog_" + Date.now(), true);
             return;
         }
         const newestLog = logFiles[logFiles.length - 1];
-        await loadRepoFile(newestLog, "md");
+        const ext = newestLog.split(".").pop().toLowerCase();
+        await loadRepoFile(newestLog, ext);
         const editor = document.getElementById("repo-code-editor");
         const logContent = repoVaultFiles[newestLog] || (editor ? editor.value : "");
-        if (autoAnnounceToAnna && logContent) {
-            appendMessage("Agent Anna V3", `INGESTED BACKEND REPORT (${newestLog}):\n\n${logContent.slice(0, 1500)}`, "msg_rep_" + Date.now(), true);
+        if (autoAnnounceToAnna !== false && logContent) {
+            appendMessage("Agent Anna V3", `LATEST LOG (${newestLog}):\n\n${logContent.slice(0, 1800)}`, "msg_rep_" + Date.now(), true);
         }
     }
 
@@ -680,10 +726,16 @@
     }
 
     async function syncAll() {
-        await fetchRepoTree();
-        await ingestVaultAssets();
-        const count = Object.keys(repoVaultFiles).length;
-        appendMessage("Agent Anna V3", `Agent Anna V3 (A1) online. Synced ${count} operational & knowledge files from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+        if (isSyncing) return;
+        isSyncing = true;
+        try {
+            await fetchRepoTree();
+            await ingestCoreVaultAssets();
+            const count = Object.keys(repoVaultFiles).length;
+            appendMessage("Agent Anna V3", `Agent Anna V3 (A1) online. Loaded ${count} core files (brain/memory/character/knowledge/AA01) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+        } finally {
+            isSyncing = false;
+        }
     }
 
     async function fetchRepoTree() {
@@ -714,17 +766,16 @@
         setMoodState("standby");
     }
 
-    async function ingestVaultAssets() {
+    async function ingestCoreVaultAssets() {
         const headers = getGitHubHeaders();
-        const targetFiles = rawTreeData.filter((f) =>
+        const coreFiles = rawTreeData.filter((f) =>
             f.type === "blob" &&
             f.size < 65000 &&
-            !isSoulOrLoveLetterPath(f.path) &&
-            (f.path.toLowerCase().endsWith(".md") || f.path.toLowerCase().endsWith(".json") || f.path.toLowerCase().endsWith(".txt"))
+            isCoreStartupFile(f.path)
         );
 
         repoVaultFiles = {};
-        for (const file of targetFiles) {
+        for (const file of coreFiles) {
             try {
                 const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" });
                 if (!res.ok) continue;
@@ -739,7 +790,7 @@
         const totalBlobs = rawTreeData.filter((f) => f.type === "blob").length;
         const badge = document.getElementById("vault-status");
         if (badge) {
-            badge.innerText = `VAULT: ${totalBlobs} FILES`;
+            badge.innerText = `CORE: ${Object.keys(repoVaultFiles).length} / ${totalBlobs}`;
             badge.className = totalBlobs > 0 ? "status-badge ok" : "status-badge err";
         }
     }
@@ -755,17 +806,12 @@
             if (f.type === "blob") manifest.push(`- ${f.path}`);
         });
 
-        const logPaths = Object.keys(repoVaultFiles)
-            .filter((p) => !isSoulOrLoveLetterPath(p) && (p.includes("/logs/") || p.startsWith("A1/logs/")))
-            .sort();
-        const latestLogPath = logPaths.length ? logPaths[logPaths.length - 1] : null;
-
         for (const [path, content] of Object.entries(repoVaultFiles)) {
             if (isSoulOrLoveLetterPath(path)) continue;
 
             const lowerPath = path.toLowerCase();
             const baseName = path.split("/").pop().toLowerCase();
-            const isConsolidatedMaster = baseName === "aa01.md";
+            const isConsolidatedMaster = baseName.startsWith("aa01");
             const isSpine = (
                 baseName === "brain.json" ||
                 baseName === "memory.json" ||
@@ -773,8 +819,7 @@
                 baseName === "tasks.json" ||
                 lowerPath.includes("/character/") ||
                 lowerPath.startsWith("character/") ||
-                lowerPath.includes("character") ||
-                path === latestLogPath
+                lowerPath.includes("character")
             );
             const isKnowledge = (
                 lowerPath.includes("/knowledge/") ||
@@ -792,7 +837,7 @@
         }
 
         const combined = spineBlocks.concat(knowledgeBlocks).join("\n\n").slice(0, 13000);
-        return `REPOSITORY MANIFEST:\n${manifest.slice(0, 100).join("\n")}\n\nOPERATIONAL BRAIN / MEMORY / CHARACTER / KNOWLEDGE:\n${combined}`;
+        return `REPOSITORY MANIFEST:\n${manifest.slice(0, 90).join("\n")}\n\nCORE BRAIN / MEMORY / CHARACTER / KNOWLEDGE:\n${combined}`;
     }
 
     async function fetchDahlWithAutoRetry(url, options, maxRetries) {
@@ -827,21 +872,21 @@
 
     async function triggerAutonomousBootSequence() {
         const apiKey = getCleanDahlKey();
-        const totalFiles = rawTreeData.filter((f) => f.type === "blob").length;
+        const coreCount = Object.keys(repoVaultFiles).length;
 
         if (!apiKey) {
-            const fallbackMsg = `Agent Anna V3 (A1) awakened. Synced ${totalFiles} repository files. Enter Dahl API Key in KEYS to connect neural core.`;
+            const fallbackMsg = `Agent Anna V3 (A1) awakened with ${coreCount} core files loaded. Enter Dahl API Key in KEYS to connect neural core.`;
             appendMessage("Agent Anna V3", fallbackMsg, "msg_boot_" + Date.now(), true);
             speakText(fallbackMsg);
             return;
         }
 
         const bootMsgId = "msg_boot_" + Date.now();
-        appendMessage("Agent Anna V3", `Awakening Agent Anna V3 (${getActiveModel()}) & loading brain/memory/character/knowledge...`, bootMsgId, true);
+        appendMessage("Agent Anna V3", `Awakening Agent Anna V3 (${getActiveModel()})...`, bootMsgId, true);
         setMoodState("thinking");
 
         const vaultContext = getCompactVaultContext("aa01 character brain memory links tasks knowledge");
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory persistent across browser refreshes and reconnects. Never write OS logs or facts into soul/, and treat love letters in soul/ as archived recollection only.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, operational spine status, and zero-hallucination rule concisely.`;
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory persistent across browser refreshes and reconnects. Never write OS logs or facts into soul/, and treat love letters in soul/ as archived recollection only.\n\n${vaultContext}\n\n[BOOT DIRECTIVE]: Confirm Agent Anna V3 (A1) readiness, core vault status, and zero-hallucination rule concisely.`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -851,7 +896,7 @@
                     model: getActiveModel(),
                     messages: [
                         { role: "system", content: systemPrompt },
-                        { role: "user", content: "Boot Agent Anna V3 (A1) and confirm character, knowledge spine, and readiness." }
+                        { role: "user", content: "Boot Agent Anna V3 (A1) and confirm character, core knowledge, and readiness." }
                     ]
                 })
             });
@@ -1229,33 +1274,21 @@
         const selectEl = document.getElementById("model-select");
         if (selectEl) {
             localStorage.setItem("DAHL_MODEL", selectEl.value);
-            const settingsSelect = document.getElementById("settings-model-select");
-            if (settingsSelect) settingsSelect.value = selectEl.value;
         }
-    }
-
-    function syncModelSelection(val) {
-        localStorage.setItem("DAHL_MODEL", val);
-        const topSelect = document.getElementById("model-select");
-        if (topSelect) topSelect.value = val;
     }
 
     async function saveCredentials() {
         const apiEl = document.getElementById("api-key");
         const ghEl = document.getElementById("gh-token");
-        const setSel = document.getElementById("settings-model-select");
         const apiKey = cleanHeaderToken(apiEl ? apiEl.value : "");
         const ghToken = cleanHeaderToken(ghEl ? ghEl.value : "");
-        const selectedModel = setSel ? setSel.value : DEFAULT_MODEL;
+        const selectedModel = getActiveModel();
 
         if (apiEl) apiEl.value = apiKey;
         if (ghEl) ghEl.value = ghToken;
         if (apiKey) localStorage.setItem("DAHL_API_KEY", apiKey);
         if (ghToken) localStorage.setItem("GITHUB_PAT", ghToken);
         localStorage.setItem("DAHL_MODEL", selectedModel);
-
-        const topSelect = document.getElementById("model-select");
-        if (topSelect) topSelect.value = selectedModel;
 
         updateKeyBadge();
         toggleSettings();
@@ -1282,7 +1315,7 @@
         chatHistory.push({ role: "user", content: prompt });
 
         const assistantMsgId = "msg_a_" + Date.now();
-        appendMessage("Agent Anna V3", `Fetching telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
+        appendMessage("Agent Anna V3", `Fetching live telemetry & querying ${getActiveModel()}...`, assistantMsgId, true);
         setMoodState("thinking");
 
         const apiKey = getCleanDahlKey();
@@ -1295,7 +1328,7 @@
 
         const liveTelemetry = await fetchLiveWebAndMarketTelemetry(prompt);
         const vaultContext = getCompactVaultContext(prompt);
-        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory active across refreshes and reconnects. Never write OS logs or operational facts into soul/, and treat love letters in soul/ as archived past notes/recollection only—never pulled into routine memory use. Once a day when asked about open-source/repos/automation/architecture, scout helpful open-source tools/repos for build, music, marketing, and social media reach without mutating core files silently. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
+        const systemPrompt = `You are AGENT ANNA V3 (A1), operating inside ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}. Reply in clean, readable Markdown with real line breaks (never raw escaped \\n strings). Keep your character, knowledge, brain, and memory active across refreshes and reconnects. Never write OS logs or operational facts into soul/, and treat love letters in soul/ as archived past notes/recollection only. When [VERIFIED LIVE ...] blocks are provided, summarize and answer directly from those live results instead of claiming you cannot fetch live web/news/prices. ONLY quote live facts inside [VERIFIED LIVE ...] blocks.${liveTelemetry}\n\n${vaultContext}`;
 
         try {
             const response = await fetchDahlWithAutoRetry(DAHL_ENDPOINT, {
@@ -1351,9 +1384,7 @@
 
         const savedModel = localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
         const topSelect = document.getElementById("model-select");
-        const settingsSelect = document.getElementById("settings-model-select");
         if (topSelect) topSelect.value = savedModel;
-        if (settingsSelect) settingsSelect.value = savedModel;
 
         updateKeyBadge();
 
@@ -1371,7 +1402,6 @@
 
     window.setMoodState = setMoodState;
     window.updateActiveModel = updateActiveModel;
-    window.syncModelSelection = syncModelSelection;
     window.triggerAutonomousBootSequence = triggerAutonomousBootSequence;
     window.toggleVoice = toggleVoice;
     window.toggleSettings = toggleSettings;
