@@ -36,7 +36,7 @@
                 <div style="display:flex; gap:5px; flex-wrap:wrap;">
                     <button class="ctrl-btn military-btn" onclick="toggleViewMode()" id="view-toggle-btn">VIEW: TREE</button>
                     <button class="ctrl-btn military-btn" id="sync-btn" onclick="syncAll()">SYNC</button>
-                    <button class="ctrl-btn military-btn" id="backend-run-btn" onclick="dispatchBackendWorkflow()">BACKEND</button>
+                    <button class="ctrl-btn military-btn" id="backend-run-btn" onclick="dispatchBackendWorkflow()">RUN BACKEND</button>
                     <button class="ctrl-btn military-btn" id="audit-btn" onclick="auditActiveFile()">AUDIT</button>
                     <button class="ctrl-btn military-btn" id="commit-btn" onclick="commitCurrentFile()">COMMIT</button>
                     <button class="ctrl-btn del-btn" id="delete-prompt-btn" onclick="promptDeleteFile()">DELETE</button>
@@ -66,7 +66,10 @@
 
             <div class="chat-header">
                 <span>CONSOLE [AGENT ANNA V3 // A1 WORKBENCH]</span>
-                <button class="ctrl-btn" id="clear-logs-btn" onclick="clearLogs()">CLEAR</button>
+                <div style="display:flex; gap:5px;">
+                    <button class="ctrl-btn" onclick="toggleWriteZone()">WRITE ZONE</button>
+                    <button class="ctrl-btn" id="clear-logs-btn" onclick="clearLogs()">CLEAR</button>
+                </div>
             </div>
 
             <div id="settings-panel" role="region" aria-label="API Keys Settings Panel">
@@ -86,13 +89,12 @@
             <div id="chat-container" role="log" aria-live="polite" aria-label="Chat Message History"></div>
 
             <div class="quick-tactical-bar" role="toolbar" aria-label="Quick Tactical Actions">
-                <button class="tactical-chip backend-chip" onclick="dispatchBackendWorkflow('Perform a full A1 vault integrity audit, verify live BTC/DOGE prices, and log system telemetry.')">BACKEND AUDIT</button>
-                <button class="tactical-chip" onclick="fetchLatestBackendReport()">LAST LOG</button>
+                <button class="tactical-chip" onclick="fetchLatestBackendReport()">READ LAST LOG</button>
                 <button class="tactical-chip" onclick="triggerPreset('Search and summarize latest Dogecoin and Bitcoin news and exact prices right now.')">BTC / DOGE</button>
                 <button class="tactical-chip" onclick="triggerPreset('Read https://kundacafe.com and summarize status.')">KUNDA CAFE</button>
             </div>
 
-            <div class="anna-write-zone" role="region" aria-label="Anna Write Zone Command Terminal">
+            <div id="anna-write-zone" class="anna-write-zone" role="region" aria-label="Anna Write Zone Command Terminal">
                 <div class="write-zone-header">
                     <span>ANNA WRITE ZONE // BACKEND DISPATCH</span>
                     <span id="write-zone-status" aria-live="polite">READY</span>
