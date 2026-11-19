@@ -31,6 +31,7 @@
         return String(text)
             .replace(/\s*\bon\s+MiniMaxAI\/MiniMax-M2\.7\.?/gi, "")
             .replace(/\bMiniMaxAI\/MiniMax-M2\.7\b/gi, "")
+            .replace(/\bMiniMaxAI\/MiniMax-M2\.7\.?/gi, "")
             .replace(/\bMiniMax-M2\.7\b/gi, "")
             .replace(/ {2,}/g, " ")
             .replace(/\s+([.,!?;:])/g, "$1")
@@ -827,6 +828,19 @@
         }
     }
 
+    function toggleFolderRowEl(rowEl) {
+        if (!rowEl) return;
+        const childrenEl = rowEl.nextElementSibling;
+        if (!childrenEl) return;
+        const isClosed = childrenEl.style.display === "none";
+        childrenEl.style.display = isClosed ? "block" : "none";
+        childrenEl.classList.toggle("collapsed", !isClosed);
+        const arrowEl = rowEl.querySelector(".tree-arrow");
+        if (arrowEl) {
+            arrowEl.textContent = isClosed ? "▾" : "▸";
+        }
+    }
+
     function renderTreeView() {
         const treeEl = document.getElementById("repo-tree-view");
         if (!treeEl) return;
@@ -861,7 +875,7 @@
                     const icon = ["md", "json"].includes(ext) ? "📋" : (["js", "html", "css", "ps1", "yml", "svg"].includes(ext) ? "⚡" : "📄");
                     html += `<span class="tree-file" onclick="window.loadRepoFile('${item.path}', '${ext}')" onkeydown="if(event.key==='Enter')window.loadRepoFile('${item.path}', '${ext}')" tabindex="0" role="treeitem">${icon} ${key}</span>`;
                 } else {
-                    html += `<div role="group"><div class="tree-folder-row" onclick="this.nextElementSibling.classList.toggle('collapsed')" onkeydown="if(event.key==='Enter')this.nextElementSibling.classList.toggle('collapsed')" tabindex="0" role="button">▾ 📁 ${key}/</div><div class="tree-children" style="display:block;">${buildHtml(item)}</div></div>`;
+                    html += `<div role="group"><div class="tree-folder-row" onclick="window.toggleFolderRowEl(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFolderRowEl(this);}" tabindex="0" role="button"><span class="tree-arrow">▾</span> 📁 ${key}/</div><div class="tree-children" style="display:block;">${buildHtml(item)}</div></div>`;
                 }
             });
             return html;
@@ -1586,6 +1600,7 @@ LOCATION & TRUTH RULE: State clearly what is in your loaded context and ${WORKSP
     window.updateActiveModel = updateActiveModel;
     window.triggerAutonomousBootSequence = triggerAutonomousBootSequence;
     window.toggleFullScreen = toggleFullScreen;
+    window.toggleFolderRowEl = toggleFolderRowEl;
     window.toggleVoice = toggleVoice;
     window.toggleSettings = toggleSettings;
     window.saveCredentials = saveCredentials;
