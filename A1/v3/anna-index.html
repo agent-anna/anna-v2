@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AGENT ANNA V3 // A1 WORKBENCH</title>
+  <title>AGENT ANNA V3 // GOANNA v1 WORKBENCH</title>
   <link rel="stylesheet" href="anna-v3.css?v=3.8" />
 </head>
 <body class="is-standby">
   <header class="top-bar">
-    <div id="state-text">STANDBY // AGENT ANNA V3</div>
+    <div id="state-text">STANDBY // ANNA V3</div>
     <div id="vault-status" class="status-badge">FILES: 0</div>
     <div id="actions-status" class="status-badge">ACTIONS: IDLE</div>
     <div id="key-status" class="status-badge">KEY: MISSING</div>
     <select id="model-select" onchange="window.updateActiveModel()">
-      <option value="MiniMaxAI/MiniMax-M2.7">MiniMaxAI/MiniMax-M2.7</option>
+      <option value="MiniMaxAI/MiniMax-M2.7">Agent Anna v3</option>
     </select>
     <button onclick="window.syncAll()">SYNC</button>
     <button onclick="window.triggerAutonomousBootSequence()">AWAKEN</button>
@@ -70,7 +70,7 @@
         </div>
         <div class="input-bar">
           <button id="mic-btn" onclick="window.toggleMicrophone()">MIC</button>
-          <input id="user-input" type="text" onkeydown="window.handleKey(event)" placeholder="Ask Anna to search, summarize, write file, or run backend..." />
+          <input id="user-input" type="text" onkeydown="window.handleKey(event)" placeholder="Ask, search, summarize, write file ..." />
           <button onclick="window.sendMessage()">SEND</button>
         </div>
       </section>
