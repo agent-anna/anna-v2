@@ -4,9 +4,10 @@
     const GITHUB_REPO_OWNER = "agent-anna";
     const GITHUB_REPO_NAME = "anna-v2";
     const WORKSPACE_ROOT = "A1/v3";
+    const SCRAPE_WORKFLOW_FILE = "scrape-intel.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
-    const DAHL_TIMEOUT_MS = 35000;
+    const DAHL_TIMEOUT_MS = 30000;
 
     let isVoiceEnabled = true;
     const messagePayloadStore = {};
@@ -131,13 +132,6 @@
             badge.innerText = "KEY: MISSING";
             badge.className = "status-badge err";
         }
-    }
-
-    function updateActionsBadge(text, stateClass) {
-        const badge = document.getElementById("actions-status");
-        if (!badge) return;
-        badge.innerText = `ACTIONS: ${text}`;
-        badge.className = `status-badge ${stateClass || ""}`;
     }
 
     function playToneCue(freq, durationMs) {
@@ -366,154 +360,53 @@
         }
     }
 
-    function htmlToReadableText(html) {
-        if (!html) return "";
-        try {
-            const doc = new DOMParser().parseFromString(String(html), "text/html");
-            doc.querySelectorAll("script, style, noscript").forEach((el) => el.remove());
-            const links = Array.from(doc.querySelectorAll("a[href]"))
-                .map((a) => `${(a.textContent || "").trim()} -> ${a.getAttribute("href")}`)
-                .filter((line) => line.length > 4)
-                .slice(0, 80);
-            const bodyText = (doc.body && doc.body.innerText ? doc.body.innerText : "")
-                .replace(/\s+/g, " ")
-                .trim()
-                .slice(0, 2200);
-            return `PAGE TEXT:\n${bodyText}\n\nLINKS FOUND:\n${links.join("\n")}`.trim();
-        } catch (e) {
-            return String(html).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 2500);
+    async function dispatchScrapeWorkflow(targetUrl, outputSlug) {
+        const token = getCleanGitHubToken();
+        if (!token) {
+            const msg = "GitHub PAT missing. Open KEYS to save your token before running a GitHub Action.";
+            appendMessage("System Telemetry", msg, "msg_gh_need_" + Date.now(), false);
+            speakText(msg);
+            toggleSettings();
+            return;
         }
-    }
-
-    async function fetchLiveUrlBuiltIn(targetUrl) {
-        const cleanUrl = String(targetUrl || "").trim();
-        if (!cleanUrl) return "";
-
-        if (window.Telemetry && typeof window.Telemetry.fetchUrl === "function") {
-            try {
-                const tRes = await window.Telemetry.fetchUrl(cleanUrl, 750);
-                if (tRes && String(tRes).trim().length > 40) {
-                    return String(tRes).trim().slice(0, 3200);
-                }
-            } catch (e) {}
-        }
-
+        const urlToScrape = (targetUrl || "https://martinstrayd.github.io/artist/").trim();
+        const slug = (outputSlug || "strayd-artist-live").trim();
+        setMoodState("saving");
         try {
-            const jinaUrl = `https://r.jina.ai/${cleanUrl}`;
-            const res = await fetchWithTimeout(jinaUrl, {
-                headers: { Accept: "text/plain" },
-                cache: "no-store"
-            }, 12000);
-            if (res.ok) {
-                const txt = await res.text();
-                if (txt && txt.trim().length > 40) {
-                    return txt.trim().slice(0, 3200);
-                }
-            }
-        } catch (e) {}
-
-        try {
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(cleanUrl)}`;
-            const res = await fetchWithTimeout(proxyUrl, { cache: "no-store" }, 12000);
-            if (res.ok) {
-                const rawHtml = await res.text();
-                const parsed = htmlToReadableText(rawHtml);
-                if (parsed && parsed.length > 40) {
-                    return parsed.slice(0, 3200);
-                }
-            }
-        } catch (e) {}
-
-        return "";
-    }
-
-    async function searchWebBuiltIn(query) {
-        const q = String(query || "").trim();
-        if (!q) return "";
-
-        if (window.Telemetry && typeof window.Telemetry.searchWeb === "function") {
-            try {
-                const tRes = await window.Telemetry.searchWeb(q, 700);
-                if (tRes && String(tRes).trim().length > 40) {
-                    return String(tRes).trim().slice(0, 2800);
-                }
-            } catch (e) {}
-        }
-
-        try {
-            const res = await fetchWithTimeout(`https://s.jina.ai/${encodeURIComponent(q)}`, {
-                headers: { Accept: "text/plain" },
-                cache: "no-store"
-            }, 12000);
-            if (res.ok) {
-                const txt = await res.text();
-                if (txt && txt.trim().length > 40) {
-                    return txt.trim().slice(0, 2800);
-                }
-            }
-        } catch (e) {}
-
-        return "";
-    }
-
-    async function fetchCryptoPricesBuiltIn() {
-        if (window.Telemetry && typeof window.Telemetry.getCryptoPrices === "function") {
-            try {
-                const p = await window.Telemetry.getCryptoPrices();
-                if (p) return JSON.stringify(p);
-            } catch (e) {}
-        }
-        try {
-            const res = await fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin&vs_currencies=usd", { cache: "no-store" }, 9000);
-            if (res.ok) {
-                const data = await res.json();
-                return JSON.stringify(data);
-            }
-        } catch (e) {}
-        return "";
-    }
-
-    async function gatherLiveWebContext(prompt) {
-        if (!prompt) return "";
-        const blocks = [];
-        const urlMatches = prompt.match(/https?:\/\/[^\s"'<>]+/gi) || [];
-
-        if (urlMatches.length > 0) {
-            const uniqueUrls = Array.from(new Set(urlMatches)).slice(0, 2);
-            const results = await Promise.all(uniqueUrls.map((u) => fetchLiveUrlBuiltIn(u)));
-            results.forEach((content, idx) => {
-                const target = uniqueUrls[idx];
-                if (content) {
-                    blocks.push(`[VERIFIED LIVE PAGE CONTENT FOR ${target}]\n${content}`);
-                } else {
-                    blocks.push(`[WEB FETCH FAILED FOR ${target}]: Live fetch returned empty or was blocked. You MUST tell the Commander the live fetch failed and you do NOT have the contents of ${target}. Do NOT guess or invent anything about this page.`);
-                }
-            });
-        }
-
-        if (/\b(btc|bitcoin|doge|dogecoin|crypto|price)\b/i.test(prompt)) {
-            const prices = await fetchCryptoPricesBuiltIn();
-            if (prices) {
-                blocks.push(`[VERIFIED LIVE CRYPTO PRICES]\n${prices}`);
+            const res = await fetchWithTimeout(
+                `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${SCRAPE_WORKFLOW_FILE}/dispatches`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `token ${token}`,
+                        Accept: "application/vnd.github.v3+json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        ref: activeBranch || "main",
+                        inputs: {
+                            target_url: urlToScrape,
+                            output_slug: slug
+                        }
+                    })
+                },
+                12000
+            );
+            if (res.status === 204 || res.ok) {
+                const okMsg = `Dispatched ${SCRAPE_WORKFLOW_FILE} on ${activeBranch} for ${urlToScrape} -> A1/v3/knowledge/${slug}.md. Click SYNC after the run finishes.`;
+                appendMessage("System Telemetry", okMsg, "msg_wf_ok_" + Date.now(), false);
+                speakText("Scraper workflow dispatched.");
             } else {
-                blocks.push(`[CRYPTO FETCH FAILED]: Could not fetch live crypto prices right now. Do NOT guess prices.`);
+                const errTxt = await res.text();
+                const errMsg = `Workflow dispatch failed (${res.status}): ${errTxt.slice(0, 180)}`;
+                appendMessage("System Telemetry", errMsg, "msg_wf_err_" + Date.now(), false);
+                speakText("Workflow dispatch failed.");
             }
+        } catch (err) {
+            appendMessage("System Telemetry", `Workflow dispatch error: ${err.message}`, "msg_wf_ex_" + Date.now(), false);
+            speakText("Workflow dispatch error.");
         }
-
-        const needsSearch =
-            /\b(search|news|latest|today|current|lookup|find|check|who is|what is|website|site|artist|strayd|kunda)\b/i.test(prompt) &&
-            urlMatches.length === 0;
-
-        if (needsSearch) {
-            const searchRes = await searchWebBuiltIn(prompt);
-            if (searchRes) {
-                blocks.push(`[VERIFIED LIVE WEB SEARCH RESULTS]\n${searchRes}`);
-            } else {
-                blocks.push(`[WEB SEARCH FAILED]: Live web search returned no data right now. State that honestly and do NOT invent results.`);
-            }
-        }
-
-        return blocks.join("\n\n").slice(0, 5000);
+        setMoodState("standby");
     }
 
     function toggleMessageCollapse(id) {
@@ -923,7 +816,7 @@
             } else if (isCharacterFile) {
                 characterBlocks.push(`=== CHARACTER [${path}] ===\n${content.slice(0, 1400)}`);
             } else if (isKnowledgeFile || isTermMatch) {
-                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 1000)}`);
+                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 1600)}`);
             }
         }
 
@@ -935,7 +828,7 @@
             .join(", ");
 
         const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Active Workspace Root: ${WORKSPACE_ROOT}/\n- Loaded V3 files in context: ${loadedList}\n- Active ${WORKSPACE_ROOT} tree paths: ${treeSample}`;
-        const combined = memoryBlocks.concat(characterBlocks, knowledgeBlocks).join("\n\n").slice(0, 6500);
+        const combined = memoryBlocks.concat(characterBlocks, knowledgeBlocks).join("\n\n").slice(0, 7500);
         return `${header}\n\nACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}`;
     }
 
@@ -1348,7 +1241,7 @@
         chatHistory.push({ role: "user", content: prompt });
 
         const assistantMsgId = "msg_a_" + Date.now();
-        appendMessage("Agent Anna V3", "Fetching & thinking...", assistantMsgId, true);
+        appendMessage("Agent Anna V3", "Thinking...", assistantMsgId, true);
         setMoodState("thinking");
 
         const apiKey = getCleanDahlKey();
@@ -1362,17 +1255,12 @@
         }
 
         try {
-            const [vaultContext, liveWebContext] = await Promise.all([
-                Promise.resolve(getCompactVaultContext(prompt)),
-                gatherLiveWebContext(prompt)
-            ]);
-
-            const webSection = liveWebContext ? `\n\nLIVE WEB FETCH & TELEMETRY RESULTS:\n${liveWebContext}` : "";
+            const vaultContext = getCompactVaultContext(prompt);
             const systemPrompt =
                 `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.\n` +
-                `STRICT ANTI-HALLUCINATION & TRUTH LAW: You have NO separate browser tool after this prompt. Everything fetched from the internet for this turn is already inside LIVE WEB FETCH & TELEMETRY RESULTS below. NEVER say "fetching now" or "one moment". NEVER guess, invent, or hallucinate titles, tracks, links, or facts from a URL if they are not explicitly written in LIVE WEB FETCH & TELEMETRY RESULTS or ACTIVE V3 CONTEXT. If [WEB FETCH FAILED] appears or a URL was not retrieved, state clearly that the live fetch failed.\n` +
-                `SPEECH & FORMAT LAW: Respond in clear English only. Never read code blocks aloud.\n\n` +
-                `${vaultContext}${webSection}`;
+                `TRUTH & ANTI-HALLUCINATION RULE: Dahl is a text inference endpoint with no direct live internet browser inside this chat call. Answer strictly from ACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT below. If live web scraping is requested and not yet committed into A1/v3/knowledge/, say clearly that a GitHub Action scrape run is needed rather than inventing web results or pretending to fetch in chat.\n` +
+                `SPEECH & FORMAT RULE: Respond in clear English only. Never read code blocks aloud.\n\n` +
+                `${vaultContext}`;
 
             const response = await fetchWithTimeout(
                 DAHL_ENDPOINT,
@@ -1425,7 +1313,6 @@
             return;
         }
 
-        updateActionsBadge("IDLE", "");
         setMoodState("standby");
     }
 
@@ -1468,6 +1355,7 @@
     window.toggleViewMode = toggleViewMode;
     window.syncAll = syncAll;
     window.fetchLatestBackendReport = fetchLatestBackendReport;
+    window.dispatchScrapeWorkflow = dispatchScrapeWorkflow;
     window.triggerPreset = triggerPreset;
     window.auditActiveFile = auditActiveFile;
     window.commitCurrentFile = commitCurrentFile;
