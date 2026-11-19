@@ -125,7 +125,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 .github-pane {
-    width: 58%;
+    width: 56%;
     height: 100%;
     background: var(--pane-bg);
     border-right: 2px solid var(--state-color);
@@ -138,7 +138,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 .chat-pane {
-    width: 42%;
+    width: 44%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -157,7 +157,7 @@ body.is-error { --state-color: var(--error); }
 }
 
 .repo-view-container {
-    height: 175px;
+    height: 185px;
     overflow-y: auto;
     background: var(--bg-dark);
     border: 1px solid var(--border-subtle);
@@ -348,25 +348,24 @@ body.is-error { --state-color: var(--error); }
     padding: 10px 12px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .message {
     border-radius: 4px;
-    max-width: 96%;
+    width: 100%;
     font-size: 11px;
-    line-height: 1.5;
-    overflow: hidden;
+    line-height: 1.45;
+    display: flex;
+    flex-direction: column;
 }
 
 .message.user {
-    align-self: flex-end;
     background: var(--bg-elevated);
     border: 1px solid #354766;
 }
 
 .message.assistant {
-    align-self: flex-start;
     background: var(--bg-surface);
     border: 1px solid var(--state-color);
 }
@@ -385,20 +384,12 @@ body.is-error { --state-color: var(--error); }
     user-select: none;
 }
 
-.msg-content {
-    padding: 8px 12px;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.msg-content.collapsed {
-    display: none;
-}
-
 .action-row {
     display: flex;
-    gap: 4px;
-    padding: 0 10px 8px 10px;
+    gap: 5px;
+    padding: 6px 10px;
+    background: rgba(6, 8, 13, 0.55);
+    border-bottom: 1px solid var(--border-subtle);
     flex-wrap: wrap;
 }
 
@@ -406,9 +397,9 @@ body.is-error { --state-color: var(--error); }
     background: var(--bg-elevated);
     border: 1px solid var(--gold-dim);
     color: var(--text-light);
-    padding: 3px 7px;
+    padding: 3px 8px;
     font-family: "Courier New", "Lucida Console", monospace;
-    font-size: 8px;
+    font-size: 9px;
     cursor: pointer;
     border-radius: 3px;
 }
@@ -429,9 +420,21 @@ body.is-error { --state-color: var(--error); }
     color: #fda4af !important;
 }
 
+.msg-content {
+    padding: 8px 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.msg-content.collapsed {
+    display: none;
+}
+
 .quick-tactical-bar {
     display: flex;
-    gap: 4px;
+    gap: 5px;
     padding: 6px 10px;
     background: var(--bg-surface);
     border-top: 1px solid var(--border-subtle);
@@ -462,14 +465,17 @@ body.is-error { --state-color: var(--error); }
 }
 
 .anna-write-zone {
+    display: none;
     padding: 8px 10px;
     background: var(--bg-surface);
     border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid var(--border-subtle);
-    display: flex;
     flex-direction: column;
     gap: 5px;
     flex-shrink: 0;
+}
+
+.anna-write-zone.open {
+    display: flex;
 }
 
 .write-zone-header {
@@ -494,18 +500,13 @@ body.is-error { --state-color: var(--error); }
     resize: none;
 }
 
-.anna-write-zone textarea:focus {
-    border-color: var(--state-color);
-    outline: none;
-}
-
 #anna-cmd-input {
-    height: 34px;
+    height: 32px;
     color: var(--gold);
 }
 
 #anna-content-input {
-    height: 42px;
+    height: 40px;
 }
 
 .write-zone-footer {
@@ -526,6 +527,7 @@ body.is-error { --state-color: var(--error); }
     flex-direction: column;
     gap: 6px;
     background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
     flex-shrink: 0;
 }
 
