@@ -1,9 +1,14 @@
-# STRAYD ARTIST LIVE SNAPSHOT (VERIFIED FETCH)
+# STRAYD ARTIST LIVE SNAPSHOT (VERIFIED FETCH + SCRIPT CATALOG)
 - Source URL: https://martinstrayd.github.io/artist/
 - HTTP Status: 200
-- Fetched At (UTC): 2026-11-19T16:32:53.911491+00:00
-- Extracted Links: 3
+- Fetched At (UTC): 2026-11-19T16:42:57.820831+00:00
+- Inspected Sources: https://martinstrayd.github.io/artist/
+- Extracted Song/Track Entries: 0
 - Extracted Art/Song Files & Folders: 2
+- Extracted Page Links: 3
+
+## EXTRACTED SONGS / SINGLES / ART & AUDIO PATHS
+- No structured track objects matched in inline/external scripts.
 
 ## EXTRACTED FOLDERS & FILE NAMES (ART / SINGLES / ASSETS)
 - Folder: `/` | File: `(folder)` | URL: https://strayd.com/
