@@ -1,0 +1,20 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Agent Anna Docs
+  structure:
+    - type: section
+      key: section-1
+      title: Agent Anna Docs
+      path: anna
+      description: ""
+      icon: mushroom
+      default: true
+      children:
+        - type: space
+          key: space-2
+          title: Anna
+          path: landing-page
+          default: true
+          draft: true
+          content:
+            directory: ./agent-anna-docs/landing-page
