@@ -22,6 +22,11 @@
     let ttsKeepAliveTimer = null;
     let isSyncing = false;
 
+    function isInV3Scope(path) {
+        const p = String(path || "").replace(/^\/+/, "").toLowerCase();
+        return p === "a1/v3" || p.startsWith("a1/v3/");
+    }
+
     function stripModelStrings(text) {
         if (!text) return "";
         return String(text)
@@ -56,25 +61,8 @@
     }
 
     function isV3CoreFile(path) {
-        if (!path || isSoulOrLoveLetterPath(path)) return false;
-        const lower = path.toLowerCase();
-        if (!/\.(md|json|txt)$/i.test(lower)) return false;
-        const base = lower.split("/").pop();
-        return (
-            lower.startsWith("a1/v3/") ||
-            lower.includes("/v3/") ||
-            base.includes("anna-v3") ||
-            base.startsWith("aa01") ||
-            base === "brain.json" ||
-            base === "memory.json" ||
-            base === "links.json" ||
-            base === "tasks.json" ||
-            base === "sessions.md" ||
-            base.includes("character") ||
-            lower.includes("/character/") ||
-            lower.includes("/knowledge/") ||
-            lower.includes("/memory/")
-        );
+        if (!path || !isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return false;
+        return /\.(md|json|txt)$/i.test(path.toLowerCase());
     }
 
     function cleanHeaderToken(str) {
@@ -501,6 +489,7 @@
     }
 
     async function getLatestFileSha(path) {
+        if (!isInV3Scope(path)) return undefined;
         try {
             const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                 headers: getGitHubHeaders(),
@@ -515,7 +504,7 @@
     }
 
     async function writeFileToGitHub(path, content, commitMessage) {
-        if (isSoulOrLoveLetterPath(path)) return false;
+        if (!isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return false;
         setMoodState("saving");
         if (window.GitHub && typeof window.GitHub.upsert === "function") {
             try {
@@ -545,7 +534,7 @@
         }
         const v3LogFiles = rawTreeData
             .filter((f) => {
-                if (f.type !== "blob" || isSoulOrLoveLetterPath(f.path)) return false;
+                if (f.type !== "blob" || !isInV3Scope(f.path) || isSoulOrLoveLetterPath(f.path)) return false;
                 return f.path.toLowerCase().startsWith("a1/v3/logs/");
             })
             .map((f) => f.path)
@@ -603,14 +592,15 @@
     function renderTreeView() {
         const treeEl = document.getElementById("repo-tree-view");
         if (!treeEl) return;
-        const treeItems = rawTreeData.filter((f) => f.type === "blob");
+        const treeItems = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path));
         if (!treeItems.length) {
-            treeEl.innerHTML = `<span style="color:var(--text-muted);">No repository files loaded. Click SYNC.</span>`;
+            treeEl.innerHTML = `<span style="color:var(--text-muted);">No ${WORKSPACE_ROOT}/ files loaded. Click SYNC.</span>`;
             return;
         }
         const root = {};
         treeItems.forEach((item) => {
-            const parts = item.path.split("/");
+            const relPath = item.path.replace(/^A1\/v3\/?/i, "") || item.path;
+            const parts = relPath.split("/");
             let current = root;
             parts.forEach((part, idx) => {
                 if (!current[part]) {
@@ -639,13 +629,13 @@
             });
             return html;
         }
-        treeEl.innerHTML = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">FULL REPO TREE (${treeItems.length} files on ${activeBranch})</div>` + buildHtml(root);
+        treeEl.innerHTML = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">${WORKSPACE_ROOT} TREE (${treeItems.length} files on ${activeBranch})</div>` + buildHtml(root);
     }
 
     function renderGridView() {
         const gridEl = document.getElementById("repo-file-grid");
         if (!gridEl) return;
-        const gridItems = rawTreeData.filter((f) => f.type === "blob");
+        const gridItems = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path));
         gridEl.innerHTML = "";
         gridItems.forEach((file) => {
             const ext = file.path.split(".").pop().toLowerCase();
@@ -671,7 +661,9 @@
     }
 
     async function walkRepoContentsRecursive(dirPath, branch, collected) {
-        const encodedDir = dirPath ? "/" + dirPath.split("/").map(encodeURIComponent).join("/") : "";
+        const cleanDir = String(dirPath || "").replace(/^\/+|\/+$/g, "");
+        if (cleanDir && !isInV3Scope(cleanDir)) return;
+        const encodedDir = cleanDir ? "/" + cleanDir.split("/").map(encodeURIComponent).join("/") : "/A1/v3";
         const url = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents${encodedDir}?ref=${encodeURIComponent(branch)}`;
         const res = await fetchWithTimeout(url, { headers: getGitHubHeaders(), cache: "no-store" }, 10000);
         if (!res.ok) return;
@@ -680,6 +672,7 @@
 
         const subDirs = [];
         for (const entry of entries) {
+            if (!isInV3Scope(entry.path)) continue;
             if (entry.type === "file") {
                 collected.push({ path: entry.path, type: "blob", size: entry.size || 0, sha: entry.sha });
             } else if (entry.type === "dir") {
@@ -697,8 +690,8 @@
             await fetchRepoTree();
             await ingestCoreVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
-            const totalTreeFiles = rawTreeData.filter((f) => f.type === "blob").length;
-            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. Loaded ${totalTreeFiles} total repository files in tree (${count} V3 / character / knowledge / memory files active in context) from ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_boot_" + Date.now(), true);
+            const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
+            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. Loaded ${v3Files} files in ${WORKSPACE_ROOT} (${count} core context files active) on ${activeBranch}.`, "msg_boot_" + Date.now(), true);
         } finally {
             isSyncing = false;
         }
@@ -722,16 +715,16 @@
         }
 
         if (data && Array.isArray(data.tree) && !data.truncated) {
-            rawTreeData = data.tree;
+            rawTreeData = data.tree.filter((f) => isInV3Scope(f.path));
         } else {
             const walked = [];
             try {
-                await walkRepoContentsRecursive("", activeBranch, walked);
+                await walkRepoContentsRecursive(WORKSPACE_ROOT, activeBranch, walked);
             } catch (e) {}
             if (walked.length > 0) {
-                rawTreeData = walked;
+                rawTreeData = walked.filter((f) => isInV3Scope(f.path));
             } else if (data && Array.isArray(data.tree)) {
-                rawTreeData = data.tree;
+                rawTreeData = data.tree.filter((f) => isInV3Scope(f.path));
             } else {
                 rawTreeData = [];
             }
@@ -742,7 +735,7 @@
             else renderGridView();
         } else {
             const treeEl = document.getElementById("repo-tree-view");
-            if (treeEl) treeEl.innerHTML = `<span style="color:#fda4af;">Unable to load tree. Verify GitHub PAT in KEYS.</span>`;
+            if (treeEl) treeEl.innerHTML = `<span style="color:#fda4af;">Unable to load ${WORKSPACE_ROOT}/ tree. Verify GitHub PAT in KEYS.</span>`;
         }
         setMoodState("standby");
     }
@@ -751,6 +744,7 @@
         const headers = getGitHubHeaders();
         const coreFiles = rawTreeData.filter((f) =>
             f.type === "blob" &&
+            isInV3Scope(f.path) &&
             (f.size || 0) < 65000 &&
             isV3CoreFile(f.path)
         );
@@ -770,11 +764,11 @@
         repoVaultFiles = nextVault;
 
         const count = Object.keys(repoVaultFiles).length;
-        const totalFiles = rawTreeData.filter((f) => f.type === "blob").length;
+        const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
         const badge = document.getElementById("vault-status");
         if (badge) {
-            badge.innerText = `FILES: ${totalFiles} (V3: ${count})`;
-            badge.className = totalFiles > 0 ? "status-badge ok" : "status-badge err";
+            badge.innerText = `V3 FILES: ${v3Files} (CTX: ${count})`;
+            badge.className = v3Files > 0 ? "status-badge ok" : "status-badge err";
         }
     }
 
@@ -786,13 +780,12 @@
         const terms = lowerPrompt.split(/[^a-z0-9_-]+/).filter((w) => w.length > 2);
 
         for (const [path, content] of Object.entries(repoVaultFiles)) {
-            if (isSoulOrLoveLetterPath(path) || !isV3CoreFile(path)) continue;
+            if (!isInV3Scope(path) || isSoulOrLoveLetterPath(path) || !isV3CoreFile(path)) continue;
 
             const lowerPath = path.toLowerCase();
             const baseName = path.split("/").pop().toLowerCase();
             const isMemoryFile = (
                 lowerPath.includes("/memory/") ||
-                lowerPath.startsWith("memory/") ||
                 baseName === "memory.json" ||
                 baseName === "tasks.json" ||
                 baseName === "links.json" ||
@@ -801,14 +794,10 @@
             );
             const isCharacterFile = (
                 lowerPath.includes("/character/") ||
-                lowerPath.startsWith("character/") ||
                 baseName.startsWith("aa01") ||
                 baseName.includes("character")
             );
-            const isKnowledgeFile = (
-                lowerPath.includes("/knowledge/") ||
-                lowerPath.startsWith("knowledge/")
-            );
+            const isKnowledgeFile = lowerPath.includes("/knowledge/");
             const isTermMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
 
             if (isMemoryFile) {
@@ -822,26 +811,27 @@
 
         const loadedList = Object.keys(repoVaultFiles).join(", ") || "none";
         const treeSample = rawTreeData
-            .filter((f) => f.type === "blob" && f.path.startsWith("A1/v3/"))
+            .filter((f) => f.type === "blob" && isInV3Scope(f.path))
             .map((f) => f.path)
             .slice(0, 40)
             .join(", ");
 
-        const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Active Workspace Root: ${WORKSPACE_ROOT}/\n- Loaded V3 files in context: ${loadedList}\n- Active ${WORKSPACE_ROOT} tree paths: ${treeSample}`;
+        const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Active Workspace Root: ${WORKSPACE_ROOT}/ (STRICT V3 SCOPE)\n- Loaded V3 files in context: ${loadedList}\n- Active ${WORKSPACE_ROOT} tree paths: ${treeSample}`;
         const combined = memoryBlocks.concat(characterBlocks, knowledgeBlocks).join("\n\n").slice(0, 7500);
-        return `${header}\n\nACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT:\n${combined}`;
+        return `${header}\n\nACTIVE V3 CONTEXT:\n${combined}`;
     }
 
     async function triggerAutonomousBootSequence() {
         const coreCount = Object.keys(repoVaultFiles).length;
-        const totalFiles = rawTreeData.filter((f) => f.type === "blob").length;
-        const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${totalFiles} repository files in tree (${coreCount} V3, memory, character, and knowledge files active).`;
+        const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
+        const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${coreCount} core context files active).`;
         appendMessage("Agent Anna V3", msg, "msg_boot_" + Date.now(), true);
         speakText(msg);
         setMoodState("standby");
     }
 
     async function loadRepoFile(path, ext) {
+        if (!isInV3Scope(path)) return;
         const pathEl = document.getElementById("active-file-path");
         if (pathEl) pathEl.value = path;
         const editor = document.getElementById("repo-code-editor");
@@ -895,7 +885,7 @@
         const edEl = document.getElementById("repo-code-editor");
         const path = pathEl ? pathEl.value.trim() : "";
         const content = edEl ? edEl.value : "";
-        if (!path || isSoulOrLoveLetterPath(path)) return;
+        if (!path || !isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return;
 
         setMoodState("saving");
         try {
@@ -920,7 +910,7 @@
     function promptDeleteFile() {
         const pathEl = document.getElementById("active-file-path");
         const path = pathEl ? pathEl.value.trim() : "";
-        if (!path) return;
+        if (!path || !isInV3Scope(path)) return;
         const banner = document.getElementById("delete-warning-banner");
         const warnText = document.getElementById("delete-warning-text");
         if (warnText) warnText.innerText = `DELETE "${path}" PERMANENTLY?`;
@@ -937,7 +927,7 @@
         const token = getCleanGitHubToken();
         const pathEl = document.getElementById("active-file-path");
         const path = pathEl ? pathEl.value.trim() : "";
-        if (!token || !path || isSoulOrLoveLetterPath(path)) return;
+        if (!token || !path || !isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return;
 
         setMoodState("saving");
         try {
@@ -979,7 +969,7 @@
         const edEl = document.getElementById("repo-code-editor");
         const path = pathEl ? pathEl.value.trim() : "";
         const content = edEl ? edEl.value : "";
-        if (!path || !content) return;
+        if (!path || !content || !isInV3Scope(path)) return;
 
         const apiKey = getCleanDahlKey();
         if (!apiKey) { toggleSettings(); return; }
@@ -1020,13 +1010,13 @@
         const fileRegex = /```file:([^\n]+)\n([\s\S]*?)```/g;
         let match;
         const committedFiles = [];
-        const skippedSoulWrites = [];
+        const skippedPaths = [];
 
         while ((match = fileRegex.exec(aiResponseText)) !== null) {
             const filePath = match[1].trim();
             const fileContent = match[2];
-            if (isSoulOrLoveLetterPath(filePath)) {
-                skippedSoulWrites.push(filePath);
+            if (!isInV3Scope(filePath) || isSoulOrLoveLetterPath(filePath)) {
+                skippedPaths.push(filePath);
                 continue;
             }
             const stamp = new Date().toISOString();
@@ -1047,8 +1037,8 @@
                 const parsed = JSON.parse(jsonMatch[1]);
                 if (parsed && parsed.path && typeof parsed.content === "string") {
                     const targetPath = parsed.path.trim();
-                    if (isSoulOrLoveLetterPath(targetPath)) {
-                        skippedSoulWrites.push(targetPath);
+                    if (!isInV3Scope(targetPath) || isSoulOrLoveLetterPath(targetPath)) {
+                        skippedPaths.push(targetPath);
                     } else {
                         const unescaped = parsed.content
                             .replace(/\\r\\n/g, "\n")
@@ -1065,8 +1055,8 @@
             } catch (e) {}
         }
 
-        if (skippedSoulWrites.length > 0) {
-            appendMessage("System Telemetry", `GUARDRAIL: Blocked auto-write into soul/archive path(s): ${skippedSoulWrites.join(", ")}.`, "msg_soul_guard_" + Date.now(), false);
+        if (skippedPaths.length > 0) {
+            appendMessage("System Telemetry", `SCOPE GUARD: Blocked write outside ${WORKSPACE_ROOT}/ or soul path(s): ${skippedPaths.join(", ")}.`, "msg_scope_guard_" + Date.now(), false);
         }
 
         if (committedFiles.length > 0) {
@@ -1257,8 +1247,8 @@
         try {
             const vaultContext = getCompactVaultContext(prompt);
             const systemPrompt =
-                `You are AGENT ANNA V3 working inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.\n` +
-                `TRUTH & ANTI-HALLUCINATION RULE: Dahl is a text inference endpoint with no direct live internet browser inside this chat call. Answer strictly from ACTIVE V3 / MEMORY / CHARACTER / KNOWLEDGE CONTEXT below. If live web scraping is requested and not yet committed into A1/v3/knowledge/, say clearly that a GitHub Action scrape run is needed rather than inventing web results or pretending to fetch in chat.\n` +
+                `You are AGENT ANNA V3 working strictly inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.\n` +
+                `TRUTH & ANTI-HALLUCINATION RULE: Dahl is a text inference endpoint with no direct live internet browser inside this chat call. Answer strictly from ACTIVE V3 CONTEXT below. If live web scraping is requested and not yet committed into ${WORKSPACE_ROOT}/knowledge/, say clearly that a GitHub Action scrape run is needed rather than inventing web results or pretending to fetch in chat.\n` +
                 `SPEECH & FORMAT RULE: Respond in clear English only. Never read code blocks aloud.\n\n` +
                 `${vaultContext}`;
 
