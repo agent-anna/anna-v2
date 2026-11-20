@@ -762,10 +762,11 @@
         const headers = getGitHubHeaders();
         const priorityScore = (path) => {
             const l = path.toLowerCase();
-            if (l.endsWith("/aa01.md") || l.endsWith("/brain.json") || l.endsWith("/memory.json") || l.endsWith("/tasks.json")) return 0;
-            if (l.includes("/knowledge/")) return 1;
-            if (l.includes("/docs/")) return 2;
-            return 3;
+            if (l.endsWith("/aa01.md") || l.includes("/memory/brain.json") || l.includes("/memory/memory.json") || l.includes("/memory/tasks.json")) return 0;
+            if (l.includes("/memory/")) return 1;
+            if (l.includes("/knowledge/")) return 2;
+            if (l.includes("/docs/")) return 3;
+            return 4;
         };
 
         const coreFiles = rawTreeData
@@ -811,7 +812,7 @@
         for (const [path, content] of sortedEntries) {
             if (!isInV3Scope(path) || isSoulOrLoveLetterPath(path) || !isV3CoreFile(path)) continue;
             const lowerPath = path.toLowerCase();
-            const isCore = lowerPath.endsWith("/aa01.md") || lowerPath.endsWith("/brain.json") || lowerPath.endsWith("/memory.json") || lowerPath.endsWith("/tasks.json") || lowerPath.includes("/knowledge/");
+            const isCore = lowerPath.endsWith("/aa01.md") || lowerPath.includes("/memory/") || lowerPath.includes("/knowledge/");
             const isMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
             if (!isCore && !isMatch) continue;
 
