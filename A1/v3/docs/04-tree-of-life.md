@@ -1,5 +1,5 @@
 # 4. Living Tree of Life System Map
-_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T08:34:29.050447+00:00`_
+_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T08:52:24.706058+00:00`_
 
 ## The Roots (Core Config & Memory)
 - `A1/v3/docs/01-the-roots.md`
@@ -14,6 +14,7 @@ _Auto-generated on push to `A1/v3/docs/` at `2026-11-20T08:34:29.050447+00:00`_
 - `A1/v3/anna-index.html`
 - `A1/v3/anna-v3-ui.js`
 - `A1/v3/anna-v3.css`
+- `A1/v3/docs/index.html`
 - `A1/v3/functions/brain.js`
 - `A1/v3/functions/chat.js`
 - `A1/v3/functions/github.js`
