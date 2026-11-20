@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AA01 // TREE OF LIFE &amp; PAGE FLIP</title>
-    <link rel="stylesheet" href="./v4.css?v=4.2">
+    <title>AA01 // TREE OF LIFE, GITBOOK &amp; PAGE FLIP</title>
+    <link rel="stylesheet" href="./v4.css?v=4.3">
 </head>
 <body class="is-standby decor-military-calm">
     <div class="military-top-bar">
         <div class="top-status-indicator">
             <div class="status-dot" aria-hidden="true"></div>
-            <span>TREE OF LIFE // AGENT ANNA V4 (A1)</span>
+            <span>STANDBY // TREE OF LIFE &amp; FLIPBOOK</span>
             <span class="status-badge" id="registry-status">REGISTRY: LOADING</span>
+            <span class="status-badge">VOICE: ANNA</span>
         </div>
-        <div class="top-controls-right">
-            <a class="ctrl-btn military-btn" href="./index.html">BACK TO WORKBENCH</a>
+        <div class="top-controls-cluster">
+            <a class="ctrl-btn military-btn" href="./index.html">WORKBENCH</a>
             <a class="ctrl-btn" href="./intro.html">INTRO</a>
         </div>
     </div>
@@ -22,10 +23,14 @@
     <div class="v4-page-wrap">
         <div class="v4-page-hero">
             <div>
-                <div class="v4-eyebrow">AA01 // ONE-TOUCH LINKS &amp; HANDBOOK FLIP</div>
-                <div class="v4-page-title">Tree of Life &amp; Page Flip</div>
+                <div class="v4-eyebrow">AA01 // CONNECTED LINKS, GITBOOK &amp; PAGE FLIP</div>
+                <div class="v4-page-title">Tree of Life &amp; Handbook Flipbook</div>
             </div>
-            <a class="v4-link-chip" href="./index.html">Return to V4 Command Console</a>
+            <div class="v4-chip-grid">
+                <a class="v4-link-chip" href="./index.html">Back to V4 Workbench</a>
+                <a class="v4-link-chip" href="../v3/docs/agent-anna-docs/landing-page/README.md" target="_blank" rel="noopener">GitBook Landing Doc</a>
+                <a class="v4-link-chip" href="../v3/docs/SUMMARY.md" target="_blank" rel="noopener">GitBook SUMMARY.md</a>
+            </div>
         </div>
 
         <div class="v4-card">
@@ -41,7 +46,7 @@
                     <option value="anna">Anna Social &amp; Broadcast Fingers</option>
                     <option value="martin">Martin &amp; Command Branches</option>
                 </select>
-                <input id="new-link-label" class="v4-input" type="text" placeholder="Label (e.g. Anna New Channel)" aria-label="Link Label">
+                <input id="new-link-label" class="v4-input" type="text" placeholder="Label (e.g. Anna GitBook / Channel)" aria-label="Link Label">
                 <input id="new-link-url" class="v4-input" type="url" placeholder="https://..." aria-label="Link URL">
                 <button id="btn-add-link" class="ctrl-btn military-btn" type="button">ADD LINK</button>
                 <button id="btn-copy-json" class="ctrl-btn" type="button">COPY REGISTRY JSON</button>
@@ -50,7 +55,7 @@
         </div>
 
         <div class="v4-card">
-            <h2>Handbook &amp; OPORD Page Flip</h2>
+            <h2>Handbook, GitBook &amp; OPORD Page Flip</h2>
             <div class="v4-form-row">
                 <button id="btn-prev-page" class="ctrl-btn military-btn" type="button">PREV PAGE</button>
                 <button id="btn-next-page" class="ctrl-btn military-btn" type="button">NEXT PAGE</button>
@@ -60,6 +65,13 @@
         </div>
     </div>
 
-    <script src="./tree-of-life.js?v=4.2"></script>
+    <script src="./tree-of-life.js?v=4.3"></script>
+    <script>
+        (function () {
+            const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
+            document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
+            document.body.classList.add("decor-" + savedDecor);
+        })();
+    </script>
 </body>
 </html>
