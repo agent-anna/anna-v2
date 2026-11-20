@@ -1,6 +1,7 @@
 # SUMMARY
-* [Agent Anna V3: From Code to Conduct]
-# Table of contents 
+* **Agent Anna V3: From Code to Conduct**
+* 
+* # Table of contents 
 * [00 Anna Bible Index](00-anna-bible-index.md)
 * [01. The Roots: Staying Connected to Your SELF](01-the-roots.md)
 * [02. The Trunk: Thin Cockpit & Voice Architecture](02-the-trunk.md)
