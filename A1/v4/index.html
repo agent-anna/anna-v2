@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AGENT ANNA V4 // A1 WORKBENCH</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👩‍💻</text></svg>">
-    <link rel="stylesheet" href="./v4.css?v=4.1">
+    <link rel="stylesheet" href="./v4.css?v=4.2">
 </head>
-<body class="is-standby decor-military-calm" aria-label="Agent Anna V4 A1 Workbench">
+<body class="workbench-lock is-standby decor-military-calm" aria-label="Agent Anna V4 A1 Workbench">
 
     <div class="military-top-bar" role="region" aria-label="System Status Bar">
         <div class="top-status-indicator">
@@ -18,14 +18,18 @@
             <span class="status-badge" id="actions-status" aria-live="polite">ACTIONS: IDLE</span>
             <span class="status-badge" id="voice-profile-badge" aria-live="polite">VOICE: FEMALE-EN</span>
         </div>
-        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-            <a class="ctrl-btn military-btn" href="./intro.html">INTRO</a>
-            <a class="ctrl-btn military-btn" href="./tree-of-life.html">TREE OF LIFE</a>
-            <select id="room-decor-select" class="ctrl-btn military-btn" onchange="updateRoomDecor()" aria-label="Select Anna Room Tone">
+
+        <div class="top-controls-left">
+            <a class="ctrl-btn" href="./intro.html">INTRO</a>
+            <a class="ctrl-btn" href="./tree-of-life.html">TREE OF LIFE</a>
+            <select id="room-decor-select" class="ctrl-btn military-btn" onchange="updateRoomDecor()" aria-label="Select Anna Room Mode">
                 <option value="military-calm" selected>ROOM: MILITARY-CALM</option>
                 <option value="night-watch">ROOM: NIGHT-WATCH</option>
                 <option value="war-room-brief">ROOM: WAR-ROOM-BRIEF</option>
             </select>
+        </div>
+
+        <div class="top-controls-right">
             <select id="model-select" class="ctrl-btn military-btn" onchange="updateActiveModel()" aria-label="Select AI Model">
                 <option value="MiniMaxAI/MiniMax-M2.7" selected>MODEL: ANNA</option>
                 <option value="deepseek-ai/DeepSeek-V4-Flash-0731">MODEL: DEEPSEEK-V4-FLASH</option>
@@ -121,6 +125,6 @@
 
     </div>
 
-    <script src="./v4.js?v=4.1"></script>
+    <script src="./v4.js?v=4.2"></script>
 </body>
 </html>
