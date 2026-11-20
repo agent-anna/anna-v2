@@ -1,6 +1,8 @@
 $schema: https://api.gitbook.com/gitbook-docs.yaml
 site:
+  title: Agent Anna Docs
   structure:
     - type: space
       space: cnpReu8iW5Cuqs5VZf31
       directory: ./
+      default: true
