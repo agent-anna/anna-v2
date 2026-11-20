@@ -10,16 +10,10 @@ site:
       default: true
       children:
         - type: space
-          key: space-1
-          title: Agent Anna Docs
-          path: documentation
-          default: true
-          content:
-            directory: ./
-        - type: space
           key: space-2
           title: Anna
           path: landing-page
+          default: true
           draft: true
           content:
             directory: ./agent-anna-docs/landing-page
