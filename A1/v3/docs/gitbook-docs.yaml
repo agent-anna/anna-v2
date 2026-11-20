@@ -18,7 +18,7 @@ site:
     - type: section
       key: section-3
       title: BIBLE
-      path: imported-content
+      path: anna-bible
       description: ANNA BIBLE
       icon: mushroom
       default: true
