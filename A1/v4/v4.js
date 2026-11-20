@@ -87,8 +87,10 @@
 
     function getStoredKey(names) {
         for (const n of names) {
-            const v = localStorage.getItem(n);
-            if (v && v.trim()) return cleanHeaderToken(v);
+            try {
+                const v = localStorage.getItem(n);
+                if (v && v.trim()) return cleanHeaderToken(v);
+            } catch (e) {}
         }
         return "";
     }
@@ -108,15 +110,41 @@
     function getActiveModel() {
         const selectEl = document.getElementById("model-select");
         if (selectEl && selectEl.value) return selectEl.value;
-        return localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
+        try {
+            return localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
+        } catch (e) {
+            return DEFAULT_MODEL;
+        }
+    }
+
+    function applyRoomDecorVisuals(mode) {
+        const cleanMode = ["military-calm", "night-watch", "war-room-brief"].includes(mode) ? mode : "military-calm";
+        document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
+        document.body.classList.add(`decor-${cleanMode}`);
+        try { localStorage.setItem("ANNA_V4_DECOR", cleanMode); } catch (e) {}
+        const sel = document.getElementById("room-decor-select");
+        if (sel && sel.value !== cleanMode) sel.value = cleanMode;
     }
 
     function updateRoomDecor() {
         const sel = document.getElementById("room-decor-select");
-        const mode = (sel && sel.value) || "military-calm";
-        document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
-        document.body.classList.add(`decor-${mode}`);
-        localStorage.setItem("ANNA_V4_DECOR", mode);
+        applyRoomDecorVisuals((sel && sel.value) || "military-calm");
+    }
+
+    function applyPulseCadence(scale) {
+        const parsed = parseFloat(scale);
+        const safeScale = Number.isFinite(parsed) && parsed > 0.2 && parsed < 3 ? parsed : 1;
+        document.documentElement.style.setProperty("--pulse-scale", String(safeScale));
+        try { localStorage.setItem("ANNA_V4_PULSE_SCALE", String(safeScale)); } catch (e) {}
+        const sel = document.getElementById("pulse-cadence-select");
+        if (sel && Math.abs(parseFloat(sel.value) - safeScale) > 0.01) {
+            sel.value = String(safeScale);
+        }
+    }
+
+    function updatePulseCadence() {
+        const sel = document.getElementById("pulse-cadence-select");
+        applyPulseCadence((sel && sel.value) || "1");
     }
 
     function loadSeeOnlyImageFile(file) {
@@ -180,6 +208,13 @@
         }
     }
 
+    function updateVoiceBadge() {
+        const badge = document.getElementById("voice-profile-badge");
+        if (!badge) return;
+        badge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";
+        badge.className = isVoiceEnabled ? "status-badge ok" : "status-badge";
+    }
+
     function playToneCue(freq, durationMs) {
         if (!isVoiceEnabled) return;
         try {
@@ -213,9 +248,7 @@
         try {
             const v = window.speechSynthesis.getVoices();
             if (v && v.length) cachedVoices = v;
-            const badge = document.getElementById("voice-profile-badge");
-            const chosen = pickFemaleEnglishVoice(cachedVoices);
-            if (badge) { badge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF"; }
+            updateVoiceBadge();
         } catch (e) {}
     }
 
@@ -713,6 +746,8 @@
         try {
             await fetchRepoTree();
             await ingestCoreVaultAssets();
+        } catch (e) {
+            setMoodState("standby");
         } finally {
             isSyncing = false;
         }
@@ -756,7 +791,7 @@
             else renderGridView();
         } else {
             const treeEl = document.getElementById("repo-tree-view");
-            if (treeEl) treeEl.innerHTML = `<span style="color:#fda4af;">Unable to load ${WORKSPACE_ROOT}/ tree. Verify GitHub PAT in KEYS.</span>`;
+            if (treeEl) treeEl.innerHTML = `<span style="color:var(--text-muted);">No ${WORKSPACE_ROOT}/ files loaded yet or PAT needed in KEYS.</span>`;
         }
         setMoodState("standby");
     }
@@ -786,7 +821,7 @@
         const badge = document.getElementById("vault-status");
         if (badge) {
             badge.innerText = `VAULT: ${v4Files} FILES (${count} CTX)`;
-            badge.className = v4Files > 0 ? "status-badge ok" : "status-badge err";
+            badge.className = v4Files > 0 ? "status-badge ok" : "status-badge";
         }
     }
 
@@ -1147,19 +1182,24 @@
     function toggleVoice() {
         isVoiceEnabled = !isVoiceEnabled;
         const btn = document.getElementById("voice-btn");
-        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF";  if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";  if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";
+        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF";
+        updateVoiceBadge();
         if (!isVoiceEnabled) executeStfuProtocol();
         else speakText("Voice on.");
     }
 
     function toggleSettings() {
         const p = document.getElementById("settings-panel");
-        if (p) p.style.display = p.style.display === "block" ? "none" : "block";
+        if (!p) return;
+        const current = window.getComputedStyle(p).display;
+        p.style.display = current === "block" ? "none" : "block";
     }
 
     function updateActiveModel() {
         const selectEl = document.getElementById("model-select");
-        if (selectEl) localStorage.setItem("DAHL_MODEL", selectEl.value);
+        if (selectEl) {
+            try { localStorage.setItem("DAHL_MODEL", selectEl.value); } catch (e) {}
+        }
     }
 
     async function saveCredentials() {
@@ -1170,16 +1210,20 @@
         const selectedModel = getActiveModel();
         if (apiEl) apiEl.value = apiKey;
         if (ghEl) ghEl.value = ghToken;
-        if (apiKey) localStorage.setItem("DAHL_API_KEY", apiKey);
-        if (ghToken) localStorage.setItem("GITHUB_PAT", ghToken);
-        localStorage.setItem("DAHL_MODEL", selectedModel);
+        try {
+            if (apiKey) localStorage.setItem("DAHL_API_KEY", apiKey);
+            if (ghToken) localStorage.setItem("GITHUB_PAT", ghToken);
+            localStorage.setItem("DAHL_MODEL", selectedModel);
+        } catch (e) {}
+        updateRoomDecor();
+        updatePulseCadence();
         updateKeyBadge();
         toggleSettings();
         await syncAll();
     }
 
     function handleKey(e) {
-        if (e && e.key === "Enter") {
+        if (e && e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
@@ -1240,25 +1284,31 @@
         const savedToken = getStoredKey(["GITHUB_PAT", "gh_token", "github_token"]);
         const ghEl = document.getElementById("gh-token");
         if (savedToken && ghEl) {
-            localStorage.setItem("GITHUB_PAT", savedToken);
+            try { localStorage.setItem("GITHUB_PAT", savedToken); } catch (e) {}
             ghEl.value = savedToken;
         }
 
         const savedApiKey = getStoredKey(["DAHL_API_KEY", "dahl_api_key", "OPENAI_API_KEY", "api_key"]);
         const apiEl = document.getElementById("api-key");
         if (savedApiKey && apiEl) {
-            localStorage.setItem("DAHL_API_KEY", savedApiKey);
+            try { localStorage.setItem("DAHL_API_KEY", savedApiKey); } catch (e) {}
             apiEl.value = savedApiKey;
         }
 
-        const savedModel = localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
+        let savedModel = DEFAULT_MODEL;
+        let savedDecor = "military-calm";
+        let savedPulse = "1";
+        try {
+            savedModel = localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
+            savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
+            savedPulse = localStorage.getItem("ANNA_V4_PULSE_SCALE") || "1";
+        } catch (e) {}
+
         const topSelect = document.getElementById("model-select");
         if (topSelect) topSelect.value = savedModel;
 
-        const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
-        const decorSelect = document.getElementById("room-decor-select");
-        if (decorSelect) decorSelect.value = savedDecor;
-        updateRoomDecor();
+        applyRoomDecorVisuals(savedDecor);
+        applyPulseCadence(savedPulse);
 
         const fileEl = document.getElementById("v4-vision-file");
         if (fileEl) {
@@ -1282,6 +1332,7 @@
         }
 
         updateKeyBadge();
+        updateVoiceBadge();
         setActionsStatus("IDLE", "");
         syncFullPageButtonUi();
 
@@ -1296,6 +1347,7 @@
     window.setMoodState = setMoodState;
     window.updateActiveModel = updateActiveModel;
     window.updateRoomDecor = updateRoomDecor;
+    window.updatePulseCadence = updatePulseCadence;
     window.clearSeeOnlyVision = clearSeeOnlyVision;
     window.triggerAutonomousBootSequence = triggerAutonomousBootSequence;
     window.toggleFolderRowEl = toggleFolderRowEl;
@@ -1322,76 +1374,4 @@
     window.autonomousSwallowAndCommit = autonomousSwallowAndCommit;
     window.executeStfuProtocol = executeStfuProtocol;
     window.deleteMessage = deleteMessage;
-})();
-
-    function applyRoomDecorVisuals(mode) {
-        const cleanMode = ["military-calm", "night-watch", "war-room-brief"].includes(mode) ? mode : "military-calm";
-        document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
-        document.body.classList.add(`decor-${cleanMode}`);
-        localStorage.setItem("ANNA_V4_DECOR", cleanMode);
-        const sel = document.getElementById("room-decor-select");
-        if (sel && sel.value !== cleanMode) sel.value = cleanMode;
-        const stEl = document.getElementById("state-text");
-        if (stEl) {
-            const currentState = (document.body.className.match(/is-([a-z]+)/) || [null, "standby"])[1].toUpperCase();
-            stEl.innerText = `${currentState} // AGENT ANNA V4 (${cleanMode.toUpperCase()})`;
-        }
-    }
-
-    window.updateRoomDecor = function updateRoomDecor() {
-        const sel = document.getElementById("room-decor-select");
-        const chosen = (sel && sel.value) || "military-calm";
-        applyRoomDecorVisuals(chosen);
-    };
-
-    window.addEventListener("DOMContentLoaded", () => {
-        const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
-        applyRoomDecorVisuals(savedDecor);
-    });
-
-    function applyRoomDecorVisuals(mode) {
-        const cleanMode = ["military-calm", "night-watch", "war-room-brief"].includes(mode) ? mode : "military-calm";
-        document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
-        document.body.classList.add(`decor-${cleanMode}`);
-        localStorage.setItem("ANNA_V4_DECOR", cleanMode);
-        const sel = document.getElementById("room-decor-select");
-        if (sel && sel.value !== cleanMode) sel.value = cleanMode;
-    }
-
-    function applyPulseCadence(scale) {
-        const parsed = parseFloat(scale);
-        const safeScale = Number.isFinite(parsed) && parsed > 0.2 && parsed < 3 ? parsed : 1;
-        document.documentElement.style.setProperty("--pulse-scale", String(safeScale));
-        localStorage.setItem("ANNA_V4_PULSE_SCALE", String(safeScale));
-        const sel = document.getElementById("pulse-cadence-select");
-        if (sel && Math.abs(parseFloat(sel.value) - safeScale) > 0.01) {
-            sel.value = String(safeScale);
-        }
-    }
-
-    window.updateRoomDecor = function updateRoomDecor() {
-        const sel = document.getElementById("room-decor-select");
-        applyRoomDecorVisuals((sel && sel.value) || "military-calm");
-    };
-
-    window.updatePulseCadence = function updatePulseCadence() {
-        const sel = document.getElementById("pulse-cadence-select");
-        applyPulseCadence((sel && sel.value) || "1");
-    };
-
-    window.addEventListener("DOMContentLoaded", () => {
-        applyRoomDecorVisuals(localStorage.getItem("ANNA_V4_DECOR") || "military-calm");
-        applyPulseCadence(localStorage.getItem("ANNA_V4_PULSE_SCALE") || "1");
-    });
-;(function () {
-    if (typeof window.handleKey !== "function") {
-        window.handleKey = function (ev) {
-            if (ev && ev.key === "Enter" && !ev.shiftKey) {
-                ev.preventDefault();
-                if (typeof window.sendMessage === "function") {
-                    window.sendMessage();
-                }
-            }
-        };
-    }
 })();
