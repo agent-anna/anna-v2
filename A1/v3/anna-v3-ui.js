@@ -4,7 +4,7 @@
     const GITHUB_REPO_OWNER = "agent-anna";
     const GITHUB_REPO_NAME = "anna-v2";
     const WORKSPACE_ROOT = "A1/v3";
-    const SCRAPE_WORKFLOW_FILE = "scrape-intel.yml";
+    const SCRAPE_WORKFLOW_FILE = "aa01-intel-feed.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
     const DAHL_TIMEOUT_MS = 30000;
@@ -351,7 +351,7 @@
         }
     }
 
-    async function dispatchScrapeWorkflow(targetUrl, outputSlug) {
+    async function dispatchScrapeWorkflow(targetUrl, outputSlug, mode) {
         const token = getCleanGitHubToken();
         if (!token) {
             const msg = "GitHub PAT missing. Open KEYS to save your token before running a GitHub Action.";
@@ -360,7 +360,8 @@
             toggleSettings();
             return;
         }
-        const urlToScrape = (targetUrl || "https://martinstrayd.github.io/artist/").trim();
+        const feedMode = (mode || "url").trim().toLowerCase() === "search" ? "search" : "url";
+        const val = (targetUrl || "https://martinstrayd.github.io/artist/").trim();
         const slug = (outputSlug || "strayd-artist-live").trim();
         setMoodState("saving");
         try {
@@ -376,17 +377,18 @@
                     body: JSON.stringify({
                         ref: activeBranch || "main",
                         inputs: {
-                            target_url: urlToScrape,
-                            output_slug: slug
+                            mode: feedMode,
+                            target_or_query: val,
+                            output_name: slug
                         }
                     })
                 },
                 12000
             );
             if (res.status === 204 || res.ok) {
-                const okMsg = `Dispatched ${SCRAPE_WORKFLOW_FILE} on ${activeBranch} for ${urlToScrape} -> A1/v3/knowledge/${slug}.md. Click SYNC after the run finishes.`;
+                const okMsg = `Dispatched ${SCRAPE_WORKFLOW_FILE} (${feedMode}) on ${activeBranch} -> A1/v3/knowledge/${slug}.md. Click SYNC after the run finishes.`;
                 appendMessage("System Telemetry", okMsg, "msg_wf_ok_" + Date.now(), false);
-                speakText("Scraper workflow dispatched.");
+                speakText("Intel workflow dispatched.");
             } else {
                 const errTxt = await res.text();
                 const errMsg = `Workflow dispatch failed (${res.status}): ${errTxt.slice(0, 180)}`;
@@ -694,7 +696,7 @@
             await ingestCoreVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
             const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
-            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${count} core files loaded).`, "msg_boot_" + Date.now(), true);
+            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${count} core files loaded). Action: ${SCRAPE_WORKFLOW_FILE}.`, "msg_boot_" + Date.now(), true);
         } finally {
             isSyncing = false;
         }
@@ -807,7 +809,7 @@
             usedChars += block.length;
         }
 
-        const header = `RUNTIME: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}) | ROOT: ${WORKSPACE_ROOT}/`;
+        const header = `RUNTIME: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}) | ROOT: ${WORKSPACE_ROOT}/ | ACTION: ${SCRAPE_WORKFLOW_FILE}`;
         return `${header}\n\n${blocks.join("\n\n")}`.slice(0, MAX_CONTEXT_CHARS + 200);
     }
 
