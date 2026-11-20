@@ -8,7 +8,7 @@
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
     const DAHL_TIMEOUT_MS = 30000;
-    const MAX_CONTEXT_CHARS = 3000;
+    const MAX_CONTEXT_CHARS = 3500;
 
     let isVoiceEnabled = true;
     const messagePayloadStore = {};
@@ -450,10 +450,10 @@
         container.scrollTop = container.scrollHeight;
     }
 
-    function updateMessage(id, text, isRawStream) {
+    function updateMessage(id, text) {
         const el = document.getElementById(id);
         if (!el) return;
-        const readableText = isRawStream ? stripModelStrings(String(text || "")) : formatReadableMessage(text);
+        const readableText = formatReadableMessage(text);
         const body = el.querySelector(".msg-content");
         if (body) body.textContent = readableText;
         messagePayloadStore[id] = readableText;
@@ -800,7 +800,7 @@
             const isMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
             if (!isCore && !isMatch) continue;
 
-            const sliceLen = isMatch ? 950 : 500;
+            const sliceLen = isMatch ? 1100 : 600;
             const block = `=== [${path}] ===\n${content.slice(0, sliceLen)}`;
             if (usedChars + block.length > MAX_CONTEXT_CHARS) break;
             blocks.push(block);
@@ -954,6 +954,45 @@
         return clean(rawText);
     }
 
+    async function callDahlDirect(messages) {
+        const apiKey = getCleanDahlKey();
+        if (!apiKey) {
+            throw new Error("Dahl API key missing. Open KEYS to save it.");
+        }
+
+        const response = await fetchWithTimeout(
+            DAHL_ENDPOINT,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: getActiveModel(),
+                    stream: false,
+                    messages
+                })
+            },
+            DAHL_TIMEOUT_MS
+        );
+
+        const rawText = await response.text();
+        let json = null;
+        try {
+            json = JSON.parse(rawText);
+        } catch (e) {}
+
+        if (!response.ok) {
+            const detail = json && json.error
+                ? (json.error.message || JSON.stringify(json.error))
+                : rawText.slice(0, 200);
+            throw new Error(`DAHL HTTP ${response.status}: ${detail}`);
+        }
+
+        return extractDahlReply(json, rawText) || "Ready.";
+    }
+
     async function auditActiveFile() {
         const pathEl = document.getElementById("active-file-path");
         const edEl = document.getElementById("repo-code-editor");
@@ -969,21 +1008,10 @@
         setMoodState("thinking");
 
         try {
-            const response = await fetchWithTimeout(DAHL_ENDPOINT, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-                body: JSON.stringify({
-                    model: getActiveModel(),
-                    messages: [
-                        { role: "system", content: `Respond in English only. Active workspace is ${WORKSPACE_ROOT}. Do not mention model names in prose. Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
-                        { role: "user", content }
-                    ]
-                })
-            }, DAHL_TIMEOUT_MS);
-            const rawText = await response.text();
-            let json = null;
-            try { json = JSON.parse(rawText); } catch (e) {}
-            const cleanReply = extractDahlReply(json, rawText);
+            const cleanReply = await callDahlDirect([
+                { role: "system", content: `Respond in English only. Active workspace is ${WORKSPACE_ROOT}. Do not mention model names in prose. Audit ${path} for bugs or flaws and return a complete block:\n\`\`\`file:${path}\n...\n\`\`\`` },
+                { role: "user", content }
+            ]);
             setMoodState("responding");
             updateMessage(auditMsgId, cleanReply);
             speakText(cleanReply);
@@ -1211,58 +1239,6 @@
         sendMessage();
     }
 
-    async function readStreamOrJsonResponse(response, assistantMsgId) {
-        const contentType = (response.headers.get("content-type") || "").toLowerCase();
-        if (!contentType.includes("text/event-stream") || !response.body || typeof response.body.getReader !== "function") {
-            const rawText = await response.text();
-            let json = null;
-            try { json = JSON.parse(rawText); } catch (e) {}
-            return extractDahlReply(json, rawText) || "Ready.";
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let buffer = "";
-        let assembled = "";
-        let firstTokenSeen = false;
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split(/\r?\n/);
-            buffer = lines.pop() || "";
-
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed.startsWith("data:")) continue;
-                const payload = trimmed.slice(5).trim();
-                if (!payload || payload === "[DONE]") continue;
-                try {
-                    const chunk = JSON.parse(payload);
-                    const delta = chunk && chunk.choices && chunk.choices[0] && (
-                        (chunk.choices[0].delta && chunk.choices[0].delta.content) ||
-                        chunk.choices[0].text ||
-                        (chunk.choices[0].message && chunk.choices[0].message.content)
-                    );
-                    if (typeof delta === "string" && delta.length > 0) {
-                        if (!firstTokenSeen) {
-                            firstTokenSeen = true;
-                            setMoodState("responding");
-                        }
-                        assembled += delta;
-                        const visible = assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/<think>[\s\S]*$/gi, "");
-                        if (visible.trim()) {
-                            updateMessage(assistantMsgId, visible, true);
-                        }
-                    }
-                } catch (e) {}
-            }
-        }
-
-        return sanitizeResponse(assembled) || "Ready.";
-    }
-
     async function sendMessage() {
         const input = document.getElementById("user-input");
         const prompt = input ? input.value.trim() : "";
@@ -1273,75 +1249,31 @@
         chatHistory.push({ role: "user", content: prompt });
 
         const assistantMsgId = "msg_a_" + Date.now();
-        appendMessage("Agent Anna V3", "Thinking...", assistantMsgId, true);
+        appendMessage("Agent Anna V3", "Working...", assistantMsgId, true);
         setMoodState("thinking");
-
-        const apiKey = getCleanDahlKey();
-        if (!apiKey) {
-            const errMsg = "ERROR: Dahl API key missing. Click KEYS to configure.";
-            updateMessage(assistantMsgId, errMsg);
-            speakText(errMsg);
-            toggleSettings();
-            setMoodState("standby");
-            return;
-        }
 
         try {
             const vaultContext = getCompactVaultContext(prompt);
             const systemPrompt =
                 `You are AGENT ANNA V3 inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).\n` +
-                `RULES: Answer concisely in English from ACTIVE V3 CONTEXT below. Never invent missing files, tracks, or web pages; if live web scraping is needed, state that a GitHub Action run is required. Never read code blocks aloud.\n\n` +
+                `RULES: Answer directly, clearly, and concisely in English using only the V3 context below. Never invent missing files or live web facts. Never read code blocks aloud.\n\n` +
                 `${vaultContext}`;
 
-            const response = await fetchWithTimeout(
-                DAHL_ENDPOINT,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: getActiveModel(),
-                        stream: true,
-                        messages: [
-                            { role: "system", content: systemPrompt },
-                            ...chatHistory.slice(-2)
-                        ]
-                    })
-                },
-                DAHL_TIMEOUT_MS
-            );
+            const reply = await callDahlDirect([
+                { role: "system", content: systemPrompt },
+                ...chatHistory.slice(-3)
+            ]);
 
-            if (!response.ok) {
-                const rawText = await response.text();
-                let json = null;
-                try { json = JSON.parse(rawText); } catch (e) {}
-                const errDetail = json && json.error
-                    ? (json.error.message || JSON.stringify(json.error))
-                    : rawText.slice(0, 200);
-                const errMsg = stripModelStrings(`DAHL HTTP ${response.status}: ${errDetail}`);
-                updateMessage(assistantMsgId, errMsg);
-                speakText(errMsg);
-                setMoodState("error");
-                return;
-            }
-
-            const cleanReply = await readStreamOrJsonResponse(response, assistantMsgId);
             setMoodState("responding");
-            chatHistory.push({ role: "assistant", content: formatReadableMessage(cleanReply) });
-            updateMessage(assistantMsgId, cleanReply);
-            speakText(cleanReply);
-            await parseAndExecuteAutonomousFiles(cleanReply);
+            chatHistory.push({ role: "assistant", content: formatReadableMessage(reply) });
+            updateMessage(assistantMsgId, reply);
+            speakText(reply);
+            await parseAndExecuteAutonomousFiles(reply);
         } catch (err) {
-            const reason = err && err.name === "AbortError"
-                ? `Request timed out after ${Math.round(DAHL_TIMEOUT_MS / 1000)}s`
-                : err.message;
-            const failMsg = `DAHL CONNECTION ERROR: ${reason}.`;
             setMoodState("error");
-            updateMessage(assistantMsgId, failMsg);
-            speakText("Connection error.");
-            return;
+            const msg = err && err.message ? err.message : "Dahl request failed.";
+            updateMessage(assistantMsgId, msg);
+            speakText("Dahl request failed.");
         }
 
         setMoodState("standby");
