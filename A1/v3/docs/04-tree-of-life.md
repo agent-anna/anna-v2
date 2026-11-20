@@ -1,5 +1,5 @@
 # 4. Living Tree of Life System Map
-_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T08:04:47.629956+00:00`_
+_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T08:06:11.853661+00:00`_
 
 ## The Roots (Core Config & Memory)
 - `A1/v3/docs/01-the-roots.md`
