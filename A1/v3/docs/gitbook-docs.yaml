@@ -17,13 +17,15 @@ site:
             directory: ./
     - type: section
       key: section-3
-      title: Imported content
+      title: BIBLE
       path: imported-content
+      description: ANNA BIBLE
+      icon: mushroom
       default: true
       children:
         - type: space
           key: space-3
-          title: Imported content
+          title: BIBLE
           path: imported-content
           default: true
           draft: true
