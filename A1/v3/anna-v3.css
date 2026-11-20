@@ -202,7 +202,6 @@ body.is-error .github-pane {
     flex-wrap: wrap;
     font-size: 11px;
     z-index: 100;
-    will-change: box-shadow;
     animation: state-border-breathe var(--pulse-duration) ease-in-out infinite;
     transition: border-color 0.25s ease, background-color 0.25s ease;
 }
@@ -221,7 +220,6 @@ body.is-error .github-pane {
     height: 9px;
     border-radius: 50%;
     background: var(--state-color);
-    will-change: transform, opacity, box-shadow;
     animation: dot-breathe var(--pulse-duration) ease-in-out infinite;
     transition: background-color 0.25s ease;
 }
@@ -268,7 +266,6 @@ body.is-error .github-pane {
     padding: 10px;
     gap: 8px;
     overflow: hidden;
-    will-change: box-shadow;
     animation: state-border-breathe var(--pulse-duration) ease-in-out infinite;
     transition: border-color 0.25s ease;
 }
@@ -281,9 +278,24 @@ body.is-error .github-pane {
     background: var(--bg-dark);
     overflow: hidden;
     position: relative;
-    will-change: box-shadow;
     animation: state-border-breathe var(--pulse-duration) ease-in-out infinite;
     transition: border-color 0.25s ease;
+}
+
+/* Top-right FULL PAGE toggle mode */
+body.is-fullpage .github-pane {
+    display: none;
+}
+
+body.is-fullpage .chat-pane {
+    width: 100%;
+    max-width: 100%;
+    border-right: none;
+}
+
+body.is-fullpage #fullpage-btn {
+    border-color: var(--standby);
+    color: var(--standby);
 }
 
 .repo-toolbar {
@@ -660,4 +672,28 @@ body.is-error .github-pane {
     background: rgba(168, 85, 247, 0.16) !important;
     border-color: var(--listening) !important;
     color: var(--listening) !important;
+}
+
+@media (max-width: 820px) {
+    html, body {
+        overflow: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .main-workspace {
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 38px);
+        overflow: visible;
+    }
+
+    .github-pane,
+    .chat-pane {
+        width: 100%;
+        height: auto;
+        min-height: 360px;
+        border-right: none;
+        border-bottom: 1px solid var(--state-color);
+    }
 }
