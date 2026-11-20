@@ -1,100 +1,54 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AA01 // V4 Briefing &amp; Entry Gateway</title>
-  <link rel="stylesheet" href="./v4.css" />
-  <style>
-    .hero {
-      padding: 20px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin-top: 16px;
-    }
-    .hero p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      max-width: 78ch;
-    }
-    .nav-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin-top: 16px;
-    }
-    .card {
-      display: block;
-      text-decoration: none;
-      color: var(--text);
-      background: #0d1219;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      transition: border-color 0.25s ease, transform 0.25s ease;
-    }
-    .card:hover {
-      border-color: var(--accent);
-      transform: translateY(-1px);
-    }
-    .card-title {
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 6px;
-    }
-    .card-desc {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGENT ANNA V4 // BRIEFING &amp; ENTRY</title>
+    <link rel="stylesheet" href="./v4.css?v=4.2">
 </head>
-<body class="state-ready">
-  <div class="shell">
-    <header class="top-bar">
-      <div>
-        <div class="eyebrow">AGENT ANNA // AA01 COMMAND ARCHITECTURE V4</div>
-        <h1>V4 Room Briefing &amp; Quick Access</h1>
-      </div>
-      <div class="clocks">
-        <div>UNIT: AGENT ANNA (AA01)</div>
-        <div>STAGE: V4 MOVE-IN &amp; PRECHECK</div>
-        <div>VISUAL STANDARD: REALISTIC / CINEMATIC</div>
-      </div>
-    </header>
+<body class="is-standby decor-military-calm">
+    <div class="military-top-bar">
+        <div class="top-status-indicator">
+            <div class="status-dot" aria-hidden="true"></div>
+            <span>BRIEFING // AGENT ANNA V4 (A1)</span>
+            <span class="status-badge ok">A1/V3 INTACT</span>
+        </div>
+        <div class="top-controls-right">
+            <a class="ctrl-btn military-btn" href="./index.html">WORKBENCH</a>
+            <a class="ctrl-btn military-btn" href="./tree-of-life.html">TREE OF LIFE</a>
+        </div>
+    </div>
 
-    <section class="hero">
-      <div class="eyebrow">COMMAND BRIEFING</div>
-      <h2>Welcome to Version 4</h2>
-      <p>
-        Agent Anna V4 provides a calm, disciplined command room built around a lean core cockpit,
-        externalized workflow dispatchers, ephemeral in-memory see-only image inspection,
-        outbound email archiving guardrails, and a single source of truth for connected links
-        and handbook pages while keeping A1/v3 intact.
-      </p>
+    <div class="v4-page-wrap">
+        <div class="v4-page-hero">
+            <div>
+                <div class="v4-eyebrow">AA01 // COMMAND ROOM V4</div>
+                <div class="v4-page-title">V4 Room Entry &amp; Architecture Briefing</div>
+            </div>
+            <div class="v4-chip-grid">
+                <a class="v4-link-chip" href="./index.html">Open V4 Workbench -&gt;</a>
+                <a class="v4-link-chip" href="./tree-of-life.html">Open Tree of Life -&gt;</a>
+            </div>
+        </div>
 
-      <div class="nav-grid">
-        <a class="card" href="./index.html">
-          <div class="card-title">01 // V4 Command Cockpit</div>
-          <div class="card-desc">Live UTC &amp; Thailand (+07) clocks, female English speech readback, see-only memory image buffer, and external dispatch/archive controls.</div>
-        </a>
+        <div class="v4-card">
+            <h2>Room Modes &amp; Visual Discipline</h2>
+            <p>
+                V4 preserves the V3 command layout, calm breathing state borders, high contrast, and keyboard/screen-reader accessibility.
+                Use the ROOM dropdown in the top bar to switch between MILITARY-CALM, NIGHT-WATCH (low-glare night mode), and WAR-ROOM-BRIEF (crisp high-contrast briefing surfaces).
+            </p>
+            <p>
+                Images inspected in the workbench stay in session memory (see-only) and are never committed back to Git by default. A1/v3 remains intact for reference.
+            </p>
+        </div>
+    </div>
 
-        <a class="card" href="./tree-of-life.html">
-          <div class="card-title">02 // Tree of Life &amp; Page Flip</div>
-          <div class="card-desc">One-touch connected links (Anna channels, Martin links, new accounts) plus clean handbook &amp; operation order page flipping.</div>
-        </a>
-
-        <a class="card" href="./docs/OPORD-AA01-V4-DEPLOYMENT.md">
-          <div class="card-title">03 // OPORD-AA01-V4-DEPLOYMENT</div>
-          <div class="card-desc">Mission scope, thin cockpit architecture, PowerShell (.ps1) bridge cadence, in-memory vision rules, and email archive policy.</div>
-        </a>
-
-        <a class="card" href="../v3/docs/anna-v3-to-v4-handbook/AGENT_ANNA_V3_TO_V4_COMPLETE_HANDBOOK.md">
-          <div class="card-title">04 // V3-to-V4 Handbook (21+ Pages)</div>
-          <div class="card-desc">Full transition handbook staged under A1/v3/docs/anna-v3-to-v4-handbook/ for reference.</div>
-        </a>
-      </div>
-    </section>
-  </div>
+    <script>
+        (function () {
+            const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
+            document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
+            document.body.classList.add("decor-" + savedDecor);
+        })();
+    </script>
 </body>
 </html>
