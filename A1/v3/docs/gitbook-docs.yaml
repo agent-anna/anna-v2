@@ -1,4 +1,10 @@
-root: ./
-structure:
-  readme: README.md
-  summary: SUMMARY.md
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Agent Anna Docs
+  structure:
+    - type: space
+      key: anna-docs
+      title: Agent Anna Docs
+      path: /
+      content:
+        directory: ./
