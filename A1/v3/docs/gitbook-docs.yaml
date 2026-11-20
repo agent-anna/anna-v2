@@ -3,8 +3,9 @@ site:
   title: Agent Anna Docs
   structure:
     - type: space
-      key: anna-docs
-      title: Agent Anna Docs
-      path: /
+      key: space-1
+      title: Documentation
+      path: documentation
+      default: true
       content:
         directory: ./
