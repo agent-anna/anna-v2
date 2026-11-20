@@ -5,7 +5,7 @@ site:
     - type: section
       key: section-1
       title: Agent Anna Docs
-      path: agent-anna-docs
+      path: anna
       description: ""
       icon: mushroom
       default: true
