@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "url (fetch target_url) or search (query DuckDB/HTML search feed)"
+        description: "url (fetch target_or_query) or search (query HTML search feed)"
         required: true
         default: "url"
       target_or_query:
@@ -19,12 +19,18 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: aa01-intel-feed-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   fetch-grounded-intel:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Fetch verified snapshot into A1/v3/knowledge
         env:
@@ -33,7 +39,7 @@ jobs:
           OUT_NAME: ${{ github.event.inputs.output_name || 'strayd-artist-live' }}
         run: |
           python3 - << 'EOF'
-          import os, re, json, time, urllib.parse, urllib.request
+          import os, re, time, urllib.parse, urllib.request
           from html.parser import HTMLParser
           from datetime import datetime, timezone
 
@@ -149,10 +155,11 @@ jobs:
         run: |
           git config user.name "Agent Anna V3 Bot"
           git config user.email "agent-anna@users.noreply.github.com"
+          git pull --rebase --autostash origin "${{ github.ref_name }}" || true
           git add A1/v3/knowledge/
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
             git commit -m "AA01 grounded intel sync into A1/v3/knowledge"
-            git push
+            git push origin "${{ github.ref_name }}"
           fi
