@@ -100,6 +100,13 @@
         return localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
     }
 
+    function setActionsStatus(label, statusClass) {
+        const badge = document.getElementById("actions-status");
+        if (!badge) return;
+        badge.innerText = `ACTIONS: ${label}`;
+        badge.className = statusClass ? `status-badge ${statusClass}` : "status-badge";
+    }
+
     function setMoodState(stateName) {
         const normalized = String(stateName || "standby").toLowerCase();
         const valid = ["standby", "thinking", "responding", "saving", "error", "speaking", "listening"];
@@ -107,7 +114,7 @@
         document.body.classList.remove("is-standby", "is-thinking", "is-responding", "is-saving", "is-error", "is-speaking", "is-listening");
         document.body.classList.add(`is-${target}`);
         const stEl = document.getElementById("state-text");
-        if (stEl) stEl.innerText = `${target.toUpperCase()} // AGENT ANNA V3`;
+        if (stEl) stEl.innerText = `${target.toUpperCase()} // AGENT ANNA V3 (A1)`;
         if (window.Brain && typeof window.Brain.setState === "function") {
             try { window.Brain.setState(target.toUpperCase()); } catch (e) {}
         }
@@ -340,7 +347,7 @@
             btn.setAttribute("aria-pressed", String(isFullPageMode));
             btn.classList.toggle("active-mode", isFullPageMode);
         }
-        speakText(isFullPageMode ? "Full page mode active." : "Split workbench restored.");
+        speakText(isFullPageMode ? "Full page console active." : "Split workbench restored.");
     }
 
     function getGitHubHeaders() {
@@ -377,6 +384,7 @@
         const val = (targetUrl || "https://martinstrayd.github.io/artist/").trim();
         const slug = (outputSlug || "strayd-artist-live").trim();
         setMoodState("saving");
+        setActionsStatus("DISPATCHING", "active");
         try {
             const res = await fetchWithTimeout(
                 `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${SCRAPE_WORKFLOW_FILE}/dispatches`,
@@ -399,16 +407,19 @@
                 12000
             );
             if (res.status === 204 || res.ok) {
+                setActionsStatus("QUEUED", "ok");
                 const okMsg = `Dispatched ${SCRAPE_WORKFLOW_FILE} (${feedMode}) on ${activeBranch} -> A1/v3/knowledge/${slug}.md. Click SYNC after the run finishes.`;
                 appendMessage("System Telemetry", okMsg, "msg_wf_ok_" + Date.now(), false);
                 speakText("Intel workflow dispatched.");
             } else {
+                setActionsStatus("ERR", "err");
                 const errTxt = await res.text();
                 const errMsg = `Workflow dispatch failed (${res.status}): ${errTxt.slice(0, 180)}`;
                 appendMessage("System Telemetry", errMsg, "msg_wf_err_" + Date.now(), false);
                 speakText("Workflow dispatch failed.");
             }
         } catch (err) {
+            setActionsStatus("ERR", "err");
             appendMessage("System Telemetry", `Workflow dispatch error: ${err.message}`, "msg_wf_ex_" + Date.now(), false);
             speakText("Workflow dispatch error.");
         }
@@ -707,9 +718,6 @@
         try {
             await fetchRepoTree();
             await ingestCoreVaultAssets();
-            const count = Object.keys(repoVaultFiles).length;
-            const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
-            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${count} core files loaded). Action: ${SCRAPE_WORKFLOW_FILE}.`, "msg_boot_" + Date.now(), true);
         } finally {
             isSyncing = false;
         }
@@ -792,7 +800,7 @@
         const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
         const badge = document.getElementById("vault-status");
         if (badge) {
-            badge.innerText = `V3 FILES: ${v3Files} (CTX: ${count})`;
+            badge.innerText = `VAULT: ${v3Files} FILES (${count} CTX)`;
             badge.className = v3Files > 0 ? "status-badge ok" : "status-badge err";
         }
     }
@@ -828,6 +836,7 @@
     }
 
     async function triggerAutonomousBootSequence() {
+        await syncAll();
         const coreCount = Object.keys(repoVaultFiles).length;
         const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
         const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${coreCount} core files active).`;
@@ -1246,7 +1255,10 @@
     }
 
     function handleKey(e) {
-        if (e.key === "Enter") sendMessage();
+        if (e && e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+        }
     }
 
     function triggerPreset(queryText) {
@@ -1315,6 +1327,7 @@
         if (topSelect) topSelect.value = savedModel;
 
         updateKeyBadge();
+        setActionsStatus("IDLE", "");
 
         if ("speechSynthesis" in window) {
             loadVoices();
