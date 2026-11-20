@@ -8,6 +8,7 @@
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
     const DAHL_TIMEOUT_MS = 30000;
+    const MAX_CONTEXT_CHARS = 3000;
 
     let isVoiceEnabled = true;
     const messagePayloadStore = {};
@@ -62,7 +63,9 @@
 
     function isV3CoreFile(path) {
         if (!path || !isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return false;
-        return /\.(md|json|txt)$/i.test(path.toLowerCase());
+        const lower = path.toLowerCase();
+        if (lower.includes("/logs/")) return false;
+        return /\.(md|json|txt)$/i.test(lower);
     }
 
     function cleanHeaderToken(str) {
@@ -447,10 +450,10 @@
         container.scrollTop = container.scrollHeight;
     }
 
-    function updateMessage(id, text) {
+    function updateMessage(id, text, isRawStream) {
         const el = document.getElementById(id);
         if (!el) return;
-        const readableText = formatReadableMessage(text);
+        const readableText = isRawStream ? stripModelStrings(String(text || "")) : formatReadableMessage(text);
         const body = el.querySelector(".msg-content");
         if (body) body.textContent = readableText;
         messagePayloadStore[id] = readableText;
@@ -691,7 +694,7 @@
             await ingestCoreVaultAssets();
             const count = Object.keys(repoVaultFiles).length;
             const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
-            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. Loaded ${v3Files} files in ${WORKSPACE_ROOT} (${count} core context files active) on ${activeBranch}.`, "msg_boot_" + Date.now(), true);
+            appendMessage("Agent Anna V3", `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${count} core files loaded).`, "msg_boot_" + Date.now(), true);
         } finally {
             isSyncing = false;
         }
@@ -705,7 +708,7 @@
                 const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${branch}?recursive=1`, {
                     headers: getGitHubHeaders(),
                     cache: "no-store"
-                }, 10000);
+                }, 8000);
                 if (res.ok) {
                     data = await res.json();
                     activeBranch = branch;
@@ -742,17 +745,23 @@
 
     async function ingestCoreVaultAssets() {
         const headers = getGitHubHeaders();
-        const coreFiles = rawTreeData.filter((f) =>
-            f.type === "blob" &&
-            isInV3Scope(f.path) &&
-            (f.size || 0) < 65000 &&
-            isV3CoreFile(f.path)
-        );
+        const priorityScore = (path) => {
+            const l = path.toLowerCase();
+            if (l.endsWith("/aa01.md") || l.endsWith("/brain.json") || l.endsWith("/memory.json") || l.endsWith("/tasks.json")) return 0;
+            if (l.includes("/knowledge/")) return 1;
+            if (l.includes("/docs/")) return 2;
+            return 3;
+        };
+
+        const coreFiles = rawTreeData
+            .filter((f) => f.type === "blob" && isInV3Scope(f.path) && (f.size || 0) < 45000 && isV3CoreFile(f.path))
+            .sort((a, b) => priorityScore(a.path) - priorityScore(b.path))
+            .slice(0, 14);
 
         const nextVault = {};
         await Promise.allSettled(
             coreFiles.map(async (file) => {
-                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" }, 10000);
+                const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" }, 7000);
                 if (!res.ok) return;
                 const data = await res.json();
                 if (data.content) {
@@ -773,58 +782,39 @@
     }
 
     function getCompactVaultContext(userPrompt) {
-        const memoryBlocks = [];
-        const characterBlocks = [];
-        const knowledgeBlocks = [];
+        const blocks = [];
         const lowerPrompt = String(userPrompt || "").toLowerCase();
         const terms = lowerPrompt.split(/[^a-z0-9_-]+/).filter((w) => w.length > 2);
 
-        for (const [path, content] of Object.entries(repoVaultFiles)) {
+        const sortedEntries = Object.entries(repoVaultFiles).sort(([a], [b]) => {
+            const aMatch = terms.some((t) => a.toLowerCase().includes(t)) ? 0 : 1;
+            const bMatch = terms.some((t) => b.toLowerCase().includes(t)) ? 0 : 1;
+            return aMatch - bMatch;
+        });
+
+        let usedChars = 0;
+        for (const [path, content] of sortedEntries) {
             if (!isInV3Scope(path) || isSoulOrLoveLetterPath(path) || !isV3CoreFile(path)) continue;
-
             const lowerPath = path.toLowerCase();
-            const baseName = path.split("/").pop().toLowerCase();
-            const isMemoryFile = (
-                lowerPath.includes("/memory/") ||
-                baseName === "memory.json" ||
-                baseName === "tasks.json" ||
-                baseName === "links.json" ||
-                baseName === "brain.json" ||
-                baseName === "sessions.md"
-            );
-            const isCharacterFile = (
-                lowerPath.includes("/character/") ||
-                baseName.startsWith("aa01") ||
-                baseName.includes("character")
-            );
-            const isKnowledgeFile = lowerPath.includes("/knowledge/");
-            const isTermMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
+            const isCore = lowerPath.endsWith("/aa01.md") || lowerPath.endsWith("/brain.json") || lowerPath.endsWith("/memory.json") || lowerPath.endsWith("/tasks.json") || lowerPath.includes("/knowledge/");
+            const isMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
+            if (!isCore && !isMatch) continue;
 
-            if (isMemoryFile) {
-                memoryBlocks.push(`=== MEMORY [${path}] ===\n${content.slice(0, 1400)}`);
-            } else if (isCharacterFile) {
-                characterBlocks.push(`=== CHARACTER [${path}] ===\n${content.slice(0, 1400)}`);
-            } else if (isKnowledgeFile || isTermMatch) {
-                knowledgeBlocks.push(`=== KNOWLEDGE [${path}] ===\n${content.slice(0, 1600)}`);
-            }
+            const sliceLen = isMatch ? 950 : 500;
+            const block = `=== [${path}] ===\n${content.slice(0, sliceLen)}`;
+            if (usedChars + block.length > MAX_CONTEXT_CHARS) break;
+            blocks.push(block);
+            usedChars += block.length;
         }
 
-        const loadedList = Object.keys(repoVaultFiles).join(", ") || "none";
-        const treeSample = rawTreeData
-            .filter((f) => f.type === "blob" && isInV3Scope(f.path))
-            .map((f) => f.path)
-            .slice(0, 40)
-            .join(", ");
-
-        const header = `CURRENT RUNTIME LOCATION:\n- Repo: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch})\n- Active Workspace Root: ${WORKSPACE_ROOT}/ (STRICT V3 SCOPE)\n- Loaded V3 files in context: ${loadedList}\n- Active ${WORKSPACE_ROOT} tree paths: ${treeSample}`;
-        const combined = memoryBlocks.concat(characterBlocks, knowledgeBlocks).join("\n\n").slice(0, 7500);
-        return `${header}\n\nACTIVE V3 CONTEXT:\n${combined}`;
+        const header = `RUNTIME: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}) | ROOT: ${WORKSPACE_ROOT}/`;
+        return `${header}\n\n${blocks.join("\n\n")}`.slice(0, MAX_CONTEXT_CHARS + 200);
     }
 
     async function triggerAutonomousBootSequence() {
         const coreCount = Object.keys(repoVaultFiles).length;
         const v3Files = rawTreeData.filter((f) => f.type === "blob" && isInV3Scope(f.path)).length;
-        const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${coreCount} core context files active).`;
+        const msg = `Agent Anna V3 online in ${WORKSPACE_ROOT}. ${v3Files} files in ${WORKSPACE_ROOT} (${coreCount} core files active).`;
         appendMessage("Agent Anna V3", msg, "msg_boot_" + Date.now(), true);
         speakText(msg);
         setMoodState("standby");
@@ -1221,6 +1211,58 @@
         sendMessage();
     }
 
+    async function readStreamOrJsonResponse(response, assistantMsgId) {
+        const contentType = (response.headers.get("content-type") || "").toLowerCase();
+        if (!contentType.includes("text/event-stream") || !response.body || typeof response.body.getReader !== "function") {
+            const rawText = await response.text();
+            let json = null;
+            try { json = JSON.parse(rawText); } catch (e) {}
+            return extractDahlReply(json, rawText) || "Ready.";
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+        let assembled = "";
+        let firstTokenSeen = false;
+
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split(/\r?\n/);
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed.startsWith("data:")) continue;
+                const payload = trimmed.slice(5).trim();
+                if (!payload || payload === "[DONE]") continue;
+                try {
+                    const chunk = JSON.parse(payload);
+                    const delta = chunk && chunk.choices && chunk.choices[0] && (
+                        (chunk.choices[0].delta && chunk.choices[0].delta.content) ||
+                        chunk.choices[0].text ||
+                        (chunk.choices[0].message && chunk.choices[0].message.content)
+                    );
+                    if (typeof delta === "string" && delta.length > 0) {
+                        if (!firstTokenSeen) {
+                            firstTokenSeen = true;
+                            setMoodState("responding");
+                        }
+                        assembled += delta;
+                        const visible = assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/<think>[\s\S]*$/gi, "");
+                        if (visible.trim()) {
+                            updateMessage(assistantMsgId, visible, true);
+                        }
+                    }
+                } catch (e) {}
+            }
+        }
+
+        return sanitizeResponse(assembled) || "Ready.";
+    }
+
     async function sendMessage() {
         const input = document.getElementById("user-input");
         const prompt = input ? input.value.trim() : "";
@@ -1247,9 +1289,8 @@
         try {
             const vaultContext = getCompactVaultContext(prompt);
             const systemPrompt =
-                `You are AGENT ANNA V3 working strictly inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} on branch ${activeBranch}.\n` +
-                `TRUTH & ANTI-HALLUCINATION RULE: Dahl is a text inference endpoint with no direct live internet browser inside this chat call. Answer strictly from ACTIVE V3 CONTEXT below. If live web scraping is requested and not yet committed into ${WORKSPACE_ROOT}/knowledge/, say clearly that a GitHub Action scrape run is needed rather than inventing web results or pretending to fetch in chat.\n` +
-                `SPEECH & FORMAT RULE: Respond in clear English only. Never read code blocks aloud.\n\n` +
+                `You are AGENT ANNA V3 inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).\n` +
+                `RULES: Answer concisely in English from ACTIVE V3 CONTEXT below. Never invent missing files, tracks, or web pages; if live web scraping is needed, state that a GitHub Action run is required. Never read code blocks aloud.\n\n` +
                 `${vaultContext}`;
 
             const response = await fetchWithTimeout(
@@ -1262,20 +1303,20 @@
                     },
                     body: JSON.stringify({
                         model: getActiveModel(),
+                        stream: true,
                         messages: [
                             { role: "system", content: systemPrompt },
-                            ...chatHistory.slice(-4)
+                            ...chatHistory.slice(-2)
                         ]
                     })
                 },
                 DAHL_TIMEOUT_MS
             );
 
-            const rawText = await response.text();
-            let json = null;
-            try { json = JSON.parse(rawText); } catch (e) {}
-
             if (!response.ok) {
+                const rawText = await response.text();
+                let json = null;
+                try { json = JSON.parse(rawText); } catch (e) {}
                 const errDetail = json && json.error
                     ? (json.error.message || JSON.stringify(json.error))
                     : rawText.slice(0, 200);
@@ -1286,7 +1327,7 @@
                 return;
             }
 
-            const cleanReply = extractDahlReply(json, rawText) || "Ready.";
+            const cleanReply = await readStreamOrJsonResponse(response, assistantMsgId);
             setMoodState("responding");
             chatHistory.push({ role: "assistant", content: formatReadableMessage(cleanReply) });
             updateMessage(assistantMsgId, cleanReply);
