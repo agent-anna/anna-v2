@@ -338,15 +338,41 @@
         setMoodState("standby");
     }
 
-    function toggleFullPageMode() {
-        isFullPageMode = !isFullPageMode;
+    function syncFullPageButtonUi() {
+        const fsActive = Boolean(document.fullscreenElement);
+        const active = fsActive || isFullPageMode;
         document.body.classList.toggle("is-fullpage", isFullPageMode);
         const btn = document.getElementById("fullpage-btn");
         if (btn) {
-            btn.innerText = isFullPageMode ? "EXIT FULL" : "FULL PAGE";
-            btn.setAttribute("aria-pressed", String(isFullPageMode));
-            btn.classList.toggle("active-mode", isFullPageMode);
+            btn.innerText = active ? "EXIT FULL" : "FULLPAGE";
+            btn.setAttribute("aria-pressed", String(active));
+            btn.classList.toggle("active-mode", active);
         }
+    }
+
+    async function toggleFullPageMode() {
+        const fsNow = Boolean(document.fullscreenElement);
+        try {
+            if (!fsNow && document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+                isFullPageMode = false;
+                syncFullPageButtonUi();
+                speakText("Browser fullscreen active.");
+                return;
+            }
+            if (fsNow && document.exitFullscreen) {
+                await document.exitFullscreen();
+                isFullPageMode = false;
+                syncFullPageButtonUi();
+                speakText("Exited browser fullscreen.");
+                return;
+            }
+        } catch (e) {
+            // Fallback to console full-page toggle if browser blocks fullscreen API
+        }
+
+        isFullPageMode = !isFullPageMode;
+        syncFullPageButtonUi();
         speakText(isFullPageMode ? "Full page console active." : "Split workbench restored.");
     }
 
@@ -612,6 +638,7 @@
         const currentlyHidden = window.getComputedStyle(childrenEl).display === "none";
         childrenEl.style.setProperty("display", currentlyHidden ? "block" : "none", "important");
         childrenEl.classList.toggle("collapsed", !currentlyHidden);
+        rowEl.setAttribute("aria-expanded", String(currentlyHidden));
         const arrowEl = rowEl.querySelector(".tree-arrow");
         if (arrowEl) {
             arrowEl.textContent = currentlyHidden ? "▾" : "▸";
@@ -653,7 +680,7 @@
                     const icon = ["md", "json"].includes(ext) ? "📋" : (["js", "html", "css", "ps1", "yml", "svg"].includes(ext) ? "⚡" : "📄");
                     html += `<span class="tree-file" onclick="window.loadRepoFile('${item.path}', '${ext}')" onkeydown="if(event.key==='Enter')window.loadRepoFile('${item.path}', '${ext}')" tabindex="0" role="treeitem">${icon} ${key}</span>`;
                 } else {
-                    html += `<div role="group"><div class="tree-folder-row" onclick="window.toggleFolderRowEl(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFolderRowEl(this);}" tabindex="0" role="button"><span class="tree-arrow">▾</span> 📁 ${key}/</div><div class="tree-children" style="display:block;">${buildHtml(item)}</div></div>`;
+                    html += `<div role="group"><div class="tree-folder-row" onclick="window.toggleFolderRowEl(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFolderRowEl(this);}" tabindex="0" role="button" aria-expanded="false"><span class="tree-arrow">▸</span> 📁 ${key}/</div><div class="tree-children collapsed" style="display:none;">${buildHtml(item)}</div></div>`;
                 }
             });
             return html;
@@ -1307,6 +1334,13 @@
         setMoodState("standby");
     }
 
+    document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+            isFullPageMode = false;
+        }
+        syncFullPageButtonUi();
+    });
+
     window.addEventListener("DOMContentLoaded", async () => {
         const savedToken = getStoredKey(["GITHUB_PAT", "gh_token", "github_token"]);
         const ghEl = document.getElementById("gh-token");
@@ -1328,6 +1362,7 @@
 
         updateKeyBadge();
         setActionsStatus("IDLE", "");
+        syncFullPageButtonUi();
 
         if ("speechSynthesis" in window) {
             loadVoices();
