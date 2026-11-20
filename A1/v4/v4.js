@@ -1147,7 +1147,7 @@
     function toggleVoice() {
         isVoiceEnabled = !isVoiceEnabled;
         const btn = document.getElementById("voice-btn");
-        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF"; const vBadge = document.getElementById("voice-profile-badge"); if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF"; const vBadge = document.getElementById("voice-profile-badge"); if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";
+        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF";  if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";  if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";
         if (!isVoiceEnabled) executeStfuProtocol();
         else speakText("Voice on.");
     }
@@ -1383,3 +1383,15 @@
         applyRoomDecorVisuals(localStorage.getItem("ANNA_V4_DECOR") || "military-calm");
         applyPulseCadence(localStorage.getItem("ANNA_V4_PULSE_SCALE") || "1");
     });
+;(function () {
+    if (typeof window.handleKey !== "function") {
+        window.handleKey = function (ev) {
+            if (ev && ev.key === "Enter" && !ev.shiftKey) {
+                ev.preventDefault();
+                if (typeof window.sendMessage === "function") {
+                    window.sendMessage();
+                }
+            }
+        };
+    }
+})();
