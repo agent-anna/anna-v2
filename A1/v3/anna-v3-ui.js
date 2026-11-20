@@ -473,7 +473,7 @@
             );
             if (res.status === 204 || res.ok) {
                 setActionsStatus("QUEUED", "ok");
-                const okMsg = `Dispatched ${SCRAPE_WORKFLOW_FILE} (${feedMode}) on ${activeBranch} -> A1/v3/knowledge/${slug}.md. Click SYNC after the run finishes.`;
+                const okMsg = `Dispatched ${SCRAPE_WORKFLOW_FILE} (${feedMode}) on ${activeBranch} to A1/v3/knowledge/${slug}.md. Click SYNC after the run finishes.`;
                 appendMessage("System Telemetry", okMsg, "msg_wf_ok_" + Date.now(), false);
                 speakText("Intel workflow dispatched.");
             } else {
@@ -530,9 +530,9 @@
                 <div class="action-row">
                     <button class="action-chip" onclick="window.speakStoredMessage('${id}')">SPEAK</button>
                     <button class="action-chip" onclick="window.copyToClipboard('${id}', this)">COPY</button>
-                    <button class="action-chip swallow-btn" onclick="window.autonomousSwallowAndCommit('${id}', this)">🌀 SWALLOW</button>
-                    <button class="action-chip del-btn" onclick="window.executeStfuProtocol()">🛑 STFU</button>
-                    <button class="action-chip del-btn" onclick="window.deleteMessage('${id}')">🗑️ DEL</button>
+                    <button class="action-chip swallow-btn" onclick="window.autonomousSwallowAndCommit('${id}', this)">SWALLOW</button>
+                    <button class="action-chip del-btn" onclick="window.executeStfuProtocol()">STFU</button>
+                    <button class="action-chip del-btn" onclick="window.deleteMessage('${id}')">DEL</button>
                 </div>`;
             while (temp.firstChild) div.appendChild(temp.firstChild);
         }
@@ -721,10 +721,9 @@
                 const item = node[key];
                 if (item.__is_file) {
                     const ext = key.split(".").pop().toLowerCase();
-                    const icon = ["md", "json"].includes(ext) ? "📋" : (["js", "html", "css", "ps1", "yml", "svg"].includes(ext) ? "⚡" : "📄");
-                    html += `<span class="tree-file" onclick="window.loadRepoFile('${item.path}', '${ext}')" onkeydown="if(event.key==='Enter')window.loadRepoFile('${item.path}', '${ext}')" tabindex="0" role="treeitem">${icon} ${key}</span>`;
+                    html += `<span class="tree-file" onclick="window.loadRepoFile('${item.path}', '${ext}')" onkeydown="if(event.key==='Enter')window.loadRepoFile('${item.path}', '${ext}')" tabindex="0" role="treeitem">${key}</span>`;
                 } else {
-                    html += `<div role="group"><div class="tree-folder-row" onclick="window.toggleFolderRowEl(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFolderRowEl(this);}" tabindex="0" role="button" aria-expanded="false"><span class="tree-arrow">▸</span> 📁 ${key}/</div><div class="tree-children collapsed" style="display:none;">${buildHtml(item)}</div></div>`;
+                    html += `<div role="group"><div class="tree-folder-row" onclick="window.toggleFolderRowEl(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFolderRowEl(this);}" tabindex="0" role="button" aria-expanded="false"><span class="tree-arrow">▸</span> ${key}/</div><div class="tree-children collapsed" style="display:none;">${buildHtml(item)}</div></div>`;
                 }
             });
             return html;
@@ -739,21 +738,11 @@
         gridEl.innerHTML = "";
         gridItems.forEach((file) => {
             const ext = file.path.split(".").pop().toLowerCase();
-            let icon = "📄";
-            if (["html", "htm"].includes(ext)) icon = "🌐";
-            else if (["js", "ts", "ps1"].includes(ext)) icon = "⚡";
-            else if (["css", "scss"].includes(ext)) icon = "🎨";
-            else if (["md", "txt", "json"].includes(ext)) icon = "📋";
-            else if (["yaml", "yml"].includes(ext)) icon = "⚙️";
-            else if (["png", "jpg", "jpeg", "gif", "svg", "avif"].includes(ext)) icon = "🖼️";
-            else if (["mp4", "webm", "mov"].includes(ext)) icon = "🎥";
-            else if (["mp3", "wav", "ogg"].includes(ext)) icon = "🎵";
-
             const card = document.createElement("div");
             card.className = "repo-file-card";
             card.setAttribute("tabindex", "0");
             card.setAttribute("role", "listitem");
-            card.innerHTML = `<div class="file-card-icon">${icon}</div><div class="file-card-name" title="${file.path}">${file.path}</div><div class="file-card-size">${((file.size || 0) / 1024).toFixed(1)} KB</div>`;
+            card.innerHTML = `<div class="file-card-name" title="${file.path}">${file.path}</div><div class="file-card-size">${((file.size || 0) / 1024).toFixed(1)} KB</div>`;
             card.onclick = () => loadRepoFile(file.path, ext);
             card.onkeydown = (e) => { if (e.key === "Enter") loadRepoFile(file.path, ext); };
             gridEl.appendChild(card);
@@ -1080,37 +1069,51 @@
             throw new Error("Dahl API key missing. Open KEYS to save it.");
         }
 
-        const response = await fetchWithTimeout(
-            DAHL_ENDPOINT,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${apiKey}`
+        const retryDelaysMs = [1800, 3600];
+        let lastError = null;
+
+        for (let attempt = 0; attempt <= retryDelaysMs.length; attempt++) {
+            const response = await fetchWithTimeout(
+                DAHL_ENDPOINT,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: getActiveModel(),
+                        stream: false,
+                        messages
+                    })
                 },
-                body: JSON.stringify({
-                    model: getActiveModel(),
-                    stream: false,
-                    messages
-                })
-            },
-            DAHL_TIMEOUT_MS
-        );
+                DAHL_TIMEOUT_MS
+            );
 
-        const rawText = await response.text();
-        let json = null;
-        try {
-            json = JSON.parse(rawText);
-        } catch (e) {}
+            const rawText = await response.text();
+            let json = null;
+            try {
+                json = JSON.parse(rawText);
+            } catch (e) {}
 
-        if (!response.ok) {
+            if (response.ok) {
+                return extractDahlReply(json, rawText) || "Ready.";
+            }
+
             const detail = json && json.error
                 ? (json.error.message || JSON.stringify(json.error))
                 : rawText.slice(0, 200);
-            throw new Error(`DAHL HTTP ${response.status}: ${detail}`);
+            lastError = new Error(`DAHL HTTP ${response.status}: ${detail}`);
+
+            if (response.status === 429 && attempt < retryDelaysMs.length) {
+                await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]));
+                continue;
+            }
+
+            throw lastError;
         }
 
-        return extractDahlReply(json, rawText) || "Ready.";
+        throw lastError || new Error("Dahl request failed.");
     }
 
     async function auditActiveFile() {
@@ -1238,7 +1241,7 @@
             if (btnEl) btnEl.innerText = "COMMIT FAILED";
         }
         setMoodState("standby");
-        if (btnEl) setTimeout(() => { btnEl.innerText = "🌀 SWALLOW"; }, 3000);
+        if (btnEl) setTimeout(() => { btnEl.innerText = "SWALLOW"; }, 3000);
     }
 
     function initSpeechRecognition() {
