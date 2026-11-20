@@ -16,11 +16,11 @@
     --text-muted: #8b9bb4;
     --pane-bg: #0a0e17;
     --state-color: var(--standby);
-    --state-glow: rgba(0, 229, 195, 0.24);
-    --state-glow-peak: rgba(0, 229, 195, 0.44);
-    --state-border-alpha: rgba(0, 229, 195, 0.55);
-    --state-border-peak: rgba(0, 229, 195, 0.95);
-    --pulse-duration: 4.5s;
+    --state-glow: rgba(0, 229, 195, 0.28);
+    --state-glow-peak: rgba(0, 229, 195, 0.56);
+    --state-border-alpha: rgba(0, 229, 195, 0.52);
+    --state-border-peak: rgba(0, 229, 195, 0.98);
+    --pulse-duration: 4.2s;
 }
 
 *, *::before, *::after {
@@ -50,62 +50,62 @@ body.workbench-lock {
     outline-offset: 2px;
 }
 
-/* Mood states */
+/* Expressive yet disciplined military-grade mood states */
 body.is-standby {
     --state-color: var(--standby);
-    --state-glow: rgba(0, 229, 195, 0.22);
-    --state-glow-peak: rgba(0, 229, 195, 0.40);
-    --state-border-alpha: rgba(0, 229, 195, 0.45);
-    --state-border-peak: rgba(0, 229, 195, 0.88);
-    --pulse-duration: 4.5s;
+    --state-glow: rgba(0, 229, 195, 0.28);
+    --state-glow-peak: rgba(0, 229, 195, 0.56);
+    --state-border-alpha: rgba(0, 229, 195, 0.52);
+    --state-border-peak: rgba(0, 229, 195, 0.98);
+    --pulse-duration: 4.2s;
 }
 body.is-thinking {
     --state-color: var(--thinking);
-    --state-glow: rgba(59, 130, 246, 0.28);
-    --state-glow-peak: rgba(59, 130, 246, 0.56);
-    --state-border-alpha: rgba(59, 130, 246, 0.60);
+    --state-glow: rgba(59, 130, 246, 0.34);
+    --state-glow-peak: rgba(59, 130, 246, 0.66);
+    --state-border-alpha: rgba(59, 130, 246, 0.65);
     --state-border-peak: rgba(59, 130, 246, 1);
-    --pulse-duration: 1.7s;
+    --pulse-duration: 1.6s;
 }
 body.is-responding {
     --state-color: var(--responding);
-    --state-glow: rgba(34, 197, 94, 0.28);
-    --state-glow-peak: rgba(34, 197, 94, 0.54);
-    --state-border-alpha: rgba(34, 197, 94, 0.60);
+    --state-glow: rgba(34, 197, 94, 0.32);
+    --state-glow-peak: rgba(34, 197, 94, 0.62);
+    --state-border-alpha: rgba(34, 197, 94, 0.65);
     --state-border-peak: rgba(34, 197, 94, 1);
-    --pulse-duration: 2.2s;
+    --pulse-duration: 2.1s;
 }
 body.is-saving {
     --state-color: var(--saving);
-    --state-glow: rgba(245, 158, 11, 0.30);
-    --state-glow-peak: rgba(245, 158, 11, 0.58);
-    --state-border-alpha: rgba(245, 158, 11, 0.65);
+    --state-glow: rgba(245, 158, 11, 0.35);
+    --state-glow-peak: rgba(245, 158, 11, 0.66);
+    --state-border-alpha: rgba(245, 158, 11, 0.70);
     --state-border-peak: rgba(245, 158, 11, 1);
-    --pulse-duration: 1.5s;
+    --pulse-duration: 1.45s;
 }
 body.is-error {
     --state-color: var(--error);
-    --state-glow: rgba(244, 63, 94, 0.36);
-    --state-glow-peak: rgba(244, 63, 94, 0.68);
-    --state-border-alpha: rgba(244, 63, 94, 0.75);
+    --state-glow: rgba(244, 63, 94, 0.42);
+    --state-glow-peak: rgba(244, 63, 94, 0.75);
+    --state-border-alpha: rgba(244, 63, 94, 0.80);
     --state-border-peak: rgba(244, 63, 94, 1);
-    --pulse-duration: 1.05s;
+    --pulse-duration: 1.0s;
 }
 body.is-speaking {
     --state-color: var(--speaking);
-    --state-glow: rgba(56, 189, 248, 0.30);
-    --state-glow-peak: rgba(56, 189, 248, 0.58);
-    --state-border-alpha: rgba(56, 189, 248, 0.65);
+    --state-glow: rgba(56, 189, 248, 0.35);
+    --state-glow-peak: rgba(56, 189, 248, 0.66);
+    --state-border-alpha: rgba(56, 189, 248, 0.70);
     --state-border-peak: rgba(56, 189, 248, 1);
-    --pulse-duration: 1.9s;
+    --pulse-duration: 1.85s;
 }
 body.is-listening {
     --state-color: var(--listening);
-    --state-glow: rgba(168, 85, 247, 0.30);
-    --state-glow-peak: rgba(168, 85, 247, 0.60);
-    --state-border-alpha: rgba(168, 85, 247, 0.65);
+    --state-glow: rgba(168, 85, 247, 0.35);
+    --state-glow-peak: rgba(168, 85, 247, 0.68);
+    --state-border-alpha: rgba(168, 85, 247, 0.70);
     --state-border-peak: rgba(168, 85, 247, 1);
-    --pulse-duration: 1.6s;
+    --pulse-duration: 1.55s;
 }
 
 /* Distinct V4 Room Modes */
@@ -116,7 +116,6 @@ body.decor-military-calm {
     --pane-bg: #0a0e17;
     --border-subtle: #222d42;
 }
-
 body.decor-night-watch {
     --bg-dark: #030508;
     --bg-surface: #080c12;
@@ -126,7 +125,6 @@ body.decor-night-watch {
     --text-light: #d7e2f0;
     --text-muted: #6f8099;
 }
-
 body.decor-war-room-brief {
     --bg-dark: #090e17;
     --bg-surface: #121b2b;
@@ -141,35 +139,50 @@ body.decor-war-room-brief {
     0%, 100% {
         box-shadow:
             inset 0 0 0 1px var(--state-border-alpha),
-            inset 0 0 10px var(--state-glow),
-            0 0 8px var(--state-glow);
+            inset 0 0 14px var(--state-glow),
+            0 0 10px var(--state-glow);
     }
     50% {
         box-shadow:
             inset 0 0 0 1.5px var(--state-border-peak),
-            inset 0 0 22px var(--state-glow-peak),
-            0 0 22px var(--state-glow-peak);
+            inset 0 0 28px var(--state-glow-peak),
+            0 0 28px var(--state-glow-peak);
     }
 }
 
 @keyframes dot-breathe {
     0%, 100% {
-        transform: scale(0.9);
+        transform: scale(0.88);
         opacity: 0.72;
-        box-shadow: 0 0 6px var(--state-color);
+        box-shadow: 0 0 8px var(--state-color);
     }
     50% {
-        transform: scale(1.18);
+        transform: scale(1.26);
         opacity: 1;
-        box-shadow: 0 0 16px var(--state-color), 0 0 26px var(--state-glow-peak);
+        box-shadow: 0 0 18px var(--state-color), 0 0 32px var(--state-glow-peak);
     }
+}
+
+@keyframes mode-aura-breathe {
+    0%, 100% {
+        background-image: radial-gradient(circle at top right, var(--state-glow), transparent 58%);
+    }
+    50% {
+        background-image: radial-gradient(circle at top right, var(--state-glow-peak), transparent 64%);
+    }
+}
+
+body.workbench-lock .chat-pane,
+body.workbench-lock .github-pane {
+    animation: state-border-breathe var(--pulse-duration) ease-in-out infinite, mode-aura-breathe var(--pulse-duration) ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
     .military-top-bar,
     .github-pane,
     .chat-pane,
-    .status-dot {
+    .status-dot,
+    .v4-page-hero {
         animation: none !important;
     }
 }
@@ -195,8 +208,8 @@ body.decor-war-room-brief {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px 12px;
-    gap: 8px;
+    padding: 5px 12px;
+    gap: 10px;
     flex-wrap: wrap;
     font-size: 11px;
     z-index: 100;
@@ -206,21 +219,18 @@ body.decor-war-room-brief {
 .top-status-indicator {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     color: var(--state-color);
     font-weight: bold;
     flex-wrap: wrap;
 }
 
-.top-controls-left,
-.top-controls-right {
+.top-controls-cluster {
     display: flex;
     gap: 6px;
     align-items: center;
+    justify-content: flex-end;
     flex-wrap: wrap;
-}
-
-.top-controls-right {
     margin-left: auto;
 }
 
@@ -262,7 +272,7 @@ body.decor-war-room-brief {
     padding: 10px;
     gap: 8px;
     overflow: hidden;
-    animation: state-border-breathe var(--pulse-duration) ease-in-out infinite;
+    transition: border-color 0.25s ease;
 }
 
 .chat-pane {
@@ -273,7 +283,7 @@ body.decor-war-room-brief {
     background: var(--bg-dark);
     overflow: hidden;
     position: relative;
-    animation: state-border-breathe var(--pulse-duration) ease-in-out infinite;
+    transition: border-color 0.25s ease;
 }
 
 body.is-fullpage .github-pane { display: none; }
@@ -313,7 +323,6 @@ body.is-fullpage #fullpage-btn { border-color: var(--standby); color: var(--stan
     text-align: center;
     cursor: pointer;
 }
-
 .repo-file-card:hover,
 .repo-file-card:focus {
     border-color: var(--state-color);
@@ -371,7 +380,6 @@ body.is-fullpage #fullpage-btn { border-color: var(--standby); color: var(--stan
     border-radius: 3px;
     resize: none;
 }
-
 #repo-code-editor:focus { border-color: var(--state-color); outline: none; }
 
 .v4-vision-strip {
@@ -579,9 +587,9 @@ body.is-fullpage #fullpage-btn { border-color: var(--standby); color: var(--stan
     color: var(--listening) !important;
 }
 
-/* Styled sub-pages: intro.html & tree-of-life.html */
+/* Military-grade sub-pages: intro.html & tree-of-life.html */
 .v4-page-wrap {
-    max-width: 1120px;
+    max-width: 1180px;
     margin: 0 auto;
     padding: 18px 16px 36px;
     display: flex;
@@ -593,12 +601,13 @@ body.is-fullpage #fullpage-btn { border-color: var(--standby); color: var(--stan
     background: var(--bg-surface);
     border: 1px solid var(--state-color);
     border-radius: 4px;
-    padding: 14px 16px;
+    padding: 16px 18px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
+    animation: state-border-breathe var(--pulse-duration) ease-in-out infinite;
 }
 
 .v4-page-title {
@@ -613,6 +622,12 @@ body.is-fullpage #fullpage-btn { border-color: var(--standby); color: var(--stan
     color: var(--state-color);
     letter-spacing: 0.08em;
     font-weight: bold;
+}
+
+.v4-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
 }
 
 .v4-card {
@@ -654,7 +669,6 @@ body.is-fullpage #fullpage-btn { border-color: var(--standby); color: var(--stan
     align-items: center;
     gap: 6px;
 }
-
 .v4-link-chip:hover {
     border-color: var(--state-color);
     color: var(--state-color);
