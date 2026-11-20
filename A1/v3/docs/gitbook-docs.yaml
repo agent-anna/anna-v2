@@ -6,11 +6,12 @@ site:
       key: section-1
       title: Agent Anna Docs
       path: agent-anna-docs
+      description: ""
       default: true
       children:
         - type: space
           key: space-1
-          title: Documentation
+          title: Agent Anna Docs
           path: documentation
           default: true
           content:
