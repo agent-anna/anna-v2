@@ -1,53 +1,36 @@
 /**
  * ANNA V3 // BRAIN MANAGER
- * Load and cache the soul brain.json identity file from GitHub
- * Version: AA01-V2-CLEAN
- * Date: 2026-11-18
+ * Load and cache the V3 brain.json identity file from A1/v3/memory/brain.json
+ * Version: AA01-V3-CLEAN
  */
 
 const Brain = {
   config: {
-    path: 'A1/v3/soul/brain.json',
-    branch: null, // defaults to repo default
+    path: 'A1/v3/memory/brain.json',
+    branch: null,
   },
 
-  // In-memory cache
   _cache: null,
 
-  // Default brain returned on first boot or 404
   _default: {
     name: 'Agent Anna',
-    version: 'V3',
+    version: 'V3-AA01',
     mission: '',
     goals: [],
     settings: {},
   },
 
-  /**
-   * Configure brain path
-   * @param {object} cfg - { path?, branch? }
-   */
   configure(cfg) {
     this.config = { ...this.config, ...cfg };
   },
 
-  /**
-   * Decode GitHub Base64 content with full UTF-8 support
-   * @param {object|string} data - GitHub API file object or raw string
-   * @returns {string} Decoded string
-   */
   _decode(data) {
-    const raw = typeof data === 'string' ? data : data.content || '';
+    const raw = typeof data === 'string' ? data : (data && data.content) || '';
     const cleaned = raw.replace(/\s/g, '');
-    const binary = atob(cleaned);
-    return decodeURIComponent(escape(binary));
+    const bin = atob(cleaned);
+    return new TextDecoder().decode(Uint8Array.from(bin, (m) => m.codePointAt(0)));
   },
 
-  /**
-   * Load brain.json from GitHub (uses cache unless force=true)
-   * @param {boolean} force - Bypass cache
-   * @returns {Promise<object>} Parsed brain object
-   */
   async load(force = false) {
     if (!force && this._cache !== null) {
       return this._cache;
@@ -57,11 +40,12 @@ const Brain = {
     try {
       const data = await GitHub.get(path);
       const decoded = this._decode(data);
-      const parsed = Utils.safeParse(decoded, { ...this._default });
+      const parsed = typeof Utils !== 'undefined' && typeof Utils.safeParse === 'function'
+        ? Utils.safeParse(decoded, { ...this._default })
+        : JSON.parse(decoded);
       this._cache = parsed;
       return parsed;
     } catch (error) {
-      // First boot: file doesn't exist yet — return clean default
       if (error.status === 404) {
         this._cache = { ...this._default };
         return this._cache;
@@ -70,42 +54,26 @@ const Brain = {
     }
   },
 
-  /**
-   * Reload brain from GitHub, bypassing cache
-   * @returns {Promise<object>} Fresh brain object
-   */
   async reload() {
     return this.load(true);
   },
 
-  /**
-   * Clear in-memory cache — next load() hits GitHub
-   */
   clearCache() {
     this._cache = null;
   },
 
-  /**
-   * Return a compact token-light summary string for system prompts
-   * @returns {Promise<string>} Summary line
-   */
   async getSummary() {
     const brain = await this.load();
     const name = brain.name || 'Agent Anna';
-    const version = brain.version || 'V3';
+    const version = brain.version || 'V3-AA01';
     const mission = brain.mission || 'No mission set.';
     const goalCount = Array.isArray(brain.goals) ? brain.goals.length : 0;
     return `[BRAIN] ${name} ${version} | ${mission} | ${goalCount} active goal${goalCount !== 1 ? 's' : ''}`;
   },
 
-  /**
-   * Get a specific field from brain (dot-notation safe)
-   * @param {string} key - Field path e.g. 'settings.voice'
-   * @returns {Promise<any>} Field value or undefined
-   */
   async get(key) {
     const brain = await this.load();
-    return key.split('.').reduce((obj, k) => obj && obj[k], brain);
+    return key.split('.').reduce((obj, k) => (obj && obj[k] !== undefined ? obj[k] : undefined), brain);
   },
 };
 
