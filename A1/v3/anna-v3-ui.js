@@ -110,6 +110,37 @@
         return localStorage.getItem("DAHL_MODEL") || DEFAULT_MODEL;
     }
 
+    function syncSharedModules() {
+        const token = getCleanGitHubToken();
+        if (window.GitHub && typeof window.GitHub.configure === "function" && token) {
+            try {
+                window.GitHub.configure({
+                    owner: GITHUB_REPO_OWNER,
+                    repo: GITHUB_REPO_NAME,
+                    branch: activeBranch || "main",
+                    token
+                });
+            } catch (e) {}
+        }
+        if (window.Brain && typeof window.Brain.configure === "function") {
+            try {
+                window.Brain.configure({
+                    path: `${WORKSPACE_ROOT}/memory/brain.json`,
+                    branch: activeBranch || "main"
+                });
+            } catch (e) {}
+        }
+        if (window.Memory && typeof window.Memory.configure === "function") {
+            try {
+                window.Memory.configure({
+                    owner: GITHUB_REPO_OWNER,
+                    repo: GITHUB_REPO_NAME,
+                    branch: activeBranch || "main"
+                });
+            } catch (e) {}
+        }
+    }
+
     function setActionsStatus(label, statusClass) {
         const badge = document.getElementById("actions-status");
         if (!badge) return;
@@ -125,9 +156,6 @@
         document.body.classList.add(`is-${target}`);
         const stEl = document.getElementById("state-text");
         if (stEl) stEl.innerText = `${target.toUpperCase()} // AGENT ANNA V3 (A1)`;
-        if (window.Brain && typeof window.Brain.setState === "function") {
-            try { window.Brain.setState(target.toUpperCase()); } catch (e) {}
-        }
     }
 
     function updateKeyBadge() {
@@ -416,6 +444,7 @@
             toggleSettings();
             return;
         }
+        syncSharedModules();
         const feedMode = (mode || "url").trim().toLowerCase() === "search" ? "search" : "url";
         const val = (targetUrl || "https://martinstrayd.github.io/artist/").trim();
         const slug = (outputSlug || "strayd-artist-live").trim();
@@ -571,10 +600,15 @@
     async function writeFileToGitHub(path, content, commitMessage) {
         if (!canWritePath(path)) return false;
         setMoodState("saving");
-        if (window.GitHub && typeof window.GitHub.upsert === "function") {
+        syncSharedModules();
+        if (window.GitHub && typeof window.GitHub.upsert === "function" && getCleanGitHubToken()) {
             try {
-                const r = await window.GitHub.upsert(path, content, commitMessage);
-                if (r && (r.ok || r.commit)) return true;
+                const r = await window.GitHub.upsert(path, {
+                    content,
+                    message: commitMessage,
+                    branch: activeBranch || "main"
+                });
+                if (r && (r.ok || r.commit || r.content)) return true;
             } catch (e) {}
         }
         const sha = await getLatestFileSha(path);
@@ -753,6 +787,13 @@
         if (isSyncing) return;
         isSyncing = true;
         try {
+            syncSharedModules();
+            if (window.Brain && typeof window.Brain.clearCache === "function") {
+                try { window.Brain.clearCache(); } catch (e) {}
+            }
+            if (window.Memory && typeof window.Memory.clearCache === "function") {
+                try { window.Memory.clearCache(); } catch (e) {}
+            }
             await fetchRepoTree();
             await ingestCoreVaultAssets();
         } finally {
@@ -1315,6 +1356,7 @@
         if (ghToken) localStorage.setItem("GITHUB_PAT", ghToken);
         localStorage.setItem("DAHL_MODEL", selectedModel);
 
+        syncSharedModules();
         updateKeyBadge();
         toggleSettings();
         await syncAll();
@@ -1402,6 +1444,7 @@
         const topSelect = document.getElementById("model-select");
         if (topSelect) topSelect.value = savedModel;
 
+        syncSharedModules();
         updateKeyBadge();
         setActionsStatus("IDLE", "");
         syncFullPageButtonUi();
