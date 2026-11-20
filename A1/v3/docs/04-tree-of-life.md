@@ -1,5 +1,5 @@
 # 4. Living Tree of Life System Map
-_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T05:13:47.675076+00:00`_
+_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T06:55:08.660593+00:00`_
 
 ## The Roots (Core Config & Memory)
 - `A1/v3/docs/01-the-roots.md`
@@ -23,6 +23,7 @@ _Auto-generated on push to `A1/v3/docs/` at `2026-11-20T05:13:47.675076+00:00`_
 - `A1/v3/plain-anna-index.html`
 
 ## The Branches (Active GitHub Actions Workflows)
+- **AA01 Bible, Catalog & Feed Action** (`.github/workflows/aa01-bible-and-feed.yml`)
 - **AA01 Grounded Intel & Feed Sync** (`.github/workflows/aa01-intel-feed.yml`)
 - **Agent Anna V3 Autonomous Audit** (`.github/workflows/anna-autonomous-audit.yml`)
 - **AA01 Book-Triggered Tree of Life Sync** (`.github/workflows/book-tree-sync.yml`)
