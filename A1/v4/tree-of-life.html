@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AA01 // Tree of Life &amp; Flip Reader</title>
+  <link rel="stylesheet" href="./v4.css" />
+</head>
+<body class="state-ready">
+  <div class="shell">
+    <header class="top-bar">
+      <div>
+        <div class="eyebrow">AA01 // TREE OF LIFE &amp; LINK REGISTRY</div>
+        <h1>One-Touch Fingers, Branches &amp; Page Flip</h1>
+      </div>
+      <div class="row">
+        <a class="nav-link" href="./index.html">BACK TO V4 COCKPIT</a>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="panel" aria-label="One-Touch Links & Add Link">
+        <h2>Connected Links (No Guessing)</h2>
+        <p class="hint">Instant one-touch links for Anna's channels, Martin's hubs, and new accounts added as V4 grows.</p>
+        <div id="links-container"></div>
+
+        <h2 style="margin-top:16px;">Add New Link</h2>
+        <div class="row">
+          <select id="new-group">
+            <option value="anna-socials">Anna Social &amp; Broadcast Fingers</option>
+            <option value="martin-and-ops">Martin &amp; Command Branches</option>
+          </select>
+          <input id="new-label" type="text" placeholder="Label (e.g. Anna New TikTok)" />
+          <input id="new-url" type="url" placeholder="https://..." />
+          <button id="btn-add-link" type="button">ADD LINK</button>
+        </div>
+        <div class="row">
+          <button id="btn-copy-json" type="button">COPY UPDATED REGISTRY JSON</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Book Page Flip View">
+        <h2>Handbook &amp; OPORD Page Flip</h2>
+        <p class="hint">Flip cleanly through core handbook and V4 order files without cluttering the main cockpit.</p>
+        <div class="row">
+          <button id="btn-prev-page" type="button">PREV PAGE</button>
+          <button id="btn-next-page" type="button">NEXT PAGE</button>
+          <span id="page-indicator" class="meta">Page 1</span>
+        </div>
+        <pre id="page-viewer" class="log" style="max-height:360px;">Loading page...</pre>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./tree-of-life.js"></script>
+</body>
+</html>
