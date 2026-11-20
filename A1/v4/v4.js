@@ -1147,7 +1147,7 @@
     function toggleVoice() {
         isVoiceEnabled = !isVoiceEnabled;
         const btn = document.getElementById("voice-btn");
-        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF"; const vBadge = document.getElementById("voice-profile-badge"); if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";
+        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF"; const vBadge = document.getElementById("voice-profile-badge"); if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF"; const vBadge = document.getElementById("voice-profile-badge"); if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";
         if (!isVoiceEnabled) executeStfuProtocol();
         else speakText("Voice on.");
     }
