@@ -4,14 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AA01 // TREE OF LIFE, GITBOOK &amp; PAGE FLIP</title>
-    <link rel="stylesheet" href="./v4.css?v=4.3">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👩‍💻</text></svg>">
+    <link rel="stylesheet" href="./v4.css?v=4.5">
+    <style>
+        body {
+            background-color: var(--bg-dark, #06080d);
+            color: var(--text-light, #eef2f7);
+            font-family: "Courier New", "Lucida Console", monospace;
+        }
+        .v4-page-wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 18px 16px 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .v4-page-hero {
+            background: #0d121c;
+            border: 1px solid #00e5c3;
+            border-radius: 4px;
+            padding: 16px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+        }
+        .v4-eyebrow {
+            font-size: 10px;
+            color: #00e5c3;
+            letter-spacing: 0.08em;
+            font-weight: bold;
+        }
+        .v4-page-title {
+            font-size: 16px;
+            color: #f0c44d;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        .v4-card {
+            background: #0d121c;
+            border: 1px solid #222d42;
+            border-radius: 4px;
+            padding: 14px 16px;
+        }
+        .v4-card h2 {
+            font-size: 12px;
+            color: #f0c44d;
+            margin-bottom: 6px;
+        }
+        .v4-card p {
+            font-size: 11px;
+            color: #cbd5e1;
+            line-height: 1.55;
+            margin-bottom: 10px;
+        }
+        .v4-chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .v4-link-chip {
+            background: #141b29;
+            border: 1px solid #f0c44d;
+            color: #eef2f7;
+            padding: 6px 11px;
+            border-radius: 3px;
+            font-size: 11px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+        }
+        .v4-link-chip:hover {
+            border-color: #00e5c3;
+            color: #00e5c3;
+        }
+        .v4-form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .v4-input,
+        .v4-select {
+            background: #06080d;
+            border: 1px solid #222d42;
+            color: #eef2f7;
+            padding: 7px 10px;
+            border-radius: 3px;
+            font-family: inherit;
+            font-size: 11px;
+        }
+        .v4-doc-reader {
+            background: #06080d;
+            border: 1px solid #222d42;
+            border-radius: 3px;
+            padding: 12px 14px;
+            font-size: 11px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 440px;
+            overflow-y: auto;
+            margin-top: 10px;
+            color: #eef2f7;
+        }
+    </style>
 </head>
 <body class="is-standby decor-military-calm">
     <div class="military-top-bar">
         <div class="top-status-indicator">
             <div class="status-dot" aria-hidden="true"></div>
             <span>STANDBY // TREE OF LIFE &amp; FLIPBOOK</span>
-            <span class="status-badge" id="registry-status">REGISTRY: LOADING</span>
+            <span class="status-badge" id="registry-status">REGISTRY: READY</span>
             <span class="status-badge">VOICE: ANNA</span>
         </div>
         <div class="top-controls-cluster">
@@ -35,7 +145,7 @@
 
         <div class="v4-card">
             <h2>Connected Links</h2>
-            <p>One-touch links for Agent Anna channels, Martin hubs, and added accounts from links-registry.json.</p>
+            <p>One-touch links for Agent Anna channels, Martin hubs, GitBook docs, and added registry links.</p>
             <div id="links-groups-container"></div>
         </div>
 
@@ -46,12 +156,12 @@
                     <option value="anna">Anna Social &amp; Broadcast Fingers</option>
                     <option value="martin">Martin &amp; Command Branches</option>
                 </select>
-                <input id="new-link-label" class="v4-input" type="text" placeholder="Label (e.g. Anna GitBook / Channel)" aria-label="Link Label">
+                <input id="new-link-label" class="v4-input" type="text" placeholder="Label (e.g. Anna GitBook)" aria-label="Link Label">
                 <input id="new-link-url" class="v4-input" type="url" placeholder="https://..." aria-label="Link URL">
                 <button id="btn-add-link" class="ctrl-btn military-btn" type="button">ADD LINK</button>
                 <button id="btn-copy-json" class="ctrl-btn" type="button">COPY REGISTRY JSON</button>
             </div>
-            <div id="registry-feedback" style="margin-top:8px; font-size:10px; color:var(--standby);"></div>
+            <div id="registry-feedback" style="margin-top:8px; font-size:10px; color:#00e5c3;"></div>
         </div>
 
         <div class="v4-card">
@@ -59,18 +169,182 @@
             <div class="v4-form-row">
                 <button id="btn-prev-page" class="ctrl-btn military-btn" type="button">PREV PAGE</button>
                 <button id="btn-next-page" class="ctrl-btn military-btn" type="button">NEXT PAGE</button>
-                <span id="page-indicator" style="font-size:11px; color:var(--gold);">Loading pages...</span>
+                <span id="page-indicator" style="font-size:11px; color:#f0c44d;">Page 1 of 3</span>
             </div>
-            <div id="page-reader" class="v4-doc-reader">Loading handbook/OPORD page...</div>
+            <div id="page-reader" class="v4-doc-reader">Loading page...</div>
         </div>
     </div>
 
-    <script src="./tree-of-life.js?v=4.3"></script>
     <script>
         (function () {
-            const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
-            document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
-            document.body.classList.add("decor-" + savedDecor);
+            "use strict";
+
+            try {
+                const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
+                document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
+                document.body.classList.add("decor-" + savedDecor);
+            } catch (e) {}
+
+            const DEFAULT_REGISTRY = {
+                anna: [
+                    { label: "Anna YouTube", url: "https://www.youtube.com/@AgentAnnaAA01" },
+                    { label: "Anna X.com", url: "https://x.com/AgentAnnaAA01" },
+                    { label: "GitBook Landing", url: "../v3/docs/agent-anna-docs/landing-page/README.md" },
+                    { label: "GitBook SUMMARY", url: "../v3/docs/SUMMARY.md" }
+                ],
+                martin: [
+                    { label: "GitHub Repo (anna-v2)", url: "https://github.com/agent-anna/anna-v2" },
+                    { label: "V4 Workbench", url: "./index.html" },
+                    { label: "V4 Briefing", url: "./intro.html" }
+                ]
+            };
+
+            let registryData = DEFAULT_REGISTRY;
+            let pagesList = [
+                {
+                    title: "Page 1/3: V3-to-V4 Complete Handbook",
+                    path: "../v3/docs/anna-v3-to-v4-handbook/AGENT_ANNA_V3_TO_V4_COMPLETE_HANDBOOK.md",
+                    fallback: "Open ../v3/docs/anna-v3-to-v4-handbook/AGENT_ANNA_V3_TO_V4_COMPLETE_HANDBOOK.md for the full 21-page handbook."
+                },
+                {
+                    title: "Page 2/3: OPORD-AA01-V4-DEPLOYMENT",
+                    path: "./docs/OPORD-AA01-V4-DEPLOYMENT.md",
+                    fallback: "Open ./docs/OPORD-AA01-V4-DEPLOYMENT.md for operational guardrails, thin cockpit rules, and A1/v3 protection."
+                },
+                {
+                    title: "Page 3/3: GitBook Summary & Landing Index",
+                    path: "../v3/docs/SUMMARY.md",
+                    fallback: "Open ../v3/docs/SUMMARY.md and ../v3/docs/agent-anna-docs/landing-page/README.md for GitBook documentation."
+                }
+            ];
+            let currentPageIndex = 0;
+
+            function renderRegistry() {
+                const container = document.getElementById("links-groups-container");
+                if (!container) return;
+                container.innerHTML = "";
+
+                const sections = [
+                    { key: "anna", title: "Anna Channels & GitBook" },
+                    { key: "martin", title: "Martin & Command Branches" }
+                ];
+
+                sections.forEach((sec) => {
+                    const items = Array.isArray(registryData[sec.key]) ? registryData[sec.key] : [];
+                    const heading = document.createElement("div");
+                    heading.style.cssText = "font-size:11px; color:#f0c44d; font-weight:bold; margin-top:10px;";
+                    heading.textContent = sec.title;
+                    container.appendChild(heading);
+
+                    const grid = document.createElement("div");
+                    grid.className = "v4-chip-grid";
+
+                    items.forEach((item) => {
+                        if (!item || !item.url) return;
+                        const a = document.createElement("a");
+                        a.className = "v4-link-chip";
+                        a.href = item.url;
+                        if (/^https?:\/\//i.test(item.url) || item.url.endsWith(".md")) {
+                            a.target = "_blank";
+                            a.rel = "noopener";
+                        }
+                        a.textContent = (item.label || item.url) + " ->";
+                        grid.appendChild(a);
+                    });
+
+                    container.appendChild(grid);
+                });
+
+                const badge = document.getElementById("registry-status");
+                if (badge) {
+                    badge.textContent = "REGISTRY: ACTIVE";
+                    badge.className = "status-badge ok";
+                }
+            }
+
+            async function loadRegistryJson() {
+                try {
+                    const res = await fetch("./registry/links-registry.json?v=" + Date.now(), { cache: "no-store" });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json && typeof json === "object") {
+                            registryData = {
+                                anna: Array.isArray(json.anna) && json.anna.length ? json.anna : DEFAULT_REGISTRY.anna,
+                                martin: Array.isArray(json.martin) && json.martin.length ? json.martin : DEFAULT_REGISTRY.martin
+                            };
+                        }
+                    }
+                } catch (e) {}
+                renderRegistry();
+            }
+
+            async function showPage(idx) {
+                if (!pagesList.length) return;
+                currentPageIndex = ((idx % pagesList.length) + pagesList.length) % pagesList.length;
+                const page = pagesList[currentPageIndex];
+                const ind = document.getElementById("page-indicator");
+                const reader = document.getElementById("page-reader");
+                if (ind) ind.textContent = page.title;
+                if (!reader) return;
+
+                reader.textContent = "Loading " + page.path + "...";
+                try {
+                    const res = await fetch(page.path + "?v=" + Date.now(), { cache: "no-store" });
+                    if (res.ok) {
+                        const txt = await res.text();
+                        reader.textContent = txt.slice(0, 12000) || page.fallback;
+                        return;
+                    }
+                } catch (e) {}
+                reader.textContent = page.fallback;
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                loadRegistryJson();
+                showPage(0);
+
+                const addBtn = document.getElementById("btn-add-link");
+                if (addBtn) {
+                    addBtn.addEventListener("click", () => {
+                        const grpEl = document.getElementById("new-link-group");
+                        const lblEl = document.getElementById("new-link-label");
+                        const urlEl = document.getElementById("new-link-url");
+                        const fbEl = document.getElementById("registry-feedback");
+                        const grp = grpEl ? grpEl.value : "anna";
+                        const label = lblEl ? lblEl.value.trim() : "";
+                        const url = urlEl ? urlEl.value.trim() : "";
+                        if (!label || !url) {
+                            if (fbEl) fbEl.textContent = "Enter both a label and URL first.";
+                            return;
+                        }
+                        if (!Array.isArray(registryData[grp])) registryData[grp] = [];
+                        registryData[grp].push({ label, url });
+                        if (lblEl) lblEl.value = "";
+                        if (urlEl) urlEl.value = "";
+                        renderRegistry();
+                        if (fbEl) fbEl.textContent = "Added link to session registry. Use COPY REGISTRY JSON to save to links-registry.json.";
+                    });
+                }
+
+                const copyBtn = document.getElementById("btn-copy-json");
+                if (copyBtn) {
+                    copyBtn.addEventListener("click", () => {
+                        const fbEl = document.getElementById("registry-feedback");
+                        const serialized = JSON.stringify(registryData, null, 2);
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(serialized).then(() => {
+                                if (fbEl) fbEl.textContent = "Copied registry JSON to clipboard.";
+                            }).catch(() => {});
+                        }
+                    });
+                }
+
+                const prevBtn = document.getElementById("btn-prev-page");
+                if (prevBtn) prevBtn.addEventListener("click", () => showPage(currentPageIndex - 1));
+
+                const nextBtn = document.getElementById("btn-next-page");
+                if (nextBtn) nextBtn.addEventListener("click", () => showPage(currentPageIndex + 1));
+            });
         })();
     </script>
 </body>
