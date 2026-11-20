@@ -464,12 +464,12 @@
     }
 
     async function fetchWithTimeout(url, opts, timeoutMs) {
-        const ms = timeoutMs || 12000;
+        const ms = Math.max(Number(timeoutMs) || 60000, 60000);
         if (typeof AbortController === "undefined") {
             return await fetch(url, opts || {});
         }
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), ms);
+        const timer = setTimeout(() => controller.abort("Request timed out after " + ms + "ms"), ms);
         try {
             return await fetch(url, { ...(opts || {}), signal: controller.signal });
         } finally {
