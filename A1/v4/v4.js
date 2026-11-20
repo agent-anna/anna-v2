@@ -1348,3 +1348,38 @@
         const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
         applyRoomDecorVisuals(savedDecor);
     });
+
+    function applyRoomDecorVisuals(mode) {
+        const cleanMode = ["military-calm", "night-watch", "war-room-brief"].includes(mode) ? mode : "military-calm";
+        document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
+        document.body.classList.add(`decor-${cleanMode}`);
+        localStorage.setItem("ANNA_V4_DECOR", cleanMode);
+        const sel = document.getElementById("room-decor-select");
+        if (sel && sel.value !== cleanMode) sel.value = cleanMode;
+    }
+
+    function applyPulseCadence(scale) {
+        const parsed = parseFloat(scale);
+        const safeScale = Number.isFinite(parsed) && parsed > 0.2 && parsed < 3 ? parsed : 1;
+        document.documentElement.style.setProperty("--pulse-scale", String(safeScale));
+        localStorage.setItem("ANNA_V4_PULSE_SCALE", String(safeScale));
+        const sel = document.getElementById("pulse-cadence-select");
+        if (sel && Math.abs(parseFloat(sel.value) - safeScale) > 0.01) {
+            sel.value = String(safeScale);
+        }
+    }
+
+    window.updateRoomDecor = function updateRoomDecor() {
+        const sel = document.getElementById("room-decor-select");
+        applyRoomDecorVisuals((sel && sel.value) || "military-calm");
+    };
+
+    window.updatePulseCadence = function updatePulseCadence() {
+        const sel = document.getElementById("pulse-cadence-select");
+        applyPulseCadence((sel && sel.value) || "1");
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+        applyRoomDecorVisuals(localStorage.getItem("ANNA_V4_DECOR") || "military-calm");
+        applyPulseCadence(localStorage.getItem("ANNA_V4_PULSE_SCALE") || "1");
+    });
