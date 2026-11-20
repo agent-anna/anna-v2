@@ -1,8 +1,7 @@
 /**
  * ANNA V3 // GITHUB REST API WRAPPER
- * Clean GitHub API client using Utils.retry and AbortController timeouts
- * Version: AA01-V2-CLEAN
- * Date: 2026-11-18
+ * Clean GitHub API client with AbortController timeouts and retry
+ * Version: AA01-V3-CLEAN
  */
 
 const GitHub = {
@@ -14,10 +13,6 @@ const GitHub = {
     timeout: 15000,
   },
 
-  /**
-   * Configure the GitHub client
-   * @param {object} cfg - { owner, repo, token, branch?, timeout? }
-   */
   configure(cfg) {
     this.config = { ...this.config, ...cfg };
     this._validateConfig();
@@ -39,18 +34,17 @@ const GitHub = {
     };
   },
 
-  /**
-   * Make an authenticated GitHub API request with timeout
-   * @param {string} method - HTTP method
-   * @param {string} endpoint - API endpoint
-   * @param {object} body - Request body
-   * @param {object} query - URL query params
-   * @returns {Promise<object>} Parsed JSON response
-   */
+  _encodeUtf8Base64(str) {
+    const bytes = new TextEncoder().encode(String(str ?? ''));
+    let bin = '';
+    bytes.forEach((b) => { bin += String.fromCodePoint(b); });
+    return btoa(bin);
+  },
+
   async request(method, endpoint, body = null, query = null) {
     this._validateConfig();
 
-    const { owner, repo, token, timeout } = this.config;
+    const { owner, repo, timeout } = this.config;
     let url = `https://api.github.com/repos/${owner}/${repo}${endpoint}`;
 
     if (query) {
@@ -97,15 +91,6 @@ const GitHub = {
     }
   },
 
-  /**
-   * Wrapped request with exponential retry
-   * @param {string} method - HTTP method
-   * @param {string} endpoint - API endpoint
-   * @param {object} body - Request body
-   * @param {object} query - URL query params
-   * @param {object} retryOpts - Options for Utils.retry
-   * @returns {Promise<object>} Parsed JSON response
-   */
   async requestWithRetry(method, endpoint, body = null, query = null, retryOpts = {}) {
     const { maxRetries = 3, baseDelay = 1000, maxDelay = 60000, factor = 2 } = retryOpts;
     let delay = baseDelay;
@@ -116,65 +101,63 @@ const GitHub = {
       } catch (error) {
         const isRetryable = error.status >= 500 || error.code === 'ETIMEOUT';
         if (!isRetryable || attempt === maxRetries) throw error;
-        await new Promise(resolve => setTimeout(resolve, Math.min(delay, maxDelay)));
+        await new Promise((resolve) => setTimeout(resolve, Math.min(delay, maxDelay)));
         delay *= factor;
       }
     }
   },
 
-  // GET /repos/{owner}/{repo}/contents/{path}
   async get(path, query = null) {
     return this.requestWithRetry('GET', `/contents/${path}`, null, query);
   },
 
-  // PUT /repos/{owner}/{repo}/contents/{path}
   async put(path, opts) {
-    const { content, message, sha = null, branch = null } = opts;
-    const encoded = btoa(unescape(encodeURIComponent(content)));
+    const { content, message, sha = null, branch = null } = opts || {};
     const body = {
       message,
-      content: encoded,
+      content: this._encodeUtf8Base64(content),
       branch: branch || this.config.branch,
     };
     if (sha) body.sha = sha;
     return this.requestWithRetry('PUT', `/contents/${path}`, body);
   },
 
-  // DELETE /repos/{owner}/{repo}/contents/{path}
   async delete(path, opts) {
-    const { message, sha } = opts;
+    const { message, sha } = opts || {};
     return this.requestWithRetry('DELETE', `/contents/${path}`, { message, sha });
   },
 
-  // GET file SHA for update operations
   async getSha(path, ref = null) {
     const query = ref ? { ref } : null;
     const data = await this.get(path, query);
     return data.sha;
   },
 
-  // Create or update — auto-gets SHA if file exists
-  async upsert(path, opts) {
-    const { content, message, branch = null } = opts;
+  // Supports both upsert(path, { content, message, branch }) and upsert(path, content, message, branch)
+  async upsert(path, contentOrOpts, messageArg = null, branchArg = null) {
+    const isObj = contentOrOpts && typeof contentOrOpts === 'object' && !Array.isArray(contentOrOpts);
+    const content = isObj ? contentOrOpts.content : contentOrOpts;
+    const message = isObj ? contentOrOpts.message : messageArg;
+    const branch = isObj ? (contentOrOpts.branch || null) : (branchArg || null);
+    const targetBranch = branch || this.config.branch;
+
     try {
-      const sha = await this.getSha(path, branch || this.config.branch);
-      return this.put(path, { content, message, sha, branch });
+      const sha = await this.getSha(path, targetBranch);
+      return this.put(path, { content, message, sha, branch: targetBranch });
     } catch (error) {
       if (error.status === 404) {
-        return this.put(path, { content, message, branch });
+        return this.put(path, { content, message, branch: targetBranch });
       }
       throw error;
     }
   },
 
-  // List directory contents
   async listDir(path = '', ref = null) {
     const query = ref ? { ref } : null;
     return this.requestWithRetry('GET', `/contents/${path}`, null, query);
   },
 };
 
-// Module export
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = GitHub;
 }
