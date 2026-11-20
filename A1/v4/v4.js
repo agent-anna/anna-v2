@@ -192,7 +192,7 @@
         document.body.classList.remove("is-standby", "is-thinking", "is-responding", "is-saving", "is-error", "is-speaking", "is-listening");
         document.body.classList.add(`is-${target}`);
         const stEl = document.getElementById("state-text");
-        if (stEl) stEl.innerText = `${target.toUpperCase()} // AGENT ANNA V4 (A1)`;
+        if (stEl) stEl.innerText = `${target.toUpperCase()} // AGENT ANNA V4`;
     }
 
     function updateKeyBadge() {
@@ -426,8 +426,7 @@
         const active = fsActive || isFullPageMode;
         document.body.classList.toggle("is-fullpage", isFullPageMode);
         const btn = document.getElementById("fullpage-btn");
-        if (btn) {
-            btn.innerText = active ? "EXIT FULL" : "FULLPAGE";
+        if (btn) { btn.innerText = active ? "🗗" : "⛶";
             btn.setAttribute("aria-pressed", String(active));
             btn.classList.toggle("active-mode", active);
         }
@@ -1182,7 +1181,7 @@
     function toggleVoice() {
         isVoiceEnabled = !isVoiceEnabled;
         const btn = document.getElementById("voice-btn");
-        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF";
+        if (btn) { btn.innerText = isVoiceEnabled ? "🔊" : "🔇"; btn.setAttribute("aria-pressed", String(isVoiceEnabled)); }
         updateVoiceBadge();
         if (!isVoiceEnabled) executeStfuProtocol();
         else speakText("Voice on.");
