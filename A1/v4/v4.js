@@ -1325,3 +1325,28 @@
     window.executeStfuProtocol = executeStfuProtocol;
     window.deleteMessage = deleteMessage;
 })();
+
+    function applyRoomDecorVisuals(mode) {
+        const cleanMode = ["military-calm", "night-watch", "war-room-brief"].includes(mode) ? mode : "military-calm";
+        document.body.classList.remove("decor-military-calm", "decor-night-watch", "decor-war-room-brief");
+        document.body.classList.add(`decor-${cleanMode}`);
+        localStorage.setItem("ANNA_V4_DECOR", cleanMode);
+        const sel = document.getElementById("room-decor-select");
+        if (sel && sel.value !== cleanMode) sel.value = cleanMode;
+        const stEl = document.getElementById("state-text");
+        if (stEl) {
+            const currentState = (document.body.className.match(/is-([a-z]+)/) || [null, "standby"])[1].toUpperCase();
+            stEl.innerText = `${currentState} // AGENT ANNA V4 (${cleanMode.toUpperCase()})`;
+        }
+    }
+
+    window.updateRoomDecor = function updateRoomDecor() {
+        const sel = document.getElementById("room-decor-select");
+        const chosen = (sel && sel.value) || "military-calm";
+        applyRoomDecorVisuals(chosen);
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const savedDecor = localStorage.getItem("ANNA_V4_DECOR") || "military-calm";
+        applyRoomDecorVisuals(savedDecor);
+    });
