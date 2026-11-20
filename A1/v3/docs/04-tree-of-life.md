@@ -1,5 +1,5 @@
 # 4. Living Tree of Life System Map
-_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T00:19:07.881108+00:00`_
+_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T04:54:07.045913+00:00`_
 
 ## The Roots (Core Config & Memory)
 - `A1/v3/docs/01-the-roots.md`
@@ -20,12 +20,12 @@ _Auto-generated on push to `A1/v3/docs/` at `2026-11-20T00:19:07.881108+00:00`_
 - `A1/v3/functions/scrape.js`
 - `A1/v3/functions/telemetry.js`
 - `A1/v3/functions/utils.js`
+- `A1/v3/plain-anna-index.html`
 
 ## The Branches (Active GitHub Actions Workflows)
+- **AA01 Grounded Intel & Feed Sync** (`.github/workflows/aa01-intel-feed.yml`)
 - **Agent Anna V3 Autonomous Audit** (`.github/workflows/anna-autonomous-audit.yml`)
 - **AA01 Book-Triggered Tree of Life Sync** (`.github/workflows/book-tree-sync.yml`)
-- **AA01 Headless Web Scraper & Knowledge Sync** (`.github/workflows/scrape-intel.yml`)
-- **Sync Strayd Artist Page into A1/v3** (`.github/workflows/sync-strayd-artist.yml`)
 
 ## The Leaves (Verified Knowledge & Logs)
 - `A1/v3/knowledge/AGENT-ANNA-MANIFESTO.md`
@@ -47,3 +47,4 @@ _Auto-generated on push to `A1/v3/docs/` at `2026-11-20T00:19:07.881108+00:00`_
 - `A1/v3/logs/aa01-v3-1795104881666.md`
 - `A1/v3/logs/aa01-v3-exec-2026-11-19T15-12-48-175Z.md`
 - `A1/v3/logs/aa01-v3-exec-2026-11-19T15-13-00-086Z.md`
+- `A1/v3/logs/aa01-v3-exec-2026-11-20T00-58-06-428Z.md`
