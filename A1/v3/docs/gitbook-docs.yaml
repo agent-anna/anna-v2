@@ -7,7 +7,6 @@ site:
       title: Agent Anna Docs
       path: agent-anna-docs
       description: ""
-      default: true
       children:
         - type: space
           key: space-1
@@ -33,6 +32,7 @@ site:
       key: section-3
       title: Imported content
       path: imported-content
+      default: true
       children:
         - type: space
           key: space-3
