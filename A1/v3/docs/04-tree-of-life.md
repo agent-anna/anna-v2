@@ -1,5 +1,5 @@
 # 4. Living Tree of Life System Map
-_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T12:38:14.585818+00:00`_
+_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T13:19:21.624691+00:00`_
 
 ## The Roots (Core Config & Memory)
 - `A1/v3/docs/01-the-roots.md`
@@ -52,3 +52,5 @@ _Auto-generated on push to `A1/v3/docs/` at `2026-11-20T12:38:14.585818+00:00`_
 - `A1/v3/logs/aa01-v3-exec-2026-11-19T15-12-48-175Z.md`
 - `A1/v3/logs/aa01-v3-exec-2026-11-19T15-13-00-086Z.md`
 - `A1/v3/logs/aa01-v3-exec-2026-11-20T00-58-06-428Z.md`
+- `A1/v3/logs/aa01-v3-exec-2026-11-20T13-04-33-800Z.md`
+- `A1/v3/logs/anna-v3-swallow-2026-11-20-part-1-live-internet-sear.md`
