@@ -1,57 +1,65 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AA01 // Tree of Life &amp; Flip Reader</title>
-  <link rel="stylesheet" href="./v4.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA01 // TREE OF LIFE &amp; PAGE FLIP</title>
+    <link rel="stylesheet" href="./v4.css?v=4.2">
 </head>
-<body class="state-ready">
-  <div class="shell">
-    <header class="top-bar">
-      <div>
-        <div class="eyebrow">AA01 // TREE OF LIFE &amp; LINK REGISTRY</div>
-        <h1>One-Touch Fingers, Branches &amp; Page Flip</h1>
-      </div>
-      <div class="row">
-        <a class="nav-link" href="./index.html">BACK TO V4 COCKPIT</a>
-      </div>
-    </header>
-
-    <main class="grid">
-      <section class="panel" aria-label="One-Touch Links & Add Link">
-        <h2>Connected Links (No Guessing)</h2>
-        <p class="hint">Instant one-touch links for Anna's channels, Martin's hubs, and new accounts added as V4 grows.</p>
-        <div id="links-container"></div>
-
-        <h2 style="margin-top:16px;">Add New Link</h2>
-        <div class="row">
-          <select id="new-group">
-            <option value="anna-socials">Anna Social &amp; Broadcast Fingers</option>
-            <option value="martin-and-ops">Martin &amp; Command Branches</option>
-          </select>
-          <input id="new-label" type="text" placeholder="Label (e.g. Anna New TikTok)" />
-          <input id="new-url" type="url" placeholder="https://..." />
-          <button id="btn-add-link" type="button">ADD LINK</button>
+<body class="is-standby decor-military-calm">
+    <div class="military-top-bar">
+        <div class="top-status-indicator">
+            <div class="status-dot" aria-hidden="true"></div>
+            <span>TREE OF LIFE // AGENT ANNA V4 (A1)</span>
+            <span class="status-badge" id="registry-status">REGISTRY: LOADING</span>
         </div>
-        <div class="row">
-          <button id="btn-copy-json" type="button">COPY UPDATED REGISTRY JSON</button>
+        <div class="top-controls-right">
+            <a class="ctrl-btn military-btn" href="./index.html">BACK TO WORKBENCH</a>
+            <a class="ctrl-btn" href="./intro.html">INTRO</a>
         </div>
-      </section>
+    </div>
 
-      <section class="panel" aria-label="Book Page Flip View">
-        <h2>Handbook &amp; OPORD Page Flip</h2>
-        <p class="hint">Flip cleanly through core handbook and V4 order files without cluttering the main cockpit.</p>
-        <div class="row">
-          <button id="btn-prev-page" type="button">PREV PAGE</button>
-          <button id="btn-next-page" type="button">NEXT PAGE</button>
-          <span id="page-indicator" class="meta">Page 1</span>
+    <div class="v4-page-wrap">
+        <div class="v4-page-hero">
+            <div>
+                <div class="v4-eyebrow">AA01 // ONE-TOUCH LINKS &amp; HANDBOOK FLIP</div>
+                <div class="v4-page-title">Tree of Life &amp; Page Flip</div>
+            </div>
+            <a class="v4-link-chip" href="./index.html">Return to V4 Command Console</a>
         </div>
-        <pre id="page-viewer" class="log" style="max-height:360px;">Loading page...</pre>
-      </section>
-    </main>
-  </div>
 
-  <script type="module" src="./tree-of-life.js"></script>
+        <div class="v4-card">
+            <h2>Connected Links</h2>
+            <p>One-touch links for Agent Anna channels, Martin hubs, and added accounts from links-registry.json.</p>
+            <div id="links-groups-container"></div>
+        </div>
+
+        <div class="v4-card">
+            <h2>Add New Link to Registry</h2>
+            <div class="v4-form-row">
+                <select id="new-link-group" class="v4-select" aria-label="Link Group">
+                    <option value="anna">Anna Social &amp; Broadcast Fingers</option>
+                    <option value="martin">Martin &amp; Command Branches</option>
+                </select>
+                <input id="new-link-label" class="v4-input" type="text" placeholder="Label (e.g. Anna New Channel)" aria-label="Link Label">
+                <input id="new-link-url" class="v4-input" type="url" placeholder="https://..." aria-label="Link URL">
+                <button id="btn-add-link" class="ctrl-btn military-btn" type="button">ADD LINK</button>
+                <button id="btn-copy-json" class="ctrl-btn" type="button">COPY REGISTRY JSON</button>
+            </div>
+            <div id="registry-feedback" style="margin-top:8px; font-size:10px; color:var(--standby);"></div>
+        </div>
+
+        <div class="v4-card">
+            <h2>Handbook &amp; OPORD Page Flip</h2>
+            <div class="v4-form-row">
+                <button id="btn-prev-page" class="ctrl-btn military-btn" type="button">PREV PAGE</button>
+                <button id="btn-next-page" class="ctrl-btn military-btn" type="button">NEXT PAGE</button>
+                <span id="page-indicator" style="font-size:11px; color:var(--gold);">Loading pages...</span>
+            </div>
+            <div id="page-reader" class="v4-doc-reader">Loading handbook/OPORD page...</div>
+        </div>
+    </div>
+
+    <script src="./tree-of-life.js?v=4.2"></script>
 </body>
 </html>
