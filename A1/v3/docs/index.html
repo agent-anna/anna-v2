@@ -53,10 +53,7 @@
       font-size: 0.95rem;
     }
 
-    .star {
-      color: var(--accent);
-      font-size: 1.1rem;
-    }
+    .star { color: var(--accent); font-size: 1.1rem; }
 
     .path-badge {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -68,11 +65,7 @@
       border-radius: 6px;
     }
 
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
 
     button, a.btn {
       background: var(--panel-2);
@@ -126,10 +119,7 @@
       font-size: 0.88rem;
     }
 
-    .doc-link:hover {
-      background: var(--panel-2);
-      border-color: var(--border);
-    }
+    .doc-link:hover { background: var(--panel-2); border-color: var(--border); }
 
     .doc-link.active {
       background: var(--accent-soft);
@@ -174,19 +164,11 @@
     article h1 { font-size: 1.9rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
     article h2 { font-size: 1.35rem; }
     article h3 { font-size: 1.1rem; }
-
     article p { margin: 0 0 14px; }
     article ul, article ol { margin: 0 0 16px; padding-left: 24px; }
     article li { margin-bottom: 6px; }
-
-    article a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    article a:hover {
-      text-decoration: underline;
-    }
+    article a { color: var(--accent); text-decoration: none; }
+    article a:hover { text-decoration: underline; }
 
     article blockquote {
       margin: 16px 0;
@@ -214,16 +196,8 @@
       border-radius: 4px;
     }
 
-    article pre code {
-      background: transparent;
-      padding: 0;
-    }
-
-    article hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 24px 0;
-    }
+    article pre code { background: transparent; padding: 0; }
+    article hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
     .status-note {
       background: var(--panel);
@@ -235,20 +209,10 @@
     }
 
     @media (max-width: 820px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-      aside {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        max-height: 240px;
-      }
-      main {
-        padding: 20px 18px 48px;
-      }
-      .path-badge {
-        display: none;
-      }
+      .layout { grid-template-columns: 1fr; }
+      aside { border-right: none; border-bottom: 1px solid var(--border); max-height: 240px; }
+      main { padding: 20px 18px 48px; }
+      .path-badge { display: none; }
     }
   </style>
 </head>
@@ -273,7 +237,7 @@
 
     <main>
       <div class="doc-meta">
-        <span>Active file: <code id="currentFileLabel">00-anna-bible-index.md</code></span>
+        <span>Active file: <code id="currentFileLabel">README.md</code></span>
         <span>Source of Truth: <code>A1/v3/docs</code></span>
       </div>
       <article id="viewer">
@@ -283,13 +247,13 @@
   </div>
 
   <script>
-    const FALLBACK_DOCS = [
-      { title: "00 Anna Bible Index", file: "00-anna-bible-index.md" },
-      { title: "01 The Roots", file: "01-the-roots.md" },
-      { title: "02 The Trunk", file: "02-the-trunk.md" },
-      { title: "03 The Branches", file: "03-the-branches.md" },
-      { title: "04 Tree of Life", file: "04-tree-of-life.md" },
-      { title: "README", file: "README.md" }
+    const CANDIDATE_DOCS = [
+      { title: "00 Anna Bible Index", candidates: ["00-anna-bible-index.md", "imported-content/00-anna-bible-index.md", "README.md"] },
+      { title: "01 The Roots", candidates: ["imported-content/01-the-roots.md", "01-the-roots.md"] },
+      { title: "02 The Trunk", candidates: ["imported-content/02-the-trunk.md", "02-the-trunk.md"] },
+      { title: "03 The Branches", candidates: ["imported-content/03-the-branches.md", "03-the-branches.md"] },
+      { title: "04 Tree of Life", candidates: ["imported-content/04-tree-of-life.md", "04-tree-of-life.md"] },
+      { title: "README", candidates: ["README.md"] }
     ];
 
     const navList = document.getElementById("navList");
@@ -298,8 +262,8 @@
     const rawLink = document.getElementById("rawLink");
     const reloadBtn = document.getElementById("reloadBtn");
 
-    let docs = [...FALLBACK_DOCS];
-    let activeFile = docs[0].file;
+    let docs = [];
+    let activeDoc = null;
 
     function escapeHtml(str) {
       return str
@@ -326,7 +290,6 @@
       });
       out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
       out = out.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-
       out = out.replace(/@@CODE(\d+)@@/g, (_, idx) => codeSpans[Number(idx)] || "");
       return out;
     }
@@ -368,23 +331,11 @@
           continue;
         }
 
-        if (inCode) {
-          codeBuffer.push(line);
-          continue;
-        }
+        if (inCode) { codeBuffer.push(line); continue; }
 
-        if (/^\s*$/.test(line)) {
-          closeLists();
-          closeBlockquote();
-          continue;
-        }
+        if (/^\s*$/.test(line)) { closeLists(); closeBlockquote(); continue; }
 
-        if (/^---+\s*$/.test(line)) {
-          closeLists();
-          closeBlockquote();
-          html += "<hr />\n";
-          continue;
-        }
+        if (/^---+\s*$/.test(line)) { closeLists(); closeBlockquote(); html += "<hr />\n"; continue; }
 
         const headingMatch = line.match(/^(#{1,4})\s+(.*)$/);
         if (headingMatch) {
@@ -398,10 +349,7 @@
         const bqMatch = line.match(/^>\s?(.*)$/);
         if (bqMatch) {
           closeLists();
-          if (!inBlockquote) {
-            html += "<blockquote>\n";
-            inBlockquote = true;
-          }
+          if (!inBlockquote) { html += "<blockquote>\n"; inBlockquote = true; }
           html += `<p>${formatInline(bqMatch[1])}</p>\n`;
           continue;
         } else {
@@ -428,26 +376,25 @@
         html += `<p>${formatInline(line)}</p>\n`;
       }
 
-      if (inCode) {
-        html += `<pre><code>${escapeHtml(codeBuffer.join("\n"))}</code></pre>\n`;
-      }
+      if (inCode) html += `<pre><code>${escapeHtml(codeBuffer.join("\n"))}</code></pre>\n`;
       closeLists();
       closeBlockquote();
       return html;
     }
 
-    function parseSummary(summaryText) {
-      const parsed = [];
-      const linkRegex = /\[([^\]]+)\]\(([^)]+\.md)\)/gi;
-      let match;
-      while ((match = linkRegex.exec(summaryText)) !== null) {
-        const title = match[1].trim();
-        const file = match[2].trim().replace(/^\.\//, "");
-        if (!parsed.some((item) => item.file === file)) {
-          parsed.push({ title, file });
+    async function resolveExistingFile(paths) {
+      for (const rel of paths) {
+        try {
+          const res = await fetch(`./${encodeURI(rel)}?t=${Date.now()}`, { cache: "no-store" });
+          if (res.ok) {
+            const text = await res.text();
+            return { path: rel, text };
+          }
+        } catch (_) {
+          // Try next candidate
         }
       }
-      return parsed;
+      return null;
     }
 
     function renderNav() {
@@ -455,65 +402,52 @@
       for (const item of docs) {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "doc-link" + (item.file === activeFile ? " active" : "");
+        btn.className = "doc-link" + (activeDoc && item.title === activeDoc.title ? " active" : "");
         btn.textContent = item.title;
-        btn.addEventListener("click", () => loadDoc(item.file));
+        btn.addEventListener("click", () => selectDoc(item));
         navList.appendChild(btn);
       }
     }
 
-    async function loadDoc(file) {
-      activeFile = file;
-      currentFileLabel.textContent = file;
-      rawLink.href = `./${file}`;
+    async function selectDoc(item) {
+      activeDoc = item;
+      currentFileLabel.textContent = item.resolvedPath || item.candidates[0];
+      rawLink.href = `./${item.resolvedPath || item.candidates[0]}`;
       renderNav();
-      viewer.innerHTML = `<div class="status-note">Loading <code>${escapeHtml(file)}</code>...</div>`;
+      viewer.innerHTML = `<div class="status-note">Loading <code>${escapeHtml(currentFileLabel.textContent)}</code>...</div>`;
 
-      try {
-        const res = await fetch(`./${encodeURI(file)}?t=${Date.now()}`, { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status} loading ${file}`);
-        }
-        const md = await res.text();
-        viewer.innerHTML = renderMarkdown(md);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } catch (err) {
+      const found = await resolveExistingFile(item.candidates);
+      if (!found) {
         viewer.innerHTML = `
           <div class="status-note">
-            <strong>Could not load <code>${escapeHtml(file)}</code></strong><br />
-            ${escapeHtml(err.message)}<br /><br />
-            Verify that <code>${escapeHtml(file)}</code> exists inside <code>A1/v3/docs/</code> on <code>main</code>.
+            <strong>File not found for ${escapeHtml(item.title)}</strong><br />
+            Checked: <code>${escapeHtml(item.candidates.join(", "))}</code> inside <code>A1/v3/docs/</code>.
           </div>`;
+        return;
       }
+
+      item.resolvedPath = found.path;
+      currentFileLabel.textContent = found.path;
+      rawLink.href = `./${found.path}`;
+      viewer.innerHTML = renderMarkdown(found.text);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     async function init() {
-      try {
-        const summaryRes = await fetch(`./SUMMARY.md?t=${Date.now()}`, { cache: "no-store" });
-        if (summaryRes.ok) {
-          const summaryText = await summaryRes.text();
-          const parsed = parseSummary(summaryText);
-          if (parsed.length > 0) {
-            docs = parsed;
-          }
+      const available = [];
+      for (const entry of CANDIDATE_DOCS) {
+        const found = await resolveExistingFile(entry.candidates);
+        if (found) {
+          available.push({ ...entry, resolvedPath: found.path });
         }
-      } catch (_) {
-        // Keep FALLBACK_DOCS if SUMMARY.md is absent
       }
 
-      const params = new URLSearchParams(window.location.search);
-      const requested = params.get("doc");
-      if (requested && docs.some((d) => d.file === requested)) {
-        activeFile = requested;
-      } else if (docs.length > 0) {
-        activeFile = docs[0].file;
-      }
-
+      docs = available.length > 0 ? available : CANDIDATE_DOCS;
       renderNav();
-      await loadDoc(activeFile);
+      await selectDoc(docs[0]);
     }
 
-    reloadBtn.addEventListener("click", () => loadDoc(activeFile));
+    reloadBtn.addEventListener("click", () => activeDoc && selectDoc(activeDoc));
     init();
   </script>
 </body>
