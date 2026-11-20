@@ -215,9 +215,7 @@
             if (v && v.length) cachedVoices = v;
             const badge = document.getElementById("voice-profile-badge");
             const chosen = pickFemaleEnglishVoice(cachedVoices);
-            if (badge) {
-                badge.innerText = chosen ? `VOICE: ${chosen.name.slice(0, 18)}` : "VOICE: FEMALE-EN";
-            }
+            if (badge) { badge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF"; }
         } catch (e) {}
     }
 
@@ -1149,7 +1147,7 @@
     function toggleVoice() {
         isVoiceEnabled = !isVoiceEnabled;
         const btn = document.getElementById("voice-btn");
-        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF";
+        if (btn) btn.innerText = isVoiceEnabled ? "VOICE: ON" : "VOICE: OFF"; const vBadge = document.getElementById("voice-profile-badge"); if (vBadge) vBadge.innerText = isVoiceEnabled ? "VOICE: ANNA" : "VOICE: OFF";
         if (!isVoiceEnabled) executeStfuProtocol();
         else speakText("Voice on.");
     }
