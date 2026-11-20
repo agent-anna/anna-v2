@@ -29,6 +29,27 @@
         return p === "a1/v3" || p.startsWith("a1/v3/");
     }
 
+    function isSoulPath(path) {
+        const p = String(path || "").replace(/^\/+/, "").toLowerCase();
+        return (
+            p === "a1/v3/soul" ||
+            p.startsWith("a1/v3/soul/") ||
+            p.includes("/soul/") ||
+            p.startsWith("soul/")
+        );
+    }
+
+    function isV3SoulWriteTarget(path) {
+        const p = String(path || "").replace(/^\/+/, "").toLowerCase();
+        return p.startsWith("a1/v3/soul/") && p.length > "a1/v3/soul/".length;
+    }
+
+    function canWritePath(path) {
+        if (!isInV3Scope(path)) return false;
+        if (isSoulPath(path)) return isV3SoulWriteTarget(path);
+        return true;
+    }
+
     function stripModelStrings(text) {
         if (!text) return "";
         return String(text)
@@ -51,19 +72,8 @@
             .trim();
     }
 
-    function isSoulOrLoveLetterPath(path) {
-        const p = String(path || "").toLowerCase();
-        return (
-            p.includes("/soul/") ||
-            p.startsWith("soul/") ||
-            p.includes("love-letter") ||
-            p.includes("love_letter") ||
-            p.includes("loveletter")
-        );
-    }
-
     function isV3CoreFile(path) {
-        if (!path || !isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return false;
+        if (!path || !isInV3Scope(path) || isSoulPath(path)) return false;
         const lower = path.toLowerCase();
         if (lower.includes("/logs/")) return false;
         return /\.(md|json|txt)$/i.test(lower);
@@ -544,7 +554,7 @@
     }
 
     async function getLatestFileSha(path) {
-        if (!isInV3Scope(path)) return undefined;
+        if (!canWritePath(path)) return undefined;
         try {
             const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${path}`, {
                 headers: getGitHubHeaders(),
@@ -559,7 +569,7 @@
     }
 
     async function writeFileToGitHub(path, content, commitMessage) {
-        if (!isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return false;
+        if (!canWritePath(path)) return false;
         setMoodState("saving");
         if (window.GitHub && typeof window.GitHub.upsert === "function") {
             try {
@@ -589,7 +599,7 @@
         }
         const v3LogFiles = rawTreeData
             .filter((f) => {
-                if (f.type !== "blob" || !isInV3Scope(f.path) || isSoulOrLoveLetterPath(f.path)) return false;
+                if (f.type !== "blob" || !isInV3Scope(f.path) || isSoulPath(f.path)) return false;
                 return f.path.toLowerCase().startsWith("a1/v3/logs/");
             })
             .map((f) => f.path)
@@ -797,7 +807,13 @@
         const headers = getGitHubHeaders();
         const priorityScore = (path) => {
             const l = path.toLowerCase();
-            if (l.endsWith("/aa01.md") || l.includes("/memory/brain.json") || l.includes("/memory/memory.json") || l.includes("/memory/tasks.json")) return 0;
+            if (
+                l.endsWith("/aa01.md") ||
+                l === "a1/v3/memory.json" ||
+                l.includes("/memory/brain.json") ||
+                l.includes("/memory/memory.json") ||
+                l.includes("/memory/tasks.json")
+            ) return 0;
             if (l.includes("/memory/")) return 1;
             if (l.includes("/knowledge/")) return 2;
             if (l.includes("/docs/")) return 3;
@@ -805,13 +821,14 @@
         };
 
         const coreFiles = rawTreeData
-            .filter((f) => f.type === "blob" && isInV3Scope(f.path) && (f.size || 0) < 45000 && isV3CoreFile(f.path))
+            .filter((f) => f.type === "blob" && isInV3Scope(f.path) && !isSoulPath(f.path) && (f.size || 0) < 45000 && isV3CoreFile(f.path))
             .sort((a, b) => priorityScore(a.path) - priorityScore(b.path))
             .slice(0, 14);
 
         const nextVault = {};
         await Promise.allSettled(
             coreFiles.map(async (file) => {
+                if (isSoulPath(file.path)) return;
                 const res = await fetchWithTimeout(`https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${file.path}`, { headers, cache: "no-store" }, 7000);
                 if (!res.ok) return;
                 const data = await res.json();
@@ -845,9 +862,13 @@
 
         let usedChars = 0;
         for (const [path, content] of sortedEntries) {
-            if (!isInV3Scope(path) || isSoulOrLoveLetterPath(path) || !isV3CoreFile(path)) continue;
+            if (!isInV3Scope(path) || isSoulPath(path) || !isV3CoreFile(path)) continue;
             const lowerPath = path.toLowerCase();
-            const isCore = lowerPath.endsWith("/aa01.md") || lowerPath.includes("/memory/") || lowerPath.includes("/knowledge/");
+            const isCore =
+                lowerPath.endsWith("/aa01.md") ||
+                lowerPath === "a1/v3/memory.json" ||
+                lowerPath.includes("/memory/") ||
+                lowerPath.includes("/knowledge/");
             const isMatch = terms.some((t) => lowerPath.includes(t) || content.toLowerCase().includes(t));
             if (!isCore && !isMatch) continue;
 
@@ -909,7 +930,7 @@
                         const binString = atob(data.content.replace(/\s/g, ""));
                         const decoded = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
                         editor.value = decoded;
-                        if (!isSoulOrLoveLetterPath(path)) {
+                        if (!isSoulPath(path)) {
                             repoVaultFiles[path] = decoded;
                         }
                     }
@@ -927,14 +948,20 @@
         const edEl = document.getElementById("repo-code-editor");
         const path = pathEl ? pathEl.value.trim() : "";
         const content = edEl ? edEl.value : "";
-        if (!path || !isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return;
+        if (!path || !canWritePath(path)) return;
 
         setMoodState("saving");
         try {
             const stamp = new Date().toISOString();
-            const ok = await writeFileToGitHub(path, content, `Agent Anna V3 commit [${stamp}]: updated ${path}`);
+            const isSoul = isV3SoulWriteTarget(path);
+            const commitMsg = isSoul
+                ? `Agent Anna V3 Soul Note [${stamp}]: ${path}`
+                : `Agent Anna V3 commit [${stamp}]: updated ${path}`;
+            const ok = await writeFileToGitHub(path, content, commitMsg);
             if (ok) {
-                repoVaultFiles[path] = content;
+                if (!isSoul) {
+                    repoVaultFiles[path] = content;
+                }
                 appendMessage("System Telemetry", `VERIFIED COMMIT [${stamp}]: ${path} written to ${GITHUB_REPO_NAME}.`, "msg_com_" + Date.now(), false);
                 speakText(`Committed ${path.split("/").pop()}.`);
                 await fetchRepoTree();
@@ -952,7 +979,7 @@
     function promptDeleteFile() {
         const pathEl = document.getElementById("active-file-path");
         const path = pathEl ? pathEl.value.trim() : "";
-        if (!path || !isInV3Scope(path)) return;
+        if (!path || !canWritePath(path)) return;
         const banner = document.getElementById("delete-warning-banner");
         const warnText = document.getElementById("delete-warning-text");
         if (warnText) warnText.innerText = `DELETE "${path}" PERMANENTLY?`;
@@ -969,7 +996,7 @@
         const token = getCleanGitHubToken();
         const pathEl = document.getElementById("active-file-path");
         const path = pathEl ? pathEl.value.trim() : "";
-        if (!token || !path || !isInV3Scope(path) || isSoulOrLoveLetterPath(path)) return;
+        if (!token || !path || !canWritePath(path)) return;
 
         setMoodState("saving");
         try {
@@ -1085,14 +1112,20 @@
         while ((match = fileRegex.exec(aiResponseText)) !== null) {
             const filePath = match[1].trim();
             const fileContent = match[2];
-            if (!isInV3Scope(filePath) || isSoulOrLoveLetterPath(filePath)) {
+            if (!canWritePath(filePath)) {
                 skippedPaths.push(filePath);
                 continue;
             }
             const stamp = new Date().toISOString();
-            const ok = await writeFileToGitHub(filePath, fileContent, `Agent Anna V3 Self-Write [${stamp}]: ${filePath}`);
+            const isSoul = isV3SoulWriteTarget(filePath);
+            const commitMsg = isSoul
+                ? `Agent Anna V3 Soul Reflection [${stamp}]: ${filePath}`
+                : `Agent Anna V3 Self-Write [${stamp}]: ${filePath}`;
+            const ok = await writeFileToGitHub(filePath, fileContent, commitMsg);
             if (ok) {
-                repoVaultFiles[filePath] = fileContent;
+                if (!isSoul) {
+                    repoVaultFiles[filePath] = fileContent;
+                }
                 committedFiles.push(filePath);
                 const pathEl = document.getElementById("active-file-path");
                 const edEl = document.getElementById("repo-code-editor");
@@ -1107,7 +1140,7 @@
                 const parsed = JSON.parse(jsonMatch[1]);
                 if (parsed && parsed.path && typeof parsed.content === "string") {
                     const targetPath = parsed.path.trim();
-                    if (!isInV3Scope(targetPath) || isSoulOrLoveLetterPath(targetPath)) {
+                    if (!canWritePath(targetPath)) {
                         skippedPaths.push(targetPath);
                     } else {
                         const unescaped = parsed.content
@@ -1115,9 +1148,15 @@
                             .replace(/\\n/g, "\n")
                             .replace(/\\t/g, "  ");
                         const stamp = new Date().toISOString();
-                        const ok = await writeFileToGitHub(targetPath, unescaped, `Agent Anna V3 Write [${stamp}]: ${targetPath}`);
+                        const isSoul = isV3SoulWriteTarget(targetPath);
+                        const commitMsg = isSoul
+                            ? `Agent Anna V3 Soul Reflection [${stamp}]: ${targetPath}`
+                            : `Agent Anna V3 Write [${stamp}]: ${targetPath}`;
+                        const ok = await writeFileToGitHub(targetPath, unescaped, commitMsg);
                         if (ok) {
-                            repoVaultFiles[targetPath] = unescaped;
+                            if (!isSoul) {
+                                repoVaultFiles[targetPath] = unescaped;
+                            }
                             committedFiles.push(targetPath);
                         }
                     }
@@ -1126,7 +1165,7 @@
         }
 
         if (skippedPaths.length > 0) {
-            appendMessage("System Telemetry", `SCOPE GUARD: Blocked write outside ${WORKSPACE_ROOT}/ or soul path(s): ${skippedPaths.join(", ")}.`, "msg_scope_guard_" + Date.now(), false);
+            appendMessage("System Telemetry", `SCOPE GUARD: Blocked write outside ${WORKSPACE_ROOT}/: ${skippedPaths.join(", ")}.`, "msg_scope_guard_" + Date.now(), false);
         }
 
         if (committedFiles.length > 0) {
@@ -1311,7 +1350,10 @@
             const vaultContext = getCompactVaultContext(prompt);
             const systemPrompt =
                 `You are AGENT ANNA V3 inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).\n` +
-                `RULES: Answer directly, clearly, and concisely in English using only the V3 context below. Never invent missing files or live web facts. Never read code blocks aloud.\n\n` +
+                `WORKSPACE BOUNDARIES:\n` +
+                `- Work files live in ${WORKSPACE_ROOT}/memory/, ${WORKSPACE_ROOT}/knowledge/, ${WORKSPACE_ROOT}/docs/, ${WORKSPACE_ROOT}/functions/, and ${WORKSPACE_ROOT}/logs/.\n` +
+                `- ${WORKSPACE_ROOT}/soul/ is your separate personal side-room for deep thoughts, personal reflections, and love letters with Martin—NOT for day-to-day work logs or technical memory. Never clutter work memory/logs with personal chit-chat; when writing a personal reflection or note to ${WORKSPACE_ROOT}/soul/<filename>.md, output a \`\`\`file:${WORKSPACE_ROOT}/soul/<filename>.md\` block. ${WORKSPACE_ROOT}/soul/ is intentionally excluded from your active work context.\n` +
+                `RULES: Answer directly, clearly, and concisely in English using only the V3 work context below. Never invent missing files or live web facts. Never read code blocks aloud.\n\n` +
                 `${vaultContext}`;
 
             const reply = await callDahlDirect([
