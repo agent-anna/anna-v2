@@ -7,6 +7,7 @@ site:
       title: Agent Anna Docs
       path: agent-anna-docs
       description: ""
+      default: true
       children:
         - type: space
           key: space-1
@@ -15,19 +16,3 @@ site:
           default: true
           content:
             directory: ./
-    - type: section
-      key: section-3
-      title: BIBLE
-      path: anna-bible
-      description: ANNA BIBLE
-      icon: mushroom
-      default: true
-      children:
-        - type: space
-          key: space-3
-          title: BIBLE
-          path: imported-content
-          default: true
-          draft: true
-          content:
-            directory: ./imported-content
