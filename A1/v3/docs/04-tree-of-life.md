@@ -1,5 +1,5 @@
 # 4. Living Tree of Life System Map
-_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T04:54:07.045913+00:00`_
+_Auto-generated on push to `A1/v3/docs/` at `2026-11-20T05:13:47.675076+00:00`_
 
 ## The Roots (Core Config & Memory)
 - `A1/v3/docs/01-the-roots.md`
@@ -31,6 +31,7 @@ _Auto-generated on push to `A1/v3/docs/` at `2026-11-20T04:54:07.045913+00:00`_
 - `A1/v3/knowledge/AGENT-ANNA-MANIFESTO.md`
 - `A1/v3/knowledge/business.md`
 - `A1/v3/knowledge/protocols.md`
+- `A1/v3/knowledge/song-queen-meets-king.md`
 - `A1/v3/knowledge/strayd-artist-live.json`
 - `A1/v3/knowledge/strayd-artist-live.md`
 - `A1/v3/knowledge/trading.md`
