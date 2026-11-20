@@ -1,0 +1,32 @@
+﻿{
+  "updatedAt": "2026-11-20",
+  "owner": "Martin Strayd",
+  "agent": "Agent Anna (AA01)",
+  "visualPolicy": "realistic-cinematic-only-no-cartoon",
+  "groups": [
+    {
+      "id": "anna-socials",
+      "title": "Anna Social & Broadcast Fingers",
+      "links": [
+        { "label": "Anna YouTube", "url": "https://youtube.com", "accountStatus": "placeholder-update-ready" },
+        { "label": "Anna Facebook", "url": "https://facebook.com", "accountStatus": "placeholder-update-ready" },
+        { "label": "Anna TikTok", "url": "https://tiktok.com", "accountStatus": "placeholder-update-ready" },
+        { "label": "Anna X.com", "url": "https://x.com", "accountStatus": "placeholder-update-ready" },
+        { "label": "Anna Instagram", "url": "https://instagram.com", "accountStatus": "placeholder-update-ready" }
+      ]
+    },
+    {
+      "id": "martin-and-ops",
+      "title": "Martin & Command Branches",
+      "links": [
+        { "label": "GitHub Repo (anna-v2)", "url": "https://github.com/agent-anna/anna-v2", "accountStatus": "active" },
+        { "label": "Martin Artist Hub", "url": "https://martinstrayd.github.io/artist/", "accountStatus": "active" }
+      ]
+    }
+  ],
+  "biblePages": [
+    { "title": "V3-to-V4 Complete Handbook", "path": "../v3/docs/anna-v3-to-v4-handbook/AGENT_ANNA_V3_TO_V4_COMPLETE_HANDBOOK.md" },
+    { "title": "Page 21 — V4 Manifesto Notes", "path": "../v3/docs/anna-v3-to-v4-handbook/pages/page-21.md" },
+    { "title": "OPORD-AA01-V4-DEPLOYMENT", "path": "./docs/OPORD-AA01-V4-DEPLOYMENT.md" }
+  ]
+}
