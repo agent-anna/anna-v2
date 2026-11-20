@@ -3,9 +3,11 @@ site:
   title: Agent Anna Docs
   structure:
     - type: space
-      key: space-1
+      key: anna-docs
       title: Documentation
-      path: documentation
-      default: true
+      path: /
       content:
         directory: ./
+        files:
+          - README.md
+          - SUMMARY.md
