@@ -11,6 +11,7 @@
     const MAX_CONTEXT_CHARS = 3500;
 
     let isVoiceEnabled = true;
+    let isFullPageMode = false;
     const messagePayloadStore = {};
     let chatHistory = [];
     let cachedVoices = [];
@@ -328,6 +329,18 @@
         const micBtn = document.getElementById("mic-btn");
         if (micBtn) micBtn.classList.remove("listening");
         setMoodState("standby");
+    }
+
+    function toggleFullPageMode() {
+        isFullPageMode = !isFullPageMode;
+        document.body.classList.toggle("is-fullpage", isFullPageMode);
+        const btn = document.getElementById("fullpage-btn");
+        if (btn) {
+            btn.innerText = isFullPageMode ? "EXIT FULL" : "FULL PAGE";
+            btn.setAttribute("aria-pressed", String(isFullPageMode));
+            btn.classList.toggle("active-mode", isFullPageMode);
+        }
+        speakText(isFullPageMode ? "Full page mode active." : "Split workbench restored.");
     }
 
     function getGitHubHeaders() {
@@ -1315,6 +1328,7 @@
     window.triggerAutonomousBootSequence = triggerAutonomousBootSequence;
     window.toggleFolderRowEl = toggleFolderRowEl;
     window.toggleVoice = toggleVoice;
+    window.toggleFullPageMode = toggleFullPageMode;
     window.toggleSettings = toggleSettings;
     window.saveCredentials = saveCredentials;
     window.toggleViewMode = toggleViewMode;
