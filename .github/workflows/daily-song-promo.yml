@@ -1,4 +1,4 @@
-﻿name: Daily Song Promo Gate
+name: Daily Song Promo Gate
 on:
   workflow_dispatch:
     inputs:
