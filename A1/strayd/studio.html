@@ -3,63 +3,80 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agent Anna • v4 Core + v3BIBLE Single Promoter Studio</title>
+  <title>Agent Anna • Dynamic v4 + v3BIBLE Single Promoter Studio</title>
   <style>
     :root { --bg:#0b0e14; --panel:#121722; --panel2:#182030; --text:#eef2f7; --muted:#9aa6bd; --border:rgba(255,255,255,0.12); --accent:#a3e635; --sky:#7dd3fc; }
     * { box-sizing:border-box; }
     body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); padding:20px; }
-    .wrap { max-width:1200px; margin:0 auto; }
-    .hdr { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; }
+    .wrap { max-width:1180px; margin:0 auto; }
+    .hdr { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:14px; }
     .hdr h1 { margin:0; font-size:1.25rem; }
     .hdr .sub { color:var(--muted); font-size:0.84rem; }
-    .grid { display:grid; grid-template-columns:380px 1fr; gap:16px; }
+
+    .hero-card { display:grid; grid-template-columns:190px 1fr; gap:18px; align-items:center; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:16px; }
+    @media (max-width:720px){ .hero-card { grid-template-columns:1fr; } }
+    .cd-cover { width:190px; max-width:100%; aspect-ratio:1/1; border-radius:12px; border:1px solid var(--border); overflow:hidden; background:#0d121b; display:flex; align-items:center; justify-content:center; }
+    .cd-cover img { width:100%; height:100%; object-fit:cover; display:block; }
+    .hero-title { font-size:1.2rem; font-weight:800; margin:4px 0 6px; }
+    .hero-meta { font-size:0.82rem; color:var(--muted); line-height:1.45; }
+    .pill { display:inline-block; font-size:0.72rem; padding:2px 8px; border-radius:999px; background:#0d121b; border:1px solid var(--border); color:var(--sky); margin-right:6px; margin-top:6px; }
+
+    .grid { display:grid; grid-template-columns:360px 1fr; gap:16px; align-items:start; }
     @media (max-width:900px){ .grid { grid-template-columns:1fr; } }
     .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; }
     label { display:block; font-size:0.78rem; color:var(--muted); margin:10px 0 4px; }
     input, select, textarea, button { width:100%; border-radius:8px; border:1px solid var(--border); background:#0d121b; color:var(--text); padding:9px 11px; font-size:0.88rem; }
-    textarea { min-height:88px; font-family:ui-monospace,Consolas,monospace; font-size:0.8rem; line-height:1.45; }
+    textarea { min-height:86px; font-family:ui-monospace,Consolas,monospace; font-size:0.8rem; line-height:1.45; }
     button { cursor:pointer; font-weight:700; background:var(--panel2); }
     button.ok-btn { background:var(--accent); color:#071018; border:none; }
     .mini-btn { width:auto; padding:6px 12px; font-size:0.78rem; margin-top:6px; margin-right:6px; }
-    .art-box { width:100%; max-width:250px; aspect-ratio:1/1; border-radius:10px; border:1px solid var(--border); overflow:hidden; background:#0d121b; display:flex; align-items:center; justify-content:center; }
-    .art-box img { width:100%; height:100%; object-fit:cover; display:block; }
     .draft-box { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; }
     .draft-head { display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--sky); font-weight:700; margin-bottom:6px; }
     .hint { font-size:0.74rem; color:var(--muted); margin-top:4px; word-break:break-word; }
-    .pill { display:inline-block; font-size:0.72rem; padding:2px 8px; border-radius:999px; background:#0d121b; border:1px solid var(--border); color:var(--sky); margin-right:6px; margin-top:4px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="hdr">
       <div>
-        <h1>Agent Anna • v4 Core &amp; v3BIBLE Single Promoter Studio</h1>
-        <div class="sub">Reads Agent Anna's A1/v4 core character &amp; rules + A1/docs/v3BIBLE song .md lyrics (mirrored on GitBook) • Live-action only (no cartoon)</div>
+        <h1>Agent Anna • Dynamic Single Promoter Studio</h1>
+        <div class="sub">Agent Anna (A1 / A1/v4) • Dynamically synthesizes copy from song title, cover art &amp; A1/docs/v3BIBLE .md • Live-action only (zero cartoon)</div>
       </div>
       <div class="sub" id="bootStatus">Anna booting v4 core &amp; v3BIBLE...</div>
+    </div>
+
+    <div class="hero-card">
+      <div class="cd-cover"><img id="artPreview" src="" alt="Martin Strayd Single Cover Art" /></div>
+      <div>
+        <div style="font-size:0.75rem;color:var(--sky);font-weight:700;letter-spacing:0.04em;">ACTIVE SINGLE &amp; COVER SLEEVE</div>
+        <div class="hero-title" id="heroSongTitle">Who Killed Fun (Pay the Rent)</div>
+        <div class="hero-meta" id="artMeta">Artwork file: loading...</div>
+        <div class="hero-meta" id="liveBriefLine" style="margin-top:6px;">Visual rule: Strictly realistic live-action / documentary footage only (zero cartoon).</div>
+        <div id="sourceBadges"></div>
+      </div>
     </div>
 
     <div class="grid">
       <div>
         <div class="card">
-          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;">ANNA SINGLE, v4 CORE &amp; v3BIBLE</div>
+          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;">1. SINGLE &amp; ROTATION CONTROLS</div>
 
-          <label for="songPicker">Single From Catalog (Matches Cover Art &amp; v3BIBLE .md)</label>
+          <label for="songPicker">Select Single (A–Z Catalog)</label>
           <select id="songPicker"></select>
 
-          <label for="customSong">Or Override Song Title</label>
+          <label for="customSong">Or Type Song Title</label>
           <input id="customSong" type="text" placeholder="Exact or partial song title..." />
 
-          <label for="dayAngle">Daily Angle Shift (Keeps Weekly Single Push Fresh)</label>
+          <label for="dayAngle">Daily Angle Shift</label>
           <select id="dayAngle">
             <option value="auto">Auto (Rotates by Day of Week)</option>
-            <option value="0">Mon • MTV Countdown Hook</option>
-            <option value="1">Tue • Lyric / Song Tension</option>
-            <option value="2">Wed • Direct MP3 + Art Ownership</option>
-            <option value="3">Thu • AI Search &amp; Underground Radar</option>
-            <option value="4">Fri • Late-Night / Weekend Replay</option>
-            <option value="5">Sat • Collector Vault Drop</option>
-            <option value="6">Sun • Weekly Finale &amp; Next-Up Tease</option>
+            <option value="0">Day 1 • Direct Hook &amp; Edge</option>
+            <option value="1">Day 2 • Lyric &amp; Meaning Pull</option>
+            <option value="2">Day 3 • Live-Action Scene &amp; Mood</option>
+            <option value="3">Day 4 • Direct Own (MP3 + Art)</option>
+            <option value="4">Day 5 • Search &amp; AI Discovery</option>
+            <option value="5">Day 6 • Vault &amp; Collector Angle</option>
+            <option value="6">Day 7 • Weekly Spotlight Push</option>
           </select>
 
           <label for="gitbookUrl">GitBook Mirror URL (v3BIBLE Reference)</label>
@@ -68,68 +85,64 @@
           <label for="directLink">Direct MP3 + Cover Art Link</label>
           <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
 
-          <label for="webhookUrl">Optional Webhook URL (Fires Only After Your OK)</label>
+          <label for="webhookUrl">Optional Webhook URL (Fires Only After OK)</label>
           <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
 
           <div style="margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px;">
-            <button type="button" id="reloadKnowledgeBtn">Anna: Re-Read A1/v4 Core &amp; docs/v3BIBLE</button>
-            <button type="button" id="regenBtn">Anna: Build Channel Drafts From Core + Song .md</button>
+            <button type="button" id="reloadKnowledgeBtn">Re-Read A1/v4 Core &amp; docs/v3BIBLE</button>
+            <button type="button" id="regenBtn">Synthesize Fresh Channel Drafts</button>
             <button type="button" class="ok-btn" id="approveBtn">OK To Post (Approve Single)</button>
           </div>
           <div class="hint" id="gateStatus">Anna Gate: Staged — waiting for your OK</div>
-          <div id="sourceBadges"></div>
-        </div>
-
-        <div class="card">
-          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:8px;">COVER ART &amp; v3BIBLE SONG RECORD</div>
-          <div class="art-box"><img id="artPreview" src="" alt="Martin Strayd Cover Art" /></div>
-          <div class="hint" id="artMeta">Cover art matched from catalog.</div>
-
-          <label for="bibleStatusBox">v3BIBLE Song .md Match &amp; Extracted Lyrics/Notes</label>
-          <textarea id="bibleStatusBox" readonly style="min-height:105px;"></textarea>
-
-          <label for="liveBriefOut">Anna's Live-Action Visual Direction (Never Cartoon)</label>
-          <textarea id="liveBriefOut" readonly style="min-height:70px;"></textarea>
         </div>
       </div>
 
-      <div class="card">
-        <div class="draft-box">
-          <div class="draft-head"><span>TikTok — MTV Hook + Lyric/Title Punch + Search Keywords + 4 Tags</span><span id="ttCount">0 chars</span></div>
-          <textarea id="ttOut"></textarea>
-          <button type="button" class="mini-btn" onclick="copyById('ttOut')">Copy TikTok</button>
+      <div>
+        <div class="card">
+          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:6px;">2. v3BIBLE SONG RECORD (.MD)</div>
+          <textarea id="bibleStatusBox" readonly style="min-height:96px;"></textarea>
         </div>
 
-        <div class="draft-box">
-          <div class="draft-head"><span>Instagram — First-125-Char Hook + Anna Manager Pitch + 4 Tags</span><span id="igCount">0 chars</span></div>
-          <textarea id="igOut"></textarea>
-          <button type="button" class="mini-btn" onclick="copyById('igOut')">Copy Instagram</button>
-        </div>
+        <div class="card">
+          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:10px;">3. CHANNEL-SPECIFIC DRAFTS BY AGENT ANNA</div>
 
-        <div class="draft-box">
-          <div class="draft-head"><span>YouTube Title (max 100 chars)</span><span id="ytTCount">0 chars</span></div>
-          <input id="ytTitleOut" type="text" />
-          <div class="draft-head" style="margin-top:10px;"><span>YouTube Description — Keywords First + Song/Lyric Pitch + 4 Tags</span><span id="ytDCount">0 chars</span></div>
-          <textarea id="ytDescOut"></textarea>
-          <button type="button" class="mini-btn" onclick="copyById('ytTitleOut')">Copy YT Title</button>
-          <button type="button" class="mini-btn" onclick="copyById('ytDescOut')">Copy YT Description</button>
-        </div>
+          <div class="draft-box">
+            <div class="draft-head"><span>TikTok — Dynamic Hook + Keywords + Tags</span><span id="ttCount">0 chars</span></div>
+            <textarea id="ttOut"></textarea>
+            <button type="button" class="mini-btn" onclick="copyById('ttOut')">Copy TikTok</button>
+          </div>
 
-        <div class="draft-box">
-          <div class="draft-head"><span>Facebook — MTV Manager Pitch Built for Replies &amp; Shares</span><span id="fbCount">0 chars</span></div>
-          <textarea id="fbOut"></textarea>
-          <button type="button" class="mini-btn" onclick="copyById('fbOut')">Copy Facebook</button>
-        </div>
+          <div class="draft-box">
+            <div class="draft-head"><span>Instagram — 125-Char Lead + Story + Tags</span><span id="igCount">0 chars</span></div>
+            <textarea id="igOut"></textarea>
+            <button type="button" class="mini-btn" onclick="copyById('igOut')">Copy Instagram</button>
+          </div>
 
-        <div class="draft-box">
-          <div class="draft-head"><span>X — Punchline + Single + Direct Link + 3 Tags</span><span id="xCount">0 chars</span></div>
-          <textarea id="xOut"></textarea>
-          <button type="button" class="mini-btn" onclick="copyById('xOut')">Copy X</button>
-        </div>
+          <div class="draft-box">
+            <div class="draft-head"><span>YouTube Title (max 100 chars)</span><span id="ytTCount">0 chars</span></div>
+            <input id="ytTitleOut" type="text" />
+            <div class="draft-head" style="margin-top:10px;"><span>YouTube Description — Search-Led Intro + Track Details + Tags</span><span id="ytDCount">0 chars</span></div>
+            <textarea id="ytDescOut"></textarea>
+            <button type="button" class="mini-btn" onclick="copyById('ytTitleOut')">Copy YT Title</button>
+            <button type="button" class="mini-btn" onclick="copyById('ytDescOut')">Copy YT Description</button>
+          </div>
 
-        <div class="draft-box">
-          <div class="draft-head"><span>Approved Payload JSON (Staged on OK To Post)</span></div>
-          <textarea id="payloadOut" readonly placeholder="Click OK To Post to generate Anna's approved dispatch payload..."></textarea>
+          <div class="draft-box">
+            <div class="draft-head"><span>Facebook — Manager Pitch for Conversation &amp; Shares</span><span id="fbCount">0 chars</span></div>
+            <textarea id="fbOut"></textarea>
+            <button type="button" class="mini-btn" onclick="copyById('fbOut')">Copy Facebook</button>
+          </div>
+
+          <div class="draft-box">
+            <div class="draft-head"><span>X — Sharp Punchline + Link + Tags</span><span id="xCount">0 chars</span></div>
+            <textarea id="xOut"></textarea>
+            <button type="button" class="mini-btn" onclick="copyById('xOut')">Copy X</button>
+          </div>
+
+          <div class="draft-box">
+            <div class="draft-head"><span>4. Approved Payload JSON (Staged on OK To Post)</span></div>
+            <textarea id="payloadOut" readonly placeholder="Click OK To Post to generate Anna's approved dispatch payload..."></textarea>
+          </div>
         </div>
       </div>
     </div>
@@ -139,15 +152,11 @@
   (function(){
     var catalog = [];
     var repoTree = [];
-    var v4CoreSummary = {
-      persona: "Agent Anna",
-      role: "Manager & MTV-style promoter for Martin Strayd",
-      rules: ["Realistic live-action only (no cartoon)", "Wait for OK before live dispatch"],
-      loadedSources: []
-    };
+    var v4CoreData = { loadedSources: [], personaRules: [] };
     var bibleCache = {};
+    var synthSeed = 1;
     var currentItem = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
-    var currentBible = { found: false, path: "", raw: "", lyricLine: "", summary: "" };
+    var currentBible = { found: false, path: "", raw: "", lyrics: [], location: "", links: [], management: "" };
 
     var REPO_API_TREE = "https://api.github.com/repos/agent-anna/anna-v2/git/trees/main?recursive=1";
     var RAW_BASE = "https://raw.githubusercontent.com/agent-anna/anna-v2/main/";
@@ -180,6 +189,20 @@
         .replace(/\s+/g, "-");
     }
 
+    function hashString(str){
+      var h = 2166136261;
+      for (var i = 0; i < str.length; i++){
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    function pickByHash(list, seedVal){
+      if (!list || !list.length) return "";
+      return list[seedVal % list.length];
+    }
+
     function fetchTextAny(urls){
       return new Promise(function(resolve){
         var idx = 0;
@@ -197,19 +220,6 @@
       });
     }
 
-    function parseV4Core(text){
-      var lines = (text || "").split(/\r?\n/);
-      var extracted = [];
-      for (var i = 0; i < lines.length && extracted.length < 12; i++){
-        var ln = lines[i].trim();
-        if (!ln) continue;
-        if (/anna|strayd|rule|system|prompt|persona|voice|live.?action|cartoon/i.test(ln) && ln.length < 240){
-          extracted.push(ln.replace(/^[-*#\/\/\s]+/, ""));
-        }
-      }
-      return extracted;
-    }
-
     function loadV4Core(){
       var coreCandidates = [
         "../v4/v4.js",
@@ -219,68 +229,57 @@
       ];
       return fetchTextAny(coreCandidates).then(function(res){
         if (res && res.text){
-          var clues = parseV4Core(res.text);
-          v4CoreSummary.loadedSources.push(res.url);
-          if (clues.length){
-            v4CoreSummary.v4Clues = clues.slice(0, 6);
-          }
+          v4CoreData.loadedSources.push(res.url);
+          var lines = res.text.split(/\r?\n/);
+          v4CoreData.personaRules = lines.filter(function(l){
+            return /anna|manager|promote|strayd|live.?action|cartoon/i.test(l) && l.trim().length > 8 && l.trim().length < 200;
+          }).slice(0, 8);
         }
-        var treeEntries = repoTree.filter(function(item){
-          return /^A1\/v4\//i.test(item.path) && /\.(md|json|txt)$/i.test(item.path);
-        }).slice(0, 5);
-        return Promise.all(treeEntries.map(function(entry){
-          return fetchTextAny(["../" + entry.path.replace(/^A1\//i, ""), RAW_BASE + entry.path]).then(function(r){
-            if (r && r.text){
-              v4CoreSummary.loadedSources.push(entry.path);
-              var c = parseV4Core(r.text);
-              if (c.length) v4CoreSummary.v4Clues = (v4CoreSummary.v4Clues || []).concat(c.slice(0, 3));
-            }
-          });
-        }));
       });
     }
 
-    function parseBibleMarkdown(mdText, songTitle){
+    function extractSectionBlock(md, headingRegex){
+      var m = md.match(new RegExp("##\\s*(?:" + headingRegex + ")[^\\n]*\\n([\\s\\S]*?)(?=\\n##\\s|$)", "i"));
+      return m ? m[1].trim() : "";
+    }
+
+    function parseBibleMarkdown(mdText){
       var clean = (mdText || "").replace(/\r\n/g, "\n").trim();
-      if (!clean) return { found: false, raw: "", lyricLine: "", summary: "" };
-      var lines = clean.split("\n").map(function(l){ return l.trim(); }).filter(function(l){
-        return l && !/^#/.test(l) && !/^---+$/.test(l) && !/^\*\*?(song|title|artist|cover|art|artwork)\*?\s*:/i.test(l);
-      });
-      var lyricLine = "";
-      for (var i = 0; i < lines.length; i++){
-        var candidate = lines[i].replace(/^[-*>"\s]+|["]+$/g, "").trim();
-        if (candidate.length >= 12 && candidate.length <= 150 && !/^(lyrics|verse|chorus|notes|visuals?)\s*:?$/i.test(candidate)){
-          lyricLine = candidate;
-          break;
-        }
-      }
+      if (!clean) return { found: false, raw: "", lyrics: [], location: "", links: [], management: "" };
+
+      var lyricsBlock = extractSectionBlock(clean, "lyrics?");
+      var locBlock = extractSectionBlock(clean, "location[^\\n]*|scene[^\\n]*");
+      var linksBlock = extractSectionBlock(clean, "links?[^\\n]*|ecosystem[^\\n]*");
+      var mgmtBlock = extractSectionBlock(clean, "anna\\s*management|management");
+
+      var lyricLines = lyricsBlock.split("\n")
+        .map(function(l){ return l.replace(/^[\s>*\-"]+|["]+$/g, "").trim(); })
+        .filter(function(l){ return l && !/^\[.*\]$/.test(l) && l.length >= 10; });
+
+      var locClean = locBlock.replace(/^[\s>*\-]+/gm, "").replace(/\*\*[^*]+\*\*:\s*/g, "").trim();
+      var urlMatches = (linksBlock.match(/https?:\/\/[^\s)>\]]+/g) || []);
+      var mgmtClean = mgmtBlock.replace(/^[\s>*\-]+/gm, "").replace(/\*\*[^*]+\*\*:\s*/g, "").trim();
+
       return {
         found: true,
         raw: clean,
-        lyricLine: lyricLine,
-        summary: clean.slice(0, 260)
+        lyrics: lyricLines,
+        location: locClean,
+        links: urlMatches,
+        management: mgmtClean
       };
     }
 
     function loadBibleForSong(title){
       var n = norm(title);
       if (bibleCache[n]) return Promise.resolve(bibleCache[n]);
-
       var slug = slugifyTitle(title);
       var candidates = [
         "../docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
-        "../docs/v3BIBLE/" + encodeURIComponent("Martin Strayd - " + title) + ".md",
         "../docs/v3BIBLE/" + encodeURIComponent(slug) + ".md",
-        "../docs/v3BIBLE/songs/" + encodeURIComponent(title) + ".md",
-        "../docs/v3BIBLE/songs/" + encodeURIComponent(slug) + ".md",
         RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
-        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent("Martin Strayd - " + title) + ".md",
-        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(slug) + ".md",
-        RAW_BASE + "docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
-        RAW_BASE + "docs/v3BIBLE/" + encodeURIComponent(slug) + ".md"
+        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(slug) + ".md"
       ];
-
-      // Also search discovered tree paths matching v3BIBLE and song title
       repoTree.forEach(function(node){
         if (/v3bible/i.test(node.path) && /\.md$/i.test(node.path)){
           var base = node.path.split("/").pop().replace(/\.md$/i, "");
@@ -290,13 +289,121 @@
           }
         }
       });
-
       return fetchTextAny(candidates).then(function(res){
-        var parsed = res && res.text ? parseBibleMarkdown(res.text, title) : { found: false, raw: "", lyricLine: "", summary: "" };
+        var parsed = res && res.text ? parseBibleMarkdown(res.text) : { found: false, raw: "", lyrics: [], location: "", links: [], management: "" };
         parsed.path = res ? res.url : "";
         bibleCache[n] = parsed;
         return parsed;
       });
+    }
+
+    function deriveTrackKeywords(title){
+      var stop = { "the":1,"and":1,"for":1,"with":1,"from":1,"into":1,"your":1,"you":1,"are":1,"a":1,"an":1,"to":1,"of":1,"in":1,"on":1,"at":1,"is":1,"it":1,"my":1,"me":1 };
+      var words = (title || "").toLowerCase().replace(/[^a-z0-9\s]+/g, " ").split(/\s+/).filter(function(w){
+        return w.length >= 3 && !stop[w];
+      });
+      return words.slice(0, 4);
+    }
+
+    function buildHashtags(title, seedVal){
+      var baseTags = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter", "#IndependentMusic", "#OriginalMusic", "#MusicDiscovery", "#AltRock"];
+      var kwTags = deriveTrackKeywords(title).map(function(w){
+        return "#" + w.charAt(0).toUpperCase() + w.slice(1);
+      });
+      var pool = kwTags.concat(baseTags);
+      var unique = [];
+      for (var i = 0; i < pool.length && unique.length < 4; i++){
+        var tag = pool[(seedVal + i) % pool.length];
+        if (unique.indexOf(tag) === -1) unique.push(tag);
+      }
+      return unique.join(" ");
+    }
+
+    function synthesizeCopyForSong(title, bInfo, link, gbUrl, dayIdx, runSeed){
+      var hBase = hashString(title + "|" + dayIdx + "|" + runSeed);
+      var kws = deriveTrackKeywords(title);
+      var kwPhrase = kws.length ? kws.join(" ") : "original rock song";
+      var tags = buildHashtags(title, hBase);
+
+      var hasLyric = !!(bInfo && bInfo.lyrics && bInfo.lyrics.length);
+      var chosenLyric = hasLyric ? pickByHash(bInfo.lyrics, hBase) : "";
+      var hasLoc = !!(bInfo && bInfo.location && !/\[add live-action location\]/i.test(bInfo.location));
+      var locNote = hasLoc ? bInfo.location.split("\n")[0].slice(0, 110) : "";
+
+      var focusModes = ["hook", "lyric", "scene", "ownership", "discovery", "vault", "spotlight"];
+      var activeMode = focusModes[dayIdx % focusModes.length];
+
+      var coreAngle = "";
+      if (activeMode === "lyric" && chosenLyric){
+        coreAngle = "Listen for \"" + chosenLyric + "\" — ";
+      } else if (activeMode === "scene" && locNote){
+        coreAngle = "Set around " + locNote + " — ";
+      } else if (activeMode === "ownership"){
+        coreAngle = "Skip temporary streams and own the MP3 + sleeve outright — ";
+      } else if (activeMode === "discovery"){
+        coreAngle = "Built for listeners and search queries chasing " + kwPhrase + " — ";
+      } else if (activeMode === "vault"){
+        coreAngle = "Pulled from Martin Strayd's catalog vault under Anna's management — ";
+      } else if (activeMode === "spotlight"){
+        coreAngle = "Holding the spotlight this week on Anna's single board — ";
+      } else {
+        coreAngle = chosenLyric ? ("\"" + chosenLyric + "\" sets the tone — ") : ("Hits straight on " + kwPhrase + " — ");
+      }
+
+      var ttOpeners = [
+        "Agent Anna putting \"" + title + "\" on deck — ",
+        "New single push from Anna's desk: \"" + title + "\" — ",
+        "\"" + title + "\" by Martin Strayd just locked into Anna's rotation — ",
+        "Why \"" + title + "\" stands out on Anna's feed today: "
+      ];
+      var tiktok = pickByHash(ttOpeners, hBase) + coreAngle + "Martin Strayd delivers real weight without algorithm noise. Direct MP3 + art: " + link + " " + tags;
+
+      var igOpeners = [
+        "\"" + title + "\" by Martin Strayd — ",
+        "Anna's single pick today: \"" + title + "\" — ",
+        "Running \"" + title + "\" for Martin Strayd today — "
+      ];
+      var instagram = pickByHash(igOpeners, hBase >> 1) + coreAngle + "managed and promoted by Agent Anna for listeners who keep real music. Own MP3 + cover art: " + link + " " + tags;
+
+      var ytTitleCandidates = [
+        title + " — Martin Strayd (Agent Anna Single Spotlight)",
+        "Martin Strayd - \"" + title + "\" | " + (kws[0] ? (kws[0].toUpperCase() + " & ") : "") + "Indie Rock Single",
+        "\"" + title + "\" by Martin Strayd (Official Single & Art — Agent Anna)",
+        "Agent Anna Single Pick: \"" + title + "\" — Martin Strayd"
+      ];
+      var ytTitle = pickByHash(ytTitleCandidates, hBase >> 2).slice(0, 100);
+
+      var ytDesc = "\"" + title + "\" by Martin Strayd — promoted by Agent Anna (" + kwPhrase + ").\n\n" +
+        coreAngle +
+        (chosenLyric ? ("Lyric line: \"" + chosenLyric + "\"\n") : "") +
+        "Direct MP3 + cover art bundle: " + link +
+        "\nCatalog & band hub: https://strayd.com/band" +
+        (gbUrl ? ("\nBible / lyrics mirror: " + gbUrl) : "") +
+        "\n\n" + tags;
+
+      var fbOpeners = [
+        "Agent Anna here managing Martin Strayd's single run on \"" + title + "\". ",
+        "Putting \"" + title + "\" from Martin Strayd in front of the room today. ",
+        "One single in focus today with Agent Anna: \"" + title + "\" by Martin Strayd. "
+      ];
+      var facebook = pickByHash(fbOpeners, hBase >> 3) + coreAngle + "What stands out to you first on a track like this? Grab the MP3 + cover art direct: " + link;
+
+      var shortTags = tags.split(/\s+/).slice(0, 2).join(" ");
+      var xOpeners = [
+        "\"" + title + "\" — Martin Strayd. ",
+        "Anna's single in rotation: \"" + title + "\" by Martin Strayd. ",
+        "Martin Strayd's \"" + title + "\" on Anna's radar today — "
+      ];
+      var xPost = pickByHash(xOpeners, hBase >> 4) + (chosenLyric ? ("\"" + chosenLyric + "\" ") : (kwPhrase + " ")) + link + " " + shortTags;
+
+      return {
+        tiktok: tiktok,
+        instagram: instagram,
+        ytTitle: ytTitle,
+        ytDesc: ytDesc,
+        facebook: facebook,
+        x: xPost
+      };
     }
 
     function matchSong(query){
@@ -307,15 +414,21 @@
              null;
     }
 
-    function applyArt(item){
+    function applyHero(item){
       var img = document.getElementById("artPreview");
+      var hTitle = document.getElementById("heroSongTitle");
       var meta = document.getElementById("artMeta");
+      var brief = document.getElementById("liveBriefLine");
+      if (hTitle) hTitle.textContent = (item && item.title) || "Martin Strayd Single";
       if (item && item.url && img){
         img.src = item.url;
         img.alt = item.title;
       }
       if (meta){
-        meta.textContent = "Artwork: " + ((item && item.filename) || "Catalog sleeve");
+        meta.textContent = "Cover art: " + ((item && item.filename) || "Catalog sleeve");
+      }
+      if (brief){
+        brief.textContent = "Live-action brief: Strictly realistic live-action / documentary camera footage only (zero cartoon) for \"" + ((item && item.title) || "") + "\".";
       }
     }
 
@@ -346,8 +459,9 @@
       var bibleCount = repoTree.filter(function(x){ return /v3bible/i.test(x.path) && /\.md$/i.test(x.path); }).length;
       var gb = document.getElementById("gitbookUrl").value.trim();
       box.innerHTML =
-        '<span class="pill">A1/v4 Core: ' + (v4CoreSummary.loadedSources.length ? "Loaded" : "Active Rules") + '</span>' +
-        '<span class="pill">docs/v3BIBLE .md files found: ' + bibleCount + '</span>' +
+        '<span class="pill">A1/v4 Core: ' + (v4CoreData.loadedSources.length ? "Loaded" : "Active") + '</span>' +
+        '<span class="pill">v3BIBLE .md files: ' + bibleCount + '</span>' +
+        '<span class="pill">Dynamic Generator: Active</span>' +
         (gb ? '<span class="pill">GitBook Mirror Linked</span>' : '<span class="pill">GitBook Mirror: A1/docs/v3BIBLE</span>');
     }
 
@@ -357,7 +471,7 @@
       var rawTitle = custom || picked || currentItem.title;
       var found = matchSong(rawTitle);
       currentItem = found || { title: rawTitle, filename: rawTitle + ".png", url: currentItem.url || "" };
-      applyArt(currentItem);
+      applyHero(currentItem);
 
       var link = document.getElementById("directLink").value.trim() || "https://www.paypal.com/paypalme/martinstrayd";
       var gb = document.getElementById("gitbookUrl").value.trim();
@@ -366,70 +480,17 @@
 
       return loadBibleForSong(t).then(function(bInfo){
         currentBible = bInfo;
-        var hasLyrics = !!(bInfo && bInfo.found && bInfo.lyricLine);
-        var lyricHook = hasLyrics ? ("Line on my desk: \"" + bInfo.lyricLine + "\" — ") : "";
-
         document.getElementById("bibleStatusBox").value = bInfo.found
-          ? ("MATCHED v3BIBLE .md: " + bInfo.path + "\n" + bInfo.raw.slice(0, 360))
-          : ("No .md file yet in docs/v3BIBLE for \"" + t + "\" (matching title: " + slugifyTitle(t) + ".md).\nUsing song title + cover art now; drop the matching .md into docs/v3BIBLE (and GitBook mirror) and Anna reads lyrics automatically.");
+          ? ("v3BIBLE .md: " + bInfo.path + "\n" + bInfo.raw.slice(0, 340))
+          : ("v3BIBLE entry ready for \"" + t + "\" (" + slugifyTitle(t) + ".md). Add lyrics, location, links & management notes in docs/v3BIBLE or GitBook mirror anytime.");
 
-        document.getElementById("liveBriefOut").value =
-          "Anna's visual direction for \"" + t + "\": Strictly realistic live-action / documentary footage only (zero cartoon). Real cameras, real environments, real performance.";
-
-        var ttHooks = [
-          "Stop scrolling—Agent Anna just put \"" + t + "\" at #1 on today's MTV single board. " + lyricHook + "Martin Strayd wrote a track with teeth that search & AI playlists miss. Own MP3 + art: " + link + " #MartinStrayd #STRAYD #IndieRock #NewSingle",
-          "Why is \"" + t + "\" hitting harder than half the over-polished chart noise? " + lyricHook + "I'm Agent Anna—Martin Strayd's manager—and this single is built to keep. Grab MP3 + art: " + link + " #MartinStrayd #IndependentMusic #RockSong #Songwriter",
-          "Day " + (d + 1) + " pushing \"" + t + "\" by Martin Strayd. " + lyricHook + "Real songcraft, zero algorithm sugarcoating, straight to listeners who buy music to own. Get MP3 + art: " + link + " #MartinStrayd #STRAYD #MusicDiscovery #AltRock",
-          "If you're searching for indie rock & songwriter tracks that actually mean something, start with \"" + t + "\" by Martin Strayd. " + lyricHook + "Agent Anna's pick today: " + link + " #MartinStrayd #IndieArtist #OriginalMusic #MustHear",
-          "Late-night spin on Anna's console: \"" + t + "\" by Martin Strayd. " + lyricHook + "Built for real ears and human rebellion—own the MP3 + sleeve art directly: " + link + " #MartinStrayd #STRAYD #NightDrive #RockMusic",
-          "Vault single spotlight: \"" + t + "\" by Martin Strayd. " + lyricHook + "Agent Anna curates one standout track at a time so real music cuts through. MP3 + art bundle: " + link + " #MartinStrayd #MusicCollector #IndieRock #STRAYD",
-          "Final rotation push this week for \"" + t + "\" by Martin Strayd before Anna rotates the spotlight. " + lyricHook + "Lock in your MP3 + cover art copy: " + link + " #MartinStrayd #STRAYD #Songwriting #IndependentArtist"
-        ];
-
-        var igHooks = [
-          "\"" + t + "\" just took center stage on Agent Anna's single board—and it isn't playing polite. " + lyricHook + "As Martin Strayd's manager, I'm pushing this one straight to listeners who want real weight instead of disposable streams. Own MP3 + art: " + link + " #MartinStrayd #STRAYD #IndependentMusic #RockAndRoll",
-          "Some songs ask for permission; \"" + t + "\" by Martin Strayd kicks the door open. " + lyricHook + "Agent Anna running the campaign—no middleman hype, just a track worth owning outright. Get MP3 + art: " + link + " #MartinStrayd #Songwriter #IndieRock #MusicFans",
-          "Own the song, own the cover art, skip the rental model. " + lyricHook + "Agent Anna spotlighting \"" + t + "\" by Martin Strayd today—built for people who keep great music on repeat. Direct bundle: " + link + " #MartinStrayd #STRAYD #DirectToFan #OriginalMusic",
-          "AI search and algorithm feeds love neat boxes—Martin Strayd's \"" + t + "\" gives them something real to chew on. " + lyricHook + "Agent Anna backing this single all week: " + link + " #MartinStrayd #AlternativeMusic #IndieArtist #NewMusic",
-          "Weekend volume check: \"" + t + "\" by Martin Strayd. " + lyricHook + "Agent Anna putting this single in front of real listeners who still care how a record hits at full volume. MP3 + art: " + link + " #MartinStrayd #STRAYD #RockMusic #WeekendSpin",
-          "Inside the Martin Strayd catalog with Agent Anna: \"" + t + "\" is a single you keep in your personal collection, not lose to a playlist shuffle. " + lyricHook + "Grab MP3 + art: " + link + " #MartinStrayd #MusicCollection #IndieRock #Songwriting",
-          "Last call on this week's \"" + t + "\" spotlight from Martin Strayd before Agent Anna moves the needle to the next single. " + lyricHook + "Claim MP3 + cover art: " + link + " #MartinStrayd #STRAYD #IndependentArtist #MusicScene"
-        ];
-
-        var ytTitles = [
-          (t + " — Martin Strayd (Agent Anna MTV Single Spotlight)").slice(0, 100),
-          ("Why \"" + t + "\" by Martin Strayd Hits — Agent Anna Single Pick").slice(0, 100),
-          (t + " (Official Single & Art Bundle) — Martin Strayd").slice(0, 100),
-          ("Martin Strayd - \"" + t + "\" | Indie Rock & Songwriter Single").slice(0, 100),
-          ("Late-Night Single: \"" + t + "\" by Martin Strayd (Agent Anna)").slice(0, 100),
-          ("Martin Strayd Vault Single: \"" + t + "\" — Agent Anna Picks").slice(0, 100),
-          (t + " — Martin Strayd (Weekly Single Feature w/ Agent Anna)").slice(0, 100)
-        ];
-
-        var ytDescs = [
-          "\"" + t + "\" by Martin Strayd — featured by Agent Anna as today's top single spotlight.\n\n" + (hasLyrics ? ("Featured lyric line: \"" + bInfo.lyricLine + "\"\n\n") : "") + "Independent rock and songwriter storytelling made for listeners who want real substance and direct MP3 + cover art ownership: " + link + (gb ? ("\nBible / lyrics mirror: " + gb) : "") + "\n\n#MartinStrayd #STRAYD #IndieRock #OriginalMusic",
-          "Agent Anna breaks down \"" + t + "\" by Martin Strayd — a sharp, unfiltered single built to cut through algorithm noise.\n\n" + (hasLyrics ? ("Lyric focus: \"" + bInfo.lyricLine + "\"\n\n") : "") + "Direct MP3 + artwork download: " + link + "\n\n#MartinStrayd #Songwriter #IndependentArtist #RockMusic"
-        ];
-
-        var fbPosts = [
-          "Agent Anna here—running Martin Strayd's single campaign, and \"" + t + "\" is front and center today. " + lyricHook + "Tell me what hits you first when a track like this comes on, and grab the MP3 + cover art direct: " + link,
-          "I manage and promote Martin Strayd, and \"" + t + "\" is one of those singles that earns its keep. " + lyricHook + "No algorithm filler—just real songwriting you can own directly with cover art: " + link,
-          "One single at a time, done right. Agent Anna pushing \"" + t + "\" by Martin Strayd today—own the MP3 + artwork bundle directly: " + link
-        ];
-
-        var xPosts = [
-          "\"" + t + "\" — Martin Strayd. Agent Anna's single pick today for real listeners & search discovery. MP3 + art: " + link + " #MartinStrayd #STRAYD",
-          "Agent Anna backing \"" + t + "\" by Martin Strayd today—real teeth, zero filler. Own MP3 + art: " + link + " #MartinStrayd #IndieRock",
-          "Single in rotation: \"" + t + "\" by Martin Strayd. Grab MP3 + cover art direct: " + link + " #MartinStrayd #Songwriter"
-        ];
-
-        document.getElementById("ttOut").value = ttHooks[d % ttHooks.length];
-        document.getElementById("igOut").value = igHooks[d % igHooks.length];
-        document.getElementById("ytTitleOut").value = ytTitles[d % ytTitles.length];
-        document.getElementById("ytDescOut").value = ytDescs[d % ytDescs.length];
-        document.getElementById("fbOut").value = fbPosts[d % fbPosts.length];
-        document.getElementById("xOut").value = xPosts[d % xPosts.length];
-
+        var gen = synthesizeCopyForSong(t, bInfo, link, gb, d, synthSeed);
+        document.getElementById("ttOut").value = gen.tiktok;
+        document.getElementById("igOut").value = gen.instagram;
+        document.getElementById("ytTitleOut").value = gen.ytTitle;
+        document.getElementById("ytDescOut").value = gen.ytDesc;
+        document.getElementById("fbOut").value = gen.facebook;
+        document.getElementById("xOut").value = gen.x;
         updateCounts();
       });
     }
@@ -441,16 +502,10 @@
           if (tData && Array.isArray(tData.tree)) repoTree = tData.tree;
           return loadV4Core();
         })
-        .catch(function(){
-          return loadV4Core();
-        })
+        .catch(function(){ return loadV4Core(); })
         .then(function(){
           renderBadges();
-          var urls = [
-            "./strayd-artist-live.json",
-            RAW_BASE + "A1/strayd/strayd-artist-live.json"
-          ];
-          return fetchTextAny(urls).then(function(res){
+          return fetchTextAny(["./strayd-artist-live.json", RAW_BASE + "A1/strayd/strayd-artist-live.json"]).then(function(res){
             if (!res || !res.text) return;
             var d = JSON.parse(res.text);
             var list = (d && d.files_and_folders) || [];
@@ -472,7 +527,7 @@
               currentItem = pref;
               sel.value = pref.title;
             }
-            document.getElementById("bootStatus").textContent = "Anna ready • " + catalog.length + " songs • A1/v4 + docs/v3BIBLE wired";
+            document.getElementById("bootStatus").textContent = "Anna ready • " + catalog.length + " songs • Dynamic synthesis active";
           });
         })
         .then(buildDrafts);
@@ -480,19 +535,30 @@
 
     document.getElementById("reloadKnowledgeBtn").addEventListener("click", function(){
       bibleCache = {};
+      synthSeed++;
       loadRepoTreeAndCatalog();
     });
     document.getElementById("songPicker").addEventListener("change", function(){
       document.getElementById("customSong").value = "";
+      synthSeed++;
       buildDrafts();
     });
-    document.getElementById("customSong").addEventListener("input", buildDrafts);
-    document.getElementById("dayAngle").addEventListener("change", buildDrafts);
+    document.getElementById("customSong").addEventListener("input", function(){
+      synthSeed++;
+      buildDrafts();
+    });
+    document.getElementById("dayAngle").addEventListener("change", function(){
+      synthSeed++;
+      buildDrafts();
+    });
     document.getElementById("gitbookUrl").addEventListener("input", function(){
       renderBadges();
       buildDrafts();
     });
-    document.getElementById("regenBtn").addEventListener("click", buildDrafts);
+    document.getElementById("regenBtn").addEventListener("click", function(){
+      synthSeed++;
+      buildDrafts();
+    });
     document.getElementById("directLink").addEventListener("input", buildDrafts);
     ["ttOut","igOut","ytTitleOut","ytDescOut","fbOut","xOut"].forEach(function(id){
       document.getElementById(id).addEventListener("input", updateCounts);
@@ -504,7 +570,7 @@
         ecosystem: "Agent Anna (A1 / A1/v4 + docs/v3BIBLE)",
         gitbookMirror: document.getElementById("gitbookUrl").value.trim(),
         v3BibleSource: currentBible.found ? currentBible.path : "title_and_cover_art_fallback",
-        lyricLineUsed: currentBible.lyricLine || "",
+        lyricsFoundCount: (currentBible.lyrics || []).length,
         approved: true,
         approvedAt: new Date().toISOString(),
         artist: "Martin Strayd",
