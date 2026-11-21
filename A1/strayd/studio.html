@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A1 Shell • Agent Anna v4 MTV & Dahl Studio</title>
+  <title>A1 Shell • Agent Anna v4 Social & MTV Studio</title>
   <style>
     :root {
       --bg: #090c12;
@@ -152,8 +152,8 @@
   <div class="container">
     <header class="topbar">
       <div>
-        <h1>A1 Shell • Agent Anna v4 MTV &amp; Dahl Studio</h1>
-        <div class="muted">Agent Anna (A1 shell + lean v4 core) • Powered by Dahl inference + GitHub PAT • Live-action only (zero cartoon)</div>
+        <h1>A1 Shell • Agent Anna v4 Social &amp; MTV Studio</h1>
+        <div class="muted">Agent Anna (A1 shell + lean v4 core) • Dahl creative engine + GitHub PAT • Realistic live-action only (zero cartoon)</div>
       </div>
       <div class="muted" id="bootStatus">Booting Anna v4...</div>
     </header>
@@ -164,10 +164,10 @@
           <img id="artPreview" src="" alt="Martin Strayd Single Cover Sleeve" />
         </div>
         <div>
-          <div class="section-label">ACTIVE SINGLE &amp; SLEEVE BRIEF (AGENT ANNA MTV DESK)</div>
+          <div class="section-label">ACTIVE SINGLE &amp; SLEEVE BRIEF (AGENT ANNA DESK)</div>
           <div class="hero-title" id="heroTitle">Who Killed Fun (Pay the Rent)</div>
           <div class="muted" id="artFileMeta">Cover sleeve: loading...</div>
-          <div class="muted" id="artScanMeta" style="margin-top:4px;">Visual scan: pending...</div>
+          <div class="muted" id="sceneBriefMeta" style="margin-top:4px;">Live-action direction: loading...</div>
           <div class="muted" id="visualRuleMeta" style="margin-top:6px;">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div id="statusBadges"></div>
         </div>
@@ -184,16 +184,16 @@
             <label for="customSong">Or Type Song Title</label>
             <input id="customSong" type="text" placeholder="Song title..." />
 
-            <label for="rotationShift">MTV Rotation &amp; Creative Angle</label>
+            <label for="rotationShift">Campaign Angle &amp; Rotation</label>
             <select id="rotationShift">
               <option value="auto">Auto (Day of Week)</option>
-              <option value="0">01 • MTV Countdown &amp; Opening Cut</option>
-              <option value="1">02 • Topic, Lyrics &amp; Street Heat</option>
-              <option value="2">03 • Live-Action Scene &amp; Camera Mood</option>
-              <option value="3">04 • Own MP3 + Sleeve Bundle</option>
-              <option value="4">05 • Search &amp; AI Discovery Bait</option>
-              <option value="5">06 • External Note &amp; Story Pull</option>
-              <option value="6">07 • Weekend Spotlight Push</option>
+              <option value="0">01 • Late-Night MTV Hook &amp; Attitude</option>
+              <option value="1">02 • Lyrics, Tension &amp; Real Stakes</option>
+              <option value="2">03 • Live-Action Frame &amp; Street Mood</option>
+              <option value="3">04 • Own MP3 + Sleeve (Skip Renting)</option>
+              <option value="4">05 • Search &amp; Discovery Angle</option>
+              <option value="5">06 • External Note &amp; Story Cut</option>
+              <option value="6">07 • Weekend Heavy Rotation</option>
             </select>
 
             <label for="directLink">Direct MP3 + Cover Art Link</label>
@@ -205,7 +205,7 @@
             <label for="dahlModel">Dahl Model</label>
             <input id="dahlModel" type="text" value="MiniMaxAI/MiniMax-M2.7" />
 
-            <label for="dahlKey">Dahl API Key (Session / Local)</label>
+            <label for="dahlKey">Dahl API Key</label>
             <input id="dahlKey" type="password" placeholder="dahl-... or API key" />
 
             <label for="ghPat">GitHub PAT (Repo Read / Save)</label>
@@ -216,7 +216,7 @@
 
             <div class="actions">
               <button type="button" id="reloadBtn">Reload Repo Catalog, Notes &amp; Art</button>
-              <button type="button" id="generateBtn">Anna: Generate With Dahl</button>
+              <button type="button" id="generateBtn">Anna: Craft Social Campaign</button>
               <button type="button" class="primary" id="approveBtn">OK To Post (Approve Single)</button>
             </div>
             <div class="muted" id="gateStatus" style="margin-top:8px;">ANNA Gate: Staged — waiting for your OK</div>
@@ -226,7 +226,7 @@
             <div class="section-label">2. CHAT WITH AGENT ANNA (DAHL AI)</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Tell Anna an MTV angle, scene, or rewrite..." />
+              <input id="chatInput" type="text" placeholder="Tell Anna a scene, hook, or rewrite direction..." />
               <button type="button" id="chatSendBtn">Ask Anna</button>
             </div>
           </section>
@@ -243,7 +243,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>TikTok • Fast MTV Hook + Keywords + Bundle CTA</span>
+                <span>TikTok • Fast Spoken Hook + Live-Action Cut + Bundle CTA</span>
                 <span class="stats" id="ttStats">0 words • 0 chars</span>
               </div>
               <textarea id="ttOut"></textarea>
@@ -252,7 +252,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Instagram • Lead Hook Before Fold + Anna Pitch + Tags</span>
+                <span>Instagram • Scroll-Stopping Lead + Story + Clean Tags</span>
                 <span class="stats" id="igStats">0 words • 0 chars</span>
               </div>
               <textarea id="igOut"></textarea>
@@ -266,7 +266,7 @@
               </div>
               <input id="ytTitleOut" type="text" maxlength="100" />
               <div class="channel-head" style="margin-top:10px;">
-                <span>YouTube Description • Search Lead First + Story + Links + Tags</span>
+                <span>YouTube Description • Search &amp; Story Lead + Links + Tags</span>
                 <span class="stats" id="ytDescStats">0 words • 0 chars</span>
               </div>
               <textarea id="ytDescOut"></textarea>
@@ -276,7 +276,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Facebook • MTV Host / Manager Callout for Replies &amp; Shares</span>
+                <span>Facebook • Real Question / Stance for Replies &amp; Shares</span>
                 <span class="stats" id="fbStats">0 words • 0 chars</span>
               </div>
               <textarea id="fbOut"></textarea>
@@ -285,7 +285,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>X • Punchy Single Line (limit: &le; 280 chars)</span>
+                <span>X • Sharp One-Liner (limit: &le; 280 chars)</span>
                 <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
               <textarea id="xOut" style="min-height:74px;"></textarea>
@@ -316,11 +316,9 @@
     let catalog = [];
     let externalNotePaths = [];
     const noteCache = new Map();
-    const artCache = new Map();
     let runCounter = 1;
     let customDirective = "";
     let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
-    let activeArt = { summary: "sleeve scan pending" };
     let activeNote = { found: false, path: "", lines: [], raw: "" };
 
     const $ = (id) => document.getElementById(id);
@@ -404,7 +402,6 @@
       return null;
     }
 
-    // Index external reference files outside A1/v4 so Anna v4 stays lean
     async function loadExternalNotesIndex() {
       try {
         const res = await fetch(
@@ -455,103 +452,52 @@
       return record;
     }
 
-    function analyzeSleeve(url) {
-      const cleanUrl = nonEmpty(url);
-      if (!cleanUrl) return Promise.resolve({ summary: "no cover art URL" });
-      if (artCache.has(cleanUrl)) return Promise.resolve(artCache.get(cleanUrl));
+    function buildEditorialBrief(title, noteRec, shift, seed, directive) {
+      const noteLine = noteRec && Array.isArray(noteRec.lines) && noteRec.lines.length
+        ? noteRec.lines[(Math.abs(shift) + seed) % noteRec.lines.length].replace(/\s+/g, " ").trim()
+        : "";
 
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => {
-          try {
-            const canvas = document.createElement("canvas");
-            canvas.width = 48;
-            canvas.height = 48;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, 48, 48);
-            const data = ctx.getImageData(0, 0, 48, 48).data;
+      const scenes = [
+        "Handheld 35mm live-action camera at dusk, street reflections, real room sound, zero animation",
+        "Close-frame live-action performance in a dim backroom, raw grain, no cartoon filters",
+        "Documentary-style real-world motion on the move, natural shadows, strictly live-action",
+        "Late-night studio & bar-counter live-action cut, gritty realism, zero illustration"
+      ];
+      const scene = nonEmpty(directive)
+        ? `Custom live-action brief: ${nonEmpty(directive)} (zero cartoon)`
+        : scenes[(Math.abs(shift) + seed) % scenes.length];
 
-            let lumTotal = 0, satTotal = 0, warmTotal = 0, pixels = 0;
-            for (let i = 0; i < data.length; i += 4) {
-              const r = data[i], g = data[i + 1], b = data[i + 2];
-              const max = Math.max(r, g, b), min = Math.min(r, g, b);
-              lumTotal += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-              satTotal += max === 0 ? 0 : (max - min) / max;
-              warmTotal += (r - b) / 255;
-              pixels++;
-            }
-
-            const lum = lumTotal / Math.max(1, pixels);
-            const sat = satTotal / Math.max(1, pixels);
-            const warm = warmTotal / Math.max(1, pixels);
-
-            const tone = lum < 0.34 ? "dark-shadowed" : lum > 0.66 ? "bright-exposed" : "midtone-balanced";
-            const chroma = sat > 0.42 ? "high-saturation" : sat < 0.16 ? "muted-gritty" : "moderate-color";
-            const temp = warm > 0.08 ? "warm-leaning" : warm < -0.08 ? "cool-leaning" : "neutral-balance";
-
-            const result = { summary: `${tone}, ${chroma}, ${temp} cover art` };
-            artCache.set(cleanUrl, result);
-            resolve(result);
-          } catch (_) {
-            const fallback = { summary: `cover sleeve (${cleanUrl.split("/").pop()})` };
-            artCache.set(cleanUrl, fallback);
-            resolve(fallback);
-          }
-        };
-        img.onerror = () => resolve({ summary: "cover sleeve image pending" });
-        img.src = cleanUrl;
-      });
+      const angleNote = noteLine ? `External note: ${noteLine.slice(0, 120)}` : `Single focus: "${title}" by Martin Strayd`;
+      return { scene, angleNote };
     }
 
-    function extractKeywords(title, noteRec) {
-      const stop = new Set(["the", "and", "for", "with", "from", "into", "your", "you", "are", "a", "an", "to", "of", "in", "on", "at", "is", "it"]);
-      const corpus = `${nonEmpty(title)} ${(noteRec && noteRec.lines ? noteRec.lines.slice(0, 4).join(" ") : "")}`;
-      const freq = {};
-      corpus
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]+/g, " ")
-        .split(/\s+/)
-        .forEach((w) => {
-          if (w.length >= 3 && !stop.has(w)) freq[w] = (freq[w] || 0) + 1;
-        });
-      return Object.keys(freq).sort((a, b) => freq[b] - freq[a]).slice(0, 4);
-    }
-
-    function buildTags(keywords, shift) {
-      const defaults = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter", "#IndependentMusic", "#OriginalMusic"];
-      const topicTags = keywords.map((w) => `#${w.charAt(0).toUpperCase()}${w.slice(1)}`);
-      const pool = [...topicTags, ...defaults];
-      const tags = [];
-      const start = Math.abs(Number(shift) || 0);
-      for (let i = 0; i < pool.length && tags.length < 4; i++) {
-        const tag = pool[(start + i) % pool.length];
-        if (!tags.includes(tag)) tags.push(tag);
-      }
-      return tags.join(" ");
-    }
-
-    function buildFallbackDrafts(track, artSummary, noteRec, link, shift, seed, directive) {
-      const title = nonEmpty(track.title, "Martin Strayd Single");
+    function buildCreativeDrafts(track, noteRec, link, shift, seed, directive) {
+      const title = nonEmpty(track.title, "Who Killed Fun (Pay the Rent)");
       const url = nonEmpty(link, "https://www.paypal.com/paypalme/martinstrayd");
-      const keywords = extractKeywords(title, noteRec);
-      const topicPhrase = keywords.length ? keywords.join(" ") : title.toLowerCase();
-      const tags = buildTags(keywords, shift + seed);
-      const shortTags = tags.split(/\s+/).slice(0, 2).join(" ");
-      const note = nonEmpty(directive) ? ` (${nonEmpty(directive)})` : "";
+      const { scene, angleNote } = buildEditorialBrief(title, noteRec, shift, seed, directive);
 
-      const story = `Agent Anna on the MTV desk—Martin Strayd's "${title}" hits with ${artSummary} edge and real ${topicPhrase} tension${note}, built for listeners who want real weight rather than polite filler.`;
-      const tiktok = `MTV single call from Agent Anna: "${title}" by Martin Strayd. ${story} Direct MP3 + sleeve: ${url} ${tags}`;
-      const instagram = `"${title}" — Martin Strayd (Agent Anna pick). ${story} Own MP3 + cover art: ${url} ${tags}`;
-      const ytTitle = `${title} — Martin Strayd | ${topicPhrase} (Agent Anna)`.slice(0, 100);
-      const ytDesc = `${topicPhrase} — "${title}" by Martin Strayd, promoted by Agent Anna.\n\n${story}\nVisual law: Strictly realistic live-action cinematography only (zero cartoon).\nDirect MP3 + sleeve: ${url}\n\n${tags}`;
-      const facebook = `Agent Anna here—${story} Where does "${title}" hit you first, and who should hear this next? Direct MP3 + sleeve: ${url}`;
+      const hooks = [
+        `Everybody complains about bland playlists until "${title}" hits the room.`,
+        `If polite background music puts you to sleep, listen to "${title}" by Martin Strayd.`,
+        `"${title}" sounds like someone actually meant every word—not a focus-grouped chorus.`,
+        `Real songwriting still exists when a record like "${title}" shows up with teeth.`
+      ];
+      const hook = hooks[(Math.abs(shift) + seed) % hooks.length];
 
-      const xBase = `"${title}" — Martin Strayd (${topicPhrase}). ${url} ${shortTags}`;
-      const xPrefix = `Anna's MTV pick: `;
-      const x = (xPrefix + xBase).length <= 280 ? (xPrefix + xBase) : xBase.slice(0, 280);
+      const tiktok = `${hook} Agent Anna cue: ${scene}. Grab the MP3 + cover sleeve direct so you actually own it: ${url} #MartinStrayd #STRAYD #IndieRock #Songwriter`;
 
-      return { tiktok, instagram, ytTitle, ytDesc, facebook, x };
+      const instagram = `"${title}" — Martin Strayd. ${hook} ${scene}. Own the MP3 + cover art bundle direct: ${url} #MartinStrayd #STRAYD #IndependentMusic #Songwriter`;
+
+      const ytTitle = `${title} — Martin Strayd (Official Single | Agent Anna)`.slice(0, 100);
+
+      const ytDesc = `"${title}" by Martin Strayd — curated by Agent Anna.\n\n${hook}\n${angleNote}\nVisual direction: ${scene}.\n\nOwn the MP3 + cover sleeve bundle direct: ${url}\n\n#MartinStrayd #STRAYD #IndieRock #Songwriter`;
+
+      const facebook = `Agent Anna spinning "${title}" by Martin Strayd tonight. ${hook} ${angleNote}. Where does this track land for you—and who else needs to hear it? Direct MP3 + sleeve: ${url}`;
+
+      const xFull = `"${title}" — Martin Strayd. ${hook} Own the MP3 + sleeve: ${url} #MartinStrayd #STRAYD`;
+      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd. ${url} #MartinStrayd #STRAYD`.slice(0, 280);
+
+      return { tiktok, instagram, ytTitle, ytDesc, facebook, x, scene };
     }
 
     function updateStats() {
@@ -595,8 +541,8 @@
       const hasGh = Boolean(getGhToken());
       $("statusBadges").innerHTML = [
         `<span class="badge">Shell: A1 + Lean v4</span>`,
-        `<span class="badge">${hasDahl ? "Dahl Key Active" : "Dahl Key Standby"}</span>`,
-        `<span class="badge">${hasGh ? "GitHub PAT Active" : "Public Repo Read"}</span>`
+        `<span class="badge">${hasDahl ? "Dahl Creative Ready" : "Dahl Key Standby"}</span>`,
+        `<span class="badge">${hasGh ? "GitHub PAT Ready" : "Repo Read Mode"}</span>`
       ].join("");
     }
 
@@ -617,7 +563,7 @@
           },
           body: JSON.stringify({
             model,
-            temperature: 0.85,
+            temperature: 0.9,
             messages
           }),
           signal: controller.signal
@@ -666,38 +612,32 @@
         $("artPreview").alt = activeTrack.title;
       }
 
-      const [noteRec, sleeveInfo] = await Promise.all([
-        loadExternalSongNote(activeTrack.title),
-        analyzeSleeve(activeTrack.url)
-      ]);
-
+      const noteRec = await loadExternalSongNote(activeTrack.title);
       activeNote = noteRec;
-      activeArt = sleeveInfo;
       renderBadges();
-
-      $("artScanMeta").textContent = `Visual scan: ${activeArt.summary}`;
-      $("bibleBox").value = activeNote.found
-        ? `External note: ${activeNote.path}\n\n${activeNote.raw.slice(0, 360)}`
-        : `External notes stay outside v4 core so v4 stays lean. Add external notes anytime or ask Anna via Dahl.`;
 
       const shiftVal = $("rotationShift").value === "auto" ? new Date().getDay() : (parseInt($("rotationShift").value, 10) || 0);
       const link = nonEmpty($("directLink").value, "https://www.paypal.com/paypalme/martinstrayd");
-      const fallback = buildFallbackDrafts(activeTrack, activeArt.summary, activeNote, link, shiftVal, runCounter, customDirective);
+      const fallback = buildCreativeDrafts(activeTrack, activeNote, link, shiftVal, runCounter, customDirective);
+      $("sceneBriefMeta").textContent = `Live-action direction: ${fallback.scene}`;
+      $("bibleBox").value = activeNote.found
+        ? `External note: ${activeNote.path}\n\n${activeNote.raw.slice(0, 360)}`
+        : `External notes stay outside v4 core so v4 stays lean. Add external notes or steer Agent Anna via Dahl chat.`;
+
       applyDrafts(fallback);
 
       const dahlOut = await askDahl([
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell with lean v4 core, acting as a sharp MTV-era music promoter/manager for Martin Strayd (STRAYD). Rules: strictly realistic live-action cinematography only (zero cartoon/anime/illustration), strong storytelling, direct MP3 + cover sleeve CTA, ytTitle <= 100 chars, x <= 280 chars. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            "You are Agent Anna in the A1 shell (v4 core), writing elite, human, MTV-sharp social copy for independent artist Martin Strayd (STRAYD). Never output raw color-meter jargon or awkward keyword mashups. Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration), own-the-MP3-plus-sleeve positioning, ytTitle <= 100 chars, and x <= 280 chars. Make each platform genuinely distinct. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
         },
         {
           role: "user",
           content: JSON.stringify({
             song: activeTrack.title,
-            sleeveScan: activeArt.summary,
-            externalNoteExcerpt: activeNote.found ? activeNote.lines.slice(0, 4).join(" | ") : "",
-            rotationShift: shiftVal,
+            externalNote: activeNote.found ? activeNote.lines.slice(0, 4).join(" | ") : "",
+            liveActionScene: fallback.scene,
             directive: customDirective,
             directLink: link
           })
@@ -729,11 +669,11 @@
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd with punchy MTV music-desk energy. Strictly realistic live-action only (zero cartoon). Give a sharp, creative reply in 2-3 sentences."
+            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd with sharp MTV/social producer instincts. Strictly realistic live-action only (zero cartoon). Respond in 2-3 punchy, creative sentences."
         },
         {
           role: "user",
-          content: `Single: "${activeTrack.title}" (${activeArt.summary}). User note: ${msg}`
+          content: `Song: "${activeTrack.title}". Creative note: ${msg}`
         }
       ], false);
 
@@ -744,7 +684,7 @@
       }
 
       await generateAll();
-      appendChat("Agent Anna", `Locked "${msg}" onto "${activeTrack.title}" (${activeArt.summary}). Add a Dahl API key above for full live LLM replies, or hit OK To Post when ready.`);
+      appendChat("Agent Anna", `Pushed "${msg}" into the live-action brief for "${activeTrack.title}". Check the drafts and hit OK To Post when it hits right.`);
     }
 
     async function boot() {
@@ -784,7 +724,7 @@
       renderBadges();
       $("bootStatus").textContent = `Anna v4 ready • ${catalog.length} songs`;
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", "MTV desk open on A1 + v4. Pick a track or tell me what angle to push for Martin Strayd.");
+        appendChat("Agent Anna", "Social & MTV desk live. Pick a single or tell me what angle to push for Martin Strayd.");
       }
       await generateAll();
     }
@@ -806,7 +746,6 @@
 
     $("reloadBtn").addEventListener("click", async () => {
       noteCache.clear();
-      artCache.clear();
       runCounter++;
       await boot();
     });
@@ -848,7 +787,6 @@
         artist: "Martin Strayd",
         song: activeTrack.title,
         artworkUrl: activeTrack.url,
-        artworkScan: activeArt.summary,
         visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)",
         link: nonEmpty($("directLink").value),
         tiktok: $("ttOut").value,
