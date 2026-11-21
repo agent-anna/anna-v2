@@ -1,23 +1,36 @@
 {
-  "version": 1,
-  "scope": "A1/strayd (outside A1/v4 core)",
-  "artBase": "https://raw.githubusercontent.com/martinstrayd/artist/main/store-art/",
-  "reachRules": {
-    "facebook": { "allowUrlInBody": false, "maxHashtags": 2 },
-    "x": { "allowUrlInBody": true, "maxHashtags": 2 },
-    "reel": { "allowUrlInBody": false, "maxHashtags": 4, "visualStyle": "realistic-cinematic-no-cartoon" }
-  },
-  "items": [
-    {
-      "id": "track-001",
-      "title": "Adhd I Can Do That (Travillen Disorder)",
-      "artFile": "Martin Strayd - Adhd I Can Do That (Travillen Disorder).png",
-      "status": "ready",
-      "drafts": {
-        "facebook": "High-energy track from the catalog: \"Adhd I Can Do That (Travillen Disorder)\" — personal digital MP3 + artwork edition available to own and share with friends. Drop a note if you want the direct link.",
-        "x": "\"Adhd I Can Do That (Travillen Disorder)\" — Martin Strayd. MP3 + cover art edition, own & share with friends. https://www.paypal.com/paypalme/martinstrayd #MartinStrayd",
-        "reel": "Realistic live-session & street cut for \"Adhd I Can Do That (Travillen Disorder)\" — personal MP3 + artwork edition (share with friends, no resale). #MartinStrayd #IndieMusic"
-      }
-    }
-  ]
+    "updated_at_utc":  "2026-11-21T10:52:33Z",
+    "source_catalog":  "A1/strayd/strayd-artist-live.json",
+    "items":  [
+                  {
+                      "status":  "PENDING_PREVIEW",
+                      "title":  "Adhd I Can Do That (Travillen Disorder)",
+                      "id":  "STRAYD-ID-001",
+                      "artUrl":  "https://martinstrayd.github.io/artist/store-art/Martin Strayd - Adhd I Can Do That (Travillen Disorder).png"
+                  },
+                  {
+                      "status":  "PENDING_PREVIEW",
+                      "title":  "Always Hard (Backstage Knee Pads)",
+                      "id":  "STRAYD-ID-002",
+                      "artUrl":  "https://martinstrayd.github.io/artist/store-art/Martin Strayd - Always Hard (Backstage Knee Pads).png"
+                  },
+                  {
+                      "status":  "PENDING_PREVIEW",
+                      "title":  "Andaman Escape",
+                      "id":  "STRAYD-ID-003",
+                      "artUrl":  "https://martinstrayd.github.io/artist/store-art/Martin Strayd - Andaman Escape.png"
+                  },
+                  {
+                      "status":  "PENDING_PREVIEW",
+                      "title":  "Angelic Gorilla (Fantasy Mix)",
+                      "id":  "STRAYD-ID-004",
+                      "artUrl":  "https://martinstrayd.github.io/artist/store-art/Martin Strayd - Angelic Gorilla (Fantasy Mix).png"
+                  },
+                  {
+                      "status":  "PENDING_PREVIEW",
+                      "title":  "Bad Habits (I Found Nun)",
+                      "id":  "STRAYD-ID-005",
+                      "artUrl":  "https://martinstrayd.github.io/artist/store-art/Martin Strayd - Bad Habits (I Found Nun).png"
+                  }
+              ]
 }
