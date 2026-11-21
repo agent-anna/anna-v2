@@ -827,14 +827,9 @@
     function getCompactVaultContext(userPrompt) {
         const pathEl = document.getElementById("active-file-path");
         const activePath = pathEl ? pathEl.value.trim() : "";
-        const v4Paths = rawTreeData
-            .filter((f) => f && f.type === "blob" && isInV4Scope(f.path))
-            .map((f) => f.path);
-        const visionNote = ephemeralVisionDataUrl
-            ? " | SEE-ONLY IMAGE IN SESSION RAM: present (never saved to Git)"
-            : "";
+        const visionNote = ephemeralVisionDataUrl ? " | IMAGE_IN_RAM: yes" : "";
         const openNote = activePath ? ` | OPEN_FILE: ${activePath}` : "";
-        return `RUNTIME: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}) | ROOT: ${WORKSPACE_ROOT}/ | ACTION: ${SCRAPE_WORKFLOW_FILE}${openNote}${visionNote}\nFILES (${v4Paths.length}, reference-only, never preloaded): ${v4Paths.join(", ")}`;
+        return `ROOT: ${WORKSPACE_ROOT}/ (${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}@${activeBranch})${openNote}${visionNote}`;
     }
 
     async function triggerAutonomousBootSequence() {
@@ -983,13 +978,18 @@
         return clean(rawText);
     }
 
-    async function callDahlDirect(messages) {
+    async function callDahlDirect(messages, onProgress = null) {
         const apiKey = getCleanDahlKey();
         if (!apiKey) throw new Error("Dahl API key missing. Open KEYS to save it.");
 
-        const response = await fetchWithTimeout(
-            DAHL_ENDPOINT,
-            {
+        const startedAt = performance.now();
+        let ttftMs = null;
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), DAHL_TIMEOUT_MS);
+
+        try {
+            const response = await fetch(DAHL_ENDPOINT, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -997,21 +997,79 @@
                 },
                 body: JSON.stringify({
                     model: getActiveModel(),
-                    stream: false,
+                    stream: true,
                     messages
-                })
-            },
-            DAHL_TIMEOUT_MS
-        );
+                }),
+                signal: controller.signal
+            });
 
-        const rawText = await response.text();
-        let json = null;
-        try { json = JSON.parse(rawText); } catch (e) {}
+            if (!response.ok) {
+                const rawErr = await response.text();
+                let errJson = null;
+                try { errJson = JSON.parse(rawErr); } catch (e) {}
+                const detail = errJson && errJson.error ? (errJson.error.message || JSON.stringify(errJson.error)) : rawErr.slice(0, 200);
+                const elapsedMs = Math.round(performance.now() - startedAt);
+                throw new Error(`DAHL HTTP ${response.status} (${elapsedMs}ms): ${detail}`);
+            }
 
-        if (response.ok) return extractDahlReply(json, rawText) || "Ready.";
+            const contentType = response.headers.get("content-type") || "";
+            if (!response.body || !contentType.includes("text/event-stream")) {
+                const rawText = await response.text();
+                const totalMs = Math.round(performance.now() - startedAt);
+                ttftMs = ttftMs ?? totalMs;
+                let json = null;
+                try { json = JSON.parse(rawText); } catch (e) {}
+                const text = extractDahlReply(json, rawText) || "Ready.";
+                return { text, ttftMs, totalMs, status: response.status };
+            }
 
-        const detail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 200);
-        throw new Error(`DAHL HTTP ${response.status}: ${detail}`);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            let assembled = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split(/\r?\n/);
+                buffer = lines.pop() || "";
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed.startsWith("data:")) continue;
+                    const dataStr = trimmed.slice(5).trim();
+                    if (dataStr === "[DONE]") continue;
+                    try {
+                        const chunk = JSON.parse(dataStr);
+                        const delta = chunk?.choices?.[0]?.delta?.content
+                            ?? chunk?.choices?.[0]?.text
+                            ?? "";
+                        if (delta) {
+                            if (ttftMs === null) ttftMs = Math.round(performance.now() - startedAt);
+                            assembled += delta;
+                            const cleanPreview = stripModelStrings(assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").trim());
+                            if (typeof onProgress === "function" && cleanPreview) {
+                                onProgress(cleanPreview, ttftMs, Math.round(performance.now() - startedAt));
+                            }
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            const totalMs = Math.round(performance.now() - startedAt);
+            ttftMs = ttftMs ?? totalMs;
+            const cleanFinal = stripModelStrings(assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").trim()) || "Ready.";
+            return { text: cleanFinal, ttftMs, totalMs, status: response.status };
+        } catch (err) {
+            const elapsedMs = Math.round(performance.now() - startedAt);
+            if (err && err.name === "AbortError") {
+                throw new Error(`DAHL TIMEOUT after ${elapsedMs}ms (limit ${DAHL_TIMEOUT_MS}ms)`);
+            }
+            throw new Error(`${err && err.message ? err.message : "Dahl request failed."} (${elapsedMs}ms)`);
+        } finally {
+            clearTimeout(timer);
+        }
     }
 
     async function auditActiveFile() {
@@ -1232,14 +1290,25 @@
                 `RULES: Answer directly, clearly, and concisely in English using only the V4 work context below. Never invent missing files or live web facts. Never read code blocks aloud.\n\n` +
                 `${vaultContext}`;
 
-            const reply = await callDahlDirect([
-                { role: "system", content: systemPrompt },
-                ...chatHistory.slice(-3)
-            ]);
+            const result = await callDahlDirect(
+                [
+                    { role: "system", content: systemPrompt },
+                    ...chatHistory.slice(-3)
+                ],
+                (liveText, liveTtft, liveElapsed) => {
+                    setMoodState("responding");
+                    updateMessage(assistantMsgId, `${liveText}\n\n[TTFT: ${liveTtft}ms | ${liveElapsed}ms streaming]`);
+                }
+            );
+
+            const reply = typeof result === "string" ? result : result.text;
+            const timingTag = typeof result === "object" && result
+                ? `\n\n[HTTP ${result.status} | TTFT: ${result.ttftMs}ms | Total: ${result.totalMs}ms]`
+                : "";
 
             setMoodState("responding");
             chatHistory.push({ role: "assistant", content: formatReadableMessage(reply) });
-            updateMessage(assistantMsgId, reply);
+            updateMessage(assistantMsgId, `${reply}${timingTag}`);
             speakText(reply);
             await parseAndExecuteAutonomousFiles(reply);
         } catch (err) {
