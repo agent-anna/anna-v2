@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A1 Shell • Agent Anna v4 Social & MTV Studio</title>
+  <title>A1 Shell • Agent Anna v4 Studio</title>
   <style>
     :root {
       --bg: #090c12;
-      --panel: #111622;
-      --panel-2: #171f30;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --line: rgba(148, 163, 184, 0.16);
+      --panel: #111724;
+      --panel-2: #172033;
+      --text: #f3f6fb;
+      --muted: #98a6bd;
+      --line: rgba(148, 163, 184, 0.18);
       --accent: #e5b84b;
       --accent-ink: #090c12;
       --ok: #a3e635;
@@ -25,175 +25,242 @@
       background: var(--bg);
       color: var(--text);
       padding: 20px;
-      line-height: 1.45;
+      line-height: 1.5;
     }
-    .container { max-width: 1220px; margin: 0 auto; }
+    .container { max-width: 1280px; margin: 0 auto; }
+
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: center;
       flex-wrap: wrap;
       gap: 12px;
       border-bottom: 1px solid var(--line);
-      padding-bottom: 12px;
-      margin-bottom: 16px;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
     }
-    .topbar h1 { margin: 0; font-size: 1.28rem; }
-    .muted { color: var(--muted); font-size: 0.84rem; }
+    .topbar h1 { margin: 0; font-size: 1.32rem; letter-spacing: 0.01em; }
+    .muted { color: var(--muted); font-size: 0.85rem; }
 
     .hero {
       display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 18px;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
       align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+    }
+    .sleeve {
+      width: 300px;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #0b0f18;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+    .sleeve img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .hero-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin: 0 0 8px;
+      line-height: 1.2;
+    }
+    .hero-meta { margin: 6px 0; color: var(--muted); font-size: 0.9rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .badge {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #0b0f18;
+      border: 1px solid var(--line);
+      color: var(--sky);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 980px) {
+      .workspace { grid-template-columns: 1fr; }
+    }
+
+    .card {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 16px;
       margin-bottom: 16px;
     }
-    @media (max-width: 720px) { .hero { grid-template-columns: 1fr; } }
-    .sleeve {
-      width: 200px;
-      max-width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 12px;
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 10px 0 4px;
+    }
+    label:first-of-type { margin-top: 0; }
+    input, select, textarea, button {
+      width: 100%;
+      border-radius: 9px;
       border: 1px solid var(--line);
       background: #0b0f18;
-      overflow: hidden;
+      color: var(--text);
+      padding: 9px 12px;
+      font-size: 0.9rem;
     }
-    .sleeve img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .hero-title { font-size: 1.24rem; font-weight: 800; margin: 4px 0 6px; }
-    .badge {
-      display: inline-block;
-      font-size: 0.72rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: #0b0f18;
-      border: 1px solid var(--line);
-      color: var(--sky);
-      margin: 6px 6px 0 0;
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--sky);
     }
+    textarea {
+      min-height: 92px;
+      font-family: ui-monospace, Consolas, Menlo, monospace;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      resize: vertical;
+    }
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      background: var(--panel-2);
+      transition: border-color 0.15s ease, transform 0.08s ease;
+    }
+    button:hover { border-color: var(--accent); }
+    button:active { transform: translateY(1px); }
+    button.primary {
+      background: var(--ok);
+      color: var(--accent-ink);
+      border: none;
+    }
+    button.accent {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border: none;
+    }
+    .actions { display: grid; gap: 8px; margin-top: 14px; }
 
-    .workspace {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 16px;
-      align-items: start;
+    .chat-log {
+      background: #0b0f18;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      max-height: 230px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
     }
-    @media (max-width: 920px) { .workspace { grid-template-columns: 1fr; } }
-    .card {
-      background: var(--panel);
+    .chat-msg { margin-bottom: 9px; }
+    .chat-msg:last-child { margin-bottom: 0; }
+    .chat-msg strong { color: var(--accent); }
+    .chat-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .chat-row button { width: auto; padding: 9px 16px; }
+
+    .channel {
+      background: var(--panel-2);
       border: 1px solid var(--line);
       border-radius: 12px;
       padding: 14px;
       margin-bottom: 14px;
     }
-    .section-label { font-size: 0.78rem; font-weight: 700; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.03em; }
-    label { display: block; font-size: 0.78rem; color: var(--muted); margin: 10px 0 4px; }
-    input, select, textarea, button {
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #0b0f18;
-      color: var(--text);
-      padding: 9px 11px;
-      font-size: 0.88rem;
-    }
-    textarea {
-      min-height: 92px;
-      font-family: ui-monospace, Consolas, monospace;
-      font-size: 0.8rem;
-      line-height: 1.48;
-    }
-    button { cursor: pointer; font-weight: 700; background: var(--panel-2); }
-    button:hover { border-color: var(--accent); }
-    button.primary { background: var(--ok); color: var(--accent-ink); border: none; }
-    .copy-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; margin-top: 6px; }
-    .actions { display: grid; gap: 8px; margin-top: 12px; }
-
-    .channel {
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
+    .channel:last-child { margin-bottom: 0; }
     .channel-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
-      font-size: 0.8rem;
+      font-size: 0.84rem;
       font-weight: 700;
       color: var(--sky);
-      margin-bottom: 6px;
-    }
-    .stats { color: var(--muted); font-weight: 600; font-size: 0.75rem; white-space: nowrap; }
-    .stats.over { color: var(--warn); }
-
-    .chat-log {
-      background: #0b0f18;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      max-height: 210px;
-      overflow-y: auto;
-      font-size: 0.82rem;
       margin-bottom: 8px;
     }
-    .chat-msg { margin-bottom: 8px; }
-    .chat-msg strong { color: var(--accent); }
-    .chat-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-    .chat-row button { width: auto; padding: 9px 14px; }
+    .stats { color: var(--muted); font-weight: 600; font-size: 0.78rem; }
+    .stats.over { color: var(--warn); }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .copy-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; }
   </style>
 </head>
 <body>
   <div class="container">
     <header class="topbar">
       <div>
-        <h1>A1 Shell • Agent Anna v4 Social &amp; MTV Studio</h1>
-        <div class="muted">Agent Anna (A1 shell + lean v4 core) • Dahl creative engine + GitHub PAT • Realistic live-action only (zero cartoon)</div>
+        <h1>A1 Shell • Agent Anna v4 Studio</h1>
+        <div class="muted">Martin Strayd • Dahl AI + GitHub PAT • Strictly realistic live-action only (zero cartoon)</div>
       </div>
-      <div class="muted" id="bootStatus">Booting Anna v4...</div>
+      <div class="muted" id="bootStatus">Initializing...</div>
     </header>
 
     <main>
-      <section class="hero" aria-label="Active Single and Cover Sleeve">
+      <section class="hero" aria-label="Featured Cover Artwork">
         <div class="sleeve">
-          <img id="artPreview" src="" alt="Martin Strayd Single Cover Sleeve" />
+          <img id="artPreview" src="" alt="Martin Strayd Cover Sleeve" />
         </div>
         <div>
-          <div class="section-label">ACTIVE SINGLE &amp; SLEEVE BRIEF (AGENT ANNA DESK)</div>
+          <div class="eyebrow">Featured Sleeve &amp; Campaign Brief</div>
           <div class="hero-title" id="heroTitle">Who Killed Fun (Pay the Rent)</div>
-          <div class="muted" id="artFileMeta">Cover sleeve: loading...</div>
-          <div class="muted" id="sceneBriefMeta" style="margin-top:4px;">Live-action direction: loading...</div>
-          <div class="muted" id="visualRuleMeta" style="margin-top:6px;">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
-          <div id="statusBadges"></div>
+          <div class="hero-meta" id="artFileMeta">Artwork: loading catalog...</div>
+          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: preparing shot &amp; mood brief...</div>
+          <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
+          <div class="badges" id="statusBadges"></div>
+          <div class="muted" id="gateStatus" style="margin-top:12px;">Approval gate: Staged — click OK To Post when ready</div>
         </div>
       </section>
 
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="section-label">1. SINGLE, DAHL &amp; GITHUB CONTROLS</div>
+            <div class="card-title">1. Track &amp; Engine Controls</div>
 
-            <label for="songPicker">Select Single (Catalog)</label>
+            <label for="songPicker">Select Single</label>
             <select id="songPicker"></select>
 
-            <label for="customSong">Or Type Song Title</label>
-            <input id="customSong" type="text" placeholder="Song title..." />
+            <label for="customSong">Custom Song Title Override</label>
+            <input id="customSong" type="text" placeholder="Type a title or leave blank..." />
 
-            <label for="rotationShift">Campaign Angle &amp; Rotation</label>
+            <label for="keywordsInput">Priority Keywords &amp; Trends</label>
+            <input id="keywordsInput" type="text" placeholder="e.g. indie rock, late night, direct mp3, live session..." />
+
+            <label for="rotationShift">Angle &amp; Rotation</label>
             <select id="rotationShift">
               <option value="auto">Auto (Day of Week)</option>
-              <option value="0">01 • Late-Night MTV Hook &amp; Attitude</option>
-              <option value="1">02 • Lyrics, Tension &amp; Real Stakes</option>
-              <option value="2">03 • Live-Action Frame &amp; Street Mood</option>
-              <option value="3">04 • Own MP3 + Sleeve (Skip Renting)</option>
-              <option value="4">05 • Search &amp; Discovery Angle</option>
+              <option value="0">01 • Opening Hook &amp; Attitude</option>
+              <option value="1">02 • Lyrics, Stakes &amp; Tension</option>
+              <option value="2">03 • Live-Action Scene &amp; Camera</option>
+              <option value="3">04 • Own MP3 + Sleeve Bundle</option>
+              <option value="4">05 • Search &amp; Discovery Keywords</option>
               <option value="5">06 • External Note &amp; Story Cut</option>
-              <option value="6">07 • Weekend Heavy Rotation</option>
+              <option value="6">07 • Weekend Spotlight</option>
             </select>
 
             <label for="directLink">Direct MP3 + Cover Art Link</label>
@@ -206,97 +273,109 @@
             <input id="dahlModel" type="text" value="MiniMaxAI/MiniMax-M2.7" />
 
             <label for="dahlKey">Dahl API Key</label>
-            <input id="dahlKey" type="password" placeholder="dahl-... or API key" />
+            <input id="dahlKey" type="password" placeholder="Stored locally in browser..." />
 
-            <label for="ghPat">GitHub PAT (Repo Read / Save)</label>
-            <input id="ghPat" type="password" placeholder="github_pat_... or ghp_..." />
+            <label for="ghPat">GitHub PAT (Optional Repo Lookup)</label>
+            <input id="ghPat" type="password" placeholder="Stored locally in browser..." />
 
-            <label for="webhookUrl">Approval Webhook (Fires Only After OK)</label>
-            <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
+            <label for="webhookUrl">Approval Webhook (Optional)</label>
+            <input id="webhookUrl" type="text" placeholder="https://..." />
 
             <div class="actions">
-              <button type="button" id="reloadBtn">Reload Repo Catalog, Notes &amp; Art</button>
-              <button type="button" id="generateBtn">Anna: Craft Social Campaign</button>
-              <button type="button" class="primary" id="approveBtn">OK To Post (Approve Single)</button>
+              <button type="button" class="accent" id="generateBtn">Generate Channel Copy</button>
+              <button type="button" id="reloadBtn">Reload Catalog &amp; Notes</button>
+              <button type="button" class="primary" id="approveBtn">OK To Post</button>
             </div>
-            <div class="muted" id="gateStatus" style="margin-top:8px;">ANNA Gate: Staged — waiting for your OK</div>
           </section>
 
           <section class="card">
-            <div class="section-label">2. CHAT WITH AGENT ANNA (DAHL AI)</div>
+            <div class="card-title">2. Chat With Agent Anna</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Tell Anna a scene, hook, or rewrite direction..." />
-              <button type="button" id="chatSendBtn">Ask Anna</button>
+              <input id="chatInput" type="text" placeholder="Ask Anna for a hook, scene, or rewrite..." />
+              <button type="button" id="chatSendBtn">Send</button>
             </div>
           </section>
         </aside>
 
         <div>
           <section class="card">
-            <div class="section-label">3. EXTERNAL CONTEXT (KEPT OUTSIDE V4 CORE)</div>
-            <textarea id="bibleBox" readonly style="min-height:76px;"></textarea>
+            <div class="card-title">3. External Notes (Outside v4 Core)</div>
+            <textarea id="bibleBox" readonly style="min-height:74px;"></textarea>
           </section>
 
           <section class="card">
-            <div class="section-label">4. PLATFORM-TUNED DRAFTS BY AGENT ANNA</div>
+            <div class="card-title">4. Channel Drafts</div>
 
             <article class="channel">
               <div class="channel-head">
-                <span>TikTok • Fast Spoken Hook + Live-Action Cut + Bundle CTA</span>
+                <span>TikTok • Fast Hook + Live-Action Cue + Bundle CTA</span>
                 <span class="stats" id="ttStats">0 words • 0 chars</span>
               </div>
               <textarea id="ttOut"></textarea>
-              <button type="button" class="copy-btn" data-copy="ttOut">Copy TikTok</button>
+              <div class="btn-row">
+                <button type="button" class="copy-btn" data-copy="ttOut">Copy TikTok</button>
+              </div>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>Instagram • Scroll-Stopping Lead + Story + Clean Tags</span>
+                <span>Instagram • Lead Hook + Story + Direct Link</span>
                 <span class="stats" id="igStats">0 words • 0 chars</span>
               </div>
               <textarea id="igOut"></textarea>
-              <button type="button" class="copy-btn" data-copy="igOut">Copy Instagram</button>
+              <div class="btn-row">
+                <button type="button" class="copy-btn" data-copy="igOut">Copy Instagram</button>
+              </div>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>YouTube Title (limit: 100 chars)</span>
+                <span>YouTube Title (max 100 chars)</span>
                 <span class="stats" id="ytTitleStats">0 words • 0 / 100 chars</span>
               </div>
               <input id="ytTitleOut" type="text" maxlength="100" />
-              <div class="channel-head" style="margin-top:10px;">
-                <span>YouTube Description • Search &amp; Story Lead + Links + Tags</span>
+              <div class="channel-head" style="margin-top:12px;">
+                <span>YouTube Description • Context + Live-Action Note + Link</span>
                 <span class="stats" id="ytDescStats">0 words • 0 chars</span>
               </div>
               <textarea id="ytDescOut"></textarea>
-              <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
-              <button type="button" class="copy-btn" data-copy="ytDescOut">Copy YT Description</button>
+              <div class="btn-row">
+                <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
+                <button type="button" class="copy-btn" data-copy="ytDescOut">Copy YT Description</button>
+              </div>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>Facebook • Real Question / Stance for Replies &amp; Shares</span>
+                <span>Facebook • Conversation &amp; Share Pitch</span>
                 <span class="stats" id="fbStats">0 words • 0 chars</span>
               </div>
               <textarea id="fbOut"></textarea>
-              <button type="button" class="copy-btn" data-copy="fbOut">Copy Facebook</button>
+              <div class="btn-row">
+                <button type="button" class="copy-btn" data-copy="fbOut">Copy Facebook</button>
+              </div>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>X • Sharp One-Liner (limit: &le; 280 chars)</span>
+                <span>X • Punchy Post (target &le; 280 chars)</span>
                 <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
               <textarea id="xOut" style="min-height:74px;"></textarea>
-              <button type="button" class="copy-btn" data-copy="xOut">Copy X</button>
+              <div class="btn-row">
+                <button type="button" class="copy-btn" data-copy="xOut">Copy X</button>
+              </div>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>5. Approved Payload JSON (Staged on OK To Post)</span>
+                <span>5. Approved Payload JSON</span>
               </div>
-              <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage the approved payload..."></textarea>
+              <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage approved JSON..."></textarea>
+              <div class="btn-row">
+                <button type="button" class="copy-btn" data-copy="payloadOut">Copy JSON</button>
+              </div>
             </article>
           </section>
         </div>
@@ -318,7 +397,7 @@
     const noteCache = new Map();
     let runCounter = 1;
     let customDirective = "";
-    let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
+    let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "Martin Strayd - Who Killed Fun (Pay the Rent).png", url: "" };
     let activeNote = { found: false, path: "", lines: [], raw: "" };
 
     const $ = (id) => document.getElementById(id);
@@ -328,34 +407,24 @@
       return nonEmpty(val).replace(/[^\x20-\x7E\xA0-\xFF]/g, "");
     }
 
+    function readStorage(key) {
+      try { return localStorage.getItem(key) || ""; } catch (_) { return ""; }
+    }
+
+    function writeStorage(key, val) {
+      try { localStorage.setItem(key, val); } catch (_) {}
+    }
+
     function getDahlKey() {
-      const fromInput = cleanSecret($("dahlKey")?.value);
-      if (fromInput) {
-        try { localStorage.setItem("DAHL_API_KEY", fromInput); } catch (_) {}
-        return fromInput;
-      }
-      for (const k of ["DAHL_API_KEY", "dahl_api_key", "OPENAI_API_KEY", "api_key"]) {
-        try {
-          const v = cleanSecret(localStorage.getItem(k));
-          if (v) return v;
-        } catch (_) {}
-      }
-      return "";
+      const val = cleanSecret($("dahlKey")?.value) || cleanSecret(readStorage("DAHL_API_KEY"));
+      if (val) writeStorage("DAHL_API_KEY", val);
+      return val;
     }
 
     function getGhToken() {
-      const fromInput = cleanSecret($("ghPat")?.value);
-      if (fromInput) {
-        try { localStorage.setItem("GITHUB_PAT", fromInput); } catch (_) {}
-        return fromInput;
-      }
-      for (const k of ["GITHUB_PAT", "gh_token", "github_token"]) {
-        try {
-          const v = cleanSecret(localStorage.getItem(k));
-          if (v) return v;
-        } catch (_) {}
-      }
-      return "";
+      const val = cleanSecret($("ghPat")?.value) || cleanSecret(readStorage("GITHUB_PAT"));
+      if (val) writeStorage("GITHUB_PAT", val);
+      return val;
     }
 
     function getGhHeaders() {
@@ -424,12 +493,7 @@
       const lines = clean
         .split("\n")
         .map((l) => l.replace(/^[\s>#*\-]+/, "").trim())
-        .filter((l) =>
-          l.length >= 10 &&
-          !/^---+$/.test(l) &&
-          !/^\[.*\]$/.test(l) &&
-          !/^(title|artist|cover art|location|visual direction|band \/ catalog|direct bundle link|anna v4 id|promoter & manager|rollout notes|song length|tunecore)/i.test(l)
-        );
+        .filter((l) => l.length >= 10 && !/^---+$/.test(l));
       return { found: true, lines, raw: clean };
     }
 
@@ -452,50 +516,73 @@
       return record;
     }
 
-    function buildEditorialBrief(title, noteRec, shift, seed, directive) {
+    function parseKeywords(rawKeywords) {
+      const list = nonEmpty(rawKeywords)
+        .split(/[,\n]+/)
+        .map((k) => k.trim())
+        .filter(Boolean);
+      const hashtags = list.map((k) => {
+        const cleanTag = k.replace(/[^a-zA-Z0-9]+/g, "");
+        return cleanTag ? `#${cleanTag}` : "";
+      }).filter(Boolean);
+
+      const defaults = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter"];
+      const merged = [...hashtags];
+      for (const tag of defaults) {
+        if (!merged.some((t) => t.toLowerCase() === tag.toLowerCase())) merged.push(tag);
+      }
+      return {
+        list,
+        phrase: list.slice(0, 3).join(" "),
+        tags: merged.slice(0, 5).join(" "),
+        shortTags: merged.slice(0, 2).join(" ")
+      };
+    }
+
+    function buildSceneBrief(title, noteRec, shift, seed, directive) {
       const noteLine = noteRec && Array.isArray(noteRec.lines) && noteRec.lines.length
         ? noteRec.lines[(Math.abs(shift) + seed) % noteRec.lines.length].replace(/\s+/g, " ").trim()
         : "";
 
       const scenes = [
-        "Handheld 35mm live-action camera at dusk, street reflections, real room sound, zero animation",
-        "Close-frame live-action performance in a dim backroom, raw grain, no cartoon filters",
-        "Documentary-style real-world motion on the move, natural shadows, strictly live-action",
-        "Late-night studio & bar-counter live-action cut, gritty realism, zero illustration"
+        "Handheld live-action camera at dusk, real street atmosphere, natural lighting, zero cartoon",
+        "Intimate live-action room cut with genuine performance energy, no animation or illustration",
+        "Documentary-style live-action movement in real spaces, grounded shadows, zero cartoon",
+        "Late-night live-action studio & room cut, unpolished realism, zero cartoon"
       ];
       const scene = nonEmpty(directive)
-        ? `Custom live-action brief: ${nonEmpty(directive)} (zero cartoon)`
+        ? `Live-action brief: ${nonEmpty(directive)} (strictly realistic live-action only, zero cartoon)`
         : scenes[(Math.abs(shift) + seed) % scenes.length];
 
-      const angleNote = noteLine ? `External note: ${noteLine.slice(0, 120)}` : `Single focus: "${title}" by Martin Strayd`;
-      return { scene, angleNote };
+      const noteContext = noteLine ? `Note: ${noteLine.slice(0, 120)}` : `Single: "${title}" by Martin Strayd`;
+      return { scene, noteContext };
     }
 
-    function buildCreativeDrafts(track, noteRec, link, shift, seed, directive) {
+    function buildDrafts(track, noteRec, link, shift, seed, directive, rawKeywords) {
       const title = nonEmpty(track.title, "Who Killed Fun (Pay the Rent)");
       const url = nonEmpty(link, "https://www.paypal.com/paypalme/martinstrayd");
-      const { scene, angleNote } = buildEditorialBrief(title, noteRec, shift, seed, directive);
+      const kw = parseKeywords(rawKeywords);
+      const { scene, noteContext } = buildSceneBrief(title, noteRec, shift, seed, directive);
 
       const hooks = [
-        `Everybody complains about bland playlists until "${title}" hits the room.`,
-        `If polite background music puts you to sleep, listen to "${title}" by Martin Strayd.`,
-        `"${title}" sounds like someone actually meant every word—not a focus-grouped chorus.`,
-        `Real songwriting still exists when a record like "${title}" shows up with teeth.`
+        `Most tracks play safe until "${title}" breaks the room.`,
+        `If flat background noise is getting old, put "${title}" by Martin Strayd on.`,
+        `"${title}" hits with real bite—no polite filler, just straight-ahead songcraft.`,
+        `Here is why "${title}" stands out right now: real weight and zero polish-gloss.`
       ];
       const hook = hooks[(Math.abs(shift) + seed) % hooks.length];
+      const kwLine = kw.phrase ? ` Focus: ${kw.phrase}.` : "";
 
-      const tiktok = `${hook} Agent Anna cue: ${scene}. Grab the MP3 + cover sleeve direct so you actually own it: ${url} #MartinStrayd #STRAYD #IndieRock #Songwriter`;
+      const tiktok = `${hook}${kwLine} Agent Anna cue: ${scene}. Grab the MP3 + sleeve direct: ${url} ${kw.tags}`;
+      const instagram = `"${title}" — Martin Strayd. ${hook}${kwLine} ${scene}. Own the MP3 + cover art bundle: ${url} ${kw.tags}`;
+      const ytTitle = (kw.phrase
+        ? `${title} — Martin Strayd (${kw.phrase})`
+        : `${title} — Martin Strayd (Official Single)`).slice(0, 100);
+      const ytDesc = `"${title}" by Martin Strayd — presented by Agent Anna.\n\n${hook}${kwLine}\n${noteContext}\nVisual direction: ${scene}.\n\nOwn the MP3 + cover sleeve direct: ${url}\n\n${kw.tags}`;
+      const facebook = `Agent Anna sharing "${title}" by Martin Strayd. ${hook}${kwLine} ${noteContext}. How does this hit you, and who else should hear it? Direct MP3 + sleeve: ${url}`;
 
-      const instagram = `"${title}" — Martin Strayd. ${hook} ${scene}. Own the MP3 + cover art bundle direct: ${url} #MartinStrayd #STRAYD #IndependentMusic #Songwriter`;
-
-      const ytTitle = `${title} — Martin Strayd (Official Single | Agent Anna)`.slice(0, 100);
-
-      const ytDesc = `"${title}" by Martin Strayd — curated by Agent Anna.\n\n${hook}\n${angleNote}\nVisual direction: ${scene}.\n\nOwn the MP3 + cover sleeve bundle direct: ${url}\n\n#MartinStrayd #STRAYD #IndieRock #Songwriter`;
-
-      const facebook = `Agent Anna spinning "${title}" by Martin Strayd tonight. ${hook} ${angleNote}. Where does this track land for you—and who else needs to hear it? Direct MP3 + sleeve: ${url}`;
-
-      const xFull = `"${title}" — Martin Strayd. ${hook} Own the MP3 + sleeve: ${url} #MartinStrayd #STRAYD`;
-      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd. ${url} #MartinStrayd #STRAYD`.slice(0, 280);
+      const xFull = `"${title}" — Martin Strayd. ${hook} ${url} ${kw.shortTags}`;
+      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd. ${url} ${kw.shortTags}`.slice(0, 280);
 
       return { tiktok, instagram, ytTitle, ytDesc, facebook, x, scene };
     }
@@ -541,8 +628,9 @@
       const hasGh = Boolean(getGhToken());
       $("statusBadges").innerHTML = [
         `<span class="badge">Shell: A1 + Lean v4</span>`,
-        `<span class="badge">${hasDahl ? "Dahl Creative Ready" : "Dahl Key Standby"}</span>`,
-        `<span class="badge">${hasGh ? "GitHub PAT Ready" : "Repo Read Mode"}</span>`
+        `<span class="badge">Live-Action Only (Zero Cartoon)</span>`,
+        `<span class="badge">${hasDahl ? "Dahl Connected" : "Local Engine Ready"}</span>`,
+        `<span class="badge">${hasGh ? "GitHub PAT Set" : "Public Catalog"}</span>`
       ].join("");
     }
 
@@ -561,31 +649,42 @@
             Authorization: `Bearer ${key}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            model,
-            temperature: 0.9,
-            messages
-          }),
+          body: JSON.stringify({ model, temperature: 0.85, messages }),
           signal: controller.signal
         });
         if (!res.ok) return null;
         const data = await res.json();
-        const rawContent = nonEmpty(data?.choices?.[0]?.message?.content);
-        if (!rawContent) return null;
-        const stripped = rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
-        if (!expectJson) return { text: stripped };
+        const raw = nonEmpty(data?.choices?.[0]?.message?.content);
+        if (!raw) return null;
+        const cleaned = raw.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        if (!expectJson) return { text: cleaned };
 
-        const jsonMatch = stripped.match(/```json\s*([\s\S]*?)```/i) || stripped.match(/(\{[\s\S]*\})/);
-        if (jsonMatch) {
-          try {
-            return { json: JSON.parse(jsonMatch[1]), text: stripped };
-          } catch (_) {}
+        const match = cleaned.match(/```json\s*([\s\S]*?)```/i) || cleaned.match(/(\{[\s\S]*\})/);
+        if (match) {
+          try { return { json: JSON.parse(match[1]), text: cleaned }; } catch (_) {}
         }
-        return { text: stripped };
+        return { text: cleaned };
       } catch (_) {
         return null;
       } finally {
         clearTimeout(timer);
+      }
+    }
+
+    function updateArtworkDisplay(track) {
+      $("heroTitle").textContent = track.title;
+      $("artFileMeta").textContent = `Artwork: ${nonEmpty(track.filename, track.title)}`;
+      const img = $("artPreview");
+      if (track.url) {
+        if (img.src !== track.url) {
+          img.onerror = () => {
+            img.onerror = null;
+            img.src = `${RAW_BASE}A1/strayd/${encodeURIComponent(track.filename || "")}`;
+          };
+          img.src = track.url;
+        }
+      } else {
+        img.removeAttribute("src");
       }
     }
 
@@ -602,27 +701,30 @@
           return key && (itemKey.includes(key) || key.includes(itemKey));
         });
 
-      activeTrack = matched || { title: queryTitle, filename: `${queryTitle}.png`, url: activeTrack.url || "" };
-      $("heroTitle").textContent = activeTrack.title;
-      $("artFileMeta").textContent = `Cover sleeve: ${nonEmpty(activeTrack.filename, "Catalog sleeve")}`;
-      $("visualRuleMeta").textContent = `Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration) for "${activeTrack.title}".`;
-
-      if (activeTrack.url && $("artPreview").src !== activeTrack.url) {
-        $("artPreview").src = activeTrack.url;
-        $("artPreview").alt = activeTrack.title;
-      }
+      activeTrack = matched || {
+        title: queryTitle,
+        filename: `${queryTitle}.png`,
+        url: activeTrack.url || ""
+      };
+      updateArtworkDisplay(activeTrack);
 
       const noteRec = await loadExternalSongNote(activeTrack.title);
       activeNote = noteRec;
       renderBadges();
 
-      const shiftVal = $("rotationShift").value === "auto" ? new Date().getDay() : (parseInt($("rotationShift").value, 10) || 0);
+      const shiftVal = $("rotationShift").value === "auto"
+        ? new Date().getDay()
+        : (parseInt($("rotationShift").value, 10) || 0);
       const link = nonEmpty($("directLink").value, "https://www.paypal.com/paypalme/martinstrayd");
-      const fallback = buildCreativeDrafts(activeTrack, activeNote, link, shiftVal, runCounter, customDirective);
+      const rawKw = nonEmpty($("keywordsInput")?.value);
+      writeStorage("STRAYD_DIRECT_LINK", link);
+      writeStorage("STRAYD_KEYWORDS", rawKw);
+
+      const fallback = buildDrafts(activeTrack, activeNote, link, shiftVal, runCounter, customDirective, rawKw);
       $("sceneBriefMeta").textContent = `Live-action direction: ${fallback.scene}`;
       $("bibleBox").value = activeNote.found
         ? `External note: ${activeNote.path}\n\n${activeNote.raw.slice(0, 360)}`
-        : `External notes stay outside v4 core so v4 stays lean. Add external notes or steer Agent Anna via Dahl chat.`;
+        : `External notes stay outside v4 core so v4 stays lean. Use Anna chat or add external notes anytime.`;
 
       applyDrafts(fallback);
 
@@ -630,14 +732,15 @@
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core), writing elite, human, MTV-sharp social copy for independent artist Martin Strayd (STRAYD). Never output raw color-meter jargon or awkward keyword mashups. Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration), own-the-MP3-plus-sleeve positioning, ytTitle <= 100 chars, and x <= 280 chars. Make each platform genuinely distinct. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Write sharp, distinct copy for TikTok, Instagram, YouTube (ytTitle <= 100 chars, ytDesc), Facebook, and X (<= 280 chars). Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
         },
         {
           role: "user",
           content: JSON.stringify({
             song: activeTrack.title,
-            externalNote: activeNote.found ? activeNote.lines.slice(0, 4).join(" | ") : "",
-            liveActionScene: fallback.scene,
+            keywords: rawKw,
+            note: activeNote.found ? activeNote.lines.slice(0, 4).join(" | ") : "",
+            scene: fallback.scene,
             directive: customDirective,
             directLink: link
           })
@@ -669,11 +772,11 @@
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd with sharp MTV/social producer instincts. Strictly realistic live-action only (zero cartoon). Respond in 2-3 punchy, creative sentences."
+            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd. Strictly realistic live-action only (zero cartoon). Give a sharp, practical 2-sentence response."
         },
         {
           role: "user",
-          content: `Song: "${activeTrack.title}". Creative note: ${msg}`
+          content: `Song: "${activeTrack.title}". Note: ${msg}`
         }
       ], false);
 
@@ -684,12 +787,17 @@
       }
 
       await generateAll();
-      appendChat("Agent Anna", `Pushed "${msg}" into the live-action brief for "${activeTrack.title}". Check the drafts and hit OK To Post when it hits right.`);
+      appendChat("Agent Anna", `Updated "${activeTrack.title}" with "${msg}". Check the drafts and hit OK To Post when ready.`);
     }
 
     async function boot() {
       $("dahlKey").value = getDahlKey();
       $("ghPat").value = getGhToken();
+      const savedLink = readStorage("STRAYD_DIRECT_LINK");
+      if (savedLink) $("directLink").value = savedLink;
+      const savedKw = readStorage("STRAYD_KEYWORDS");
+      if (savedKw) $("keywordsInput").value = savedKw;
+
       await loadExternalNotesIndex();
       const catHit = await fetchFirstText(CATALOG_URLS);
       if (catHit && catHit.text) {
@@ -697,9 +805,9 @@
           const parsed = JSON.parse(catHit.text);
           const files = Array.isArray(parsed.files_and_folders) ? parsed.files_and_folders : [];
           catalog = files
-            .filter((f) => f && f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename))
+            .filter((f) => f && f.filename && /\.(png|jpe?g|webp)$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename))
             .map((f) => ({
-              title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.png$/i, "").trim(),
+              title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.(png|jpe?g|webp)$/i, "").trim(),
               filename: f.filename,
               url: f.url
             }));
@@ -722,20 +830,27 @@
       }
 
       renderBadges();
-      $("bootStatus").textContent = `Anna v4 ready • ${catalog.length} songs`;
+      $("bootStatus").textContent = catalog.length ? `Ready • ${catalog.length} singles` : "Ready • fallback mode";
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", "Social & MTV desk live. Pick a single or tell me what angle to push for Martin Strayd.");
+        appendChat("Agent Anna", "Ready on A1 + v4. Pick a track or tell me what angle to push for Martin Strayd.");
       }
       await generateAll();
     }
 
     document.querySelectorAll("[data-copy]").forEach((btn) => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", async () => {
         const target = $(btn.dataset.copy);
         if (!target) return;
-        target.focus();
-        target.select();
-        navigator.clipboard?.writeText(target.value).catch(() => {});
+        const original = btn.textContent;
+        try {
+          await navigator.clipboard.writeText(target.value);
+          btn.textContent = "Copied";
+        } catch (_) {
+          target.focus();
+          target.select();
+          btn.textContent = "Selected";
+        }
+        setTimeout(() => { btn.textContent = original; }, 1200);
       });
     });
 
@@ -763,6 +878,10 @@
       runCounter++;
       generateAll();
     });
+    $("keywordsInput").addEventListener("input", () => {
+      runCounter++;
+      generateAll();
+    });
     $("rotationShift").addEventListener("change", () => {
       runCounter++;
       generateAll();
@@ -781,6 +900,7 @@
         core: "v4 (lean)",
         model: nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL),
         externalNoteSource: activeNote.found ? activeNote.path : null,
+        keywords: nonEmpty($("keywordsInput")?.value) || null,
         directive: customDirective || null,
         approved: true,
         approvedAt: new Date().toISOString(),
@@ -798,7 +918,7 @@
       };
       $("payloadOut").value = JSON.stringify(payload, null, 2);
       const gate = $("gateStatus");
-      gate.textContent = `ANNA Gate: OK APPROVED (${payload.song})`;
+      gate.textContent = `Approval gate: OK APPROVED (${payload.song})`;
       gate.style.color = "var(--ok)";
 
       const webhook = nonEmpty($("webhookUrl").value);
@@ -809,9 +929,9 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
-          gate.textContent = `ANNA Gate: OK APPROVED + WEBHOOK (HTTP ${r.status})`;
+          gate.textContent = `Approval gate: OK APPROVED + WEBHOOK (HTTP ${r.status})`;
         } catch (err) {
-          gate.textContent = `ANNA Gate: OK APPROVED (Webhook error: ${err.message})`;
+          gate.textContent = `Approval gate: OK APPROVED (Webhook error: ${err.message})`;
         }
       }
     });
