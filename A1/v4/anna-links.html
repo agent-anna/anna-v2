@@ -1,0 +1,180 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VEG ANNA AA01 // A1 &amp; Automation Links</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #121821;
+    --border: #263241;
+    --accent: #d4af37;
+    --accent-soft: rgba(212, 175, 55, 0.14);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --btn: #192230;
+    --btn-hover: #223044;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.45;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+  .title { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.4px; }
+  .star { color: var(--accent); margin-right: 8px; }
+  .meta { font-size: 12px; color: var(--muted); }
+  .section-title {
+    margin: 22px 0 12px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    animation: aa01Fade 4.4s ease-in-out infinite;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+    gap: 14px;
+  }
+  .link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 15px 16px;
+    background: var(--btn);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .link-card:hover { background: var(--btn-hover); border-color: var(--accent); transform: translateY(-1px); }
+  .link-card[data-primary="true"] { background: var(--accent-soft); border-color: var(--accent); }
+  .tag { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--accent); }
+  .name { font-size: 15px; font-weight: 700; }
+  .desc { font-size: 12px; color: var(--muted); }
+  @keyframes aa01Fade { 0%,100% { opacity: 0.72; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <div>
+        <h1 class="title"><span class="star">&#10022;</span>VEG ANNA AA01 // AUTOMATION &amp; CANONICAL LINKS</h1>
+        <div class="meta">Scope: A1 / v4 / Promo Gate / Studio / Martin Strayd Archive</div>
+      </div>
+      <div class="meta">Realistic live-action visual standard</div>
+    </header>
+
+    <div class="section-title">A1 &amp; v4 Automation Hub</div>
+    <section class="grid">
+      <a class="link-card" data-primary="true" href="https://agent-anna.github.io/anna-v2/A1/v4/" target="_blank" rel="noopener">
+        <span class="tag">[a1-v4-live]</span>
+        <span class="name">VEG ANNA AA01 Portal (v4)</span>
+        <span class="desc">https://agent-anna.github.io/anna-v2/A1/v4/</span>
+      </a>
+      <a class="link-card" href="https://agent-anna.github.io/anna-v2/A1/" target="_blank" rel="noopener">
+        <span class="tag">[a1-root-live]</span>
+        <span class="name">A1 Live Root</span>
+        <span class="desc">https://agent-anna.github.io/anna-v2/A1/</span>
+      </a>
+      <a class="link-card" href="https://agent-anna.github.io/anna-v2/A1/v4/studio.html" target="_blank" rel="noopener">
+        <span class="tag">[studio-html]</span>
+        <span class="name">Studio HTML (A1/v4)</span>
+        <span class="desc">https://agent-anna.github.io/anna-v2/A1/v4/studio.html</span>
+      </a>
+      <a class="link-card" href="https://github.com/agent-anna/anna-v2/blob/main/A1/v4/promo-gate-bot.js" target="_blank" rel="noopener">
+        <span class="tag">[promo-gate-bot]</span>
+        <span class="name">Promo Gate Bot Script</span>
+        <span class="desc">A1/v4/promo-gate-bot.js — Sync State &amp; GO PUSH</span>
+      </a>
+      <a class="link-card" href="https://github.com/agent-anna/anna-v2/blob/main/A1/promo-gate/latest-review.html" target="_blank" rel="noopener">
+        <span class="tag">[latest-review.html]</span>
+        <span class="name">Latest Review HTML</span>
+        <span class="desc">A1/promo-gate/latest-review.html</span>
+      </a>
+      <a class="link-card" href="https://github.com/agent-anna/anna-v2/blob/main/A1/promo-gate/latest-package.json" target="_blank" rel="noopener">
+        <span class="tag">[latest-package.json]</span>
+        <span class="name">Latest Package JSON</span>
+        <span class="desc">A1/promo-gate/latest-package.json</span>
+      </a>
+      <a class="link-card" href="https://github.com/agent-anna/anna-v2/blob/main/A1/promo-gate/build-daily-promo.js" target="_blank" rel="noopener">
+        <span class="tag">[build-daily-promo.js]</span>
+        <span class="name">Build Daily Promo Script</span>
+        <span class="desc">A1/promo-gate/build-daily-promo.js</span>
+      </a>
+      <a class="link-card" href="https://github.com/agent-anna/anna-v2/actions/workflows/daily-song-promo.yml" target="_blank" rel="noopener">
+        <span class="tag">[workflow-runs]</span>
+        <span class="name">Daily Song Promo Workflow</span>
+        <span class="desc">.github/workflows/daily-song-promo.yml</span>
+      </a>
+      <a class="link-card" href="https://github.com/agent-anna/anna-v2/blob/main/A1/v4/docs/v4BIBLE" target="_blank" rel="noopener">
+        <span class="tag">[v4bible]</span>
+        <span class="name">v4BIBLE Doctrine &amp; Links</span>
+        <span class="desc">A1/v4/docs/v4BIBLE</span>
+      </a>
+    </section>
+
+    <div class="section-title">GitBook, Studio &amp; Martin Strayd Canonical Archive</div>
+    <section class="grid">
+      <a class="link-card" data-primary="true" href="https://app.gitbook.com/o/FBxOZX7g3a26YBkCP0Hp/sites/site_GOo3m/preview" target="_blank" rel="noopener">
+        <span class="tag">[gitbook-preview]</span>
+        <span class="name">GitBook Preview (site_GOo3m)</span>
+        <span class="desc">https://app.gitbook.com/o/FBxOZX7g3a26YBkCP0Hp/sites/site_GOo3m/preview</span>
+      </a>
+      <a class="link-card" href="https://app.gitbook.com/o/FBxOZX7g3a26YBkCP0Hp" target="_blank" rel="noopener">
+        <span class="tag">[gitbook-org]</span>
+        <span class="name">GitBook Org Hub</span>
+        <span class="desc">https://app.gitbook.com/o/FBxOZX7g3a26YBkCP0Hp</span>
+      </a>
+      <a class="link-card" href="https://strayd.com" target="_blank" rel="noopener">
+        <span class="tag">[strayd-archive]</span>
+        <span class="name">Martin Strayd Official Archive</span>
+        <span class="desc">https://strayd.com</span>
+      </a>
+      <a class="link-card" href="https://strayd.com/band" target="_blank" rel="noopener">
+        <span class="tag">[strayd-band]</span>
+        <span class="name">Strayd Band</span>
+        <span class="desc">https://strayd.com/band</span>
+      </a>
+      <a class="link-card" href="https://martinstrayd.github.io/strayd/" target="_blank" rel="noopener">
+        <span class="tag">[gh-strayd]</span>
+        <span class="name">Martin Strayd GitHub (strayd)</span>
+        <span class="desc">https://martinstrayd.github.io/strayd/</span>
+      </a>
+      <a class="link-card" href="https://martinstrayd.github.io/artist/" target="_blank" rel="noopener">
+        <span class="tag">[gh-artist]</span>
+        <span class="name">Martin Strayd GitHub (artist)</span>
+        <span class="desc">https://martinstrayd.github.io/artist/</span>
+      </a>
+      <a class="link-card" href="https://songshare.com/artist/mcxzkfj3" target="_blank" rel="noopener">
+        <span class="tag">[songshare]</span>
+        <span class="name">SongShare Artist Archive</span>
+        <span class="desc">https://songshare.com/artist/mcxzkfj3</span>
+      </a>
+      <a class="link-card" href="https://www.shazam.com/artist/martin-strayd/1714956004" target="_blank" rel="noopener">
+        <span class="tag">[shazam]</span>
+        <span class="name">Shazam — Martin Strayd</span>
+        <span class="desc">https://www.shazam.com/artist/martin-strayd/1714956004</span>
+      </a>
+    </section>
+  </main>
+</body>
+</html>
