@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A1 Shell • Agent Anna v4 Single Promoter Studio</title>
+  <title>A1 Shell • Agent Anna v4 MTV Promoter & Chat Studio</title>
   <style>
     :root {
       --bg: #0b0e14;
@@ -15,6 +15,7 @@
       --accent: #a3e635;
       --accent-ink: #071018;
       --sky: #7dd3fc;
+      --warn: #fbbf24;
     }
     *, *::before, *::after { box-sizing: border-box; }
     body {
@@ -99,7 +100,7 @@
       font-size: 0.88rem;
     }
     textarea {
-      min-height: 96px;
+      min-height: 92px;
       font-family: ui-monospace, Consolas, monospace;
       font-size: 0.8rem;
       line-height: 1.48;
@@ -127,16 +128,32 @@
       margin-bottom: 6px;
     }
     .stats { color: var(--muted); font-weight: 600; font-size: 0.75rem; white-space: nowrap; }
+    .stats.over { color: var(--warn); }
+
+    .chat-log {
+      background: #0d121b;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      max-height: 190px;
+      overflow-y: auto;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+    }
+    .chat-msg { margin-bottom: 8px; }
+    .chat-msg strong { color: var(--sky); }
+    .chat-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .chat-row button { width: auto; padding: 9px 14px; }
   </style>
 </head>
 <body>
   <div class="container">
     <header class="topbar">
       <div>
-        <h1>A1 Shell • Agent Anna v4 Single Promoter Studio</h1>
-        <div class="muted">A1 shell around v4 core + external bible outside v4 • Realistic live-action only (zero cartoon)</div>
+        <h1>A1 Shell • Agent Anna v4 MTV Promoter &amp; Chat Studio</h1>
+        <div class="muted">Agent Anna (A1 shell + lean v4 core) • MTV single energy, platform limits &amp; AI chat for Martin Strayd • Live-action only (zero cartoon)</div>
       </div>
-      <div class="muted" id="bootStatus">Booting A1 shell &amp; v4...</div>
+      <div class="muted" id="bootStatus">Booting Anna v4...</div>
     </header>
 
     <main>
@@ -145,7 +162,7 @@
           <img id="artPreview" src="" alt="Martin Strayd Single Cover Sleeve" />
         </div>
         <div>
-          <div class="section-label">ACTIVE SINGLE &amp; SLEEVE BRIEF (A1 SHELL / ANNA V4)</div>
+          <div class="section-label">ACTIVE SINGLE &amp; SLEEVE BRIEF (AGENT ANNA MTV DESK)</div>
           <div class="hero-title" id="heroTitle">Who Killed Fun (Pay the Rent)</div>
           <div class="muted" id="artFileMeta">Cover sleeve: loading...</div>
           <div class="muted" id="artScanMeta" style="margin-top:4px;">Visual scan: pending...</div>
@@ -157,7 +174,7 @@
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="section-label">1. SINGLE &amp; WORKFLOW CONTROLS</div>
+            <div class="section-label">1. SINGLE &amp; CAMPAIGN CONTROLS</div>
 
             <label for="songPicker">Select Single (Catalog)</label>
             <select id="songPicker"></select>
@@ -165,48 +182,57 @@
             <label for="customSong">Or Type Song Title</label>
             <input id="customSong" type="text" placeholder="Song title..." />
 
-            <label for="rotationShift">Storytelling &amp; Rotation Angle</label>
+            <label for="rotationShift">MTV Rotation &amp; Angle</label>
             <select id="rotationShift">
               <option value="auto">Auto (Day of Week)</option>
-              <option value="0">01 • Hook &amp; Backstage Edge</option>
-              <option value="1">02 • Topic, Lyrics &amp; Tension</option>
-              <option value="2">03 • Live-Action Scene &amp; Mood</option>
+              <option value="0">01 • MTV Countdown &amp; Opening Cut</option>
+              <option value="1">02 • Topic, Lyrics &amp; Street Heat</option>
+              <option value="2">03 • Live-Action Scene &amp; Camera Mood</option>
               <option value="3">04 • Own MP3 + Sleeve Bundle</option>
-              <option value="4">05 • Search &amp; AI Discovery</option>
+              <option value="4">05 • Search &amp; AI Discovery Bait</option>
               <option value="5">06 • External Bible &amp; Story Pull</option>
-              <option value="6">07 • Weekly Spotlight Push</option>
+              <option value="6">07 • Weekend Spotlight Push</option>
             </select>
 
             <label for="directLink">Direct MP3 + Cover Art Link</label>
             <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
 
-            <label for="aiEndpoint">Optional AI Endpoint (JSON POST)</label>
-            <input id="aiEndpoint" type="text" placeholder="https://your-ai-endpoint.example/generate" />
+            <label for="aiEndpoint">AI Chat / Generator Endpoint (JSON POST)</label>
+            <input id="aiEndpoint" type="text" placeholder="Optional LLM/worker URL for live AI chat & drafts..." />
 
-            <label for="webhookUrl">Optional Approval Webhook (After OK)</label>
+            <label for="webhookUrl">Approval Webhook (Fires Only After OK)</label>
             <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
 
             <div class="actions">
               <button type="button" id="reloadBtn">Reload External Bible, Catalog &amp; Art</button>
-              <button type="button" id="generateBtn">Generate Channel Copy</button>
+              <button type="button" id="generateBtn">Anna: Generate Platform Pitches</button>
               <button type="button" class="primary" id="approveBtn">OK To Post (Approve Single)</button>
             </div>
             <div class="muted" id="gateStatus" style="margin-top:8px;">ANNA Gate: Staged — waiting for your OK</div>
+          </section>
+
+          <section class="card">
+            <div class="section-label">2. CHAT WITH AGENT ANNA (AI / CAMPAIGN DESK)</div>
+            <div class="chat-log" id="chatLog" aria-live="polite"></div>
+            <div class="chat-row">
+              <input id="chatInput" type="text" placeholder="Tell Anna how to pitch this single or rewrite a channel..." />
+              <button type="button" id="chatSendBtn">Ask Anna</button>
+            </div>
           </section>
         </aside>
 
         <div>
           <section class="card">
-            <div class="section-label">2. EXTERNAL BIBLE RECORD (OUTSIDE V4 CORE)</div>
-            <textarea id="bibleBox" readonly></textarea>
+            <div class="section-label">3. EXTERNAL BIBLE RECORD (OUTSIDE V4 CORE)</div>
+            <textarea id="bibleBox" readonly style="min-height:80px;"></textarea>
           </section>
 
           <section class="card">
-            <div class="section-label">3. PLATFORM DRAFTS BY AGENT ANNA (A1 SHELL)</div>
+            <div class="section-label">4. PLATFORM-TUNED DRAFTS BY AGENT ANNA</div>
 
             <article class="channel">
               <div class="channel-head">
-                <span>TikTok • Hook + Topic/Lyrics/Sleeve Story + Discovery Tags</span>
+                <span>TikTok • Fast MTV Hook + Keywords + Bundle CTA</span>
                 <span class="stats" id="ttStats">0 words • 0 chars</span>
               </div>
               <textarea id="ttOut"></textarea>
@@ -215,7 +241,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Instagram • Lead Hook + Anna Story + Bundle CTA</span>
+                <span>Instagram • Lead Hook Before Fold + Anna Pitch + Tags</span>
                 <span class="stats" id="igStats">0 words • 0 chars</span>
               </div>
               <textarea id="igOut"></textarea>
@@ -224,12 +250,12 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>YouTube Title (max 100 chars)</span>
-                <span class="stats" id="ytTitleStats">0 words • 0 chars</span>
+                <span>YouTube Title (limit: 100 chars)</span>
+                <span class="stats" id="ytTitleStats">0 words • 0 / 100 chars</span>
               </div>
               <input id="ytTitleOut" type="text" maxlength="100" />
               <div class="channel-head" style="margin-top:10px;">
-                <span>YouTube Description • Search Keywords + Story + Links</span>
+                <span>YouTube Description • Search Lead First + Story + Links + Tags</span>
                 <span class="stats" id="ytDescStats">0 words • 0 chars</span>
               </div>
               <textarea id="ytDescOut"></textarea>
@@ -239,7 +265,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Facebook • Conversation &amp; Share Pitch</span>
+                <span>Facebook • MTV Host / Manager Callout for Replies &amp; Shares</span>
                 <span class="stats" id="fbStats">0 words • 0 chars</span>
               </div>
               <textarea id="fbOut"></textarea>
@@ -248,18 +274,18 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>X • Punchy Hook + Link + Tags</span>
-                <span class="stats" id="xStats">0 words • 0 chars</span>
+                <span>X • Punchy Single Line (target: &le; 280 chars)</span>
+                <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
-              <textarea id="xOut"></textarea>
+              <textarea id="xOut" style="min-height:74px;"></textarea>
               <button type="button" class="copy-btn" data-copy="xOut">Copy X</button>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>4. Approved Payload JSON (Staged on OK To Post)</span>
+                <span>5. Approved Payload JSON (Staged on OK To Post)</span>
               </div>
-              <textarea id="payloadOut" readonly placeholder="Click OK To Post to build the approved payload..."></textarea>
+              <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage the approved payload..."></textarea>
             </article>
           </section>
         </div>
@@ -278,6 +304,7 @@
     const bibleCache = new Map();
     const artCache = new Map();
     let runCounter = 1;
+    let customDirective = "";
     let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
     let activeArt = { summary: "sleeve scan pending" };
     let activeBible = { found: false, path: "", lines: [], raw: "" };
@@ -298,6 +325,20 @@
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
 
+    function appendChat(sender, text) {
+      const box = $("chatLog");
+      const row = document.createElement("div");
+      row.className = "chat-msg";
+      const strong = document.createElement("strong");
+      strong.textContent = `${sender}: `;
+      const span = document.createElement("span");
+      span.textContent = text;
+      row.appendChild(strong);
+      row.appendChild(span);
+      box.appendChild(row);
+      box.scrollTop = box.scrollHeight;
+    }
+
     async function fetchFirstText(urls) {
       for (const url of urls) {
         try {
@@ -308,7 +349,6 @@
       return null;
     }
 
-    // Index external bible/song records under A1 outside A1/v4 so v4 core stays unbloated
     async function loadExternalBibleIndex() {
       try {
         const res = await fetch(REPO_API_TREE, { cache: "no-store" });
@@ -344,9 +384,7 @@
       const candidates = [];
       for (const p of externalBiblePaths) {
         const base = p.split("/").pop().replace(/\.md$/i, "");
-        if (normalizeKey(base) === key) {
-          candidates.push(`${RAW_BASE}${p}`);
-        }
+        if (normalizeKey(base) === key) candidates.push(`${RAW_BASE}${p}`);
       }
 
       const hit = await fetchFirstText(candidates);
@@ -434,53 +472,77 @@
       return tags.join(" ");
     }
 
-    function buildChannelDrafts(track, artSummary, bibleRec, link, shift, seed) {
+    function buildChannelDrafts(track, artSummary, bibleRec, link, shift, seed, directive) {
       const title = nonEmpty(track.title, "Martin Strayd Single");
       const url = nonEmpty(link, "https://www.paypal.com/paypalme/martinstrayd");
       const keywords = extractKeywords(title, bibleRec);
       const topicPhrase = keywords.length ? keywords.join(" ") : title.toLowerCase();
       const tags = buildTags(keywords, shift + seed);
       const shortTags = tags.split(/\s+/).slice(0, 2).join(" ");
+      const note = nonEmpty(directive) ? ` Note: ${nonEmpty(directive)}.` : "";
 
       const lyricLine = bibleRec && Array.isArray(bibleRec.lines) && bibleRec.lines.length
-        ? bibleRec.lines[(Math.abs(shift) + seed) % bibleRec.lines.length].slice(0, 110)
+        ? bibleRec.lines[(Math.abs(shift) + seed) % bibleRec.lines.length].slice(0, 95)
         : "";
 
       const mode = (Math.abs(shift) + seed) % 4;
-      let storyAngle = "";
+      let story = "";
       if (mode === 0) {
-        storyAngle = `Agent Anna operating inside the A1 shell with v4 core—pushing "${title}" by Martin Strayd alongside ${artSummary} around ${topicPhrase} with real weight rather than polite filler.`;
+        story = `Agent Anna on the MTV desk—Martin Strayd's "${title}" hits with ${artSummary} energy and real ${topicPhrase} bite, built for people who want actual songwriting rather than polite filler.${note}`;
       } else if (mode === 1) {
-        storyAngle = `Agent Anna putting "${title}" in front of listeners chasing ${topicPhrase} (${artSummary})${lyricLine ? `—from external bible notes: "${lyricLine}"` : ""}.`;
+        story = `Anna's rotation cut: "${title}" by Martin Strayd digs into ${topicPhrase} against a ${artSummary}${lyricLine ? `—hear that edge in "${lyricLine}"` : ""}.${note}`;
       } else if (mode === 2) {
-        storyAngle = `Agent Anna framing "${title}" around ${artSummary} and strictly realistic live-action cinematography—zero cartoon shortcuts, focused straight on ${topicPhrase}.`;
+        story = `Agent Anna framing "${title}" around ${artSummary} and strictly realistic live-action camera work—zero cartoon shortcuts, pure ${topicPhrase} tension.${note}`;
       } else {
-        storyAngle = `Why Agent Anna is backing "${title}" today: real ${topicPhrase} edge (${artSummary}) meant to be owned as MP3 + cover sleeve, not rented.`;
+        story = `Why Agent Anna pushes "${title}" to keep: real ${topicPhrase} heat (${artSummary})—own the MP3 + sleeve bundle direct instead of renting a stream.${note}`;
       }
 
-      const tiktok = `Agent Anna on "${title}" by Martin Strayd—${storyAngle} Direct MP3 + sleeve: ${url} ${tags}`;
-      const instagram = `"${title}" — Martin Strayd. ${storyAngle} Own the MP3 + cover art: ${url} ${tags}`;
-      const ytTitle = `${title} — Martin Strayd (${topicPhrase} | Agent Anna)`.slice(0, 100);
-      const ytDesc = `${topicPhrase} — "${title}" by Martin Strayd, promoted by Agent Anna (A1 shell + v4 core).\n\n${storyAngle}\nVisual law: Strictly realistic live-action cinematography only (zero cartoon).\nDirect MP3 + sleeve: ${url}\n\n${tags}`;
-      const facebook = `Agent Anna here—${storyAngle} What hits you first on "${title}"? Grab the MP3 + cover art direct: ${url}`;
-      const x = `"${title}" — Martin Strayd (${topicPhrase}). ${storyAngle} ${url} ${shortTags}`;
+      // TikTok: punchy MTV hook + topic/sleeve story + discovery tags
+      const tiktok = `MTV single call from Agent Anna: "${title}" by Martin Strayd. ${story} Grab MP3 + sleeve: ${url} ${tags}`;
+
+      // Instagram: first ~125 chars hit cleanly before fold + story + CTA + tags
+      const igLead = `"${title}" — Martin Strayd (Agent Anna pick). `;
+      const instagram = `${igLead}${story} Own MP3 + cover art: ${url} ${tags}`;
+
+      // YouTube: strictly <= 100 char title + search-first description
+      const ytTitle = `${title} — Martin Strayd | ${topicPhrase} (Agent Anna)`.slice(0, 100);
+      const ytDesc = `${topicPhrase} — "${title}" by Martin Strayd, promoted by Agent Anna.\n\n${story}\nVisual law: Strictly realistic live-action cinematography only (zero cartoon).\nDirect MP3 + sleeve: ${url}\n\n${tags}`;
+
+      // Facebook: conversational MTV/manager hook for comments & shares
+      const facebook = `Agent Anna here—${story} Where does "${title}" hit you first, and who needs this in their rotation? Direct MP3 + sleeve: ${url}`;
+
+      // X: fit within 280 chars cleanly
+      const xBase = `"${title}" — Martin Strayd (${topicPhrase}). ${url} ${shortTags}`;
+      const xPrefix = `Anna's MTV pick: `;
+      const x = (xPrefix + xBase).length <= 280 ? (xPrefix + xBase) : xBase.slice(0, 280);
 
       return { tiktok, instagram, ytTitle, ytDesc, facebook, x };
     }
 
     function updateStats() {
-      const pairs = [
-        ["ttOut", "ttStats"],
-        ["igOut", "igStats"],
-        ["ytTitleOut", "ytTitleStats"],
-        ["ytDescOut", "ytDescStats"],
-        ["fbOut", "fbStats"],
-        ["xOut", "xStats"]
-      ];
-      for (const [inputId, statId] of pairs) {
-        const val = nonEmpty($(inputId).value);
-        $(statId).textContent = `${countWords(val)} words • ${val.length} chars`;
-      }
+      const ttVal = nonEmpty($("ttOut").value);
+      $("ttStats").textContent = `${countWords(ttVal)} words • ${ttVal.length} chars`;
+      $("ttStats").className = "stats";
+
+      const igVal = nonEmpty($("igOut").value);
+      $("igStats").textContent = `${countWords(igVal)} words • ${igVal.length} chars`;
+      $("igStats").className = "stats";
+
+      const ytTVal = nonEmpty($("ytTitleOut").value);
+      $("ytTitleStats").textContent = `${countWords(ytTVal)} words • ${ytTVal.length} / 100 chars`;
+      $("ytTitleStats").className = ytTVal.length > 100 ? "stats over" : "stats";
+
+      const ytDVal = nonEmpty($("ytDescOut").value);
+      $("ytDescStats").textContent = `${countWords(ytDVal)} words • ${ytDVal.length} chars`;
+      $("ytDescStats").className = "stats";
+
+      const fbVal = nonEmpty($("fbOut").value);
+      $("fbStats").textContent = `${countWords(fbVal)} words • ${fbVal.length} chars`;
+      $("fbStats").className = "stats";
+
+      const xVal = nonEmpty($("xOut").value);
+      $("xStats").textContent = `${countWords(xVal)} words • ${xVal.length} / 280 chars`;
+      $("xStats").className = xVal.length > 280 ? "stats over" : "stats";
     }
 
     function applyDrafts(drafts) {
@@ -498,7 +560,7 @@
       $("statusBadges").innerHTML = [
         `<span class="badge">Shell: A1 + Lean v4 Core</span>`,
         `<span class="badge">External Bible: ${activeBible.found ? "Loaded" : "Standby"}</span>`,
-        `<span class="badge">${hasAi ? "AI Endpoint Linked" : "Local Sleeve + Bible Synth"}</span>`
+        `<span class="badge">${hasAi ? "AI Endpoint Active" : "Local MTV + Sleeve Synth"}</span>`
       ].join("");
     }
 
@@ -536,13 +598,13 @@
 
       $("artScanMeta").textContent = `Visual scan: ${activeArt.summary}`;
       $("bibleBox").value = activeBible.found
-        ? `External bible: ${activeBible.path}\n\n${activeBible.raw.slice(0, 420)}`
+        ? `External bible: ${activeBible.path}\n\n${activeBible.raw.slice(0, 380)}`
         : `Bible stays outside v4 core so Anna v4 stays lean. Add/update song notes in external A1 bible docs anytime.`;
 
       const shiftVal = $("rotationShift").value === "auto" ? new Date().getDay() : (parseInt($("rotationShift").value, 10) || 0);
       const link = nonEmpty($("directLink").value, "https://www.paypal.com/paypalme/martinstrayd");
 
-      const drafts = buildChannelDrafts(activeTrack, activeArt.summary, activeBible, link, shiftVal, runCounter);
+      const drafts = buildChannelDrafts(activeTrack, activeArt.summary, activeBible, link, shiftVal, runCounter, customDirective);
       applyDrafts(drafts);
 
       const aiUrl = nonEmpty($("aiEndpoint").value);
@@ -552,12 +614,14 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+              mode: "drafts",
               shell: "A1",
               agent: "Agent Anna",
               core: "v4 (lean)",
               track: activeTrack,
               artwork: activeArt,
               externalBible: activeBible.found ? activeBible.path : null,
+              directive: customDirective,
               link,
               shift: shiftVal,
               visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)"
@@ -576,6 +640,58 @@
           }
         } catch (_) {}
       }
+    }
+
+    async function sendChatToAnna() {
+      const msg = nonEmpty($("chatInput").value);
+      if (!msg) return;
+      $("chatInput").value = "";
+      appendChat("You", msg);
+      customDirective = msg;
+      runCounter++;
+
+      const aiUrl = nonEmpty($("aiEndpoint").value);
+      if (aiUrl) {
+        try {
+          const resp = await fetch(aiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              mode: "chat",
+              agent: "Agent Anna",
+              message: msg,
+              track: activeTrack,
+              artwork: activeArt,
+              currentDrafts: {
+                tiktok: $("ttOut").value,
+                instagram: $("igOut").value,
+                ytTitle: $("ytTitleOut").value,
+                ytDesc: $("ytDescOut").value,
+                facebook: $("fbOut").value,
+                x: $("xOut").value
+              }
+            })
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            appendChat("Agent Anna", nonEmpty(data.reply, `Re-angled "${activeTrack.title}" around "${msg}".`));
+            if (data.drafts) {
+              applyDrafts({
+                tiktok: nonEmpty(data.drafts.tiktok, $("ttOut").value),
+                instagram: nonEmpty(data.drafts.instagram, $("igOut").value),
+                ytTitle: nonEmpty(data.drafts.ytTitle, $("ytTitleOut").value).slice(0, 100),
+                ytDesc: nonEmpty(data.drafts.ytDesc, $("ytDescOut").value),
+                facebook: nonEmpty(data.drafts.facebook, $("fbOut").value),
+                x: nonEmpty(data.drafts.x, $("xOut").value)
+              });
+            }
+            return;
+          }
+        } catch (_) {}
+      }
+
+      await generateAll();
+      appendChat("Agent Anna", `Locked "${msg}" into the rotation for "${activeTrack.title}" (${activeArt.summary}). Review the drafts and hit OK To Post when ready.`);
     }
 
     async function boot() {
@@ -611,7 +727,10 @@
       }
 
       renderBadges();
-      $("bootStatus").textContent = `A1 shell + Anna v4 ready • ${catalog.length} songs`;
+      $("bootStatus").textContent = `Anna v4 ready • ${catalog.length} songs`;
+      if (!$("chatLog").children.length) {
+        appendChat("Agent Anna", "MTV desk open. Pick a single or tell me what angle to push for Martin Strayd.");
+      }
       await generateAll();
     }
 
@@ -623,6 +742,11 @@
         target.select();
         navigator.clipboard?.writeText(target.value).catch(() => {});
       });
+    });
+
+    $("chatSendBtn").addEventListener("click", sendChatToAnna);
+    $("chatInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendChatToAnna();
     });
 
     $("reloadBtn").addEventListener("click", async () => {
@@ -637,6 +761,7 @@
     });
     $("songPicker").addEventListener("change", () => {
       $("customSong").value = "";
+      customDirective = "";
       runCounter++;
       generateAll();
     });
@@ -660,6 +785,7 @@
         agent: "Agent Anna",
         core: "v4 (lean)",
         externalBibleSource: activeBible.found ? activeBible.path : null,
+        directive: customDirective || null,
         approved: true,
         approvedAt: new Date().toISOString(),
         artist: "Martin Strayd",
