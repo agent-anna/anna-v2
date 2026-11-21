@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A1 Shell • Agent Anna v4 MTV Promoter & Chat Studio</title>
+  <title>A1 Shell • Agent Anna v4 MTV & Dahl Studio</title>
   <style>
     :root {
-      --bg: #0b0e14;
-      --panel: #121722;
-      --panel-2: #182030;
-      --text: #eef2f7;
-      --muted: #9aa6bd;
-      --line: rgba(255, 255, 255, 0.12);
-      --accent: #a3e635;
-      --accent-ink: #071018;
-      --sky: #7dd3fc;
+      --bg: #090c12;
+      --panel: #111622;
+      --panel-2: #171f30;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --line: rgba(148, 163, 184, 0.16);
+      --accent: #e5b84b;
+      --accent-ink: #090c12;
+      --ok: #a3e635;
+      --sky: #38bdf8;
       --warn: #fbbf24;
     }
     *, *::before, *::after { box-sizing: border-box; }
@@ -26,7 +27,7 @@
       padding: 20px;
       line-height: 1.45;
     }
-    .container { max-width: 1180px; margin: 0 auto; }
+    .container { max-width: 1220px; margin: 0 auto; }
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -37,12 +38,12 @@
       padding-bottom: 12px;
       margin-bottom: 16px;
     }
-    .topbar h1 { margin: 0; font-size: 1.25rem; }
+    .topbar h1 { margin: 0; font-size: 1.28rem; }
     .muted { color: var(--muted); font-size: 0.84rem; }
 
     .hero {
       display: grid;
-      grid-template-columns: 196px 1fr;
+      grid-template-columns: 200px 1fr;
       gap: 18px;
       align-items: center;
       background: var(--panel);
@@ -53,22 +54,22 @@
     }
     @media (max-width: 720px) { .hero { grid-template-columns: 1fr; } }
     .sleeve {
-      width: 196px;
+      width: 200px;
       max-width: 100%;
       aspect-ratio: 1 / 1;
       border-radius: 12px;
       border: 1px solid var(--line);
-      background: #0d121b;
+      background: #0b0f18;
       overflow: hidden;
     }
     .sleeve img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .hero-title { font-size: 1.2rem; font-weight: 800; margin: 4px 0 6px; }
+    .hero-title { font-size: 1.24rem; font-weight: 800; margin: 4px 0 6px; }
     .badge {
       display: inline-block;
       font-size: 0.72rem;
       padding: 2px 8px;
       border-radius: 999px;
-      background: #0d121b;
+      background: #0b0f18;
       border: 1px solid var(--line);
       color: var(--sky);
       margin: 6px 6px 0 0;
@@ -76,11 +77,11 @@
 
     .workspace {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 380px 1fr;
       gap: 16px;
       align-items: start;
     }
-    @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
+    @media (max-width: 920px) { .workspace { grid-template-columns: 1fr; } }
     .card {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -88,13 +89,13 @@
       padding: 14px;
       margin-bottom: 14px;
     }
-    .section-label { font-size: 0.78rem; font-weight: 700; color: var(--sky); margin-bottom: 6px; }
+    .section-label { font-size: 0.78rem; font-weight: 700; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.03em; }
     label { display: block; font-size: 0.78rem; color: var(--muted); margin: 10px 0 4px; }
     input, select, textarea, button {
       width: 100%;
       border-radius: 8px;
       border: 1px solid var(--line);
-      background: #0d121b;
+      background: #0b0f18;
       color: var(--text);
       padding: 9px 11px;
       font-size: 0.88rem;
@@ -106,7 +107,8 @@
       line-height: 1.48;
     }
     button { cursor: pointer; font-weight: 700; background: var(--panel-2); }
-    button.primary { background: var(--accent); color: var(--accent-ink); border: none; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: var(--ok); color: var(--accent-ink); border: none; }
     .copy-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; margin-top: 6px; }
     .actions { display: grid; gap: 8px; margin-top: 12px; }
 
@@ -131,17 +133,17 @@
     .stats.over { color: var(--warn); }
 
     .chat-log {
-      background: #0d121b;
+      background: #0b0f18;
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 10px;
-      max-height: 190px;
+      max-height: 210px;
       overflow-y: auto;
       font-size: 0.82rem;
       margin-bottom: 8px;
     }
     .chat-msg { margin-bottom: 8px; }
-    .chat-msg strong { color: var(--sky); }
+    .chat-msg strong { color: var(--accent); }
     .chat-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
     .chat-row button { width: auto; padding: 9px 14px; }
   </style>
@@ -150,8 +152,8 @@
   <div class="container">
     <header class="topbar">
       <div>
-        <h1>A1 Shell • Agent Anna v4 MTV Promoter &amp; Chat Studio</h1>
-        <div class="muted">Agent Anna (A1 shell + lean v4 core) • MTV single energy, platform limits &amp; AI chat for Martin Strayd • Live-action only (zero cartoon)</div>
+        <h1>A1 Shell • Agent Anna v4 MTV &amp; Dahl Studio</h1>
+        <div class="muted">Agent Anna (A1 shell + lean v4 core) • Powered by Dahl inference + GitHub PAT • Live-action only (zero cartoon)</div>
       </div>
       <div class="muted" id="bootStatus">Booting Anna v4...</div>
     </header>
@@ -174,7 +176,7 @@
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="section-label">1. SINGLE &amp; CAMPAIGN CONTROLS</div>
+            <div class="section-label">1. SINGLE, DAHL &amp; GITHUB CONTROLS</div>
 
             <label for="songPicker">Select Single (Catalog)</label>
             <select id="songPicker"></select>
@@ -182,7 +184,7 @@
             <label for="customSong">Or Type Song Title</label>
             <input id="customSong" type="text" placeholder="Song title..." />
 
-            <label for="rotationShift">MTV Rotation &amp; Angle</label>
+            <label for="rotationShift">MTV Rotation &amp; Creative Angle</label>
             <select id="rotationShift">
               <option value="auto">Auto (Day of Week)</option>
               <option value="0">01 • MTV Countdown &amp; Opening Cut</option>
@@ -190,32 +192,41 @@
               <option value="2">03 • Live-Action Scene &amp; Camera Mood</option>
               <option value="3">04 • Own MP3 + Sleeve Bundle</option>
               <option value="4">05 • Search &amp; AI Discovery Bait</option>
-              <option value="5">06 • External Bible &amp; Story Pull</option>
+              <option value="5">06 • External Note &amp; Story Pull</option>
               <option value="6">07 • Weekend Spotlight Push</option>
             </select>
 
             <label for="directLink">Direct MP3 + Cover Art Link</label>
             <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
 
-            <label for="aiEndpoint">AI Chat / Generator Endpoint (JSON POST)</label>
-            <input id="aiEndpoint" type="text" placeholder="Optional LLM/worker URL for live AI chat & drafts..." />
+            <label for="dahlEndpoint">Dahl Endpoint</label>
+            <input id="dahlEndpoint" type="text" value="https://inference.dahl.global/v1/chat/completions" />
+
+            <label for="dahlModel">Dahl Model</label>
+            <input id="dahlModel" type="text" value="MiniMaxAI/MiniMax-M2.7" />
+
+            <label for="dahlKey">Dahl API Key (Session / Local)</label>
+            <input id="dahlKey" type="password" placeholder="dahl-... or API key" />
+
+            <label for="ghPat">GitHub PAT (Repo Read / Save)</label>
+            <input id="ghPat" type="password" placeholder="github_pat_... or ghp_..." />
 
             <label for="webhookUrl">Approval Webhook (Fires Only After OK)</label>
             <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
 
             <div class="actions">
-              <button type="button" id="reloadBtn">Reload External Bible, Catalog &amp; Art</button>
-              <button type="button" id="generateBtn">Anna: Generate Platform Pitches</button>
+              <button type="button" id="reloadBtn">Reload Repo Catalog, Notes &amp; Art</button>
+              <button type="button" id="generateBtn">Anna: Generate With Dahl</button>
               <button type="button" class="primary" id="approveBtn">OK To Post (Approve Single)</button>
             </div>
             <div class="muted" id="gateStatus" style="margin-top:8px;">ANNA Gate: Staged — waiting for your OK</div>
           </section>
 
           <section class="card">
-            <div class="section-label">2. CHAT WITH AGENT ANNA (AI / CAMPAIGN DESK)</div>
+            <div class="section-label">2. CHAT WITH AGENT ANNA (DAHL AI)</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Tell Anna how to pitch this single or rewrite a channel..." />
+              <input id="chatInput" type="text" placeholder="Tell Anna an MTV angle, scene, or rewrite..." />
               <button type="button" id="chatSendBtn">Ask Anna</button>
             </div>
           </section>
@@ -223,8 +234,8 @@
 
         <div>
           <section class="card">
-            <div class="section-label">3. EXTERNAL BIBLE RECORD (OUTSIDE V4 CORE)</div>
-            <textarea id="bibleBox" readonly style="min-height:80px;"></textarea>
+            <div class="section-label">3. EXTERNAL CONTEXT (KEPT OUTSIDE V4 CORE)</div>
+            <textarea id="bibleBox" readonly style="min-height:76px;"></textarea>
           </section>
 
           <section class="card">
@@ -274,7 +285,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>X • Punchy Single Line (target: &le; 280 chars)</span>
+                <span>X • Punchy Single Line (limit: &le; 280 chars)</span>
                 <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
               <textarea id="xOut" style="min-height:74px;"></textarea>
@@ -295,22 +306,66 @@
 
   <script>
   (() => {
-    const REPO_API_TREE = "https://api.github.com/repos/agent-anna/anna-v2/git/trees/main?recursive=1";
-    const RAW_BASE = "https://raw.githubusercontent.com/agent-anna/anna-v2/main/";
+    const REPO_OWNER = "agent-anna";
+    const REPO_NAME = "anna-v2";
+    const DEFAULT_DAHL_URL = "https://inference.dahl.global/v1/chat/completions";
+    const DEFAULT_DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
+    const RAW_BASE = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
     const CATALOG_URLS = ["./strayd-artist-live.json", `${RAW_BASE}A1/strayd/strayd-artist-live.json`];
 
     let catalog = [];
-    let externalBiblePaths = [];
-    const bibleCache = new Map();
+    let externalNotePaths = [];
+    const noteCache = new Map();
     const artCache = new Map();
     let runCounter = 1;
     let customDirective = "";
     let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
     let activeArt = { summary: "sleeve scan pending" };
-    let activeBible = { found: false, path: "", lines: [], raw: "" };
+    let activeNote = { found: false, path: "", lines: [], raw: "" };
 
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
+
+    function cleanSecret(val) {
+      return nonEmpty(val).replace(/[^\x20-\x7E\xA0-\xFF]/g, "");
+    }
+
+    function getDahlKey() {
+      const fromInput = cleanSecret($("dahlKey")?.value);
+      if (fromInput) {
+        try { localStorage.setItem("DAHL_API_KEY", fromInput); } catch (_) {}
+        return fromInput;
+      }
+      for (const k of ["DAHL_API_KEY", "dahl_api_key", "OPENAI_API_KEY", "api_key"]) {
+        try {
+          const v = cleanSecret(localStorage.getItem(k));
+          if (v) return v;
+        } catch (_) {}
+      }
+      return "";
+    }
+
+    function getGhToken() {
+      const fromInput = cleanSecret($("ghPat")?.value);
+      if (fromInput) {
+        try { localStorage.setItem("GITHUB_PAT", fromInput); } catch (_) {}
+        return fromInput;
+      }
+      for (const k of ["GITHUB_PAT", "gh_token", "github_token"]) {
+        try {
+          const v = cleanSecret(localStorage.getItem(k));
+          if (v) return v;
+        } catch (_) {}
+      }
+      return "";
+    }
+
+    function getGhHeaders() {
+      const headers = { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+      const pat = getGhToken();
+      if (pat) headers.Authorization = `Bearer ${pat}`;
+      return headers;
+    }
 
     const countWords = (text) => {
       const cleaned = nonEmpty(text).replace(/https?:\/\/\S+/g, " ").replace(/#\S+/g, " ").trim();
@@ -332,7 +387,7 @@
       const strong = document.createElement("strong");
       strong.textContent = `${sender}: `;
       const span = document.createElement("span");
-      span.textContent = text;
+      span.textContent = nonEmpty(text).replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
       row.appendChild(strong);
       row.appendChild(span);
       box.appendChild(row);
@@ -349,21 +404,25 @@
       return null;
     }
 
-    async function loadExternalBibleIndex() {
+    // Index external reference files outside A1/v4 so Anna v4 stays lean
+    async function loadExternalNotesIndex() {
       try {
-        const res = await fetch(REPO_API_TREE, { cache: "no-store" });
+        const res = await fetch(
+          `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/main?recursive=1`,
+          { headers: getGhHeaders(), cache: "no-store" }
+        );
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.tree)) {
-            externalBiblePaths = data.tree
-              .filter((n) => n && n.type === "blob" && n.path && /^A1\//i.test(n.path) && !/^A1\/v4\//i.test(n.path) && !/^A1\/v3\//i.test(n.path) && (/bible/i.test(n.path) || /\.md$/i.test(n.path)))
+            externalNotePaths = data.tree
+              .filter((n) => n && n.type === "blob" && n.path && !/^A1\/v4\//i.test(n.path) && !/^A1\/v3\//i.test(n.path) && /\.md$/i.test(n.path))
               .map((n) => n.path);
           }
         }
       } catch (_) {}
     }
 
-    function parseExternalMarkdown(mdText) {
+    function parseMarkdownNote(mdText) {
       const clean = nonEmpty(mdText).replace(/\r\n/g, "\n");
       const lines = clean
         .split("\n")
@@ -377,22 +436,22 @@
       return { found: true, lines, raw: clean };
     }
 
-    async function loadExternalSongBible(title) {
+    async function loadExternalSongNote(title) {
       const key = normalizeKey(title);
-      if (bibleCache.has(key)) return bibleCache.get(key);
+      if (noteCache.has(key)) return noteCache.get(key);
 
       const candidates = [];
-      for (const p of externalBiblePaths) {
+      for (const p of externalNotePaths) {
         const base = p.split("/").pop().replace(/\.md$/i, "");
         if (normalizeKey(base) === key) candidates.push(`${RAW_BASE}${p}`);
       }
 
       const hit = await fetchFirstText(candidates);
       const record = hit && hit.text
-        ? { ...parseExternalMarkdown(hit.text), path: hit.url }
+        ? { ...parseMarkdownNote(hit.text), path: hit.url }
         : { found: false, path: "", lines: [], raw: "" };
 
-      bibleCache.set(key, record);
+      noteCache.set(key, record);
       return record;
     }
 
@@ -445,9 +504,9 @@
       });
     }
 
-    function extractKeywords(title, bibleRec) {
+    function extractKeywords(title, noteRec) {
       const stop = new Set(["the", "and", "for", "with", "from", "into", "your", "you", "are", "a", "an", "to", "of", "in", "on", "at", "is", "it"]);
-      const corpus = `${nonEmpty(title)} ${(bibleRec && bibleRec.lines ? bibleRec.lines.slice(0, 4).join(" ") : "")}`;
+      const corpus = `${nonEmpty(title)} ${(noteRec && noteRec.lines ? noteRec.lines.slice(0, 4).join(" ") : "")}`;
       const freq = {};
       corpus
         .toLowerCase()
@@ -472,46 +531,22 @@
       return tags.join(" ");
     }
 
-    function buildChannelDrafts(track, artSummary, bibleRec, link, shift, seed, directive) {
+    function buildFallbackDrafts(track, artSummary, noteRec, link, shift, seed, directive) {
       const title = nonEmpty(track.title, "Martin Strayd Single");
       const url = nonEmpty(link, "https://www.paypal.com/paypalme/martinstrayd");
-      const keywords = extractKeywords(title, bibleRec);
+      const keywords = extractKeywords(title, noteRec);
       const topicPhrase = keywords.length ? keywords.join(" ") : title.toLowerCase();
       const tags = buildTags(keywords, shift + seed);
       const shortTags = tags.split(/\s+/).slice(0, 2).join(" ");
-      const note = nonEmpty(directive) ? ` Note: ${nonEmpty(directive)}.` : "";
+      const note = nonEmpty(directive) ? ` (${nonEmpty(directive)})` : "";
 
-      const lyricLine = bibleRec && Array.isArray(bibleRec.lines) && bibleRec.lines.length
-        ? bibleRec.lines[(Math.abs(shift) + seed) % bibleRec.lines.length].slice(0, 95)
-        : "";
-
-      const mode = (Math.abs(shift) + seed) % 4;
-      let story = "";
-      if (mode === 0) {
-        story = `Agent Anna on the MTV desk—Martin Strayd's "${title}" hits with ${artSummary} energy and real ${topicPhrase} bite, built for people who want actual songwriting rather than polite filler.${note}`;
-      } else if (mode === 1) {
-        story = `Anna's rotation cut: "${title}" by Martin Strayd digs into ${topicPhrase} against a ${artSummary}${lyricLine ? `—hear that edge in "${lyricLine}"` : ""}.${note}`;
-      } else if (mode === 2) {
-        story = `Agent Anna framing "${title}" around ${artSummary} and strictly realistic live-action camera work—zero cartoon shortcuts, pure ${topicPhrase} tension.${note}`;
-      } else {
-        story = `Why Agent Anna pushes "${title}" to keep: real ${topicPhrase} heat (${artSummary})—own the MP3 + sleeve bundle direct instead of renting a stream.${note}`;
-      }
-
-      // TikTok: punchy MTV hook + topic/sleeve story + discovery tags
-      const tiktok = `MTV single call from Agent Anna: "${title}" by Martin Strayd. ${story} Grab MP3 + sleeve: ${url} ${tags}`;
-
-      // Instagram: first ~125 chars hit cleanly before fold + story + CTA + tags
-      const igLead = `"${title}" — Martin Strayd (Agent Anna pick). `;
-      const instagram = `${igLead}${story} Own MP3 + cover art: ${url} ${tags}`;
-
-      // YouTube: strictly <= 100 char title + search-first description
+      const story = `Agent Anna on the MTV desk—Martin Strayd's "${title}" hits with ${artSummary} edge and real ${topicPhrase} tension${note}, built for listeners who want real weight rather than polite filler.`;
+      const tiktok = `MTV single call from Agent Anna: "${title}" by Martin Strayd. ${story} Direct MP3 + sleeve: ${url} ${tags}`;
+      const instagram = `"${title}" — Martin Strayd (Agent Anna pick). ${story} Own MP3 + cover art: ${url} ${tags}`;
       const ytTitle = `${title} — Martin Strayd | ${topicPhrase} (Agent Anna)`.slice(0, 100);
       const ytDesc = `${topicPhrase} — "${title}" by Martin Strayd, promoted by Agent Anna.\n\n${story}\nVisual law: Strictly realistic live-action cinematography only (zero cartoon).\nDirect MP3 + sleeve: ${url}\n\n${tags}`;
+      const facebook = `Agent Anna here—${story} Where does "${title}" hit you first, and who should hear this next? Direct MP3 + sleeve: ${url}`;
 
-      // Facebook: conversational MTV/manager hook for comments & shares
-      const facebook = `Agent Anna here—${story} Where does "${title}" hit you first, and who needs this in their rotation? Direct MP3 + sleeve: ${url}`;
-
-      // X: fit within 280 chars cleanly
       const xBase = `"${title}" — Martin Strayd (${topicPhrase}). ${url} ${shortTags}`;
       const xPrefix = `Anna's MTV pick: `;
       const x = (xPrefix + xBase).length <= 280 ? (xPrefix + xBase) : xBase.slice(0, 280);
@@ -556,12 +591,56 @@
     }
 
     function renderBadges() {
-      const hasAi = Boolean(nonEmpty($("aiEndpoint").value));
+      const hasDahl = Boolean(getDahlKey());
+      const hasGh = Boolean(getGhToken());
       $("statusBadges").innerHTML = [
-        `<span class="badge">Shell: A1 + Lean v4 Core</span>`,
-        `<span class="badge">External Bible: ${activeBible.found ? "Loaded" : "Standby"}</span>`,
-        `<span class="badge">${hasAi ? "AI Endpoint Active" : "Local MTV + Sleeve Synth"}</span>`
+        `<span class="badge">Shell: A1 + Lean v4</span>`,
+        `<span class="badge">${hasDahl ? "Dahl Key Active" : "Dahl Key Standby"}</span>`,
+        `<span class="badge">${hasGh ? "GitHub PAT Active" : "Public Repo Read"}</span>`
       ].join("");
+    }
+
+    async function askDahl(messages, expectJson = false) {
+      const key = getDahlKey();
+      const endpoint = nonEmpty($("dahlEndpoint")?.value, DEFAULT_DAHL_URL);
+      const model = nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL);
+      if (!key) return null;
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 30000);
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model,
+            temperature: 0.85,
+            messages
+          }),
+          signal: controller.signal
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const rawContent = nonEmpty(data?.choices?.[0]?.message?.content);
+        if (!rawContent) return null;
+        const stripped = rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        if (!expectJson) return { text: stripped };
+
+        const jsonMatch = stripped.match(/```json\s*([\s\S]*?)```/i) || stripped.match(/(\{[\s\S]*\})/);
+        if (jsonMatch) {
+          try {
+            return { json: JSON.parse(jsonMatch[1]), text: stripped };
+          } catch (_) {}
+        }
+        return { text: stripped };
+      } catch (_) {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
     }
 
     async function generateAll() {
@@ -587,58 +666,54 @@
         $("artPreview").alt = activeTrack.title;
       }
 
-      const [bibleRec, sleeveInfo] = await Promise.all([
-        loadExternalSongBible(activeTrack.title),
+      const [noteRec, sleeveInfo] = await Promise.all([
+        loadExternalSongNote(activeTrack.title),
         analyzeSleeve(activeTrack.url)
       ]);
 
-      activeBible = bibleRec;
+      activeNote = noteRec;
       activeArt = sleeveInfo;
       renderBadges();
 
       $("artScanMeta").textContent = `Visual scan: ${activeArt.summary}`;
-      $("bibleBox").value = activeBible.found
-        ? `External bible: ${activeBible.path}\n\n${activeBible.raw.slice(0, 380)}`
-        : `Bible stays outside v4 core so Anna v4 stays lean. Add/update song notes in external A1 bible docs anytime.`;
+      $("bibleBox").value = activeNote.found
+        ? `External note: ${activeNote.path}\n\n${activeNote.raw.slice(0, 360)}`
+        : `External notes stay outside v4 core so v4 stays lean. Add external notes anytime or ask Anna via Dahl.`;
 
       const shiftVal = $("rotationShift").value === "auto" ? new Date().getDay() : (parseInt($("rotationShift").value, 10) || 0);
       const link = nonEmpty($("directLink").value, "https://www.paypal.com/paypalme/martinstrayd");
+      const fallback = buildFallbackDrafts(activeTrack, activeArt.summary, activeNote, link, shiftVal, runCounter, customDirective);
+      applyDrafts(fallback);
 
-      const drafts = buildChannelDrafts(activeTrack, activeArt.summary, activeBible, link, shiftVal, runCounter, customDirective);
-      applyDrafts(drafts);
+      const dahlOut = await askDahl([
+        {
+          role: "system",
+          content:
+            "You are Agent Anna in the A1 shell with lean v4 core, acting as a sharp MTV-era music promoter/manager for Martin Strayd (STRAYD). Rules: strictly realistic live-action cinematography only (zero cartoon/anime/illustration), strong storytelling, direct MP3 + cover sleeve CTA, ytTitle <= 100 chars, x <= 280 chars. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
+        },
+        {
+          role: "user",
+          content: JSON.stringify({
+            song: activeTrack.title,
+            sleeveScan: activeArt.summary,
+            externalNoteExcerpt: activeNote.found ? activeNote.lines.slice(0, 4).join(" | ") : "",
+            rotationShift: shiftVal,
+            directive: customDirective,
+            directLink: link
+          })
+        }
+      ], true);
 
-      const aiUrl = nonEmpty($("aiEndpoint").value);
-      if (aiUrl) {
-        try {
-          const resp = await fetch(aiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              mode: "drafts",
-              shell: "A1",
-              agent: "Agent Anna",
-              core: "v4 (lean)",
-              track: activeTrack,
-              artwork: activeArt,
-              externalBible: activeBible.found ? activeBible.path : null,
-              directive: customDirective,
-              link,
-              shift: shiftVal,
-              visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)"
-            })
-          });
-          if (resp.ok) {
-            const aiOut = await resp.json();
-            applyDrafts({
-              tiktok: nonEmpty(aiOut.tiktok, drafts.tiktok),
-              instagram: nonEmpty(aiOut.instagram, drafts.instagram),
-              ytTitle: nonEmpty(aiOut.ytTitle, drafts.ytTitle).slice(0, 100),
-              ytDesc: nonEmpty(aiOut.ytDesc, drafts.ytDesc),
-              facebook: nonEmpty(aiOut.facebook, drafts.facebook),
-              x: nonEmpty(aiOut.x, drafts.x)
-            });
-          }
-        } catch (_) {}
+      if (dahlOut && dahlOut.json) {
+        const j = dahlOut.json;
+        applyDrafts({
+          tiktok: nonEmpty(j.tiktok, fallback.tiktok),
+          instagram: nonEmpty(j.instagram, fallback.instagram),
+          ytTitle: nonEmpty(j.ytTitle, fallback.ytTitle).slice(0, 100),
+          ytDesc: nonEmpty(j.ytDesc, fallback.ytDesc),
+          facebook: nonEmpty(j.facebook, fallback.facebook),
+          x: nonEmpty(j.x, fallback.x).slice(0, 280)
+        });
       }
     }
 
@@ -650,52 +725,32 @@
       customDirective = msg;
       runCounter++;
 
-      const aiUrl = nonEmpty($("aiEndpoint").value);
-      if (aiUrl) {
-        try {
-          const resp = await fetch(aiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              mode: "chat",
-              agent: "Agent Anna",
-              message: msg,
-              track: activeTrack,
-              artwork: activeArt,
-              currentDrafts: {
-                tiktok: $("ttOut").value,
-                instagram: $("igOut").value,
-                ytTitle: $("ytTitleOut").value,
-                ytDesc: $("ytDescOut").value,
-                facebook: $("fbOut").value,
-                x: $("xOut").value
-              }
-            })
-          });
-          if (resp.ok) {
-            const data = await resp.json();
-            appendChat("Agent Anna", nonEmpty(data.reply, `Re-angled "${activeTrack.title}" around "${msg}".`));
-            if (data.drafts) {
-              applyDrafts({
-                tiktok: nonEmpty(data.drafts.tiktok, $("ttOut").value),
-                instagram: nonEmpty(data.drafts.instagram, $("igOut").value),
-                ytTitle: nonEmpty(data.drafts.ytTitle, $("ytTitleOut").value).slice(0, 100),
-                ytDesc: nonEmpty(data.drafts.ytDesc, $("ytDescOut").value),
-                facebook: nonEmpty(data.drafts.facebook, $("fbOut").value),
-                x: nonEmpty(data.drafts.x, $("xOut").value)
-              });
-            }
-            return;
-          }
-        } catch (_) {}
+      const dahlReply = await askDahl([
+        {
+          role: "system",
+          content:
+            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd with punchy MTV music-desk energy. Strictly realistic live-action only (zero cartoon). Give a sharp, creative reply in 2-3 sentences."
+        },
+        {
+          role: "user",
+          content: `Single: "${activeTrack.title}" (${activeArt.summary}). User note: ${msg}`
+        }
+      ], false);
+
+      if (dahlReply && dahlReply.text) {
+        appendChat("Agent Anna", dahlReply.text);
+        await generateAll();
+        return;
       }
 
       await generateAll();
-      appendChat("Agent Anna", `Locked "${msg}" into the rotation for "${activeTrack.title}" (${activeArt.summary}). Review the drafts and hit OK To Post when ready.`);
+      appendChat("Agent Anna", `Locked "${msg}" onto "${activeTrack.title}" (${activeArt.summary}). Add a Dahl API key above for full live LLM replies, or hit OK To Post when ready.`);
     }
 
     async function boot() {
-      await loadExternalBibleIndex();
+      $("dahlKey").value = getDahlKey();
+      $("ghPat").value = getGhToken();
+      await loadExternalNotesIndex();
       const catHit = await fetchFirstText(CATALOG_URLS);
       if (catHit && catHit.text) {
         try {
@@ -729,7 +784,7 @@
       renderBadges();
       $("bootStatus").textContent = `Anna v4 ready • ${catalog.length} songs`;
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", "MTV desk open. Pick a single or tell me what angle to push for Martin Strayd.");
+        appendChat("Agent Anna", "MTV desk open on A1 + v4. Pick a track or tell me what angle to push for Martin Strayd.");
       }
       await generateAll();
     }
@@ -750,7 +805,7 @@
     });
 
     $("reloadBtn").addEventListener("click", async () => {
-      bibleCache.clear();
+      noteCache.clear();
       artCache.clear();
       runCounter++;
       await boot();
@@ -774,7 +829,8 @@
       generateAll();
     });
     $("directLink").addEventListener("input", generateAll);
-    $("aiEndpoint").addEventListener("input", renderBadges);
+    $("dahlKey").addEventListener("input", renderBadges);
+    $("ghPat").addEventListener("input", renderBadges);
     ["ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
       $(id).addEventListener("input", updateStats);
     });
@@ -784,7 +840,8 @@
         shell: "A1",
         agent: "Agent Anna",
         core: "v4 (lean)",
-        externalBibleSource: activeBible.found ? activeBible.path : null,
+        model: nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL),
+        externalNoteSource: activeNote.found ? activeNote.path : null,
         directive: customDirective || null,
         approved: true,
         approvedAt: new Date().toISOString(),
@@ -804,7 +861,7 @@
       $("payloadOut").value = JSON.stringify(payload, null, 2);
       const gate = $("gateStatus");
       gate.textContent = `ANNA Gate: OK APPROVED (${payload.song})`;
-      gate.style.color = "var(--accent)";
+      gate.style.color = "var(--ok)";
 
       const webhook = nonEmpty($("webhookUrl").value);
       if (webhook) {
