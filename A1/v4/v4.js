@@ -1126,11 +1126,12 @@
                     if (dataStr === "[DONE]") continue;
                     try {
                         const chunk = JSON.parse(dataStr);
-                        const dObj = chunk?.choices?.[0]?.delta || {}; const delta = dObj.content ?? dObj.reasoning_content ?? dObj.reasoning ?? chunk?.choices?.[0]?.text ?? "";
+                        const dObj = chunk?.choices?.[0]?.delta || {};
+                        const delta = dObj.content ?? chunk?.choices?.[0]?.text ?? "";
                         if (delta) {
                             if (ttftMs === null) ttftMs = Math.round(performance.now() - startedAt);
                             assembled += delta;
-                            const cleanPreview = stripModelStrings(assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").trim());
+                            const cleanPreview = stripModelStrings(assembled.replace(/<(?:think|thought|thinking)>[\s\S]*?<\/(?:think|thought|thinking)>/gi, "").replace(/<(?:think|thought|thinking)>[\s\S]*$/gi, "").trim());
                             if (typeof onProgress === "function" && cleanPreview) {
                                 onProgress(cleanPreview, ttftMs, Math.round(performance.now() - startedAt), modelName);
                             }
@@ -1141,7 +1142,7 @@
 
             const totalMs = Math.round(performance.now() - startedAt);
             ttftMs = ttftMs ?? totalMs;
-            const cleanFinal = stripModelStrings(assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").trim()) || "Ready.";
+            const cleanFinal = stripModelStrings(assembled.replace(/<(?:think|thought|thinking)>[\s\S]*?<\/(?:think|thought|thinking)>/gi, "").replace(/<(?:think|thought|thinking)>[\s\S]*$/gi, "").trim()) || "Ready.";
             return { text: cleanFinal, ttftMs, totalMs, status: response.status, model: modelName };
         } catch (err) {
             const elapsedMs = Math.round(performance.now() - startedAt);
@@ -1174,7 +1175,7 @@
                 return await callDahlSingleModel(candidate, apiKey, messages, onProgress);
             } catch (err) {
                 lastErr = err;
-                const isConcurrency429 = err && (err.status === 429 || String(err.message || "").includes("HTTP 429"));
+                const isConcurrency429 = err && (err.status === 429 || err.status === 503 || /HTTP (?:429|503)/.test(String(err.message || "")));
                 if (isConcurrency429 && i < candidates.length - 1) {
                     if (typeof onProgress === "function") {
                         onProgress(`Model ${candidate} busy (429), switching to ${candidates[i + 1]}...`, 0, 0, candidates[i + 1]);
