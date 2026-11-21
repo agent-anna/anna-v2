@@ -6,7 +6,7 @@
     const WORKSPACE_ROOT = "A1/v4";
     const SCRAPE_WORKFLOW_FILE = "aa01-intel-feed.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
-    const DEFAULT_MODEL = "deepseek-ai/DeepSeek-V4-Flash-0731";
+    const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
     const DAHL_TIMEOUT_MS = 30000;
     const MAX_CONTEXT_CHARS = 3500;
 
@@ -1035,9 +1035,7 @@
                     if (dataStr === "[DONE]") continue;
                     try {
                         const chunk = JSON.parse(dataStr);
-                        const delta = chunk?.choices?.[0]?.delta?.content
-                            ?? chunk?.choices?.[0]?.text
-                            ?? "";
+                        const dObj = chunk?.choices?.[0]?.delta || {}; const delta = dObj.content ?? dObj.reasoning_content ?? dObj.reasoning ?? chunk?.choices?.[0]?.text ?? "";
                         if (delta) {
                             if (ttftMs === null) ttftMs = Math.round(performance.now() - startedAt);
                             assembled += delta;
