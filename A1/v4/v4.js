@@ -557,10 +557,12 @@
         if (typeof AbortController === "undefined") {
             return await fetch(url, opts || {});
         }
+        const controller = new AbortController();
         const timer = setTimeout(() => controller.abort("Request timed out after " + ms + "ms"), ms);
         try {
             return await fetch(url, { ...(opts || {}), signal: controller.signal });
         } finally {
+            clearTimeout(timer);
         }
     }
 
