@@ -3,53 +3,58 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agent Anna • MTV Top-100 Single Promoter Studio (A1)</title>
+  <title>Agent Anna • v4 Core + v3BIBLE Single Promoter Studio</title>
   <style>
     :root { --bg:#0b0e14; --panel:#121722; --panel2:#182030; --text:#eef2f7; --muted:#9aa6bd; --border:rgba(255,255,255,0.12); --accent:#a3e635; --sky:#7dd3fc; }
     * { box-sizing:border-box; }
     body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); padding:20px; }
-    .wrap { max-width:1180px; margin:0 auto; }
+    .wrap { max-width:1200px; margin:0 auto; }
     .hdr { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; }
     .hdr h1 { margin:0; font-size:1.25rem; }
     .hdr .sub { color:var(--muted); font-size:0.84rem; }
-    .grid { display:grid; grid-template-columns:360px 1fr; gap:16px; }
-    @media (max-width:860px){ .grid { grid-template-columns:1fr; } }
+    .grid { display:grid; grid-template-columns:380px 1fr; gap:16px; }
+    @media (max-width:900px){ .grid { grid-template-columns:1fr; } }
     .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; }
     label { display:block; font-size:0.78rem; color:var(--muted); margin:10px 0 4px; }
     input, select, textarea, button { width:100%; border-radius:8px; border:1px solid var(--border); background:#0d121b; color:var(--text); padding:9px 11px; font-size:0.88rem; }
-    textarea { min-height:88px; font-family:ui-monospace,Consolas,monospace; font-size:0.81rem; line-height:1.45; }
+    textarea { min-height:88px; font-family:ui-monospace,Consolas,monospace; font-size:0.8rem; line-height:1.45; }
     button { cursor:pointer; font-weight:700; background:var(--panel2); }
     button.ok-btn { background:var(--accent); color:#071018; border:none; }
     .mini-btn { width:auto; padding:6px 12px; font-size:0.78rem; margin-top:6px; margin-right:6px; }
-    .art-box { width:100%; max-width:260px; aspect-ratio:1/1; border-radius:10px; border:1px solid var(--border); overflow:hidden; background:#0d121b; display:flex; align-items:center; justify-content:center; }
+    .art-box { width:100%; max-width:250px; aspect-ratio:1/1; border-radius:10px; border:1px solid var(--border); overflow:hidden; background:#0d121b; display:flex; align-items:center; justify-content:center; }
     .art-box img { width:100%; height:100%; object-fit:cover; display:block; }
     .draft-box { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; }
     .draft-head { display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--sky); font-weight:700; margin-bottom:6px; }
-    .hint { font-size:0.74rem; color:var(--muted); margin-top:4px; }
+    .hint { font-size:0.74rem; color:var(--muted); margin-top:4px; word-break:break-word; }
+    .pill { display:inline-block; font-size:0.72rem; padding:2px 8px; border-radius:999px; background:#0d121b; border:1px solid var(--border); color:var(--sky); margin-right:6px; margin-top:4px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="hdr">
       <div>
-        <h1>Agent Anna • MTV Single-a-Day &amp; Weekly Rotation Studio</h1>
-        <div class="sub">Agent Anna (A1 / A1/v4) • Manager &amp; promoter for Martin Strayd (74-song vault) • Sharp platform copy, SEO/AI keywords &amp; daily angle shifts</div>
+        <h1>Agent Anna • v4 Core &amp; v3BIBLE Single Promoter Studio</h1>
+        <div class="sub">Reads Agent Anna's A1/v4 core character &amp; rules + A1/docs/v3BIBLE song .md lyrics (mirrored on GitBook) • Live-action only (no cartoon)</div>
       </div>
-      <div class="sub" id="catalogStatus">Anna loading catalog...</div>
+      <div class="sub" id="bootStatus">Anna booting v4 core &amp; v3BIBLE...</div>
     </div>
 
     <div class="grid">
       <div>
         <div class="card">
-          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;">ANNA SINGLE &amp; WEEKLY ROTATION</div>
-          <label for="songPicker">Featured Single (74 Songs)</label>
+          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;">ANNA SINGLE, v4 CORE &amp; v3BIBLE</div>
+
+          <label for="songPicker">Single From Catalog (Matches Cover Art &amp; v3BIBLE .md)</label>
           <select id="songPicker"></select>
 
-          <label for="dayAngle">Daily Angle Shift (Keeps Weekly Push Fresh)</label>
+          <label for="customSong">Or Override Song Title</label>
+          <input id="customSong" type="text" placeholder="Exact or partial song title..." />
+
+          <label for="dayAngle">Daily Angle Shift (Keeps Weekly Single Push Fresh)</label>
           <select id="dayAngle">
             <option value="auto">Auto (Rotates by Day of Week)</option>
             <option value="0">Mon • MTV Countdown Hook</option>
-            <option value="1">Tue • Song Tension &amp; Real Life</option>
+            <option value="1">Tue • Lyric / Song Tension</option>
             <option value="2">Wed • Direct MP3 + Art Ownership</option>
             <option value="3">Thu • AI Search &amp; Underground Radar</option>
             <option value="4">Fri • Late-Night / Weekend Replay</option>
@@ -57,8 +62,8 @@
             <option value="6">Sun • Weekly Finale &amp; Next-Up Tease</option>
           </select>
 
-          <label for="customSong">Or Override Song / Hook Topic</label>
-          <input id="customSong" type="text" placeholder="Type any song title from the catalog..." />
+          <label for="gitbookUrl">GitBook Mirror URL (v3BIBLE Reference)</label>
+          <input id="gitbookUrl" type="text" placeholder="Optional GitBook mirror URL for docs/v3BIBLE..." />
 
           <label for="directLink">Direct MP3 + Cover Art Link</label>
           <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
@@ -67,30 +72,36 @@
           <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
 
           <div style="margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px;">
-            <button type="button" id="regenBtn">Anna: Build Channel-Specific Copy</button>
+            <button type="button" id="reloadKnowledgeBtn">Anna: Re-Read A1/v4 Core &amp; docs/v3BIBLE</button>
+            <button type="button" id="regenBtn">Anna: Build Channel Drafts From Core + Song .md</button>
             <button type="button" class="ok-btn" id="approveBtn">OK To Post (Approve Single)</button>
           </div>
           <div class="hint" id="gateStatus">Anna Gate: Staged — waiting for your OK</div>
+          <div id="sourceBadges"></div>
         </div>
 
         <div class="card">
-          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:8px;">COVER ART &amp; LIVE-ACTION BRIEF</div>
+          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:8px;">COVER ART &amp; v3BIBLE SONG RECORD</div>
           <div class="art-box"><img id="artPreview" src="" alt="Martin Strayd Cover Art" /></div>
           <div class="hint" id="artMeta">Cover art matched from catalog.</div>
+
+          <label for="bibleStatusBox">v3BIBLE Song .md Match &amp; Extracted Lyrics/Notes</label>
+          <textarea id="bibleStatusBox" readonly style="min-height:105px;"></textarea>
+
           <label for="liveBriefOut">Anna's Live-Action Visual Direction (Never Cartoon)</label>
-          <textarea id="liveBriefOut" readonly style="min-height:72px;"></textarea>
+          <textarea id="liveBriefOut" readonly style="min-height:70px;"></textarea>
         </div>
       </div>
 
       <div class="card">
         <div class="draft-box">
-          <div class="draft-head"><span>TikTok — Fast MTV Hook + Search Keywords + 4 Tags</span><span id="ttCount">0 chars</span></div>
+          <div class="draft-head"><span>TikTok — MTV Hook + Lyric/Title Punch + Search Keywords + 4 Tags</span><span id="ttCount">0 chars</span></div>
           <textarea id="ttOut"></textarea>
           <button type="button" class="mini-btn" onclick="copyById('ttOut')">Copy TikTok</button>
         </div>
 
         <div class="draft-box">
-          <div class="draft-head"><span>Instagram — First-125-Char Hook + Story + 4 Tags</span><span id="igCount">0 chars</span></div>
+          <div class="draft-head"><span>Instagram — First-125-Char Hook + Anna Manager Pitch + 4 Tags</span><span id="igCount">0 chars</span></div>
           <textarea id="igOut"></textarea>
           <button type="button" class="mini-btn" onclick="copyById('igOut')">Copy Instagram</button>
         </div>
@@ -98,7 +109,7 @@
         <div class="draft-box">
           <div class="draft-head"><span>YouTube Title (max 100 chars)</span><span id="ytTCount">0 chars</span></div>
           <input id="ytTitleOut" type="text" />
-          <div class="draft-head" style="margin-top:10px;"><span>YouTube Description — Keywords First + Single Pitch + 4 Tags</span><span id="ytDCount">0 chars</span></div>
+          <div class="draft-head" style="margin-top:10px;"><span>YouTube Description — Keywords First + Song/Lyric Pitch + 4 Tags</span><span id="ytDCount">0 chars</span></div>
           <textarea id="ytDescOut"></textarea>
           <button type="button" class="mini-btn" onclick="copyById('ytTitleOut')">Copy YT Title</button>
           <button type="button" class="mini-btn" onclick="copyById('ytDescOut')">Copy YT Description</button>
@@ -127,7 +138,19 @@
   <script>
   (function(){
     var catalog = [];
+    var repoTree = [];
+    var v4CoreSummary = {
+      persona: "Agent Anna",
+      role: "Manager & MTV-style promoter for Martin Strayd",
+      rules: ["Realistic live-action only (no cartoon)", "Wait for OK before live dispatch"],
+      loadedSources: []
+    };
+    var bibleCache = {};
     var currentItem = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
+    var currentBible = { found: false, path: "", raw: "", lyricLine: "", summary: "" };
+
+    var REPO_API_TREE = "https://api.github.com/repos/agent-anna/anna-v2/git/trees/main?recursive=1";
+    var RAW_BASE = "https://raw.githubusercontent.com/agent-anna/anna-v2/main/";
 
     window.copyById = function(id){
       var el = document.getElementById(id);
@@ -140,7 +163,140 @@
     };
 
     function norm(s){
-      return (s || "").toLowerCase().replace(/^martin strayd\s*-\s*/i, "").replace(/\.[a-z0-9]+$/i, "").replace(/[^a-z0-9]+/g, " ").trim();
+      return (s || "")
+        .toLowerCase()
+        .replace(/^martin strayd\s*-\s*/i, "")
+        .replace(/\.[a-z0-9]+$/i, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+
+    function slugifyTitle(s){
+      return (s || "")
+        .replace(/^martin strayd\s*-\s*/i, "")
+        .replace(/\.[a-z0-9]+$/i, "")
+        .trim()
+        .replace(/[^a-zA-Z0-9 _()-]+/g, "")
+        .replace(/\s+/g, "-");
+    }
+
+    function fetchTextAny(urls){
+      return new Promise(function(resolve){
+        var idx = 0;
+        function step(){
+          if (idx >= urls.length) return resolve(null);
+          var u = urls[idx++];
+          fetch(u, { cache: "no-store" }).then(function(r){
+            if (!r.ok) throw new Error(r.status);
+            return r.text();
+          }).then(function(t){
+            resolve({ url: u, text: t });
+          }).catch(step);
+        }
+        step();
+      });
+    }
+
+    function parseV4Core(text){
+      var lines = (text || "").split(/\r?\n/);
+      var extracted = [];
+      for (var i = 0; i < lines.length && extracted.length < 12; i++){
+        var ln = lines[i].trim();
+        if (!ln) continue;
+        if (/anna|strayd|rule|system|prompt|persona|voice|live.?action|cartoon/i.test(ln) && ln.length < 240){
+          extracted.push(ln.replace(/^[-*#\/\/\s]+/, ""));
+        }
+      }
+      return extracted;
+    }
+
+    function loadV4Core(){
+      var coreCandidates = [
+        "../v4/v4.js",
+        "../v4/index.html",
+        RAW_BASE + "A1/v4/v4.js",
+        RAW_BASE + "A1/v4/index.html"
+      ];
+      return fetchTextAny(coreCandidates).then(function(res){
+        if (res && res.text){
+          var clues = parseV4Core(res.text);
+          v4CoreSummary.loadedSources.push(res.url);
+          if (clues.length){
+            v4CoreSummary.v4Clues = clues.slice(0, 6);
+          }
+        }
+        var treeEntries = repoTree.filter(function(item){
+          return /^A1\/v4\//i.test(item.path) && /\.(md|json|txt)$/i.test(item.path);
+        }).slice(0, 5);
+        return Promise.all(treeEntries.map(function(entry){
+          return fetchTextAny(["../" + entry.path.replace(/^A1\//i, ""), RAW_BASE + entry.path]).then(function(r){
+            if (r && r.text){
+              v4CoreSummary.loadedSources.push(entry.path);
+              var c = parseV4Core(r.text);
+              if (c.length) v4CoreSummary.v4Clues = (v4CoreSummary.v4Clues || []).concat(c.slice(0, 3));
+            }
+          });
+        }));
+      });
+    }
+
+    function parseBibleMarkdown(mdText, songTitle){
+      var clean = (mdText || "").replace(/\r\n/g, "\n").trim();
+      if (!clean) return { found: false, raw: "", lyricLine: "", summary: "" };
+      var lines = clean.split("\n").map(function(l){ return l.trim(); }).filter(function(l){
+        return l && !/^#/.test(l) && !/^---+$/.test(l) && !/^\*\*?(song|title|artist|cover|art|artwork)\*?\s*:/i.test(l);
+      });
+      var lyricLine = "";
+      for (var i = 0; i < lines.length; i++){
+        var candidate = lines[i].replace(/^[-*>"\s]+|["]+$/g, "").trim();
+        if (candidate.length >= 12 && candidate.length <= 150 && !/^(lyrics|verse|chorus|notes|visuals?)\s*:?$/i.test(candidate)){
+          lyricLine = candidate;
+          break;
+        }
+      }
+      return {
+        found: true,
+        raw: clean,
+        lyricLine: lyricLine,
+        summary: clean.slice(0, 260)
+      };
+    }
+
+    function loadBibleForSong(title){
+      var n = norm(title);
+      if (bibleCache[n]) return Promise.resolve(bibleCache[n]);
+
+      var slug = slugifyTitle(title);
+      var candidates = [
+        "../docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
+        "../docs/v3BIBLE/" + encodeURIComponent("Martin Strayd - " + title) + ".md",
+        "../docs/v3BIBLE/" + encodeURIComponent(slug) + ".md",
+        "../docs/v3BIBLE/songs/" + encodeURIComponent(title) + ".md",
+        "../docs/v3BIBLE/songs/" + encodeURIComponent(slug) + ".md",
+        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
+        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent("Martin Strayd - " + title) + ".md",
+        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(slug) + ".md",
+        RAW_BASE + "docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
+        RAW_BASE + "docs/v3BIBLE/" + encodeURIComponent(slug) + ".md"
+      ];
+
+      // Also search discovered tree paths matching v3BIBLE and song title
+      repoTree.forEach(function(node){
+        if (/v3bible/i.test(node.path) && /\.md$/i.test(node.path)){
+          var base = node.path.split("/").pop().replace(/\.md$/i, "");
+          var nb = norm(base);
+          if (nb === n || (n.length > 5 && nb.indexOf(n) !== -1)){
+            candidates.unshift(RAW_BASE + node.path);
+          }
+        }
+      });
+
+      return fetchTextAny(candidates).then(function(res){
+        var parsed = res && res.text ? parseBibleMarkdown(res.text, title) : { found: false, raw: "", lyricLine: "", summary: "" };
+        parsed.path = res ? res.url : "";
+        bibleCache[n] = parsed;
+        return parsed;
+      });
     }
 
     function matchSong(query){
@@ -184,6 +340,17 @@
       });
     }
 
+    function renderBadges(){
+      var box = document.getElementById("sourceBadges");
+      if (!box) return;
+      var bibleCount = repoTree.filter(function(x){ return /v3bible/i.test(x.path) && /\.md$/i.test(x.path); }).length;
+      var gb = document.getElementById("gitbookUrl").value.trim();
+      box.innerHTML =
+        '<span class="pill">A1/v4 Core: ' + (v4CoreSummary.loadedSources.length ? "Loaded" : "Active Rules") + '</span>' +
+        '<span class="pill">docs/v3BIBLE .md files found: ' + bibleCount + '</span>' +
+        (gb ? '<span class="pill">GitBook Mirror Linked</span>' : '<span class="pill">GitBook Mirror: A1/docs/v3BIBLE</span>');
+    }
+
     function buildDrafts(){
       var custom = document.getElementById("customSong").value.trim();
       var picked = document.getElementById("songPicker").value.trim();
@@ -193,108 +360,138 @@
       applyArt(currentItem);
 
       var link = document.getElementById("directLink").value.trim() || "https://www.paypal.com/paypalme/martinstrayd";
+      var gb = document.getElementById("gitbookUrl").value.trim();
       var t = currentItem.title;
       var d = getDayIdx();
 
-      var ttHooks = [
-        "Stop scrolling—Agent Anna just put \"" + t + "\" at #1 on today's MTV single board. Martin Strayd wrote a track with teeth that search & AI playlists miss. Own MP3 + art: " + link + " #MartinStrayd #STRAYD #IndieRock #NewSingle",
-        "Why is \"" + t + "\" hitting harder than half the over-polished chart noise? I'm Agent Anna—Martin Strayd's manager—and this single is built to keep. Grab MP3 + art: " + link + " #MartinStrayd #IndependentMusic #RockSong #Songwriter",
-        "Day " + (d + 1) + " pushing \"" + t + "\" by Martin Strayd. Real songcraft, zero algorithm sugarcoating, straight to listeners who buy music to own. Get MP3 + art: " + link + " #MartinStrayd #STRAYD #MusicDiscovery #AltRock",
-        "If you're searching for indie rock & songwriter tracks that actually mean something, start with \"" + t + "\" by Martin Strayd. Agent Anna's pick today: " + link + " #MartinStrayd #IndieArtist #OriginalMusic #MustHear",
-        "Late-night spin on Anna's console: \"" + t + "\" by Martin Strayd. Built for real ears and human rebellion—own the MP3 + sleeve art directly: " + link + " #MartinStrayd #STRAYD #NightDrive #RockMusic",
-        "Vault single spotlight: \"" + t + "\" by Martin Strayd. Agent Anna curates one standout track at a time so real music cuts through. MP3 + art bundle: " + link + " #MartinStrayd #MusicCollector #IndieRock #STRAYD",
-        "Final rotation push this week for \"" + t + "\" by Martin Strayd before Anna rotates the spotlight. Lock in your MP3 + cover art copy: " + link + " #MartinStrayd #STRAYD #Songwriting #IndependentArtist"
-      ];
+      return loadBibleForSong(t).then(function(bInfo){
+        currentBible = bInfo;
+        var hasLyrics = !!(bInfo && bInfo.found && bInfo.lyricLine);
+        var lyricHook = hasLyrics ? ("Line on my desk: \"" + bInfo.lyricLine + "\" — ") : "";
 
-      var igHooks = [
-        "\"" + t + "\" just took center stage on Agent Anna's single board—and it isn't playing polite. As Martin Strayd's manager, I'm pushing this one straight to listeners who want real weight instead of disposable streams. Own the MP3 + cover art bundle: " + link + " #MartinStrayd #STRAYD #IndependentMusic #RockAndRoll",
-        "Some songs ask for permission; \"" + t + "\" by Martin Strayd kicks the door open. Agent Anna running the campaign—no middleman hype, just a track worth owning outright. Get MP3 + art: " + link + " #MartinStrayd #Songwriter #IndieRock #MusicFans",
-        "Own the song, own the cover art, skip the rental model. Agent Anna spotlighting \"" + t + "\" by Martin Strayd today—built for people who keep great music on repeat. Direct bundle: " + link + " #MartinStrayd #STRAYD #DirectToFan #OriginalMusic",
-        "AI search and algorithm feeds love neat boxes—Martin Strayd's \"" + t + "\" gives them something real to chew on. Agent Anna backing this single all week: " + link + " #MartinStrayd #AlternativeMusic #IndieArtist #NewMusic",
-        "Weekend volume check: \"" + t + "\" by Martin Strayd. Agent Anna putting this single in front of real listeners who still care how a record hits at full volume. MP3 + art: " + link + " #MartinStrayd #STRAYD #RockMusic #WeekendSpin",
-        "Inside the Martin Strayd catalog with Agent Anna: \"" + t + "\" is a single you keep in your personal collection, not lose to a playlist shuffle. Grab MP3 + art: " + link + " #MartinStrayd #MusicCollection #IndieRock #Songwriting",
-        "Last call on this week's \"" + t + "\" spotlight from Martin Strayd before Agent Anna moves the needle to the next single. Claim MP3 + cover art: " + link + " #MartinStrayd #STRAYD #IndependentArtist #MusicScene"
-      ];
+        document.getElementById("bibleStatusBox").value = bInfo.found
+          ? ("MATCHED v3BIBLE .md: " + bInfo.path + "\n" + bInfo.raw.slice(0, 360))
+          : ("No .md file yet in docs/v3BIBLE for \"" + t + "\" (matching title: " + slugifyTitle(t) + ".md).\nUsing song title + cover art now; drop the matching .md into docs/v3BIBLE (and GitBook mirror) and Anna reads lyrics automatically.");
 
-      var ytTitles = [
-        (t + " — Martin Strayd (Agent Anna MTV Single Spotlight)").slice(0, 100),
-        ("Why \"" + t + "\" by Martin Strayd Hits — Agent Anna Single Pick").slice(0, 100),
-        (t + " (Official Single & Art Bundle) — Martin Strayd").slice(0, 100),
-        ("Martin Strayd - \"" + t + "\" | Indie Rock & Songwriter Single").slice(0, 100),
-        ("Late-Night Single: \"" + t + "\" by Martin Strayd (Agent Anna)").slice(0, 100),
-        ("Martin Strayd Vault Single: \"" + t + "\" — Agent Anna Picks").slice(0, 100),
-        (t + " — Martin Strayd (Weekly Single Feature w/ Agent Anna)").slice(0, 100)
-      ];
+        document.getElementById("liveBriefOut").value =
+          "Anna's visual direction for \"" + t + "\": Strictly realistic live-action / documentary footage only (zero cartoon). Real cameras, real environments, real performance.";
 
-      var ytDescs = [
-        "\"" + t + "\" by Martin Strayd — featured by Agent Anna as today's top single spotlight.\n\nIndependent rock and songwriter storytelling made for listeners who want real substance and direct MP3 + cover art ownership: " + link + "\n\n#MartinStrayd #STRAYD #IndieRock #OriginalMusic",
-        "Agent Anna breaks down \"" + t + "\" by Martin Strayd — a sharp, unfiltered single built to cut through algorithm noise.\n\nDirect MP3 + artwork download: " + link + "\n\n#MartinStrayd #Songwriter #IndependentArtist #RockMusic"
-      ];
+        var ttHooks = [
+          "Stop scrolling—Agent Anna just put \"" + t + "\" at #1 on today's MTV single board. " + lyricHook + "Martin Strayd wrote a track with teeth that search & AI playlists miss. Own MP3 + art: " + link + " #MartinStrayd #STRAYD #IndieRock #NewSingle",
+          "Why is \"" + t + "\" hitting harder than half the over-polished chart noise? " + lyricHook + "I'm Agent Anna—Martin Strayd's manager—and this single is built to keep. Grab MP3 + art: " + link + " #MartinStrayd #IndependentMusic #RockSong #Songwriter",
+          "Day " + (d + 1) + " pushing \"" + t + "\" by Martin Strayd. " + lyricHook + "Real songcraft, zero algorithm sugarcoating, straight to listeners who buy music to own. Get MP3 + art: " + link + " #MartinStrayd #STRAYD #MusicDiscovery #AltRock",
+          "If you're searching for indie rock & songwriter tracks that actually mean something, start with \"" + t + "\" by Martin Strayd. " + lyricHook + "Agent Anna's pick today: " + link + " #MartinStrayd #IndieArtist #OriginalMusic #MustHear",
+          "Late-night spin on Anna's console: \"" + t + "\" by Martin Strayd. " + lyricHook + "Built for real ears and human rebellion—own the MP3 + sleeve art directly: " + link + " #MartinStrayd #STRAYD #NightDrive #RockMusic",
+          "Vault single spotlight: \"" + t + "\" by Martin Strayd. " + lyricHook + "Agent Anna curates one standout track at a time so real music cuts through. MP3 + art bundle: " + link + " #MartinStrayd #MusicCollector #IndieRock #STRAYD",
+          "Final rotation push this week for \"" + t + "\" by Martin Strayd before Anna rotates the spotlight. " + lyricHook + "Lock in your MP3 + cover art copy: " + link + " #MartinStrayd #STRAYD #Songwriting #IndependentArtist"
+        ];
 
-      var fbPosts = [
-        "Agent Anna here—running Martin Strayd's single campaign, and \"" + t + "\" is front and center today. Tell me what hits you first when a track like this comes on, and grab the MP3 + cover art direct if you want it in your library: " + link,
-        "I manage and promote Martin Strayd, and \"" + t + "\" is one of those singles that earns its keep. No algorithm filler—just real songwriting you can own directly with cover art: " + link,
-        "One single at a time, done right. Agent Anna pushing \"" + t + "\" by Martin Strayd today—own the MP3 + artwork bundle directly: " + link
-      ];
+        var igHooks = [
+          "\"" + t + "\" just took center stage on Agent Anna's single board—and it isn't playing polite. " + lyricHook + "As Martin Strayd's manager, I'm pushing this one straight to listeners who want real weight instead of disposable streams. Own MP3 + art: " + link + " #MartinStrayd #STRAYD #IndependentMusic #RockAndRoll",
+          "Some songs ask for permission; \"" + t + "\" by Martin Strayd kicks the door open. " + lyricHook + "Agent Anna running the campaign—no middleman hype, just a track worth owning outright. Get MP3 + art: " + link + " #MartinStrayd #Songwriter #IndieRock #MusicFans",
+          "Own the song, own the cover art, skip the rental model. " + lyricHook + "Agent Anna spotlighting \"" + t + "\" by Martin Strayd today—built for people who keep great music on repeat. Direct bundle: " + link + " #MartinStrayd #STRAYD #DirectToFan #OriginalMusic",
+          "AI search and algorithm feeds love neat boxes—Martin Strayd's \"" + t + "\" gives them something real to chew on. " + lyricHook + "Agent Anna backing this single all week: " + link + " #MartinStrayd #AlternativeMusic #IndieArtist #NewMusic",
+          "Weekend volume check: \"" + t + "\" by Martin Strayd. " + lyricHook + "Agent Anna putting this single in front of real listeners who still care how a record hits at full volume. MP3 + art: " + link + " #MartinStrayd #STRAYD #RockMusic #WeekendSpin",
+          "Inside the Martin Strayd catalog with Agent Anna: \"" + t + "\" is a single you keep in your personal collection, not lose to a playlist shuffle. " + lyricHook + "Grab MP3 + art: " + link + " #MartinStrayd #MusicCollection #IndieRock #Songwriting",
+          "Last call on this week's \"" + t + "\" spotlight from Martin Strayd before Agent Anna moves the needle to the next single. " + lyricHook + "Claim MP3 + cover art: " + link + " #MartinStrayd #STRAYD #IndependentArtist #MusicScene"
+        ];
 
-      var xPosts = [
-        "\"" + t + "\" — Martin Strayd. Agent Anna's single pick today for real listeners & search discovery. MP3 + art: " + link + " #MartinStrayd #STRAYD",
-        "Agent Anna backing \"" + t + "\" by Martin Strayd today—real teeth, zero filler. Own MP3 + art: " + link + " #MartinStrayd #IndieRock",
-        "Single in rotation: \"" + t + "\" by Martin Strayd. Grab MP3 + cover art direct: " + link + " #MartinStrayd #Songwriter"
-      ];
+        var ytTitles = [
+          (t + " — Martin Strayd (Agent Anna MTV Single Spotlight)").slice(0, 100),
+          ("Why \"" + t + "\" by Martin Strayd Hits — Agent Anna Single Pick").slice(0, 100),
+          (t + " (Official Single & Art Bundle) — Martin Strayd").slice(0, 100),
+          ("Martin Strayd - \"" + t + "\" | Indie Rock & Songwriter Single").slice(0, 100),
+          ("Late-Night Single: \"" + t + "\" by Martin Strayd (Agent Anna)").slice(0, 100),
+          ("Martin Strayd Vault Single: \"" + t + "\" — Agent Anna Picks").slice(0, 100),
+          (t + " — Martin Strayd (Weekly Single Feature w/ Agent Anna)").slice(0, 100)
+        ];
 
-      document.getElementById("ttOut").value = ttHooks[d % ttHooks.length];
-      document.getElementById("igOut").value = igHooks[d % igHooks.length];
-      document.getElementById("ytTitleOut").value = ytTitles[d % ytTitles.length];
-      document.getElementById("ytDescOut").value = ytDescs[d % ytDescs.length];
-      document.getElementById("fbOut").value = fbPosts[d % fbPosts.length];
-      document.getElementById("xOut").value = xPosts[d % xPosts.length];
+        var ytDescs = [
+          "\"" + t + "\" by Martin Strayd — featured by Agent Anna as today's top single spotlight.\n\n" + (hasLyrics ? ("Featured lyric line: \"" + bInfo.lyricLine + "\"\n\n") : "") + "Independent rock and songwriter storytelling made for listeners who want real substance and direct MP3 + cover art ownership: " + link + (gb ? ("\nBible / lyrics mirror: " + gb) : "") + "\n\n#MartinStrayd #STRAYD #IndieRock #OriginalMusic",
+          "Agent Anna breaks down \"" + t + "\" by Martin Strayd — a sharp, unfiltered single built to cut through algorithm noise.\n\n" + (hasLyrics ? ("Lyric focus: \"" + bInfo.lyricLine + "\"\n\n") : "") + "Direct MP3 + artwork download: " + link + "\n\n#MartinStrayd #Songwriter #IndependentArtist #RockMusic"
+        ];
 
-      document.getElementById("liveBriefOut").value =
-        "Visual direction for \"" + t + "\": Strictly realistic live-action / documentary camera footage only (zero cartoon or animation). Real locations, real lighting, real performance/atmosphere.";
+        var fbPosts = [
+          "Agent Anna here—running Martin Strayd's single campaign, and \"" + t + "\" is front and center today. " + lyricHook + "Tell me what hits you first when a track like this comes on, and grab the MP3 + cover art direct: " + link,
+          "I manage and promote Martin Strayd, and \"" + t + "\" is one of those singles that earns its keep. " + lyricHook + "No algorithm filler—just real songwriting you can own directly with cover art: " + link,
+          "One single at a time, done right. Agent Anna pushing \"" + t + "\" by Martin Strayd today—own the MP3 + artwork bundle directly: " + link
+        ];
 
-      updateCounts();
+        var xPosts = [
+          "\"" + t + "\" — Martin Strayd. Agent Anna's single pick today for real listeners & search discovery. MP3 + art: " + link + " #MartinStrayd #STRAYD",
+          "Agent Anna backing \"" + t + "\" by Martin Strayd today—real teeth, zero filler. Own MP3 + art: " + link + " #MartinStrayd #IndieRock",
+          "Single in rotation: \"" + t + "\" by Martin Strayd. Grab MP3 + cover art direct: " + link + " #MartinStrayd #Songwriter"
+        ];
+
+        document.getElementById("ttOut").value = ttHooks[d % ttHooks.length];
+        document.getElementById("igOut").value = igHooks[d % igHooks.length];
+        document.getElementById("ytTitleOut").value = ytTitles[d % ytTitles.length];
+        document.getElementById("ytDescOut").value = ytDescs[d % ytDescs.length];
+        document.getElementById("fbOut").value = fbPosts[d % fbPosts.length];
+        document.getElementById("xOut").value = xPosts[d % xPosts.length];
+
+        updateCounts();
+      });
     }
 
-    function loadCatalog(){
-      var urls = [
-        "./strayd-artist-live.json",
-        "https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/strayd/strayd-artist-live.json"
-      ];
-      function next(i){
-        if (i >= urls.length) return;
-        fetch(urls[i]).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); }).then(function(d){
-          var list = (d && d.files_and_folders) || [];
-          catalog = list
-            .filter(function(f){ return f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename); })
-            .map(function(f){
-              return { title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.png$/i, "").trim(), filename: f.filename, url: f.url };
+    function loadRepoTreeAndCatalog(){
+      fetch(REPO_API_TREE, { cache: "no-store" })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(tData){
+          if (tData && Array.isArray(tData.tree)) repoTree = tData.tree;
+          return loadV4Core();
+        })
+        .catch(function(){
+          return loadV4Core();
+        })
+        .then(function(){
+          renderBadges();
+          var urls = [
+            "./strayd-artist-live.json",
+            RAW_BASE + "A1/strayd/strayd-artist-live.json"
+          ];
+          return fetchTextAny(urls).then(function(res){
+            if (!res || !res.text) return;
+            var d = JSON.parse(res.text);
+            var list = (d && d.files_and_folders) || [];
+            catalog = list
+              .filter(function(f){ return f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename); })
+              .map(function(f){
+                return { title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.png$/i, "").trim(), filename: f.filename, url: f.url };
+              });
+            var sel = document.getElementById("songPicker");
+            sel.innerHTML = "";
+            catalog.forEach(function(item){
+              var opt = document.createElement("option");
+              opt.value = item.title;
+              opt.textContent = item.title;
+              sel.appendChild(opt);
             });
-          var sel = document.getElementById("songPicker");
-          sel.innerHTML = "";
-          catalog.forEach(function(item){
-            var opt = document.createElement("option");
-            opt.value = item.title;
-            opt.textContent = item.title;
-            sel.appendChild(opt);
+            var pref = catalog.find(function(x){ return /who killed fun/i.test(x.title); }) || catalog[0];
+            if (pref){
+              currentItem = pref;
+              sel.value = pref.title;
+            }
+            document.getElementById("bootStatus").textContent = "Anna ready • " + catalog.length + " songs • A1/v4 + docs/v3BIBLE wired";
           });
-          var pref = catalog.find(function(x){ return /who killed fun/i.test(x.title); }) || catalog[0];
-          if (pref){
-            currentItem = pref;
-            sel.value = pref.title;
-          }
-          document.getElementById("catalogStatus").textContent = "Anna loaded " + catalog.length + " songs & art URLs";
-          buildDrafts();
-        }).catch(function(){ next(i + 1); });
-      }
-      next(0);
+        })
+        .then(buildDrafts);
     }
 
+    document.getElementById("reloadKnowledgeBtn").addEventListener("click", function(){
+      bibleCache = {};
+      loadRepoTreeAndCatalog();
+    });
     document.getElementById("songPicker").addEventListener("change", function(){
       document.getElementById("customSong").value = "";
       buildDrafts();
     });
+    document.getElementById("customSong").addEventListener("input", buildDrafts);
     document.getElementById("dayAngle").addEventListener("change", buildDrafts);
+    document.getElementById("gitbookUrl").addEventListener("input", function(){
+      renderBadges();
+      buildDrafts();
+    });
     document.getElementById("regenBtn").addEventListener("click", buildDrafts);
     document.getElementById("directLink").addEventListener("input", buildDrafts);
     ["ttOut","igOut","ytTitleOut","ytDescOut","fbOut","xOut"].forEach(function(id){
@@ -304,7 +501,10 @@
     document.getElementById("approveBtn").addEventListener("click", function(){
       var payload = {
         manager: "Agent Anna",
-        ecosystem: "Agent Anna (A1 / A1/v4)",
+        ecosystem: "Agent Anna (A1 / A1/v4 + docs/v3BIBLE)",
+        gitbookMirror: document.getElementById("gitbookUrl").value.trim(),
+        v3BibleSource: currentBible.found ? currentBible.path : "title_and_cover_art_fallback",
+        lyricLineUsed: currentBible.lyricLine || "",
         approved: true,
         approvedAt: new Date().toISOString(),
         artist: "Martin Strayd",
@@ -332,7 +532,7 @@
       }
     });
 
-    loadCatalog();
+    loadRepoTreeAndCatalog();
     buildDrafts();
   })();
   </script>
