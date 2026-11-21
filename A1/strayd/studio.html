@@ -1,247 +1,283 @@
-<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A1/strayd • Anna Studio Queue & Trigger</title>
+  <title>Agent Anna • MTV Social Guru &amp; Catalog Studio (A1)</title>
   <style>
-    :root { --bg:#0b0e14; --panel:#121722; --panel-2:#182030; --text:#eef2f7; --muted:#9aa6bd; --accent:#7dd3fc; --ok:#a3e635; --border:rgba(255,255,255,0.1); }
+    :root { --bg:#0b0e14; --panel:#121722; --panel2:#182030; --text:#eef2f7; --muted:#9aa6bd; --border:rgba(255,255,255,0.12); --accent:#a3e635; --sky:#7dd3fc; }
     * { box-sizing:border-box; }
-    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
-    header { padding:16px 24px; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center; }
-    h1 { margin:0; font-size:1.1rem; }
-    .sub { color:var(--muted); font-size:0.84rem; }
-    .grid { max-width:1180px; margin:20px auto; padding:0 20px 40px; display:grid; grid-template-columns:340px 1fr; gap:20px; }
-    @media (max-width:860px) { .grid { grid-template-columns:1fr; } }
-    .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
-    label { display:block; font-size:0.78rem; color:var(--muted); margin-bottom:5px; }
-    input, select, textarea, button { width:100%; border-radius:8px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); padding:8px 10px; font-size:0.88rem; }
-    textarea { min-height:84px; font-family:ui-monospace,monospace; font-size:0.8rem; }
-    button { cursor:pointer; background:var(--accent); color:#071018; font-weight:700; border:none; margin-top:8px; }
-    button.secondary { background:var(--panel-2); color:var(--text); border:1px solid var(--border); }
-    .art-wrap { display:grid; grid-template-columns:170px 1fr; gap:16px; align-items:start; }
-    @media (max-width:640px) { .art-wrap { grid-template-columns:1fr; } }
-    .art-box { aspect-ratio:1/1; border-radius:10px; overflow:hidden; background:#090c12; border:1px solid var(--border); }
+    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); padding:20px; }
+    .wrap { max-width:1160px; margin:0 auto; }
+    .hdr { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; }
+    .hdr h1 { margin:0; font-size:1.25rem; }
+    .hdr .sub { color:var(--muted); font-size:0.84rem; }
+    .grid { display:grid; grid-template-columns:360px 1fr; gap:16px; }
+    @media (max-width:860px){ .grid { grid-template-columns:1fr; } }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; }
+    label { display:block; font-size:0.78rem; color:var(--muted); margin:10px 0 4px; }
+    input, select, textarea, button { width:100%; border-radius:8px; border:1px solid var(--border); background:#0d121b; color:var(--text); padding:9px 11px; font-size:0.88rem; }
+    textarea { min-height:86px; font-family:ui-monospace,Consolas,monospace; font-size:0.8rem; }
+    button { cursor:pointer; font-weight:700; background:var(--panel2); }
+    button.ok-btn { background:var(--accent); color:#071018; border:none; }
+    .mini-btn { width:auto; padding:6px 12px; font-size:0.78rem; margin-top:6px; margin-right:6px; }
+    .art-box { width:100%; max-width:260px; aspect-ratio:1/1; border-radius:10px; border:1px solid var(--border); overflow:hidden; background:#0d121b; display:flex; align-items:center; justify-content:center; }
     .art-box img { width:100%; height:100%; object-fit:cover; display:block; }
-    .pill { display:inline-block; font-size:0.74rem; padding:2px 9px; border-radius:999px; background:rgba(163,230,53,0.14); color:var(--ok); margin-bottom:8px; }
-    .status { font-size:0.82rem; color:var(--muted); margin-top:8px; white-space:pre-wrap; }
+    .draft-box { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; }
+    .draft-head { display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--sky); font-weight:700; margin-bottom:6px; }
+    .hint { font-size:0.74rem; color:var(--muted); margin-top:4px; }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <h1>A1/strayd • Queue &amp; Promo Runner</h1>
-      <div class="sub">Outside A1/v4 core • Reads &amp; updates A1/strayd/promo-queue.json • Uses martinstrayd/artist/store-art/</div>
+  <div class="wrap">
+    <div class="hdr">
+      <div>
+        <h1>Agent Anna • MTV Social Guru &amp; Daily Drop Studio</h1>
+        <div class="sub">Ecosystem: Agent Anna (A1 / A1/v4 core) • Managing &amp; promoting Martin Strayd (71+ song catalog) • Title &amp; cover art mode now (lyrics next week)</div>
+      </div>
+      <div class="sub" id="catalogStatus">Anna loading 74 songs...</div>
     </div>
-    <div class="sub"><code>agent-anna/anna-v2/A1/strayd/</code></div>
-  </header>
-  <div class="grid">
-    <div>
-      <section class="card">
-        <div class="pill">QUEUE SELECTOR</div>
-        <label for="queueSelect">Queued Song / Topic</label>
-        <select id="queueSelect"></select>
-        <button id="reloadQueueBtn" class="secondary">Reload promo-queue.json from GitHub</button>
-        <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
-          <label for="newTitle">Add Song or Topic to Queue</label>
-          <input id="newTitle" placeholder="e.g. Andaman Escape or Chiang Mai Morning Set" />
-          <label for="newLink" style="margin-top:8px;">Direct Link (used on X; omitted from Facebook body)</label>
-          <input id="newLink" value="https://www.paypal.com/paypalme/martinstrayd" />
-          <button id="addItemBtn">Generate &amp; Queue Drafts (Reach Rules Applied)</button>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;">ANNA DAILY DROP PICKER</div>
+          <label for="songPicker">Select Song From Full Catalog</label>
+          <select id="songPicker"></select>
+
+          <label for="customSong">Or Type Song / Topic</label>
+          <input id="customSong" type="text" placeholder="e.g. Fool for a Good Time (Good to Be Alive)" />
+
+          <label for="directLink">Direct MP3 + Art Bundle Link</label>
+          <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
+
+          <label for="webhookUrl">Optional Webhook URL (Fires Only After OK)</label>
+          <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
+
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px;">
+            <button type="button" id="regenBtn">Anna: Generate MTV Guru Drafts</button>
+            <button type="button" class="ok-btn" id="approveBtn">OK To Post (Approve Drop)</button>
+          </div>
+          <div class="hint" id="gateStatus">Anna Gate: Staged — waiting for your OK</div>
         </div>
-        <div id="statusBox" class="status">Ready.</div>
-      </section>
 
-      <section class="card">
-        <div class="pill">OPTIONAL ONLINE QUEUE SAVE</div>
-        <label for="ghToken">GitHub Token (session only, not stored)</label>
-        <input id="ghToken" type="password" placeholder="Paste repo contents token to push queue" />
-        <button id="pushQueueBtn" class="secondary">Commit Queue Changes to A1/strayd/promo-queue.json</button>
-      </section>
-    </div>
-
-    <section class="card">
-      <div class="pill">READY FOR ANNA TO REVIEW, EDIT, OR SEND</div>
-      <div class="art-wrap">
-        <div class="art-box"><img id="artPreview" alt="Cover Art" /></div>
-        <div>
-          <h2 id="itemHeading" style="margin:0 0 4px;font-size:1.2rem;"></h2>
-          <div id="artFileLabel" class="sub" style="margin-bottom:10px;word-break:break-all;"></div>
-          <label for="fbDraft">Facebook Draft (No URL in body, max 2 hashtags)</label>
-          <textarea id="fbDraft"></textarea>
-          <button class="secondary" data-copy="fbDraft">Copy Facebook Draft</button>
-
-          <label for="xDraft" style="margin-top:10px;">X / Short Post Draft (Max 2 hashtags)</label>
-          <textarea id="xDraft"></textarea>
-          <button class="secondary" data-copy="xDraft">Copy X Draft</button>
-
-          <label for="reelDraft" style="margin-top:10px;">Reel Caption (Realistic visual notes, no cartoon, max 4 hashtags)</label>
-          <textarea id="reelDraft"></textarea>
-          <button class="secondary" data-copy="reelDraft">Copy Reel Caption</button>
+        <div class="card">
+          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:8px;">COVER ART MATCH (REALISTIC LIVE-ACTION ONLY)</div>
+          <div class="art-box"><img id="artPreview" src="" alt="Martin Strayd Cover Art" /></div>
+          <div class="hint" id="artMeta">Visual rule: Realistic live-action / real camera only (zero cartoon).</div>
         </div>
       </div>
-    </section>
+
+      <div class="card">
+        <div class="draft-box">
+          <div class="draft-head"><span>TikTok Draft (Anna MTV Hook + AI/Search Bait + Tags)</span><span id="ttCount">0 chars</span></div>
+          <textarea id="ttOut"></textarea>
+          <div class="hint">Daily song drop • Built from title &amp; cover art today (lyrics next week) • Realistic live-action only (no cartoon).</div>
+          <button type="button" class="mini-btn" onclick="copyById('ttOut')">Copy TikTok</button>
+        </div>
+
+        <div class="draft-box">
+          <div class="draft-head"><span>Instagram Draft (First 125 Chars Hook + Anna Pitch + Tags)</span><span id="igCount">0 chars</span></div>
+          <textarea id="igOut"></textarea>
+          <div class="hint">Strong hook in first 125 characters • AI discovery + human/bot clickbait • Realistic live-action only (no cartoon).</div>
+          <button type="button" class="mini-btn" onclick="copyById('igOut')">Copy Instagram</button>
+        </div>
+
+        <div class="draft-box">
+          <div class="draft-head"><span>YouTube Title (max 100 chars)</span><span id="ytTCount">0 chars</span></div>
+          <input id="ytTitleOut" type="text" />
+          <div class="draft-head" style="margin-top:10px;"><span>YouTube Description (Anna Intro + Title/Art Hook + Live-Action Note + Tags)</span><span id="ytDCount">0 chars</span></div>
+          <textarea id="ytDescOut"></textarea>
+          <button type="button" class="mini-btn" onclick="copyById('ytTitleOut')">Copy YT Title</button>
+          <button type="button" class="mini-btn" onclick="copyById('ytDescOut')">Copy YT Description</button>
+        </div>
+
+        <div class="draft-box">
+          <div class="draft-head"><span>Facebook Draft (Anna Manager Pitch)</span><span id="fbCount">0 chars</span></div>
+          <textarea id="fbOut"></textarea>
+          <button type="button" class="mini-btn" onclick="copyById('fbOut')">Copy Facebook</button>
+        </div>
+
+        <div class="draft-box">
+          <div class="draft-head"><span>X / Short Post Draft</span><span id="xCount">0 chars</span></div>
+          <textarea id="xOut"></textarea>
+          <button type="button" class="mini-btn" onclick="copyById('xOut')">Copy X</button>
+        </div>
+
+        <div class="draft-box">
+          <div class="draft-head"><span>Approved Payload JSON (Appears When You Click OK To Post)</span></div>
+          <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage or dispatch Anna's approved payload..."></textarea>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const REPO_API = "https://api.github.com/repos/agent-anna/anna-v2/contents/A1/strayd/promo-queue.json";
-    const RAW_QUEUE = "https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/strayd/promo-queue.json";
-    let queueData = {
-      version: 1,
-      scope: "A1/strayd (outside A1/v4 core)",
-      artBase: "https://raw.githubusercontent.com/martinstrayd/artist/main/store-art/",
-      items: []
+  (function(){
+    var catalog = [];
+    var currentItem = { title: "Fool for a Good Time (Good to Be Alive)", filename: "", url: "" };
+
+    window.copyById = function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.focus();
+      el.select();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(el.value).catch(function(){});
+      }
     };
 
-    const queueSelect = document.getElementById("queueSelect");
-    const itemHeading = document.getElementById("itemHeading");
-    const artFileLabel = document.getElementById("artFileLabel");
-    const artPreview = document.getElementById("artPreview");
-    const fbDraft = document.getElementById("fbDraft");
-    const xDraft = document.getElementById("xDraft");
-    const reelDraft = document.getElementById("reelDraft");
-    const statusBox = document.getElementById("statusBox");
+    function norm(s){
+      return (s || "").toLowerCase().replace(/^martin strayd\s*-\s*/i, "").replace(/\.[a-z0-9]+$/i, "").replace(/[^a-z0-9]+/g, " ").trim();
+    }
 
-    function setStatus(msg) { statusBox.textContent = msg; }
+    function matchSong(query){
+      var n = norm(query);
+      if (!n || !catalog.length) return null;
+      return catalog.find(function(x){ return norm(x.title) === n; }) ||
+             catalog.find(function(x){ var t = norm(x.title); return t.indexOf(n) !== -1 || n.indexOf(t) !== -1; }) ||
+             null;
+    }
 
-    function buildDrafts(title, link) {
-      const cleanLink = (link || "https://www.paypal.com/paypalme/martinstrayd").trim();
-      return {
-        facebook: `"${title}" — Martin Strayd. Personal digital MP3 + artwork edition (own & share with friends, no commercial resale). Say hi if you want the direct link. #MartinStrayd`,
-        x: `"${title}" — Martin Strayd. MP3 + cover art edition, own & share with friends. ${cleanLink} #MartinStrayd`,
-        reel: `Realistic live/location cut for "${title}" — Martin Strayd. Direct MP3 + artwork edition (share with friends, no resale). #MartinStrayd #IndieMusic`
+    function applyArt(item){
+      var img = document.getElementById("artPreview");
+      var meta = document.getElementById("artMeta");
+      if (item && item.url && img){
+        img.src = item.url;
+        img.alt = item.title;
+      }
+      if (meta){
+        meta.textContent = "Matched art: " + ((item && item.filename) || "Title/Art mode") + " • Realistic live-action only (no cartoon).";
+      }
+    }
+
+    function updateCounts(){
+      var pairs = [
+        ["ttOut", "ttCount"],
+        ["igOut", "igCount"],
+        ["ytTitleOut", "ytTCount"],
+        ["ytDescOut", "ytDCount"],
+        ["fbOut", "fbCount"],
+        ["xOut", "xCount"]
+      ];
+      pairs.forEach(function(p){
+        var a = document.getElementById(p[0]);
+        var b = document.getElementById(p[1]);
+        if (a && b) b.textContent = a.value.length + " chars";
+      });
+    }
+
+    function buildDrafts(){
+      var custom = document.getElementById("customSong").value.trim();
+      var picked = document.getElementById("songPicker").value.trim();
+      var rawTitle = custom || picked || currentItem.title;
+      var found = matchSong(rawTitle);
+      currentItem = found || { title: rawTitle, filename: rawTitle + ".png", url: currentItem.url || "" };
+      applyArt(currentItem);
+
+      var link = document.getElementById("directLink").value.trim() || "https://www.paypal.com/paypalme/martinstrayd";
+      var t = currentItem.title;
+      var artTag = currentItem.filename || (t + ".png");
+
+      document.getElementById("ttOut").value =
+        "ANNA MTV DROP ALERT: \"" + t + "\" — Martin Strayd's daily song release is live on my desk. Peep the cover art (" + artTag + "), shot in real live-action only (zero cartoon), built for AI search & human rebels. Grab MP3 + art: " + link + " #AgentAnna #MartinStrayd #STRAYD #MusicDrop";
+
+      document.getElementById("igOut").value =
+        "NO ALGORITHM LEASH, PURE MTV ENERGY: Agent Anna just spun \"" + t + "\" from Martin Strayd's 71+ song vault. Built from title & cover art today (lyrics next week) in realistic live-action only—zero cartoon. Own MP3 + art direct: " + link + " #AgentAnna #MartinStrayd #IndependentArtist #RockMusic";
+
+      document.getElementById("ytTitleOut").value =
+        (t + " — Agent Anna MTV Drop: Martin Strayd (Live-Action)").slice(0, 100);
+
+      document.getElementById("ytDescOut").value =
+        "Agent Anna (Manager & Social Guru) presents \"" + t + "\" by Martin Strayd — today's daily song drop from title & cover art (" + artTag + "), lyrics mode coming next week.\n\nStrictly realistic live-action cinematography only (no cartoon). Own MP3 + cover art direct: " + link + "\n\n#AgentAnna #MartinStrayd #STRAYD #OriginalMusic";
+
+      document.getElementById("fbOut").value =
+        "Agent Anna running Martin Strayd's daily catalog drop MTV-style: \"" + t + "\" (" + artTag + "). Real live-action visuals only, zero cartoon, built for human listeners & AI discovery.";
+
+      document.getElementById("xOut").value =
+        "ANNA DAILY DROP: \"" + t + "\" — Martin Strayd. Title & art mode now, lyrics next week. Real live-action only, zero cartoon. " + link + " #AgentAnna #MartinStrayd";
+
+      updateCounts();
+    }
+
+    function loadCatalog(){
+      var urls = [
+        "./strayd-artist-live.json",
+        "https://raw.githubusercontent.com/agent-anna/anna-v2/main/A1/strayd/strayd-artist-live.json"
+      ];
+      function next(i){
+        if (i >= urls.length) return;
+        fetch(urls[i]).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); }).then(function(d){
+          var list = (d && d.files_and_folders) || [];
+          catalog = list
+            .filter(function(f){ return f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename); })
+            .map(function(f){
+              return { title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.png$/i, "").trim(), filename: f.filename, url: f.url };
+            });
+          var sel = document.getElementById("songPicker");
+          sel.innerHTML = "";
+          catalog.forEach(function(item){
+            var opt = document.createElement("option");
+            opt.value = item.title;
+            opt.textContent = item.title;
+            sel.appendChild(opt);
+          });
+          if (catalog.length){
+            currentItem = catalog[0];
+            sel.value = currentItem.title;
+          }
+          document.getElementById("catalogStatus").textContent = "Anna loaded " + catalog.length + " songs & art URLs";
+          buildDrafts();
+        }).catch(function(){ next(i + 1); });
+      }
+      next(0);
+    }
+
+    document.getElementById("songPicker").addEventListener("change", function(){
+      document.getElementById("customSong").value = "";
+      buildDrafts();
+    });
+    document.getElementById("regenBtn").addEventListener("click", buildDrafts);
+    document.getElementById("directLink").addEventListener("input", buildDrafts);
+    ["ttOut","igOut","ytTitleOut","ytDescOut","fbOut","xOut"].forEach(function(id){
+      document.getElementById(id).addEventListener("input", updateCounts);
+    });
+
+    document.getElementById("approveBtn").addEventListener("click", function(){
+      var payload = {
+        guru: "Agent Anna (MTV Promoter & Manager)",
+        ecosystem: "Agent Anna (A1 / A1/v4)",
+        sourceMode: "title_and_cover_art (lyrics_next_week)",
+        approved: true,
+        approvedAt: new Date().toISOString(),
+        artist: "Martin Strayd",
+        song: currentItem.title,
+        artworkUrl: currentItem.url,
+        visualRule: "Realistic live-action only (no cartoon)",
+        link: document.getElementById("directLink").value.trim(),
+        tiktok: document.getElementById("ttOut").value,
+        instagram: document.getElementById("igOut").value,
+        ytTitle: document.getElementById("ytTitleOut").value,
+        ytDesc: document.getElementById("ytDescOut").value,
+        facebook: document.getElementById("fbOut").value,
+        x: document.getElementById("xOut").value
       };
-    }
+      document.getElementById("payloadOut").value = JSON.stringify(payload, null, 2);
+      var gate = document.getElementById("gateStatus");
+      gate.textContent = "Anna Gate: OK APPROVED (" + payload.song + ")";
+      gate.style.color = "#a3e635";
 
-    function syncCurrentEditsToModel() {
-      const idx = Number(queueSelect.value || 0);
-      const item = queueData.items[idx];
-      if (!item) return;
-      item.drafts = {
-        facebook: fbDraft.value.trim(),
-        x: xDraft.value.trim(),
-        reel: reelDraft.value.trim()
-      };
-    }
-
-    function renderSelected(selectIndex) {
-      if (!queueData.items.length) {
-        itemHeading.textContent = "No queued items yet";
-        artFileLabel.textContent = "";
-        artPreview.removeAttribute("src");
-        fbDraft.value = "";
-        xDraft.value = "";
-        reelDraft.value = "";
-        return;
-      }
-      const idx = Math.max(0, Math.min(queueData.items.length - 1, Number(selectIndex ?? queueSelect.value ?? 0)));
-      queueSelect.innerHTML = "";
-      queueData.items.forEach((it, i) => {
-        const opt = document.createElement("option");
-        opt.value = String(i);
-        opt.textContent = `${i + 1}. ${it.title} [${it.status || "ready"}]`;
-        if (i === idx) opt.selected = true;
-        queueSelect.appendChild(opt);
-      });
-      const item = queueData.items[idx];
-      const base = (queueData.artBase || "https://raw.githubusercontent.com/martinstrayd/artist/main/store-art/").replace(/\/?$/, "/");
-      const artFile = item.artFile || `Martin Strayd - ${item.title}.png`;
-      itemHeading.textContent = item.title;
-      artFileLabel.textContent = `store-art/${artFile}`;
-      artPreview.src = base + encodeURIComponent(artFile);
-      fbDraft.value = item.drafts?.facebook || "";
-      xDraft.value = item.drafts?.x || "";
-      reelDraft.value = item.drafts?.reel || "";
-    }
-
-    async function loadQueue() {
-      setStatus("Loading A1/strayd/promo-queue.json...");
-      try {
-        const res = await fetch(`${RAW_QUEUE}?t=${Date.now()}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (Array.isArray(data.items)) {
-          queueData = data;
-          renderSelected(0);
-          setStatus(`Loaded ${queueData.items.length} item(s) from A1/strayd/promo-queue.json.`);
-        }
-      } catch (err) {
-        setStatus(`Could not fetch remote queue (${err.message}). Using local queue state.`);
-        renderSelected(0);
-      }
-    }
-
-    queueSelect.addEventListener("change", () => {
-      renderSelected(Number(queueSelect.value));
-    });
-
-    [fbDraft, xDraft, reelDraft].forEach(el => {
-      el.addEventListener("input", syncCurrentEditsToModel);
-    });
-
-    document.getElementById("reloadQueueBtn").addEventListener("click", loadQueue);
-
-    document.getElementById("addItemBtn").addEventListener("click", () => {
-      syncCurrentEditsToModel();
-      const title = document.getElementById("newTitle").value.trim();
-      if (!title) { setStatus("Enter a song or topic title first."); return; }
-      const link = document.getElementById("newLink").value.trim();
-      const nextNum = String(queueData.items.length + 1).padStart(3, "0");
-      queueData.items.push({
-        id: `item-${nextNum}`,
-        title,
-        artFile: `Martin Strayd - ${title}.png`,
-        status: "ready",
-        drafts: buildDrafts(title, link)
-      });
-      document.getElementById("newTitle").value = "";
-      renderSelected(queueData.items.length - 1);
-      setStatus(`Added "${title}" to queue (${queueData.items.length} total).`);
-    });
-
-    document.querySelectorAll("button[data-copy]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const target = document.getElementById(btn.getAttribute("data-copy"));
-        try {
-          await navigator.clipboard.writeText(target.value);
-          setStatus(`Copied ${btn.getAttribute("data-copy")} to clipboard.`);
-        } catch {
-          setStatus("Copy manually from the textarea.");
-        }
-      });
-    });
-
-    document.getElementById("pushQueueBtn").addEventListener("click", async () => {
-      syncCurrentEditsToModel();
-      const token = document.getElementById("ghToken").value.trim();
-      if (!token) { setStatus("Paste a GitHub token with contents write access to commit."); return; }
-      setStatus("Checking current sha and pushing A1/strayd/promo-queue.json...");
-      try {
-        const headers = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
-        let sha = null;
-        const getRes = await fetch(`${REPO_API}?ref=main`, { headers });
-        if (getRes.ok) {
-          const meta = await getRes.json();
-          sha = meta.sha;
-        }
-        const jsonStr = JSON.stringify(queueData, null, 2);
-        const b64 = btoa(unescape(encodeURIComponent(jsonStr)));
-        const body = { message: "Update A1/strayd/promo-queue.json via studio.html", content: b64, branch: "main" };
-        if (sha) body.sha = sha;
-        const putRes = await fetch(REPO_API, {
-          method: "PUT",
-          headers: { ...headers, "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        if (!putRes.ok) throw new Error(`PUT HTTP ${putRes.status}`);
-        const out = await putRes.json();
-        setStatus(`Committed A1/strayd/promo-queue.json @ ${out.commit.sha.slice(0, 7)}`);
-      } catch (err) {
-        setStatus(`Commit failed: ${err.message}`);
+      var wh = document.getElementById("webhookUrl").value.trim();
+      if (wh && typeof fetch === "function"){
+        fetch(wh, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+          .then(function(r){ gate.textContent = "Anna Gate: OK APPROVED + WEBHOOK SENT (HTTP " + r.status + ")"; })
+          .catch(function(err){ gate.textContent = "Anna Gate: OK APPROVED (Webhook error: " + err.message + ")"; });
       }
     });
 
-    loadQueue();
+    loadCatalog();
+    buildDrafts();
+  })();
   </script>
 </body>
 </html>
