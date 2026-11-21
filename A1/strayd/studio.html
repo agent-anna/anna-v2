@@ -171,8 +171,13 @@
       }
     };
 
+    function safeStr(v, fallback){
+      if (typeof v === "string" && v.trim().length > 0) return v.trim();
+      return fallback || "";
+    }
+
     function norm(s){
-      return (s || "")
+      return safeStr(s, "")
         .toLowerCase()
         .replace(/^martin strayd\s*-\s*/i, "")
         .replace(/\.[a-z0-9]+$/i, "")
@@ -181,7 +186,7 @@
     }
 
     function slugifyTitle(s){
-      return (s || "")
+      return safeStr(s, "single")
         .replace(/^martin strayd\s*-\s*/i, "")
         .replace(/\.[a-z0-9]+$/i, "")
         .trim()
@@ -190,17 +195,19 @@
     }
 
     function hashString(str){
+      var s = safeStr(str, "anna");
       var h = 2166136261;
-      for (var i = 0; i < str.length; i++){
-        h ^= str.charCodeAt(i);
+      for (var i = 0; i < s.length; i++){
+        h ^= s.charCodeAt(i);
         h = Math.imul(h, 16777619);
       }
-      return h >>> 0;
+      return (h >>> 0);
     }
 
-    function pickByHash(list, seedVal){
-      if (!list || !list.length) return "";
-      return list[seedVal % list.length];
+    function pickByHash(list, seedVal, fallback){
+      if (!Array.isArray(list) || list.length === 0) return safeStr(fallback, "");
+      var idx = Math.abs(Number(seedVal) || 0) % list.length;
+      return safeStr(list[idx], safeStr(list[0], safeStr(fallback, "")));
     }
 
     function fetchTextAny(urls){
@@ -228,7 +235,7 @@
         RAW_BASE + "A1/v4/index.html"
       ];
       return fetchTextAny(coreCandidates).then(function(res){
-        if (res && res.text){
+        if (res && typeof res.text === "string"){
           v4CoreData.loadedSources.push(res.url);
           var lines = res.text.split(/\r?\n/);
           v4CoreData.personaRules = lines.filter(function(l){
@@ -239,12 +246,12 @@
     }
 
     function extractSectionBlock(md, headingRegex){
-      var m = md.match(new RegExp("##\\s*(?:" + headingRegex + ")[^\\n]*\\n([\\s\\S]*?)(?=\\n##\\s|$)", "i"));
-      return m ? m[1].trim() : "";
+      var m = safeStr(md, "").match(new RegExp("##\\s*(?:" + headingRegex + ")[^\\n]*\\n([\\s\\S]*?)(?=\\n##\\s|$)", "i"));
+      return m && m[1] ? m[1].trim() : "";
     }
 
     function parseBibleMarkdown(mdText){
-      var clean = (mdText || "").replace(/\r\n/g, "\n").trim();
+      var clean = safeStr(mdText, "").replace(/\r\n/g, "\n").trim();
       if (!clean) return { found: false, raw: "", lyrics: [], location: "", links: [], management: "" };
 
       var lyricsBlock = extractSectionBlock(clean, "lyrics?");
@@ -271,17 +278,18 @@
     }
 
     function loadBibleForSong(title){
-      var n = norm(title);
+      var tClean = safeStr(title, "Single");
+      var n = norm(tClean);
       if (bibleCache[n]) return Promise.resolve(bibleCache[n]);
-      var slug = slugifyTitle(title);
+      var slug = slugifyTitle(tClean);
       var candidates = [
-        "../docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
+        "../docs/v3BIBLE/" + encodeURIComponent(tClean) + ".md",
         "../docs/v3BIBLE/" + encodeURIComponent(slug) + ".md",
-        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(title) + ".md",
+        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(tClean) + ".md",
         RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(slug) + ".md"
       ];
       repoTree.forEach(function(node){
-        if (/v3bible/i.test(node.path) && /\.md$/i.test(node.path)){
+        if (node && node.path && /v3bible/i.test(node.path) && /\.md$/i.test(node.path)){
           var base = node.path.split("/").pop().replace(/\.md$/i, "");
           var nb = norm(base);
           if (nb === n || (n.length > 5 && nb.indexOf(n) !== -1)){
@@ -291,7 +299,7 @@
       });
       return fetchTextAny(candidates).then(function(res){
         var parsed = res && res.text ? parseBibleMarkdown(res.text) : { found: false, raw: "", lyrics: [], location: "", links: [], management: "" };
-        parsed.path = res ? res.url : "";
+        parsed.path = res ? safeStr(res.url, "") : "";
         bibleCache[n] = parsed;
         return parsed;
       });
@@ -299,8 +307,8 @@
 
     function deriveTrackKeywords(title){
       var stop = { "the":1,"and":1,"for":1,"with":1,"from":1,"into":1,"your":1,"you":1,"are":1,"a":1,"an":1,"to":1,"of":1,"in":1,"on":1,"at":1,"is":1,"it":1,"my":1,"me":1 };
-      var words = (title || "").toLowerCase().replace(/[^a-z0-9\s]+/g, " ").split(/\s+/).filter(function(w){
-        return w.length >= 3 && !stop[w];
+      var words = safeStr(title, "single").toLowerCase().replace(/[^a-z0-9\s]+/g, " ").split(/\s+/).filter(function(w){
+        return typeof w === "string" && w.length >= 3 && !stop[w];
       });
       return words.slice(0, 4);
     }
@@ -308,30 +316,38 @@
     function buildHashtags(title, seedVal){
       var baseTags = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter", "#IndependentMusic", "#OriginalMusic", "#MusicDiscovery", "#AltRock"];
       var kwTags = deriveTrackKeywords(title).map(function(w){
-        return "#" + w.charAt(0).toUpperCase() + w.slice(1);
-      });
+        var cleanW = safeStr(w, "");
+        if (!cleanW) return "";
+        return "#" + cleanW.charAt(0).toUpperCase() + cleanW.slice(1);
+      }).filter(Boolean);
       var pool = kwTags.concat(baseTags);
       var unique = [];
+      var sNum = Math.abs(Number(seedVal) || 0);
       for (var i = 0; i < pool.length && unique.length < 4; i++){
-        var tag = pool[(seedVal + i) % pool.length];
-        if (unique.indexOf(tag) === -1) unique.push(tag);
+        var tag = safeStr(pool[(sNum + i) % pool.length], "");
+        if (tag && unique.indexOf(tag) === -1) unique.push(tag);
       }
-      return unique.join(" ");
+      return unique.length ? unique.join(" ") : "#MartinStrayd #STRAYD #IndieRock #Songwriter";
     }
 
     function synthesizeCopyForSong(title, bInfo, link, gbUrl, dayIdx, runSeed){
-      var hBase = hashString(title + "|" + dayIdx + "|" + runSeed);
-      var kws = deriveTrackKeywords(title);
+      var safeTitle = safeStr(title, "Martin Strayd Single");
+      var safeLink = safeStr(link, "https://www.paypal.com/paypalme/martinstrayd");
+      var safeGb = safeStr(gbUrl, "");
+      var dIdx = Math.abs(Number(dayIdx) || 0) % 7;
+      var hBase = hashString(safeTitle + "|" + dIdx + "|" + (Number(runSeed) || 1));
+      var kws = deriveTrackKeywords(safeTitle);
       var kwPhrase = kws.length ? kws.join(" ") : "original rock song";
-      var tags = buildHashtags(title, hBase);
+      var tags = buildHashtags(safeTitle, hBase);
 
-      var hasLyric = !!(bInfo && bInfo.lyrics && bInfo.lyrics.length);
-      var chosenLyric = hasLyric ? pickByHash(bInfo.lyrics, hBase) : "";
-      var hasLoc = !!(bInfo && bInfo.location && !/\[add live-action location\]/i.test(bInfo.location));
-      var locNote = hasLoc ? bInfo.location.split("\n")[0].slice(0, 110) : "";
+      var lyricsArr = (bInfo && Array.isArray(bInfo.lyrics)) ? bInfo.lyrics : [];
+      var chosenLyric = lyricsArr.length ? pickByHash(lyricsArr, hBase, "") : "";
+      var rawLoc = (bInfo && typeof bInfo.location === "string") ? bInfo.location : "";
+      var hasLoc = rawLoc.length > 0 && !/\[add live-action location\]/i.test(rawLoc);
+      var locNote = hasLoc ? safeStr(rawLoc.split("\n")[0], "").slice(0, 110) : "";
 
       var focusModes = ["hook", "lyric", "scene", "ownership", "discovery", "vault", "spotlight"];
-      var activeMode = focusModes[dayIdx % focusModes.length];
+      var activeMode = focusModes[dIdx];
 
       var coreAngle = "";
       if (activeMode === "lyric" && chosenLyric){
@@ -351,50 +367,59 @@
       }
 
       var ttOpeners = [
-        "Agent Anna putting \"" + title + "\" on deck — ",
-        "New single push from Anna's desk: \"" + title + "\" — ",
-        "\"" + title + "\" by Martin Strayd just locked into Anna's rotation — ",
-        "Why \"" + title + "\" stands out on Anna's feed today: "
+        "Agent Anna putting \"" + safeTitle + "\" on deck — ",
+        "New single push from Anna's desk: \"" + safeTitle + "\" — ",
+        "\"" + safeTitle + "\" by Martin Strayd just locked into Anna's rotation — ",
+        "Why \"" + safeTitle + "\" stands out on Anna's feed today: "
       ];
-      var tiktok = pickByHash(ttOpeners, hBase) + coreAngle + "Martin Strayd delivers real weight without algorithm noise. Direct MP3 + art: " + link + " " + tags;
+      var tiktok = pickByHash(ttOpeners, hBase, "Agent Anna spotlighting \"" + safeTitle + "\" — ") +
+        coreAngle + "Martin Strayd delivers real weight without algorithm noise. Direct MP3 + art: " + safeLink + " " + tags;
 
       var igOpeners = [
-        "\"" + title + "\" by Martin Strayd — ",
-        "Anna's single pick today: \"" + title + "\" — ",
-        "Running \"" + title + "\" for Martin Strayd today — "
+        "\"" + safeTitle + "\" by Martin Strayd — ",
+        "Anna's single pick today: \"" + safeTitle + "\" — ",
+        "Running \"" + safeTitle + "\" for Martin Strayd today — "
       ];
-      var instagram = pickByHash(igOpeners, hBase >> 1) + coreAngle + "managed and promoted by Agent Anna for listeners who keep real music. Own MP3 + cover art: " + link + " " + tags;
+      var igSeed = Math.floor(hBase / 7);
+      var instagram = pickByHash(igOpeners, igSeed, "\"" + safeTitle + "\" by Martin Strayd — ") +
+        coreAngle + "managed and promoted by Agent Anna for listeners who keep real music. Own MP3 + cover art: " + safeLink + " " + tags;
 
+      var leadKw = kws.length ? (safeStr(kws[0], "").toUpperCase() + " & ") : "";
       var ytTitleCandidates = [
-        title + " — Martin Strayd (Agent Anna Single Spotlight)",
-        "Martin Strayd - \"" + title + "\" | " + (kws[0] ? (kws[0].toUpperCase() + " & ") : "") + "Indie Rock Single",
-        "\"" + title + "\" by Martin Strayd (Official Single & Art — Agent Anna)",
-        "Agent Anna Single Pick: \"" + title + "\" — Martin Strayd"
+        safeTitle + " — Martin Strayd (Agent Anna Single Spotlight)",
+        "Martin Strayd - \"" + safeTitle + "\" | " + leadKw + "Indie Rock Single",
+        "\"" + safeTitle + "\" by Martin Strayd (Official Single & Art — Agent Anna)",
+        "Agent Anna Single Pick: \"" + safeTitle + "\" — Martin Strayd"
       ];
-      var ytTitle = pickByHash(ytTitleCandidates, hBase >> 2).slice(0, 100);
+      var ytSeed = Math.floor(hBase / 13);
+      var ytTitle = pickByHash(ytTitleCandidates, ytSeed, safeTitle + " — Martin Strayd").slice(0, 100);
 
-      var ytDesc = "\"" + title + "\" by Martin Strayd — promoted by Agent Anna (" + kwPhrase + ").\n\n" +
+      var ytDesc = "\"" + safeTitle + "\" by Martin Strayd — promoted by Agent Anna (" + kwPhrase + ").\n\n" +
         coreAngle +
         (chosenLyric ? ("Lyric line: \"" + chosenLyric + "\"\n") : "") +
-        "Direct MP3 + cover art bundle: " + link +
+        "Direct MP3 + cover art bundle: " + safeLink +
         "\nCatalog & band hub: https://strayd.com/band" +
-        (gbUrl ? ("\nBible / lyrics mirror: " + gbUrl) : "") +
+        (safeGb ? ("\nBible / lyrics mirror: " + safeGb) : "") +
         "\n\n" + tags;
 
       var fbOpeners = [
-        "Agent Anna here managing Martin Strayd's single run on \"" + title + "\". ",
-        "Putting \"" + title + "\" from Martin Strayd in front of the room today. ",
-        "One single in focus today with Agent Anna: \"" + title + "\" by Martin Strayd. "
+        "Agent Anna here managing Martin Strayd's single run on \"" + safeTitle + "\". ",
+        "Putting \"" + safeTitle + "\" from Martin Strayd in front of the room today. ",
+        "One single in focus today with Agent Anna: \"" + safeTitle + "\" by Martin Strayd. "
       ];
-      var facebook = pickByHash(fbOpeners, hBase >> 3) + coreAngle + "What stands out to you first on a track like this? Grab the MP3 + cover art direct: " + link;
+      var fbSeed = Math.floor(hBase / 29);
+      var facebook = pickByHash(fbOpeners, fbSeed, "Agent Anna here on \"" + safeTitle + "\" by Martin Strayd. ") +
+        coreAngle + "What stands out to you first on a track like this? Grab the MP3 + cover art direct: " + safeLink;
 
-      var shortTags = tags.split(/\s+/).slice(0, 2).join(" ");
+      var shortTags = tags.split(/\s+/).filter(Boolean).slice(0, 2).join(" ");
       var xOpeners = [
-        "\"" + title + "\" — Martin Strayd. ",
-        "Anna's single in rotation: \"" + title + "\" by Martin Strayd. ",
-        "Martin Strayd's \"" + title + "\" on Anna's radar today — "
+        "\"" + safeTitle + "\" — Martin Strayd. ",
+        "Anna's single in rotation: \"" + safeTitle + "\" by Martin Strayd. ",
+        "Martin Strayd's \"" + safeTitle + "\" on Anna's radar today — "
       ];
-      var xPost = pickByHash(xOpeners, hBase >> 4) + (chosenLyric ? ("\"" + chosenLyric + "\" ") : (kwPhrase + " ")) + link + " " + shortTags;
+      var xSeed = Math.floor(hBase / 47);
+      var xBody = chosenLyric ? ("\"" + chosenLyric + "\" ") : (kwPhrase + " ");
+      var xPost = pickByHash(xOpeners, xSeed, "\"" + safeTitle + "\" — Martin Strayd. ") + xBody + safeLink + (shortTags ? (" " + shortTags) : "");
 
       return {
         tiktok: tiktok,
@@ -419,16 +444,17 @@
       var hTitle = document.getElementById("heroSongTitle");
       var meta = document.getElementById("artMeta");
       var brief = document.getElementById("liveBriefLine");
-      if (hTitle) hTitle.textContent = (item && item.title) || "Martin Strayd Single";
+      var t = safeStr(item && item.title, "Martin Strayd Single");
+      if (hTitle) hTitle.textContent = t;
       if (item && item.url && img){
         img.src = item.url;
-        img.alt = item.title;
+        img.alt = t;
       }
       if (meta){
-        meta.textContent = "Cover art: " + ((item && item.filename) || "Catalog sleeve");
+        meta.textContent = "Cover art: " + safeStr(item && item.filename, "Catalog sleeve");
       }
       if (brief){
-        brief.textContent = "Live-action brief: Strictly realistic live-action / documentary camera footage only (zero cartoon) for \"" + ((item && item.title) || "") + "\".";
+        brief.textContent = "Live-action brief: Strictly realistic live-action / documentary camera footage only (zero cartoon) for \"" + t + "\".";
       }
     }
 
@@ -449,14 +475,14 @@
       ].forEach(function(p){
         var a = document.getElementById(p[0]);
         var b = document.getElementById(p[1]);
-        if (a && b) b.textContent = a.value.length + " chars";
+        if (a && b) b.textContent = safeStr(a.value, "").length + " chars";
       });
     }
 
     function renderBadges(){
       var box = document.getElementById("sourceBadges");
       if (!box) return;
-      var bibleCount = repoTree.filter(function(x){ return /v3bible/i.test(x.path) && /\.md$/i.test(x.path); }).length;
+      var bibleCount = repoTree.filter(function(x){ return x && x.path && /v3bible/i.test(x.path) && /\.md$/i.test(x.path); }).length;
       var gb = document.getElementById("gitbookUrl").value.trim();
       box.innerHTML =
         '<span class="pill">A1/v4 Core: ' + (v4CoreData.loadedSources.length ? "Loaded" : "Active") + '</span>' +
@@ -479,12 +505,12 @@
       var d = getDayIdx();
 
       return loadBibleForSong(t).then(function(bInfo){
-        currentBible = bInfo;
-        document.getElementById("bibleStatusBox").value = bInfo.found
-          ? ("v3BIBLE .md: " + bInfo.path + "\n" + bInfo.raw.slice(0, 340))
+        currentBible = bInfo || { found: false, path: "", raw: "", lyrics: [], location: "", links: [], management: "" };
+        document.getElementById("bibleStatusBox").value = currentBible.found
+          ? ("v3BIBLE .md: " + currentBible.path + "\n" + safeStr(currentBible.raw, "").slice(0, 340))
           : ("v3BIBLE entry ready for \"" + t + "\" (" + slugifyTitle(t) + ".md). Add lyrics, location, links & management notes in docs/v3BIBLE or GitBook mirror anytime.");
 
-        var gen = synthesizeCopyForSong(t, bInfo, link, gb, d, synthSeed);
+        var gen = synthesizeCopyForSong(t, currentBible, link, gb, d, synthSeed);
         document.getElementById("ttOut").value = gen.tiktok;
         document.getElementById("igOut").value = gen.instagram;
         document.getElementById("ytTitleOut").value = gen.ytTitle;
@@ -492,6 +518,16 @@
         document.getElementById("fbOut").value = gen.facebook;
         document.getElementById("xOut").value = gen.x;
         updateCounts();
+      }).catch(function(err){
+        var fallbackGen = synthesizeCopyForSong(t, { lyrics: [], location: "" }, link, gb, d, synthSeed);
+        document.getElementById("ttOut").value = fallbackGen.tiktok;
+        document.getElementById("igOut").value = fallbackGen.instagram;
+        document.getElementById("ytTitleOut").value = fallbackGen.ytTitle;
+        document.getElementById("ytDescOut").value = fallbackGen.ytDesc;
+        document.getElementById("fbOut").value = fallbackGen.facebook;
+        document.getElementById("xOut").value = fallbackGen.x;
+        updateCounts();
+        if (typeof console !== "undefined" && console.warn) console.warn("Draft fallback:", err);
       });
     }
 
@@ -510,7 +546,7 @@
             var d = JSON.parse(res.text);
             var list = (d && d.files_and_folders) || [];
             catalog = list
-              .filter(function(f){ return f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename); })
+              .filter(function(f){ return f && f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename); })
               .map(function(f){
                 return { title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.png$/i, "").trim(), filename: f.filename, url: f.url };
               });
