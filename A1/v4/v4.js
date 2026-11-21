@@ -468,12 +468,10 @@
         if (typeof AbortController === "undefined") {
             return await fetch(url, opts || {});
         }
-        const controller = new AbortController();
         const timer = setTimeout(() => controller.abort("Request timed out after " + ms + "ms"), ms);
         try {
             return await fetch(url, { ...(opts || {}), signal: controller.signal });
         } finally {
-            clearTimeout(timer);
         }
     }
 
@@ -982,9 +980,6 @@
         const startedAt = performance.now();
         let ttftMs = null;
 
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), DAHL_TIMEOUT_MS);
-
         try {
             const response = await fetch(DAHL_ENDPOINT, {
                 method: "POST",
@@ -996,8 +991,7 @@
                     model: modelName,
                     stream: true,
                     messages
-                }),
-                signal: controller.signal
+                })
             });
 
             if (!response.ok) {
@@ -1069,7 +1063,6 @@
             if (err && err.status) wrapped.status = err.status;
             throw wrapped;
         } finally {
-            clearTimeout(timer);
         }
     }
 
