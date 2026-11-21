@@ -1303,7 +1303,134 @@
         sendMessage();
     }
 
-    async function sendMessage() {
+    // === ANNA V4.0 BYPASS & OFFLINE WORLD SEARCH START ===
+const annaOfflineSearchCache = new Map();
+const annaCreatedMdRegistry = new Map();
+
+function isBypassPrompt(rawText) {
+    const t = String(rawText || "").trim().toLowerCase();
+    if (!t) return true;
+    const simpleSet = new Set(["ping", "pong", "hi", "hello", "hey", "yo", "test", "ok", "status"]);
+    if (simpleSet.has(t)) return true;
+    if (t.length <= 16 && /^(ping|hi|hello|hey|yo|test|status)\b/.test(t)) return true;
+    return false;
+}
+
+function registerCreatedMarkdownFile(path, content) {
+    if (!path || typeof content !== "string") return;
+    if (/\.md$/i.test(path.trim())) {
+        annaCreatedMdRegistry.set(path.trim(), content);
+        annaOfflineSearchCache.clear();
+    }
+}
+
+function getAgentAnnaVoiceHeader(bypassMode = false) {
+    if (bypassMode) {
+        return (
+            "You are AGENT ANNA V4 (AA01) inside A1/v4.\n" +
+            "VOICE: Sharp, calm, direct, zero fluff, military-grade clarity.\n" +
+            "RULES: Reply immediately and concisely. Never read markdown or code blocks aloud."
+        );
+    }
+    return (
+        "You are AGENT ANNA V4 (AA01) inside A1/v4 of agent-anna/anna-v2.\n" +
+        "VOICE: Sharp, calm, composed, tactical, zero fluff, zero filler.\n" +
+        "RULES: Search offline workspace brain.json, memory.json, knowledge/, character/, and created .md notes first when needed; never invent missing files or live web facts; keep internal soul files private; never read code blocks aloud."
+    );
+}
+
+function searchOfflineWorld(promptText) {
+    const q = String(promptText || "    if (!q || isBypassPrompt(q)) return "";
+
+    const cacheKey = `${q}::${Object.keys(repoVaultFiles || {}).length}::${annaCreatedMdRegistry.size}`;
+    if (annaOfflineSearchCache.has(cacheKey)) {
+        return annaOfflineSearchCache.get(cacheKey);
+    }
+
+    const terms = q
+        .replace(/[^a-z0-9_\-\/\.]+/g, " ")
+        .split(/\s+/)
+        .filter((w) => w.length >= 2);
+
+    if (terms.length === 0) return "";
+
+    const sources = [];
+    if (typeof repoVaultFiles === "object" && repoVaultFiles) {
+        for (const [p, txt] of Object.entries(repoVaultFiles)) {
+            if (/\/soul\//i.test(p)) continue;
+            if (typeof txt === "string" && txt.trim()) {
+                sources.push({ path: p, text: txt, createdMd: false });
+            }
+        }
+    }
+    for (const [p, txt] of annaCreatedMdRegistry.entries()) {
+        if (/\/soul\//i.test(p)) continue;
+        if (typeof txt === "string" && txt.trim()) {
+            sources.push({ path: p, text: txt, createdMd: true });
+        }
+    }
+
+    const pillarWeight = (p, isCreatedMd) => {
+        const lp = String(p || "").toLowerCase();
+        if (lp.endsWith("memory/brain.json")) return 100;
+        if (lp.endsWith("memory/memory.json") || lp.endsWith("/memory.json")) return 110;
+        if (lp.includes("/knowledge/") || (isCreatedMd && lp.endsWith(".md"))) return 120;
+        if (lp.includes("/character/")) return 130;
+        if (lp.includes("/memory/")) return 140;
+        if (lp.includes("/registry/") || lp.includes("/vault/")) return 155;
+        if (lp.includes("/docs/") || lp.includes("/vision/")) return 170;
+        if (lp.includes("/logs/")) return 185;
+        return 190;
+    };
+
+    const hits = [];
+    for (const src of sources) {
+        const lines = src.text.split(/\r?\n/);
+        let score = 0;
+        const matchedLines = [];
+        const lp = src.path.toLowerCase();
+
+        for (const term of terms) {
+            if (lp.includes(term)) score += 6;
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const ll = line.toLowerCase();
+            let lineHits = 0;
+            for (const term of terms) {
+                if (ll.includes(term)) lineHits++;
+            }
+            if (lineHits > 0) {
+                score += lineHits * 3;
+                if (matchedLines.length < 4 && line.trim()) {
+                    matchedLines.push(`L${i + 1}: ${line.trim().slice(0, 180)}`);
+                }
+            }
+        }
+
+        if (score > 0 && matchedLines.length > 0) {
+            hits.push({
+                path: src.path,
+                score: score - (pillarWeight(src.path, src.createdMd) * 0.05),
+                snippet: matchedLines.join(" | ")
+            });
+        }
+    }
+
+    hits.sort((a, b) => b.score - a.score);
+    const top = hits.slice(0, 5);
+    const out = top.length > 0
+        ? "[OFFLINE_WORLD_MATCHES]\n" + top.map((h) => `- ${h.path}: ${h.snippet}`).join("\n")
+        : "";
+
+    if (annaOfflineSearchCache.size > 60) annaOfflineSearchCache.clear();
+    annaOfflineSearchCache.set(cacheKey, out);
+    return out;
+}
+// === ANNA V4.0 BYPASS & OFFLINE WORLD SEARCH END ===
+
+async function sendMessage() {
         const input = document.getElementById("user-input");
         const prompt = input ? input.value.trim() : "";
         if (!prompt) return;
@@ -1317,11 +1444,11 @@
         setMoodState("thinking");
 
         try {
-            const vaultContext = getCompactVaultContext(prompt);
-            const systemPrompt =
-                `You are AGENT ANNA V4 inside ${WORKSPACE_ROOT}/ of ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}).\n` +
-                `RULES: Answer directly, clearly, and concisely in English using only the V4 work context below. Never invent missing files or live web facts. Never read code blocks aloud.\n\n` +
-                `${vaultContext}`;
+            const bypassMode = isBypassPrompt(prompt);
+            const voiceHeader = getAgentAnnaVoiceHeader(bypassMode);
+            const offlineHits = bypassMode ? "" : searchOfflineWorld(prompt);
+            const vaultContext = bypassMode ? "" : getCompactVaultContext(prompt);
+            const systemPrompt = [voiceHeader, vaultContext, offlineHits].filter(Boolean).join("\n\n");
 
             const result = await callDahlDirect(
                 [
