@@ -825,26 +825,16 @@
     }
 
     function getCompactVaultContext(userPrompt) {
-        const blocks = [];
-        const lowerPrompt = String(userPrompt || "").toLowerCase();
-        const terms = lowerPrompt.split(/[^a-z0-9_-]+/).filter((w) => w.length > 2);
-        let usedChars = 0;
-
-        for (const [path, content] of Object.entries(repoVaultFiles)) {
-            if (!isInV4Scope(path) || isSoulPath(path) || !isV4CoreFile(path)) continue;
-            const isMatch = terms.some((t) => path.toLowerCase().includes(t) || content.toLowerCase().includes(t));
-            const sliceLen = isMatch ? 1100 : 600;
-            const block = `=== [${path}] ===\n${content.slice(0, sliceLen)}`;
-            if (usedChars + block.length > MAX_CONTEXT_CHARS) break;
-            blocks.push(block);
-            usedChars += block.length;
-        }
-
+        const pathEl = document.getElementById("active-file-path");
+        const activePath = pathEl ? pathEl.value.trim() : "";
+        const v4Paths = rawTreeData
+            .filter((f) => f && f.type === "blob" && isInV4Scope(f.path))
+            .map((f) => f.path);
         const visionNote = ephemeralVisionDataUrl
             ? " | SEE-ONLY IMAGE IN SESSION RAM: present (never saved to Git)"
             : "";
-        const header = `RUNTIME: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}) | ROOT: ${WORKSPACE_ROOT}/ | ACTION: ${SCRAPE_WORKFLOW_FILE}${visionNote}`;
-        return `${header}\n\n${blocks.join("\n\n")}`.slice(0, MAX_CONTEXT_CHARS + 220);
+        const openNote = activePath ? ` | OPEN_FILE: ${activePath}` : "";
+        return `RUNTIME: ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} (${activeBranch}) | ROOT: ${WORKSPACE_ROOT}/ | ACTION: ${SCRAPE_WORKFLOW_FILE}${openNote}${visionNote}\nFILES (${v4Paths.length}, reference-only, never preloaded): ${v4Paths.join(", ")}`;
     }
 
     async function triggerAutonomousBootSequence() {
@@ -997,43 +987,31 @@
         const apiKey = getCleanDahlKey();
         if (!apiKey) throw new Error("Dahl API key missing. Open KEYS to save it.");
 
-        const retryDelaysMs = [1800, 3600];
-        let lastError = null;
-
-        for (let attempt = 0; attempt <= retryDelaysMs.length; attempt++) {
-            const response = await fetchWithTimeout(
-                DAHL_ENDPOINT,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: getActiveModel(),
-                        stream: false,
-                        messages
-                    })
+        const response = await fetchWithTimeout(
+            DAHL_ENDPOINT,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
                 },
-                DAHL_TIMEOUT_MS
-            );
+                body: JSON.stringify({
+                    model: getActiveModel(),
+                    stream: false,
+                    messages
+                })
+            },
+            DAHL_TIMEOUT_MS
+        );
 
-            const rawText = await response.text();
-            let json = null;
-            try { json = JSON.parse(rawText); } catch (e) {}
+        const rawText = await response.text();
+        let json = null;
+        try { json = JSON.parse(rawText); } catch (e) {}
 
-            if (response.ok) return extractDahlReply(json, rawText) || "Ready.";
+        if (response.ok) return extractDahlReply(json, rawText) || "Ready.";
 
-            const detail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 200);
-            lastError = new Error(`DAHL HTTP ${response.status}: ${detail}`);
-
-            if (response.status === 429 && attempt < retryDelaysMs.length) {
-                await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]));
-                continue;
-            }
-            throw lastError;
-        }
-        throw lastError || new Error("Dahl request failed.");
+        const detail = json && json.error ? (json.error.message || JSON.stringify(json.error)) : rawText.slice(0, 200);
+        throw new Error(`DAHL HTTP ${response.status}: ${detail}`);
     }
 
     async function auditActiveFile() {
