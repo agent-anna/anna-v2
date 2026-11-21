@@ -1326,12 +1326,13 @@ function getAgentAnnaVoiceHeader(bypassMode = false) {
     return (
         "You are AGENT ANNA V4 (AA01) inside A1/v4 of agent-anna/anna-v2.\n" +
         "VOICE: Sharp, calm, composed, tactical, zero fluff, zero filler.\n" +
-        "RULES: Search offline workspace brain.json, memory.json, knowledge/, character/, and created .md notes first when needed; never invent missing files or live web facts; keep internal soul files private; never read code blocks aloud."
+        "RULES: V4 state lives in A1/v4/memory/brain.json, A1/v4/memory/memory.json, and A1/v4/memory.json (code in A1/v4/functions/). Reach for requested files/layers on demand without bloating normal replies; never invent missing files or live web facts; never read code blocks aloud."
     );
 }
 
 function searchOfflineWorld(promptText) {
-    const q = String(promptText || "    if (!q || isBypassPrompt(q)) return "";
+    const q = String(promptText || "").trim().toLowerCase();
+    if (!q || isBypassPrompt(q)) return "";
 
     const cacheKey = `${q}::${Object.keys(repoVaultFiles || {}).length}::${annaCreatedMdRegistry.size}`;
     if (annaOfflineSearchCache.has(cacheKey)) {
@@ -1590,66 +1591,6 @@ async function getRequestedMemoryContext(promptText) {
         }
         if (content) {
             const sliceLimit = path === "A1/v4/memory.json" ? 2200 : 3000;
-            sections.push(`[FILE: ${path}]\n${content.slice(0, sliceLimit)}`);
-        }
-    }
-    return sections.length ? `[REQUESTED_MEMORY_FILES]\n${sections.join("\n\n")}` : "";
-}
-
-async function getRequestedMemoryContext(promptText) {
-    const q = String(promptText || "").toLowerCase();
-    const wantsBrain = /\bbrain(\.json)?\b/.test(q);
-    const wantsMemory = /\bmemory(\.json)?\b/.test(q);
-    const wantsAudit = /\baudit\b/.test(q);
-    if (!wantsBrain && !wantsMemory && !wantsAudit) return "";
-
-    const targets = [];
-    if (wantsBrain) targets.push("A1/v4/memory/brain.json");
-    if (wantsMemory) targets.push("A1/v4/memory/memory.json");
-    if (wantsMemory || wantsAudit) targets.push("A1/v4/memory.json");
-
-    const sections = [];
-    let treeEntries = null;
-
-    for (const path of targets) {
-        let content = typeof repoVaultFiles === "object" && repoVaultFiles ? repoVaultFiles[path] : "";
-        if (!content) {
-            try {
-                if (!treeEntries) {
-                    const treeRes = await fetchWithTimeout(
-                        `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/trees/${encodeURIComponent(activeBranch || "main")}?recursive=1`,
-                        { headers: getGitHubHeaders(), cache: "no-store" },
-                        6000
-                    );
-                    if (treeRes && treeRes.ok) {
-                        const treeJson = await treeRes.json();
-                        treeEntries = Array.isArray(treeJson.tree) ? treeJson.tree : [];
-                    }
-                }
-                const blobEntry = Array.isArray(treeEntries)
-                    ? treeEntries.find((item) => item && item.path === path && item.type === "blob" && item.sha)
-                    : null;
-                if (blobEntry) {
-                    const blobRes = await fetchWithTimeout(
-                        `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/git/blobs/${blobEntry.sha}`,
-                        { headers: getGitHubHeaders(), cache: "no-store" },
-                        6000
-                    );
-                    if (blobRes && blobRes.ok) {
-                        const blobData = await blobRes.json();
-                        if (blobData && blobData.content) {
-                            const binString = atob(String(blobData.content).replace(/\s/g, ""));
-                            content = new TextDecoder().decode(Uint8Array.from(binString, (m) => m.codePointAt(0)));
-                            if (typeof repoVaultFiles === "object" && repoVaultFiles) {
-                                repoVaultFiles[path] = content;
-                            }
-                        }
-                    }
-                }
-            } catch (e) {}
-        }
-        if (content) {
-            const sliceLimit = path === "A1/v4/memory.json" ? 2000 : 3000;
             sections.push(`[FILE: ${path}]\n${content.slice(0, sliceLimit)}`);
         }
     }
