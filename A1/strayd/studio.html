@@ -168,6 +168,11 @@
       color: var(--accent-ink);
       border: none;
     }
+    button.post-btn {
+      background: var(--sky);
+      color: var(--accent-ink);
+      border: none;
+    }
     .actions { display: grid; gap: 8px; margin-top: 14px; }
 
     .chat-log {
@@ -208,7 +213,7 @@
     .stats { color: var(--muted); font-weight: 600; font-size: 0.78rem; }
     .stats.over { color: var(--warn); }
     .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .copy-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; }
+    .copy-btn, .post-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; }
   </style>
 </head>
 <body>
@@ -315,6 +320,7 @@
               <textarea id="ttOut"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="ttOut">Copy TikTok</button>
+                <button type="button" class="post-btn" data-post="tiktok" data-source="ttOut">Post</button>
               </div>
             </article>
 
@@ -326,6 +332,7 @@
               <textarea id="igOut"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="igOut">Copy Instagram</button>
+                <button type="button" class="post-btn" data-post="instagram" data-source="igOut">Post</button>
               </div>
             </article>
 
@@ -343,6 +350,7 @@
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
                 <button type="button" class="copy-btn" data-copy="ytDescOut">Copy YT Description</button>
+                <button type="button" class="post-btn" data-post="youtube" data-source="ytDescOut">Post</button>
               </div>
             </article>
 
@@ -354,6 +362,7 @@
               <textarea id="fbOut"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="fbOut">Copy Facebook</button>
+                <button type="button" class="post-btn" data-post="facebook" data-source="fbOut">Post</button>
               </div>
             </article>
 
@@ -365,6 +374,7 @@
               <textarea id="xOut" style="min-height:74px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="xOut">Copy X</button>
+                <button type="button" class="post-btn" data-post="x" data-source="xOut">Post</button>
               </div>
             </article>
 
@@ -732,7 +742,7 @@
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Write sharp, distinct copy for TikTok, Instagram, YouTube (ytTitle <= 100 chars, ytDesc), Facebook, and X (<= 280 chars). Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            "You are Agent Anna in the A1 shell (v4 core), writing marketing copy for recording artist Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Write sharp, distinct copy for TikTok, Instagram, YouTube (ytTitle <= 100 chars, ytDesc), Facebook, and X (<= 280 chars). Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
         },
         {
           role: "user",
@@ -772,11 +782,11 @@
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core) promoting Martin Strayd. Strictly realistic live-action only (zero cartoon). Give a sharp, practical 2-sentence response."
+            "You are Agent Anna in the A1 shell (v4 core) assisting recording artist Martin Strayd with song ideas, scenes, and marketing copy. Strictly realistic live-action only (zero cartoon). Treat terms like tuk tul or tuk-tuk as real live-action street/vehicle scenes without asking clarifying questions. Reply directly and concisely in 2 sentences."
         },
         {
           role: "user",
-          content: `Song: "${activeTrack.title}". Note: ${msg}`
+          content: `Current track: "${activeTrack.title}". Creative direction: ${msg}`
         }
       ], false);
 
@@ -788,6 +798,24 @@
 
       await generateAll();
       appendChat("Agent Anna", `Updated "${activeTrack.title}" with "${msg}". Check the drafts and hit OK To Post when ready.`);
+    }
+
+    function buildPlatformUrl(platform, text) {
+      const encoded = encodeURIComponent(nonEmpty(text));
+      switch (platform) {
+        case "x":
+          return `https://x.com/intent/tweet?text=${encoded}`;
+        case "facebook":
+          return "https://www.facebook.com/";
+        case "tiktok":
+          return "https://www.tiktok.com/tiktokstudio/upload";
+        case "instagram":
+          return "https://www.instagram.com/";
+        case "youtube":
+          return "https://studio.youtube.com/";
+        default:
+          return "";
+      }
     }
 
     async function boot() {
@@ -850,6 +878,27 @@
           target.select();
           btn.textContent = "Selected";
         }
+        setTimeout(() => { btn.textContent = original; }, 1200);
+      });
+    });
+
+    document.querySelectorAll("[data-post]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const platform = btn.dataset.post;
+        const sourceId = btn.dataset.source;
+        const text = platform === "youtube"
+          ? `${nonEmpty($("ytTitleOut")?.value)}\n\n${nonEmpty($("ytDescOut")?.value)}`.trim()
+          : nonEmpty($(sourceId)?.value);
+
+        try {
+          if (text) await navigator.clipboard.writeText(text);
+        } catch (_) {}
+
+        const targetUrl = buildPlatformUrl(platform, text);
+        if (targetUrl) window.open(targetUrl, "_blank", "noopener,noreferrer");
+
+        const original = btn.textContent;
+        btn.textContent = "Opened";
         setTimeout(() => { btn.textContent = original; }, 1200);
       });
     });
