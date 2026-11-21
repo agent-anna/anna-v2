@@ -1,0 +1,16 @@
+﻿# VEG ANNA AA01 — PROMO GATE & LIVE LINKS BIBLE
+
+## Identity & Visual Doctrine
+- Portal identity: VEG ANNA AA01 (never rebrand to unrelated apps or wallets).
+- Music identity: STRAYD (Martin Strayd music played and promoted with KUNDA CAFE).
+- Visual rule: Strictly realistic live-action cinematography only. ZERO cartoon, ZERO anime, ZERO illustration.
+- Truth rule: Never claim a post is live on X, TikTok, or YouTube unless a confirmed API/webhook response occurs.
+
+## Live GitHub & Promo Gate Links
+- VEG ANNA AA01 Portal: https://github.com/agent-anna/anna-v2/blob/main/A1/v4/index.html
+- Promo Gate Bot Script: https://github.com/agent-anna/anna-v2/blob/main/A1/v4/promo-gate-bot.js
+- Latest Review HTML (Human Gate): https://github.com/agent-anna/anna-v2/blob/main/A1/promo-gate/latest-review.html
+- Latest Package JSON: https://github.com/agent-anna/anna-v2/blob/main/A1/promo-gate/latest-package.json
+- Build Daily Promo Script: https://github.com/agent-anna/anna-v2/blob/main/A1/promo-gate/build-daily-promo.js
+- Promo Gate Folder: https://github.com/agent-anna/anna-v2/tree/main/A1/promo-gate
+- Workflow & Runs (daily-song-promo.yml): https://github.com/agent-anna/anna-v2/actions/workflows/daily-song-promo.yml
