@@ -1071,9 +1071,9 @@
         const preferred = getActiveModel();
         const candidates = [
             preferred,
+            "MiniMaxAI/MiniMax-M2.7",
             "deepseek-ai/DeepSeek-V4-Flash-0731",
-            "zai-org/GLM-5.3-Flash",
-            "MiniMaxAI/MiniMax-M2.7"
+            "zai-org/GLM-5.3-Flash"
         ].filter((m, idx, arr) => m && arr.indexOf(m) === idx);
 
         let lastErr = null;
