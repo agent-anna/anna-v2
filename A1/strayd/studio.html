@@ -1,671 +1,701 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agent Anna • Organic Artwork + v4 + v3BIBLE Studio</title>
+  <title>A1 Shell • Agent Anna v4 Single Promoter Studio</title>
   <style>
-    :root { --bg:#0b0e14; --panel:#121722; --panel2:#182030; --text:#eef2f7; --muted:#9aa6bd; --border:rgba(255,255,255,0.12); --accent:#a3e635; --sky:#7dd3fc; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); padding:20px; }
-    .wrap { max-width:1180px; margin:0 auto; }
-    .hdr { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:14px; }
-    .hdr h1 { margin:0; font-size:1.25rem; }
-    .hdr .sub { color:var(--muted); font-size:0.84rem; }
+    :root {
+      --bg: #0b0e14;
+      --panel: #121722;
+      --panel-2: #182030;
+      --text: #eef2f7;
+      --muted: #9aa6bd;
+      --line: rgba(255, 255, 255, 0.12);
+      --accent: #a3e635;
+      --accent-ink: #071018;
+      --sky: #7dd3fc;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+      line-height: 1.45;
+    }
+    .container { max-width: 1180px; margin: 0 auto; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .topbar h1 { margin: 0; font-size: 1.25rem; }
+    .muted { color: var(--muted); font-size: 0.84rem; }
 
-    .hero-card { display:grid; grid-template-columns:196px 1fr; gap:18px; align-items:center; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:16px; }
-    @media (max-width:720px){ .hero-card { grid-template-columns:1fr; } }
-    .cd-cover { width:196px; max-width:100%; aspect-ratio:1/1; border-radius:12px; border:1px solid var(--border); overflow:hidden; background:#0d121b; display:flex; align-items:center; justify-content:center; }
-    .cd-cover img { width:100%; height:100%; object-fit:cover; display:block; }
-    .hero-title { font-size:1.2rem; font-weight:800; margin:4px 0 6px; }
-    .hero-meta { font-size:0.82rem; color:var(--muted); line-height:1.45; }
-    .pill { display:inline-block; font-size:0.72rem; padding:2px 8px; border-radius:999px; background:#0d121b; border:1px solid var(--border); color:var(--sky); margin-right:6px; margin-top:6px; }
+    .hero {
+      display: grid;
+      grid-template-columns: 196px 1fr;
+      gap: 18px;
+      align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 720px) { .hero { grid-template-columns: 1fr; } }
+    .sleeve {
+      width: 196px;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0d121b;
+      overflow: hidden;
+    }
+    .sleeve img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-title { font-size: 1.2rem; font-weight: 800; margin: 4px 0 6px; }
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #0d121b;
+      border: 1px solid var(--line);
+      color: var(--sky);
+      margin: 6px 6px 0 0;
+    }
 
-    .grid { display:grid; grid-template-columns:360px 1fr; gap:16px; align-items:start; }
-    @media (max-width:900px){ .grid { grid-template-columns:1fr; } }
-    .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; }
-    label { display:block; font-size:0.78rem; color:var(--muted); margin:10px 0 4px; }
-    input, select, textarea, button { width:100%; border-radius:8px; border:1px solid var(--border); background:#0d121b; color:var(--text); padding:9px 11px; font-size:0.88rem; }
-    textarea { min-height:88px; font-family:ui-monospace,Consolas,monospace; font-size:0.8rem; line-height:1.45; }
-    button { cursor:pointer; font-weight:700; background:var(--panel2); }
-    button.ok-btn { background:var(--accent); color:#071018; border:none; }
-    .mini-btn { width:auto; padding:6px 12px; font-size:0.78rem; margin-top:6px; margin-right:6px; }
-    .draft-box { background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; }
-    .draft-head { display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--sky); font-weight:700; margin-bottom:6px; }
-    .hint { font-size:0.74rem; color:var(--muted); margin-top:4px; word-break:break-word; }
+    .workspace {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .section-label { font-size: 0.78rem; font-weight: 700; color: var(--sky); margin-bottom: 6px; }
+    label { display: block; font-size: 0.78rem; color: var(--muted); margin: 10px 0 4px; }
+    input, select, textarea, button {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #0d121b;
+      color: var(--text);
+      padding: 9px 11px;
+      font-size: 0.88rem;
+    }
+    textarea {
+      min-height: 96px;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.48;
+    }
+    button { cursor: pointer; font-weight: 700; background: var(--panel-2); }
+    button.primary { background: var(--accent); color: var(--accent-ink); border: none; }
+    .copy-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; margin-top: 6px; }
+    .actions { display: grid; gap: 8px; margin-top: 12px; }
+
+    .channel {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .channel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--sky);
+      margin-bottom: 6px;
+    }
+    .stats { color: var(--muted); font-weight: 600; font-size: 0.75rem; white-space: nowrap; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="hdr">
+  <div class="container">
+    <header class="topbar">
       <div>
-        <h1>Agent Anna • Organic Artwork, v4 Core &amp; v3BIBLE Studio</h1>
-        <div class="sub">Reads cover sleeve pixels/palette + A1/v4 core + A1/docs/v3BIBLE (.md) • Realistic live-action only (no cartoon)</div>
+        <h1>A1 Shell • Agent Anna v4 Single Promoter Studio</h1>
+        <div class="muted">A1 shell around v4 core + external bible outside v4 • Realistic live-action only (zero cartoon)</div>
       </div>
-      <div class="sub" id="bootStatus">Anna reading v4 core, v3BIBLE &amp; sleeve art...</div>
-    </div>
+      <div class="muted" id="bootStatus">Booting A1 shell &amp; v4...</div>
+    </header>
 
-    <div class="hero-card">
-      <div class="cd-cover"><img id="artPreview" src="" alt="Martin Strayd Single Cover Art" /></div>
-      <div>
-        <div style="font-size:0.75rem;color:var(--sky);font-weight:700;letter-spacing:0.04em;">COVER SLEEVE &amp; LIVE VISUAL READOUT</div>
-        <div class="hero-title" id="heroSongTitle">Who Killed Fun (Pay the Rent)</div>
-        <div class="hero-meta" id="artMeta">Artwork file: loading...</div>
-        <div class="hero-meta" id="artReadout" style="margin-top:4px;">Pixel/color scan: pending sleeve load...</div>
-        <div class="hero-meta" id="liveBriefLine" style="margin-top:6px;">Visual rule: Strictly realistic live-action / documentary footage only (zero cartoon).</div>
-        <div id="sourceBadges"></div>
-      </div>
-    </div>
+    <main>
+      <section class="hero" aria-label="Active Single and Cover Sleeve">
+        <div class="sleeve">
+          <img id="artPreview" src="" alt="Martin Strayd Single Cover Sleeve" />
+        </div>
+        <div>
+          <div class="section-label">ACTIVE SINGLE &amp; SLEEVE BRIEF (A1 SHELL / ANNA V4)</div>
+          <div class="hero-title" id="heroTitle">Who Killed Fun (Pay the Rent)</div>
+          <div class="muted" id="artFileMeta">Cover sleeve: loading...</div>
+          <div class="muted" id="artScanMeta" style="margin-top:4px;">Visual scan: pending...</div>
+          <div class="muted" id="visualRuleMeta" style="margin-top:6px;">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
+          <div id="statusBadges"></div>
+        </div>
+      </section>
 
-    <div class="grid">
-      <div>
-        <div class="card">
-          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;">1. SINGLE, BIBLE &amp; AI SYNTHESIS CONTROLS</div>
+      <div class="workspace">
+        <aside>
+          <section class="card">
+            <div class="section-label">1. SINGLE &amp; WORKFLOW CONTROLS</div>
 
-          <label for="songPicker">Select Single (A–Z Catalog)</label>
-          <select id="songPicker"></select>
+            <label for="songPicker">Select Single (Catalog)</label>
+            <select id="songPicker"></select>
 
-          <label for="customSong">Or Type Song Title</label>
-          <input id="customSong" type="text" placeholder="Exact or partial song title..." />
+            <label for="customSong">Or Type Song Title</label>
+            <input id="customSong" type="text" placeholder="Song title..." />
 
-          <label for="dayAngle">Daily Rotation Focus</label>
-          <select id="dayAngle">
-            <option value="auto">Auto (Rotates by Day of Week)</option>
-            <option value="0">Day 1 • Visual &amp; Sonic Impact</option>
-            <option value="1">Day 2 • Lyrics &amp; Narrative Core</option>
-            <option value="2">Day 3 • Live-Action Scene &amp; Setting</option>
-            <option value="3">Day 4 • Direct MP3 + Sleeve Ownership</option>
-            <option value="4">Day 5 • Search &amp; AI Discovery</option>
-            <option value="5">Day 6 • Catalog &amp; Bible Context</option>
-            <option value="6">Day 7 • Rotation Spotlight</option>
-          </select>
+            <label for="rotationShift">Storytelling &amp; Rotation Angle</label>
+            <select id="rotationShift">
+              <option value="auto">Auto (Day of Week)</option>
+              <option value="0">01 • Hook &amp; Backstage Edge</option>
+              <option value="1">02 • Topic, Lyrics &amp; Tension</option>
+              <option value="2">03 • Live-Action Scene &amp; Mood</option>
+              <option value="3">04 • Own MP3 + Sleeve Bundle</option>
+              <option value="4">05 • Search &amp; AI Discovery</option>
+              <option value="5">06 • External Bible &amp; Story Pull</option>
+              <option value="6">07 • Weekly Spotlight Push</option>
+            </select>
 
-          <label for="gitbookUrl">GitBook Mirror URL (v3BIBLE)</label>
-          <input id="gitbookUrl" type="text" placeholder="Optional GitBook mirror URL for docs/v3BIBLE..." />
+            <label for="directLink">Direct MP3 + Cover Art Link</label>
+            <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
 
-          <label for="directLink">Direct MP3 + Cover Art Link</label>
-          <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
+            <label for="aiEndpoint">Optional AI Endpoint (JSON POST)</label>
+            <input id="aiEndpoint" type="text" placeholder="https://your-ai-endpoint.example/generate" />
 
-          <label for="aiEndpoint">Optional AI Synthesis Endpoint (JSON POST)</label>
-          <input id="aiEndpoint" type="text" placeholder="Optional LLM/worker URL accepting {context, song, art, bible}" />
+            <label for="webhookUrl">Optional Approval Webhook (After OK)</label>
+            <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
 
-          <label for="webhookUrl">Optional Approval Webhook (Fires Only After OK)</label>
-          <input id="webhookUrl" type="text" placeholder="https://hook.example.com/anna-ok" />
+            <div class="actions">
+              <button type="button" id="reloadBtn">Reload External Bible, Catalog &amp; Art</button>
+              <button type="button" id="generateBtn">Generate Channel Copy</button>
+              <button type="button" class="primary" id="approveBtn">OK To Post (Approve Single)</button>
+            </div>
+            <div class="muted" id="gateStatus" style="margin-top:8px;">ANNA Gate: Staged — waiting for your OK</div>
+          </section>
+        </aside>
 
-          <div style="margin-top:12px;display:grid;grid-template-columns:1fr;gap:8px;">
-            <button type="button" id="reloadKnowledgeBtn">Re-Read v4 Core, v3BIBLE &amp; Cover Art</button>
-            <button type="button" id="regenBtn">Synthesize From Artwork + Bible</button>
-            <button type="button" class="ok-btn" id="approveBtn">OK To Post (Approve Single)</button>
-          </div>
-          <div class="hint" id="gateStatus">Anna Gate: Staged — waiting for your OK</div>
+        <div>
+          <section class="card">
+            <div class="section-label">2. EXTERNAL BIBLE RECORD (OUTSIDE V4 CORE)</div>
+            <textarea id="bibleBox" readonly></textarea>
+          </section>
+
+          <section class="card">
+            <div class="section-label">3. PLATFORM DRAFTS BY AGENT ANNA (A1 SHELL)</div>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>TikTok • Hook + Topic/Lyrics/Sleeve Story + Discovery Tags</span>
+                <span class="stats" id="ttStats">0 words • 0 chars</span>
+              </div>
+              <textarea id="ttOut"></textarea>
+              <button type="button" class="copy-btn" data-copy="ttOut">Copy TikTok</button>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>Instagram • Lead Hook + Anna Story + Bundle CTA</span>
+                <span class="stats" id="igStats">0 words • 0 chars</span>
+              </div>
+              <textarea id="igOut"></textarea>
+              <button type="button" class="copy-btn" data-copy="igOut">Copy Instagram</button>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>YouTube Title (max 100 chars)</span>
+                <span class="stats" id="ytTitleStats">0 words • 0 chars</span>
+              </div>
+              <input id="ytTitleOut" type="text" maxlength="100" />
+              <div class="channel-head" style="margin-top:10px;">
+                <span>YouTube Description • Search Keywords + Story + Links</span>
+                <span class="stats" id="ytDescStats">0 words • 0 chars</span>
+              </div>
+              <textarea id="ytDescOut"></textarea>
+              <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
+              <button type="button" class="copy-btn" data-copy="ytDescOut">Copy YT Description</button>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>Facebook • Conversation &amp; Share Pitch</span>
+                <span class="stats" id="fbStats">0 words • 0 chars</span>
+              </div>
+              <textarea id="fbOut"></textarea>
+              <button type="button" class="copy-btn" data-copy="fbOut">Copy Facebook</button>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>X • Punchy Hook + Link + Tags</span>
+                <span class="stats" id="xStats">0 words • 0 chars</span>
+              </div>
+              <textarea id="xOut"></textarea>
+              <button type="button" class="copy-btn" data-copy="xOut">Copy X</button>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>4. Approved Payload JSON (Staged on OK To Post)</span>
+              </div>
+              <textarea id="payloadOut" readonly placeholder="Click OK To Post to build the approved payload..."></textarea>
+            </article>
+          </section>
         </div>
       </div>
-
-      <div>
-        <div class="card">
-          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:6px;">2. A1/V4 CORE &amp; V3BIBLE (.MD) EXTRACTED CONTEXT</div>
-          <textarea id="bibleStatusBox" readonly style="min-height:98px;"></textarea>
-        </div>
-
-        <div class="card">
-          <div style="font-size:0.78rem;color:var(--sky);font-weight:700;margin-bottom:10px;">3. CHANNEL DRAFTS BY AGENT ANNA</div>
-
-          <div class="draft-box">
-            <div class="draft-head"><span>TikTok — Hook + Keywords + Tags</span><span id="ttCount">0 chars</span></div>
-            <textarea id="ttOut"></textarea>
-            <button type="button" class="mini-btn" onclick="copyById('ttOut')">Copy TikTok</button>
-          </div>
-
-          <div class="draft-box">
-            <div class="draft-head"><span>Instagram — 125-Char Lead + Body + Tags</span><span id="igCount">0 chars</span></div>
-            <textarea id="igOut"></textarea>
-            <button type="button" class="mini-btn" onclick="copyById('igOut')">Copy Instagram</button>
-          </div>
-
-          <div class="draft-box">
-            <div class="draft-head"><span>YouTube Title (max 100 chars)</span><span id="ytTCount">0 chars</span></div>
-            <input id="ytTitleOut" type="text" />
-            <div class="draft-head" style="margin-top:10px;"><span>YouTube Description — Keywords First + Track/Bible Context + Tags</span><span id="ytDCount">0 chars</span></div>
-            <textarea id="ytDescOut"></textarea>
-            <button type="button" class="mini-btn" onclick="copyById('ytTitleOut')">Copy YT Title</button>
-            <button type="button" class="mini-btn" onclick="copyById('ytDescOut')">Copy YT Description</button>
-          </div>
-
-          <div class="draft-box">
-            <div class="draft-head"><span>Facebook — Manager Pitch for Replies &amp; Shares</span><span id="fbCount">0 chars</span></div>
-            <textarea id="fbOut"></textarea>
-            <button type="button" class="mini-btn" onclick="copyById('fbOut')">Copy Facebook</button>
-          </div>
-
-          <div class="draft-box">
-            <div class="draft-head"><span>X — Punchline + Link + Tags</span><span id="xCount">0 chars</span></div>
-            <textarea id="xOut"></textarea>
-            <button type="button" class="mini-btn" onclick="copyById('xOut')">Copy X</button>
-          </div>
-
-          <div class="draft-box">
-            <div class="draft-head"><span>4. Approved Payload JSON (Staged on OK To Post)</span></div>
-            <textarea id="payloadOut" readonly placeholder="Click OK To Post to generate Anna's approved dispatch payload..."></textarea>
-          </div>
-        </div>
-      </div>
-    </div>
+    </main>
   </div>
 
   <script>
-  (function(){
-    var catalog = [];
-    var repoTree = [];
-    var v4Core = { sources: [], directives: [] };
-    var bibleCache = {};
-    var artCache = {};
-    var synthRun = 1;
+  (() => {
+    const REPO_API_TREE = "https://api.github.com/repos/agent-anna/anna-v2/git/trees/main?recursive=1";
+    const RAW_BASE = "https://raw.githubusercontent.com/agent-anna/anna-v2/main/";
+    const CATALOG_URLS = ["./strayd-artist-live.json", `${RAW_BASE}A1/strayd/strayd-artist-live.json`];
 
-    var currentItem = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
-    var currentBible = { found: false, path: "", raw: "", lyrics: [], location: "", links: [], management: "" };
-    var currentArt = { analyzed: false, tone: "balanced", saturation: "moderate", warmth: "neutral", summary: "sleeve pending scan" };
+    let catalog = [];
+    let externalBiblePaths = [];
+    const bibleCache = new Map();
+    const artCache = new Map();
+    let runCounter = 1;
+    let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "", url: "" };
+    let activeArt = { summary: "sleeve scan pending" };
+    let activeBible = { found: false, path: "", lines: [], raw: "" };
 
-    var REPO_API_TREE = "https://api.github.com/repos/agent-anna/anna-v2/git/trees/main?recursive=1";
-    var RAW_BASE = "https://raw.githubusercontent.com/agent-anna/anna-v2/main/";
+    const $ = (id) => document.getElementById(id);
+    const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
 
-    window.copyById = function(id){
-      var el = document.getElementById(id);
-      if (!el) return;
-      el.focus();
-      el.select();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(el.value).catch(function(){});
-      }
+    const countWords = (text) => {
+      const cleaned = nonEmpty(text).replace(/https?:\/\/\S+/g, " ").replace(/#\S+/g, " ").trim();
+      return cleaned ? cleaned.split(/\s+/).length : 0;
     };
 
-    function s(v, fb){
-      return (typeof v === "string" && v.trim().length > 0) ? v.trim() : (fb || "");
-    }
-
-    function norm(str){
-      return s(str, "")
+    const normalizeKey = (str) =>
+      nonEmpty(str)
         .toLowerCase()
         .replace(/^martin strayd\s*-\s*/i, "")
         .replace(/\.[a-z0-9]+$/i, "")
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
+
+    async function fetchFirstText(urls) {
+      for (const url of urls) {
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          if (res.ok) return { url, text: await res.text() };
+        } catch (_) {}
+      }
+      return null;
     }
 
-    function slugifyTitle(str){
-      return s(str, "single")
-        .replace(/^martin strayd\s*-\s*/i, "")
-        .replace(/\.[a-z0-9]+$/i, "")
-        .trim()
-        .replace(/[^a-zA-Z0-9 _()-]+/g, "")
-        .replace(/\s+/g, "-");
-    }
-
-    function fetchTextAny(urls){
-      return new Promise(function(resolve){
-        var i = 0;
-        function next(){
-          if (i >= urls.length) return resolve(null);
-          var u = urls[i++];
-          fetch(u, { cache: "no-store" }).then(function(r){
-            if (!r.ok) throw new Error(r.status);
-            return r.text();
-          }).then(function(t){
-            resolve({ url: u, text: t });
-          }).catch(next);
-        }
-        next();
-      });
-    }
-
-    // Read A1/v4 core files so Agent Anna adapts to v4 character/rules dynamically
-    function loadV4Core(){
-      var candidates = [
-        "../v4/v4.js",
-        "../v4/index.html",
-        RAW_BASE + "A1/v4/v4.js",
-        RAW_BASE + "A1/v4/index.html"
-      ];
-      return fetchTextAny(candidates).then(function(res){
-        if (res && typeof res.text === "string"){
-          v4Core.sources.push(res.url);
-          var lines = res.text.split(/\r?\n/);
-          v4Core.directives = lines.filter(function(ln){
-            var clean = ln.trim();
-            return clean.length > 10 && clean.length < 180 && /anna|strayd|rule|system|character|manager|promote/i.test(clean);
-          }).slice(0, 6);
-        }
-      });
-    }
-
-    function extractSection(md, headingPat){
-      var m = s(md, "").match(new RegExp("##\\s*(?:" + headingPat + ")[^\\n]*\\n([\\s\\S]*?)(?=\\n##\\s|$)", "i"));
-      return m && m[1] ? m[1].trim() : "";
-    }
-
-    function parseBibleMarkdown(mdText){
-      var clean = s(mdText, "").replace(/\r\n/g, "\n").trim();
-      if (!clean) return { found: false, raw: "", lyrics: [], location: "", links: [], management: "" };
-
-      var lyricsSec = extractSection(clean, "lyrics?");
-      var locSec = extractSection(clean, "location[^\\n]*|scene[^\\n]*");
-      var linksSec = extractSection(clean, "links?[^\\n]*|ecosystem[^\\n]*");
-      var mgmtSec = extractSection(clean, "anna\\s*management|management");
-
-      var lyrics = lyricsSec.split("\n")
-        .map(function(l){ return l.replace(/^[\s>*\-"]+|["]+$/g, "").trim(); })
-        .filter(function(l){ return l && !/^\[.*\]$/.test(l) && l.length >= 8; });
-
-      var location = locSec.replace(/^[\s>*\-]+/gm, "").replace(/\*\*[^*]+\*\*:\s*/g, "").trim();
-      var links = (linksSec.match(/https?:\/\/[^\s)>\]]+/g) || []);
-      var management = mgmtSec.replace(/^[\s>*\-]+/gm, "").replace(/\*\*[^*]+\*\*:\s*/g, "").trim();
-
-      return {
-        found: true,
-        raw: clean,
-        lyrics: lyrics,
-        location: location,
-        links: links,
-        management: management
-      };
-    }
-
-    function loadBibleForSong(title){
-      var t = s(title, "Single");
-      var key = norm(t);
-      if (bibleCache[key]) return Promise.resolve(bibleCache[key]);
-
-      var slug = slugifyTitle(t);
-      var candidates = [
-        "../docs/v3BIBLE/" + encodeURIComponent(t) + ".md",
-        "../docs/v3BIBLE/" + encodeURIComponent(slug) + ".md",
-        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(t) + ".md",
-        RAW_BASE + "A1/docs/v3BIBLE/" + encodeURIComponent(slug) + ".md"
-      ];
-      repoTree.forEach(function(node){
-        if (node && node.path && /v3bible/i.test(node.path) && /\.md$/i.test(node.path)){
-          var base = node.path.split("/").pop().replace(/\.md$/i, "");
-          var nb = norm(base);
-          if (nb === key || (key.length > 5 && nb.indexOf(key) !== -1)){
-            candidates.unshift(RAW_BASE + node.path);
+    // Index external bible/song records under A1 outside A1/v4 so v4 core stays unbloated
+    async function loadExternalBibleIndex() {
+      try {
+        const res = await fetch(REPO_API_TREE, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.tree)) {
+            externalBiblePaths = data.tree
+              .filter((n) => n && n.type === "blob" && n.path && /^A1\//i.test(n.path) && !/^A1\/v4\//i.test(n.path) && !/^A1\/v3\//i.test(n.path) && (/bible/i.test(n.path) || /\.md$/i.test(n.path)))
+              .map((n) => n.path);
           }
         }
-      });
-
-      return fetchTextAny(candidates).then(function(res){
-        var parsed = res && res.text ? parseBibleMarkdown(res.text) : { found: false, raw: "", lyrics: [], location: "", links: [], management: "" };
-        parsed.path = res ? s(res.url, "") : "";
-        bibleCache[key] = parsed;
-        return parsed;
-      });
+      } catch (_) {}
     }
 
-    // Actually inspect artwork image pixels/luminance/saturation/warmth via canvas
-    function analyzeArtworkImage(url){
-      var u = s(url, "");
-      if (!u) return Promise.resolve({ analyzed: false, tone: "balanced", saturation: "moderate", warmth: "neutral", summary: "no sleeve image url" });
-      if (artCache[u]) return Promise.resolve(artCache[u]);
+    function parseExternalMarkdown(mdText) {
+      const clean = nonEmpty(mdText).replace(/\r\n/g, "\n");
+      const lines = clean
+        .split("\n")
+        .map((l) => l.replace(/^[\s>#*\-]+/, "").trim())
+        .filter((l) =>
+          l.length >= 10 &&
+          !/^---+$/.test(l) &&
+          !/^\[.*\]$/.test(l) &&
+          !/^(title|artist|cover art|location|visual direction|band \/ catalog|direct bundle link|anna v4 id|promoter & manager|rollout notes|song length|tunecore)/i.test(l)
+        );
+      return { found: true, lines, raw: clean };
+    }
 
-      return new Promise(function(resolve){
-        var probe = new Image();
-        probe.crossOrigin = "anonymous";
-        probe.onload = function(){
+    async function loadExternalSongBible(title) {
+      const key = normalizeKey(title);
+      if (bibleCache.has(key)) return bibleCache.get(key);
+
+      const candidates = [];
+      for (const p of externalBiblePaths) {
+        const base = p.split("/").pop().replace(/\.md$/i, "");
+        if (normalizeKey(base) === key) {
+          candidates.push(`${RAW_BASE}${p}`);
+        }
+      }
+
+      const hit = await fetchFirstText(candidates);
+      const record = hit && hit.text
+        ? { ...parseExternalMarkdown(hit.text), path: hit.url }
+        : { found: false, path: "", lines: [], raw: "" };
+
+      bibleCache.set(key, record);
+      return record;
+    }
+
+    function analyzeSleeve(url) {
+      const cleanUrl = nonEmpty(url);
+      if (!cleanUrl) return Promise.resolve({ summary: "no cover art URL" });
+      if (artCache.has(cleanUrl)) return Promise.resolve(artCache.get(cleanUrl));
+
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
           try {
-            var c = document.createElement("canvas");
-            c.width = 48;
-            c.height = 48;
-            var ctx = c.getContext("2d");
-            ctx.drawImage(probe, 0, 0, 48, 48);
-            var px = ctx.getImageData(0, 0, 48, 48).data;
+            const canvas = document.createElement("canvas");
+            canvas.width = 48;
+            canvas.height = 48;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, 48, 48);
+            const data = ctx.getImageData(0, 0, 48, 48).data;
 
-            var lumSum = 0, satSum = 0, warmSum = 0, count = 0;
-            for (var i = 0; i < px.length; i += 4){
-              var r = px[i], g = px[i+1], b = px[i+2];
-              var max = Math.max(r, g, b), min = Math.min(r, g, b);
-              var lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-              var sat = max === 0 ? 0 : (max - min) / max;
-              lumSum += lum;
-              satSum += sat;
-              warmSum += (r - b) / 255;
-              count++;
+            let lumTotal = 0, satTotal = 0, warmTotal = 0, pixels = 0;
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i], g = data[i + 1], b = data[i + 2];
+              const max = Math.max(r, g, b), min = Math.min(r, g, b);
+              lumTotal += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+              satTotal += max === 0 ? 0 : (max - min) / max;
+              warmTotal += (r - b) / 255;
+              pixels++;
             }
-            var avgLum = lumSum / Math.max(1, count);
-            var avgSat = satSum / Math.max(1, count);
-            var avgWarm = warmSum / Math.max(1, count);
 
-            var tone = avgLum < 0.34 ? "dark-shadowed" : (avgLum > 0.66 ? "bright-exposed" : "midtone-balanced");
-            var saturation = avgSat > 0.42 ? "high-saturation" : (avgSat < 0.16 ? "desaturated-gritty" : "moderately-toned");
-            var warmth = avgWarm > 0.08 ? "warm-amber/red" : (avgWarm < -0.08 ? "cool-blue/slate" : "neutral-palette");
-            var summary = tone + ", " + saturation + ", " + warmth + " sleeve";
+            const lum = lumTotal / Math.max(1, pixels);
+            const sat = satTotal / Math.max(1, pixels);
+            const warm = warmTotal / Math.max(1, pixels);
 
-            var out = { analyzed: true, tone: tone, saturation: saturation, warmth: warmth, summary: summary };
-            artCache[u] = out;
-            resolve(out);
-          } catch (e) {
-            var fallback = { analyzed: false, tone: "balanced", saturation: "moderate", warmth: "neutral", summary: "cross-origin sleeve (" + u.split("/").pop() + ")" };
-            artCache[u] = fallback;
+            const tone = lum < 0.34 ? "dark-shadowed" : lum > 0.66 ? "bright-exposed" : "midtone-balanced";
+            const chroma = sat > 0.42 ? "high-saturation" : sat < 0.16 ? "muted-gritty" : "moderate-color";
+            const temp = warm > 0.08 ? "warm-leaning" : warm < -0.08 ? "cool-leaning" : "neutral-balance";
+
+            const result = { summary: `${tone}, ${chroma}, ${temp} cover art` };
+            artCache.set(cleanUrl, result);
+            resolve(result);
+          } catch (_) {
+            const fallback = { summary: `cover sleeve (${cleanUrl.split("/").pop()})` };
+            artCache.set(cleanUrl, fallback);
             resolve(fallback);
           }
         };
-        probe.onerror = function(){
-          resolve({ analyzed: false, tone: "balanced", saturation: "moderate", warmth: "neutral", summary: "sleeve image unavailable" });
-        };
-        probe.src = u;
+        img.onerror = () => resolve({ summary: "cover sleeve image pending" });
+        img.src = cleanUrl;
       });
     }
 
-    function extractKeywords(title, bible){
-      var stop = { "the":1,"and":1,"for":1,"with":1,"from":1,"into":1,"your":1,"you":1,"are":1,"a":1,"an":1,"to":1,"of":1,"in":1,"on":1,"at":1,"is":1,"it":1,"my":1,"me":1,"pay":1 };
-      var combined = s(title, "") + " " + s(bible && bible.location, "") + " " + ((bible && bible.lyrics) ? bible.lyrics.join(" ") : "");
-      var freq = {};
-      combined.toLowerCase().replace(/[^a-z0-9\s]+/g, " ").split(/\s+/).forEach(function(w){
-        if (w.length >= 3 && !stop[w] && !/^\[/.test(w)){
-          freq[w] = (freq[w] || 0) + 1;
-        }
-      });
-      return Object.keys(freq).sort(function(a,b){ return freq[b] - freq[a]; }).slice(0, 4);
+    function extractKeywords(title, bibleRec) {
+      const stop = new Set(["the", "and", "for", "with", "from", "into", "your", "you", "are", "a", "an", "to", "of", "in", "on", "at", "is", "it"]);
+      const corpus = `${nonEmpty(title)} ${(bibleRec && bibleRec.lines ? bibleRec.lines.slice(0, 4).join(" ") : "")}`;
+      const freq = {};
+      corpus
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]+/g, " ")
+        .split(/\s+/)
+        .forEach((w) => {
+          if (w.length >= 3 && !stop.has(w)) freq[w] = (freq[w] || 0) + 1;
+        });
+      return Object.keys(freq).sort((a, b) => freq[b] - freq[a]).slice(0, 4);
     }
 
-    function buildTags(title, kws, shiftNum){
-      var pool = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter", "#IndependentMusic", "#OriginalMusic"];
-      (kws || []).forEach(function(w){
-        var cw = s(w, "");
-        if (cw) pool.unshift("#" + cw.charAt(0).toUpperCase() + cw.slice(1));
-      });
-      var out = [];
-      var start = Math.abs(Number(shiftNum) || 0);
-      for (var i = 0; i < pool.length && out.length < 4; i++){
-        var tag = pool[(start + i) % pool.length];
-        if (out.indexOf(tag) === -1) out.push(tag);
+    function buildTags(keywords, shift) {
+      const defaults = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter", "#IndependentMusic", "#OriginalMusic"];
+      const topicTags = keywords.map((w) => `#${w.charAt(0).toUpperCase()}${w.slice(1)}`);
+      const pool = [...topicTags, ...defaults];
+      const tags = [];
+      const start = Math.abs(Number(shift) || 0);
+      for (let i = 0; i < pool.length && tags.length < 4; i++) {
+        const tag = pool[(start + i) % pool.length];
+        if (!tags.includes(tag)) tags.push(tag);
       }
-      return out.join(" ");
+      return tags.join(" ");
     }
 
-    // Pure live-signal synthesis from artwork analysis + song title + v3BIBLE (no hardcoded pitch arrays)
-    function synthesizeOrganicCopy(item, bible, artInfo, link, gbUrl, dayIdx, runNum){
-      var title = s(item && item.title, "Martin Strayd Single");
-      var url = s(link, "https://www.paypal.com/paypalme/martinstrayd");
-      var gb = s(gbUrl, "");
-      var kws = extractKeywords(title, bible);
-      var kwLine = kws.length ? kws.join(" ") : title.toLowerCase();
-      var tags = buildTags(title, kws, dayIdx + runNum);
+    function buildChannelDrafts(track, artSummary, bibleRec, link, shift, seed) {
+      const title = nonEmpty(track.title, "Martin Strayd Single");
+      const url = nonEmpty(link, "https://www.paypal.com/paypalme/martinstrayd");
+      const keywords = extractKeywords(title, bibleRec);
+      const topicPhrase = keywords.length ? keywords.join(" ") : title.toLowerCase();
+      const tags = buildTags(keywords, shift + seed);
+      const shortTags = tags.split(/\s+/).slice(0, 2).join(" ");
 
-      var hasLyric = !!(bible && Array.isArray(bible.lyrics) && bible.lyrics.length);
-      var lyricLine = hasLyric ? bible.lyrics[(dayIdx + runNum) % bible.lyrics.length] : "";
+      const lyricLine = bibleRec && Array.isArray(bibleRec.lines) && bibleRec.lines.length
+        ? bibleRec.lines[(Math.abs(shift) + seed) % bibleRec.lines.length].slice(0, 110)
+        : "";
 
-      var rawLoc = s(bible && bible.location, "");
-      var hasLoc = rawLoc.length > 0 && !/\[add live-action location\]/i.test(rawLoc);
-      var locLine = hasLoc ? rawLoc.split("\n")[0].slice(0, 90) : "";
-
-      var visualCue = s(artInfo && artInfo.summary, "sleeve visual");
-      var focusIndex = (dayIdx + runNum) % 5;
-
-      var leadFragment = "";
-      if (focusIndex === 0){
-        leadFragment = "Looking at the " + visualCue + " for \"" + title + "\" — Agent Anna puts Martin Strayd forward on " + kwLine + ".";
-      } else if (focusIndex === 1 && lyricLine){
-        leadFragment = "\"" + lyricLine + "\" — Agent Anna spotlighting \"" + title + "\" by Martin Strayd (" + kwLine + ").";
-      } else if (focusIndex === 2 && locLine){
-        leadFragment = "Set around " + locLine + " (" + visualCue + ") — Agent Anna backing \"" + title + "\" by Martin Strayd.";
-      } else if (focusIndex === 3){
-        leadFragment = "Agent Anna pushing \"" + title + "\" by Martin Strayd (" + visualCue + ") so listeners own the MP3 + sleeve directly.";
+      const mode = (Math.abs(shift) + seed) % 4;
+      let storyAngle = "";
+      if (mode === 0) {
+        storyAngle = `Agent Anna operating inside the A1 shell with v4 core—pushing "${title}" by Martin Strayd alongside ${artSummary} around ${topicPhrase} with real weight rather than polite filler.`;
+      } else if (mode === 1) {
+        storyAngle = `Agent Anna putting "${title}" in front of listeners chasing ${topicPhrase} (${artSummary})${lyricLine ? `—from external bible notes: "${lyricLine}"` : ""}.`;
+      } else if (mode === 2) {
+        storyAngle = `Agent Anna framing "${title}" around ${artSummary} and strictly realistic live-action cinematography—zero cartoon shortcuts, focused straight on ${topicPhrase}.`;
       } else {
-        leadFragment = "Search & discovery angle on \"" + title + "\" by Martin Strayd — " + kwLine + " (" + visualCue + "), managed by Agent Anna.";
+        storyAngle = `Why Agent Anna is backing "${title}" today: real ${topicPhrase} edge (${artSummary}) meant to be owned as MP3 + cover sleeve, not rented.`;
       }
 
-      var tiktok = leadFragment + " Direct MP3 + cover art: " + url + " " + tags;
+      const tiktok = `Agent Anna on "${title}" by Martin Strayd—${storyAngle} Direct MP3 + sleeve: ${url} ${tags}`;
+      const instagram = `"${title}" — Martin Strayd. ${storyAngle} Own the MP3 + cover art: ${url} ${tags}`;
+      const ytTitle = `${title} — Martin Strayd (${topicPhrase} | Agent Anna)`.slice(0, 100);
+      const ytDesc = `${topicPhrase} — "${title}" by Martin Strayd, promoted by Agent Anna (A1 shell + v4 core).\n\n${storyAngle}\nVisual law: Strictly realistic live-action cinematography only (zero cartoon).\nDirect MP3 + sleeve: ${url}\n\n${tags}`;
+      const facebook = `Agent Anna here—${storyAngle} What hits you first on "${title}"? Grab the MP3 + cover art direct: ${url}`;
+      const x = `"${title}" — Martin Strayd (${topicPhrase}). ${storyAngle} ${url} ${shortTags}`;
 
-      var igLead = "\"" + title + "\" by Martin Strayd — " + visualCue + ", pushed by Agent Anna.";
-      var instagram = igLead + (lyricLine ? (" Lyric pull: \"" + lyricLine + "\".") : (" Themes: " + kwLine + ".")) + " Own MP3 + sleeve: " + url + " " + tags;
-
-      var ytTitle = (title + " — Martin Strayd (" + kwLine + " | Agent Anna)").slice(0, 100);
-
-      var ytDesc = kwLine + " — \"" + title + "\" by Martin Strayd, managed & promoted by Agent Anna.\n" +
-        "Cover sleeve read: " + visualCue + " (live-action / documentary visual direction only).\n" +
-        (lyricLine ? ("Lyrics from v3BIBLE: \"" + lyricLine + "\"\n") : "") +
-        (locLine ? ("Location notes: " + locLine + "\n") : "") +
-        "Direct MP3 + cover art: " + url +
-        "\nBand & catalog: https://strayd.com/band" +
-        (gb ? ("\nv3BIBLE / GitBook mirror: " + gb) : "") +
-        "\n\n" + tags;
-
-      var facebook = "Agent Anna managing Martin Strayd's single \"" + title + "\" (" + visualCue + "). " +
-        (lyricLine ? ("\"" + lyricLine + "\" — ") : ("Focused on " + kwLine + " — ")) +
-        "where does this track land for you? MP3 + cover art direct: " + url;
-
-      var shortTags = tags.split(/\s+/).slice(0, 2).join(" ");
-      var xPost = "\"" + title + "\" — Martin Strayd (" + visualCue + " • " + kwLine + ") " + url + " " + shortTags;
-
-      return {
-        tiktok: tiktok,
-        instagram: instagram,
-        ytTitle: ytTitle,
-        ytDesc: ytDesc,
-        facebook: facebook,
-        x: xPost
-      };
+      return { tiktok, instagram, ytTitle, ytDesc, facebook, x };
     }
 
-    function applyDraftsToUI(gen){
-      document.getElementById("ttOut").value = gen.tiktok;
-      document.getElementById("igOut").value = gen.instagram;
-      document.getElementById("ytTitleOut").value = gen.ytTitle;
-      document.getElementById("ytDescOut").value = gen.ytDesc;
-      document.getElementById("fbOut").value = gen.facebook;
-      document.getElementById("xOut").value = gen.x;
-      updateCounts();
+    function updateStats() {
+      const pairs = [
+        ["ttOut", "ttStats"],
+        ["igOut", "igStats"],
+        ["ytTitleOut", "ytTitleStats"],
+        ["ytDescOut", "ytDescStats"],
+        ["fbOut", "fbStats"],
+        ["xOut", "xStats"]
+      ];
+      for (const [inputId, statId] of pairs) {
+        const val = nonEmpty($(inputId).value);
+        $(statId).textContent = `${countWords(val)} words • ${val.length} chars`;
+      }
     }
 
-    function runSynthesis(){
-      var custom = document.getElementById("customSong").value.trim();
-      var picked = document.getElementById("songPicker").value.trim();
-      var rawTitle = custom || picked || currentItem.title;
-      var n = norm(rawTitle);
-      var found = catalog.find(function(x){ return norm(x.title) === n; }) ||
-                  catalog.find(function(x){ var t = norm(x.title); return t.indexOf(n) !== -1 || n.indexOf(t) !== -1; }) ||
-                  null;
+    function applyDrafts(drafts) {
+      $("ttOut").value = drafts.tiktok;
+      $("igOut").value = drafts.instagram;
+      $("ytTitleOut").value = drafts.ytTitle;
+      $("ytDescOut").value = drafts.ytDesc;
+      $("fbOut").value = drafts.facebook;
+      $("xOut").value = drafts.x;
+      updateStats();
+    }
 
-      currentItem = found || { title: rawTitle, filename: rawTitle + ".png", url: currentItem.url || "" };
-      document.getElementById("heroSongTitle").textContent = currentItem.title;
-      document.getElementById("artMeta").textContent = "Artwork file: " + s(currentItem.filename, "Catalog sleeve");
-      document.getElementById("liveBriefLine").textContent = "Visual rule: Strictly realistic live-action / documentary footage only (zero cartoon) for \"" + currentItem.title + "\".";
+    function renderBadges() {
+      const hasAi = Boolean(nonEmpty($("aiEndpoint").value));
+      $("statusBadges").innerHTML = [
+        `<span class="badge">Shell: A1 + Lean v4 Core</span>`,
+        `<span class="badge">External Bible: ${activeBible.found ? "Loaded" : "Standby"}</span>`,
+        `<span class="badge">${hasAi ? "AI Endpoint Linked" : "Local Sleeve + Bible Synth"}</span>`
+      ].join("");
+    }
 
-      var img = document.getElementById("artPreview");
-      if (currentItem.url && img){
-        img.src = currentItem.url;
-        img.alt = currentItem.title;
+    async function generateAll() {
+      const typed = nonEmpty($("customSong").value);
+      const selected = nonEmpty($("songPicker").value);
+      const queryTitle = typed || selected || activeTrack.title;
+      const key = normalizeKey(queryTitle);
+
+      const matched =
+        catalog.find((item) => normalizeKey(item.title) === key) ||
+        catalog.find((item) => {
+          const itemKey = normalizeKey(item.title);
+          return key && (itemKey.includes(key) || key.includes(itemKey));
+        });
+
+      activeTrack = matched || { title: queryTitle, filename: `${queryTitle}.png`, url: activeTrack.url || "" };
+      $("heroTitle").textContent = activeTrack.title;
+      $("artFileMeta").textContent = `Cover sleeve: ${nonEmpty(activeTrack.filename, "Catalog sleeve")}`;
+      $("visualRuleMeta").textContent = `Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration) for "${activeTrack.title}".`;
+
+      if (activeTrack.url && $("artPreview").src !== activeTrack.url) {
+        $("artPreview").src = activeTrack.url;
+        $("artPreview").alt = activeTrack.title;
       }
 
-      var link = document.getElementById("directLink").value.trim() || "https://www.paypal.com/paypalme/martinstrayd";
-      var gb = document.getElementById("gitbookUrl").value.trim();
-      var dSel = document.getElementById("dayAngle").value;
-      var dayIdx = (dSel === "auto") ? new Date().getDay() : (parseInt(dSel, 10) || 0);
+      const [bibleRec, sleeveInfo] = await Promise.all([
+        loadExternalSongBible(activeTrack.title),
+        analyzeSleeve(activeTrack.url)
+      ]);
 
-      return Promise.all([
-        loadBibleForSong(currentItem.title),
-        analyzeArtworkImage(currentItem.url)
-      ]).then(function(resPair){
-        currentBible = resPair[0] || { found: false, path: "", raw: "", lyrics: [], location: "", links: [], management: "" };
-        currentArt = resPair[1] || { analyzed: false, summary: "sleeve scan pending" };
+      activeBible = bibleRec;
+      activeArt = sleeveInfo;
+      renderBadges();
 
-        document.getElementById("artReadout").textContent = "Artwork scan: " + currentArt.summary;
-        document.getElementById("bibleStatusBox").value = currentBible.found
-          ? ("v3BIBLE .md: " + currentBible.path + "\n" + s(currentBible.raw, "").slice(0, 340))
-          : ("v3BIBLE .md not yet populated for \"" + currentItem.title + "\" (" + slugifyTitle(currentItem.title) + ".md). Synthesizing from cover art + title + A1/v4 core.");
+      $("artScanMeta").textContent = `Visual scan: ${activeArt.summary}`;
+      $("bibleBox").value = activeBible.found
+        ? `External bible: ${activeBible.path}\n\n${activeBible.raw.slice(0, 420)}`
+        : `Bible stays outside v4 core so Anna v4 stays lean. Add/update song notes in external A1 bible docs anytime.`;
 
-        var localGen = synthesizeOrganicCopy(currentItem, currentBible, currentArt, link, gb, dayIdx, synthRun);
-        applyDraftsToUI(localGen);
+      const shiftVal = $("rotationShift").value === "auto" ? new Date().getDay() : (parseInt($("rotationShift").value, 10) || 0);
+      const link = nonEmpty($("directLink").value, "https://www.paypal.com/paypalme/martinstrayd");
 
-        var aiUrl = document.getElementById("aiEndpoint").value.trim();
-        if (aiUrl && typeof fetch === "function"){
-          return fetch(aiUrl, {
+      const drafts = buildChannelDrafts(activeTrack, activeArt.summary, activeBible, link, shiftVal, runCounter);
+      applyDrafts(drafts);
+
+      const aiUrl = nonEmpty($("aiEndpoint").value);
+      if (aiUrl) {
+        try {
+          const resp = await fetch(aiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              manager: "Agent Anna",
-              v4Sources: v4Core.sources,
-              song: currentItem,
-              artworkAnalysis: currentArt,
-              bible: currentBible,
-              link: link,
-              gitbookMirror: gb,
-              dayIndex: dayIdx,
-              visualRule: "Realistic live-action / documentary only (no cartoon)"
+              shell: "A1",
+              agent: "Agent Anna",
+              core: "v4 (lean)",
+              track: activeTrack,
+              artwork: activeArt,
+              externalBible: activeBible.found ? activeBible.path : null,
+              link,
+              shift: shiftVal,
+              visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)"
             })
-          }).then(function(r){ return r.ok ? r.json() : null; })
-            .then(function(aiData){
-              if (aiData && (aiData.tiktok || aiData.instagram || aiData.ytTitle || aiData.ytDesc || aiData.facebook || aiData.x)){
-                applyDraftsToUI({
-                  tiktok: s(aiData.tiktok, localGen.tiktok),
-                  instagram: s(aiData.instagram, localGen.instagram),
-                  ytTitle: s(aiData.ytTitle, localGen.ytTitle).slice(0, 100),
-                  ytDesc: s(aiData.ytDesc, localGen.ytDesc),
-                  facebook: s(aiData.facebook, localGen.facebook),
-                  x: s(aiData.x, localGen.x)
-                });
-              }
-            }).catch(function(){});
-        }
-      });
-    }
-
-    function updateCounts(){
-      [
-        ["ttOut", "ttCount"],
-        ["igOut", "igCount"],
-        ["ytTitleOut", "ytTCount"],
-        ["ytDescOut", "ytDCount"],
-        ["fbOut", "fbCount"],
-        ["xOut", "xCount"]
-      ].forEach(function(p){
-        var a = document.getElementById(p[0]);
-        var b = document.getElementById(p[1]);
-        if (a && b) b.textContent = s(a.value, "").length + " chars";
-      });
-    }
-
-    function renderBadges(){
-      var box = document.getElementById("sourceBadges");
-      if (!box) return;
-      var bibleCount = repoTree.filter(function(x){ return x && x.path && /v3bible/i.test(x.path) && /\.md$/i.test(x.path); }).length;
-      var gb = document.getElementById("gitbookUrl").value.trim();
-      var ai = document.getElementById("aiEndpoint").value.trim();
-      box.innerHTML =
-        '<span class="pill">A1/v4 Core: ' + (v4Core.sources.length ? "Loaded" : "Active") + '</span>' +
-        '<span class="pill">v3BIBLE .md files: ' + bibleCount + '</span>' +
-        '<span class="pill">Art + Bible Synth: Active</span>' +
-        '<span class="pill">' + (ai ? "AI Endpoint Linked" : "Local Signal Synth") + '</span>' +
-        (gb ? '<span class="pill">GitBook Mirror Linked</span>' : '<span class="pill">GitBook Mirror: A1/docs/v3BIBLE</span>');
-    }
-
-    function boot(){
-      fetch(REPO_API_TREE, { cache: "no-store" })
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .then(function(tData){
-          if (tData && Array.isArray(tData.tree)) repoTree = tData.tree;
-          return loadV4Core();
-        })
-        .catch(function(){ return loadV4Core(); })
-        .then(function(){
-          renderBadges();
-          return fetchTextAny(["./strayd-artist-live.json", RAW_BASE + "A1/strayd/strayd-artist-live.json"]).then(function(res){
-            if (!res || !res.text) return;
-            var d = JSON.parse(res.text);
-            var list = (d && d.files_and_folders) || [];
-            catalog = list
-              .filter(function(f){ return f && f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename); })
-              .map(function(f){
-                return { title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.png$/i, "").trim(), filename: f.filename, url: f.url };
-              });
-            var sel = document.getElementById("songPicker");
-            sel.innerHTML = "";
-            catalog.forEach(function(item){
-              var opt = document.createElement("option");
-              opt.value = item.title;
-              opt.textContent = item.title;
-              sel.appendChild(opt);
-            });
-            var pref = catalog.find(function(x){ return /who killed fun/i.test(x.title); }) || catalog[0];
-            if (pref){
-              currentItem = pref;
-              sel.value = pref.title;
-            }
-            document.getElementById("bootStatus").textContent = "Anna ready • " + catalog.length + " songs • Organic art + bible active";
           });
-        })
-        .then(runSynthesis);
+          if (resp.ok) {
+            const aiOut = await resp.json();
+            applyDrafts({
+              tiktok: nonEmpty(aiOut.tiktok, drafts.tiktok),
+              instagram: nonEmpty(aiOut.instagram, drafts.instagram),
+              ytTitle: nonEmpty(aiOut.ytTitle, drafts.ytTitle).slice(0, 100),
+              ytDesc: nonEmpty(aiOut.ytDesc, drafts.ytDesc),
+              facebook: nonEmpty(aiOut.facebook, drafts.facebook),
+              x: nonEmpty(aiOut.x, drafts.x)
+            });
+          }
+        } catch (_) {}
+      }
     }
 
-    document.getElementById("reloadKnowledgeBtn").addEventListener("click", function(){
-      bibleCache = {};
-      artCache = {};
-      synthRun++;
-      boot();
-    });
-    document.getElementById("songPicker").addEventListener("change", function(){
-      document.getElementById("customSong").value = "";
-      synthRun++;
-      runSynthesis();
-    });
-    document.getElementById("customSong").addEventListener("input", function(){
-      synthRun++;
-      runSynthesis();
-    });
-    document.getElementById("dayAngle").addEventListener("change", function(){
-      synthRun++;
-      runSynthesis();
-    });
-    document.getElementById("gitbookUrl").addEventListener("input", function(){
+    async function boot() {
+      await loadExternalBibleIndex();
+      const catHit = await fetchFirstText(CATALOG_URLS);
+      if (catHit && catHit.text) {
+        try {
+          const parsed = JSON.parse(catHit.text);
+          const files = Array.isArray(parsed.files_and_folders) ? parsed.files_and_folders : [];
+          catalog = files
+            .filter((f) => f && f.filename && /\.png$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename))
+            .map((f) => ({
+              title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.png$/i, "").trim(),
+              filename: f.filename,
+              url: f.url
+            }));
+
+          const picker = $("songPicker");
+          picker.innerHTML = "";
+          for (const item of catalog) {
+            const opt = document.createElement("option");
+            opt.value = item.title;
+            opt.textContent = item.title;
+            picker.appendChild(opt);
+          }
+
+          const preferred = catalog.find((item) => /who killed fun/i.test(item.title)) || catalog[0];
+          if (preferred) {
+            activeTrack = preferred;
+            picker.value = preferred.title;
+          }
+        } catch (_) {}
+      }
+
       renderBadges();
-      runSynthesis();
-    });
-    document.getElementById("aiEndpoint").addEventListener("input", function(){
-      renderBadges();
-    });
-    document.getElementById("regenBtn").addEventListener("click", function(){
-      synthRun++;
-      runSynthesis();
-    });
-    document.getElementById("directLink").addEventListener("input", runSynthesis);
-    ["ttOut","igOut","ytTitleOut","ytDescOut","fbOut","xOut"].forEach(function(id){
-      document.getElementById(id).addEventListener("input", updateCounts);
+      $("bootStatus").textContent = `A1 shell + Anna v4 ready • ${catalog.length} songs`;
+      await generateAll();
+    }
+
+    document.querySelectorAll("[data-copy]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = $(btn.dataset.copy);
+        if (!target) return;
+        target.focus();
+        target.select();
+        navigator.clipboard?.writeText(target.value).catch(() => {});
+      });
     });
 
-    document.getElementById("approveBtn").addEventListener("click", function(){
-      var payload = {
-        manager: "Agent Anna",
-        ecosystem: "Agent Anna (A1 / A1/v4 + docs/v3BIBLE)",
-        gitbookMirror: document.getElementById("gitbookUrl").value.trim(),
-        v3BibleSource: currentBible.found ? currentBible.path : "title_and_cover_art_fallback",
-        artworkAnalysis: currentArt,
+    $("reloadBtn").addEventListener("click", async () => {
+      bibleCache.clear();
+      artCache.clear();
+      runCounter++;
+      await boot();
+    });
+    $("generateBtn").addEventListener("click", () => {
+      runCounter++;
+      generateAll();
+    });
+    $("songPicker").addEventListener("change", () => {
+      $("customSong").value = "";
+      runCounter++;
+      generateAll();
+    });
+    $("customSong").addEventListener("input", () => {
+      runCounter++;
+      generateAll();
+    });
+    $("rotationShift").addEventListener("change", () => {
+      runCounter++;
+      generateAll();
+    });
+    $("directLink").addEventListener("input", generateAll);
+    $("aiEndpoint").addEventListener("input", renderBadges);
+    ["ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
+      $(id).addEventListener("input", updateStats);
+    });
+
+    $("approveBtn").addEventListener("click", async () => {
+      const payload = {
+        shell: "A1",
+        agent: "Agent Anna",
+        core: "v4 (lean)",
+        externalBibleSource: activeBible.found ? activeBible.path : null,
         approved: true,
         approvedAt: new Date().toISOString(),
         artist: "Martin Strayd",
-        song: currentItem.title,
-        artworkUrl: currentItem.url,
-        visualRule: "Realistic live-action / documentary only (no cartoon)",
-        link: document.getElementById("directLink").value.trim(),
-        tiktok: document.getElementById("ttOut").value,
-        instagram: document.getElementById("igOut").value,
-        ytTitle: document.getElementById("ytTitleOut").value,
-        ytDesc: document.getElementById("ytDescOut").value,
-        facebook: document.getElementById("fbOut").value,
-        x: document.getElementById("xOut").value
+        song: activeTrack.title,
+        artworkUrl: activeTrack.url,
+        artworkScan: activeArt.summary,
+        visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)",
+        link: nonEmpty($("directLink").value),
+        tiktok: $("ttOut").value,
+        instagram: $("igOut").value,
+        ytTitle: $("ytTitleOut").value,
+        ytDesc: $("ytDescOut").value,
+        facebook: $("fbOut").value,
+        x: $("xOut").value
       };
-      document.getElementById("payloadOut").value = JSON.stringify(payload, null, 2);
-      var gate = document.getElementById("gateStatus");
-      gate.textContent = "Anna Gate: OK APPROVED (" + payload.song + ")";
-      gate.style.color = "#a3e635";
+      $("payloadOut").value = JSON.stringify(payload, null, 2);
+      const gate = $("gateStatus");
+      gate.textContent = `ANNA Gate: OK APPROVED (${payload.song})`;
+      gate.style.color = "var(--accent)";
 
-      var wh = document.getElementById("webhookUrl").value.trim();
-      if (wh && typeof fetch === "function"){
-        fetch(wh, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-          .then(function(r){ gate.textContent = "Anna Gate: OK APPROVED + WEBHOOK SENT (HTTP " + r.status + ")"; })
-          .catch(function(err){ gate.textContent = "Anna Gate: OK APPROVED (Webhook error: " + err.message + ")"; });
+      const webhook = nonEmpty($("webhookUrl").value);
+      if (webhook) {
+        try {
+          const r = await fetch(webhook, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          gate.textContent = `ANNA Gate: OK APPROVED + WEBHOOK (HTTP ${r.status})`;
+        } catch (err) {
+          gate.textContent = `ANNA Gate: OK APPROVED (Webhook error: ${err.message})`;
+        }
       }
     });
 
     boot();
-    runSynthesis();
   })();
   </script>
 </body>
