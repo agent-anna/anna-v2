@@ -6,7 +6,7 @@
     const WORKSPACE_ROOT = "A1/v4";
     const SCRAPE_WORKFLOW_FILE = "aa01-intel-feed.yml";
     const DAHL_ENDPOINT = "https://inference.dahl.global/v1/chat/completions";
-    const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7";
+    const DEFAULT_MODEL = "deepseek-ai/DeepSeek-V4-Flash-0731";
     const DAHL_TIMEOUT_MS = 30000;
     const MAX_CONTEXT_CHARS = 3500;
 
@@ -978,10 +978,7 @@
         return clean(rawText);
     }
 
-    async function callDahlDirect(messages, onProgress = null) {
-        const apiKey = getCleanDahlKey();
-        if (!apiKey) throw new Error("Dahl API key missing. Open KEYS to save it.");
-
+    async function callDahlSingleModel(modelName, apiKey, messages, onProgress = null) {
         const startedAt = performance.now();
         let ttftMs = null;
 
@@ -996,7 +993,7 @@
                     "Authorization": `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: getActiveModel(),
+                    model: modelName,
                     stream: true,
                     messages
                 }),
@@ -1009,7 +1006,9 @@
                 try { errJson = JSON.parse(rawErr); } catch (e) {}
                 const detail = errJson && errJson.error ? (errJson.error.message || JSON.stringify(errJson.error)) : rawErr.slice(0, 200);
                 const elapsedMs = Math.round(performance.now() - startedAt);
-                throw new Error(`DAHL HTTP ${response.status} (${elapsedMs}ms): ${detail}`);
+                const err = new Error(`DAHL HTTP ${response.status} [${modelName}] (${elapsedMs}ms): ${detail}`);
+                err.status = response.status;
+                throw err;
             }
 
             const contentType = response.headers.get("content-type") || "";
@@ -1020,7 +1019,7 @@
                 let json = null;
                 try { json = JSON.parse(rawText); } catch (e) {}
                 const text = extractDahlReply(json, rawText) || "Ready.";
-                return { text, ttftMs, totalMs, status: response.status };
+                return { text, ttftMs, totalMs, status: response.status, model: modelName };
             }
 
             const reader = response.body.getReader();
@@ -1050,7 +1049,7 @@
                             assembled += delta;
                             const cleanPreview = stripModelStrings(assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").trim());
                             if (typeof onProgress === "function" && cleanPreview) {
-                                onProgress(cleanPreview, ttftMs, Math.round(performance.now() - startedAt));
+                                onProgress(cleanPreview, ttftMs, Math.round(performance.now() - startedAt), modelName);
                             }
                         }
                     } catch (e) {}
@@ -1060,16 +1059,50 @@
             const totalMs = Math.round(performance.now() - startedAt);
             ttftMs = ttftMs ?? totalMs;
             const cleanFinal = stripModelStrings(assembled.replace(/<think>[\s\S]*?<\/think>/gi, "").trim()) || "Ready.";
-            return { text: cleanFinal, ttftMs, totalMs, status: response.status };
+            return { text: cleanFinal, ttftMs, totalMs, status: response.status, model: modelName };
         } catch (err) {
             const elapsedMs = Math.round(performance.now() - startedAt);
             if (err && err.name === "AbortError") {
-                throw new Error(`DAHL TIMEOUT after ${elapsedMs}ms (limit ${DAHL_TIMEOUT_MS}ms)`);
+                throw new Error(`DAHL TIMEOUT [${modelName}] after ${elapsedMs}ms (limit ${DAHL_TIMEOUT_MS}ms)`);
             }
-            throw new Error(`${err && err.message ? err.message : "Dahl request failed."} (${elapsedMs}ms)`);
+            const wrapped = new Error(`${err && err.message ? err.message : "Dahl request failed."} (${elapsedMs}ms)`);
+            if (err && err.status) wrapped.status = err.status;
+            throw wrapped;
         } finally {
             clearTimeout(timer);
         }
+    }
+
+    async function callDahlDirect(messages, onProgress = null) {
+        const apiKey = getCleanDahlKey();
+        if (!apiKey) throw new Error("Dahl API key missing. Open KEYS to save it.");
+
+        const preferred = getActiveModel();
+        const candidates = [
+            preferred,
+            "deepseek-ai/DeepSeek-V4-Flash-0731",
+            "zai-org/GLM-5.3-Flash",
+            "MiniMaxAI/MiniMax-M2.7"
+        ].filter((m, idx, arr) => m && arr.indexOf(m) === idx);
+
+        let lastErr = null;
+        for (let i = 0; i < candidates.length; i++) {
+            const candidate = candidates[i];
+            try {
+                return await callDahlSingleModel(candidate, apiKey, messages, onProgress);
+            } catch (err) {
+                lastErr = err;
+                const isConcurrency429 = err && (err.status === 429 || String(err.message || "").includes("HTTP 429"));
+                if (isConcurrency429 && i < candidates.length - 1) {
+                    if (typeof onProgress === "function") {
+                        onProgress(`Model ${candidate} busy (429), switching to ${candidates[i + 1]}...`, 0, 0, candidates[i + 1]);
+                    }
+                    continue;
+                }
+                throw err;
+            }
+        }
+        throw lastErr || new Error("Dahl request failed.");
     }
 
     async function auditActiveFile() {
@@ -1295,15 +1328,15 @@
                     { role: "system", content: systemPrompt },
                     ...chatHistory.slice(-3)
                 ],
-                (liveText, liveTtft, liveElapsed) => {
+                (liveText, liveTtft, liveElapsed, liveModel) => {
                     setMoodState("responding");
-                    updateMessage(assistantMsgId, `${liveText}\n\n[TTFT: ${liveTtft}ms | ${liveElapsed}ms streaming]`);
+                    updateMessage(assistantMsgId, `${liveText}\n\n[${liveModel || getActiveModel()} | TTFT: ${liveTtft}ms | ${liveElapsed}ms streaming]`);
                 }
             );
 
             const reply = typeof result === "string" ? result : result.text;
             const timingTag = typeof result === "object" && result
-                ? `\n\n[HTTP ${result.status} | TTFT: ${result.ttftMs}ms | Total: ${result.totalMs}ms]`
+                ? `\n\n[${result.model || getActiveModel()} | HTTP ${result.status} | TTFT: ${result.ttftMs}ms | Total: ${result.totalMs}ms]`
                 : "";
 
             setMoodState("responding");
