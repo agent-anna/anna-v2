@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENT ANNA V3 // A1 WORKBENCH</title>
+    <title>AGENT ANNA V4 // A1 WORKBENCH</title>
     <style>
         :root {
             --bg-void: #05080f;
@@ -378,7 +378,7 @@
     <div class="app-shell">
         <header class="top-bar">
             <div class="top-left">
-                <span id="state-text" class="status-badge">STANDBY // AGENT ANNA V3</span>
+                <span id="state-text" class="status-badge">STANDBY // AGENT ANNA V4</span>
                 <span id="vault-status" class="status-badge">V3 FILES: 0 (CTX: 0)</span>
                 <span id="key-status" class="status-badge err">KEY: MISSING</span>
             </div>
@@ -403,9 +403,9 @@
         </section>
 
         <div class="main-workbench">
-            <aside class="left-panel" aria-label="A1/v3 File Tree and Editor">
+            <aside class="left-panel" aria-label="A1/v4 File Tree and Editor">
                 <div class="panel-header">
-                    <span>A1/v3 WORKSPACE</span>
+                    <span>A1/v4 WORKSPACE</span>
                     <div style="display:flex;gap:6px;flex-wrap:wrap;">
                         <button id="view-toggle-btn" class="action-chip" onclick="window.toggleViewMode()">VIEW: TREE</button>
                         <button class="action-chip" onclick="window.syncAll()">SYNC</button>
@@ -415,11 +415,11 @@
                     </div>
                 </div>
 
-                <div id="repo-tree-view" role="tree" aria-label="A1/v3 file tree"></div>
-                <div id="repo-file-grid" role="list" aria-label="A1/v3 file grid"></div>
+                <div id="repo-tree-view" role="tree" aria-label="A1/v4 file tree"></div>
+                <div id="repo-file-grid" role="list" aria-label="A1/v4 file grid"></div>
 
                 <div class="editor-box">
-                    <input id="active-file-path" type="text" placeholder="Active file path inside A1/v3/...">
+                    <input id="active-file-path" type="text" placeholder="Active file path inside A1/v4/...">
                     <div id="delete-warning-banner">
                         <span id="delete-warning-text">DELETE FILE PERMANENTLY?</span>
                         <div style="display:flex;gap:6px;">
@@ -434,7 +434,7 @@
 
             <main class="right-console" aria-label="Agent Anna Console">
                 <div class="panel-header">
-                    <span>CONSOLE // AGENT ANNA V3</span>
+                    <span>CONSOLE // AGENT ANNA V4</span>
                     <div style="display:flex;gap:6px;">
                         <button class="action-chip" onclick="window.triggerAutonomousBootSequence()">AWAKEN</button>
                         <button class="action-chip" onclick="window.clearLogs()">CLEAR</button>
@@ -446,12 +446,12 @@
                 <div class="quick-bar">
                     <button class="action-chip" onclick="window.fetchLatestBackendReport(true)">READ LAST LOG</button>
                     <button class="action-chip" onclick="window.dispatchScrapeWorkflow('https://martinstrayd.github.io/artist/', 'strayd-artist-live', 'url')">RUN ARTIST FEED</button>
-                    <button class="action-chip" onclick="window.triggerPreset('Summarize all files currently loaded in your A1/v3 context.')">SUMMARIZE V3</button>
+                    <button class="action-chip" onclick="window.triggerPreset('Summarize all files currently loaded in your A1/v4 context.')">SUMMARIZE V3</button>
                 </div>
 
                 <div class="input-bar">
                     <button id="mic-btn" class="action-chip" onclick="window.toggleMicrophone()" aria-label="Toggle Microphone">MIC</button>
-                    <input id="user-input" type="text" placeholder="Ask Anna about A1/v3, memory, tasks, or logs..." onkeydown="window.handleKey(event)">
+                    <input id="user-input" type="text" placeholder="Ask Anna about A1/v4, memory, tasks, or logs..." onkeydown="window.handleKey(event)">
                     <button class="action-chip swallow-btn" onclick="window.sendMessage()">SEND</button>
                 </div>
             </main>
