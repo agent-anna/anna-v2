@@ -127,8 +127,16 @@
       "status": "FALLBACK_VERIFIED",
       "log_file": "A1/v3/logs/aa01-v3-exec-2026-11-21T01-03-00-446Z.md",
       "notes": "API Network Exception: This operation was aborted"
+    },
+    {
+      "date": "2026-11-21T12:51:11.315Z",
+      "workspace": "A1/v3",
+      "action": "scheduled_or_default_audit",
+      "status": "FALLBACK_VERIFIED",
+      "log_file": "A1/v3/logs/aa01-v3-exec-2026-11-21T12-51-11-306Z.md",
+      "notes": "Dahl API Error [HTTP 503]: {\"error\":{\"message\":\"no escrow capacity\"}}\n"
     }
   ],
   "workspace": "A1/v3",
-  "last_updated": "2026-11-21T01:03:00.451Z"
+  "last_updated": "2026-11-21T12:51:11.315Z"
 }
