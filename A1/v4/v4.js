@@ -147,19 +147,26 @@
         applyPulseCadence((sel && sel.value) || "1");
     }
 
+    let ephemeralVisionMeta = null;
+
     function loadSeeOnlyImageFile(file) {
         if (!file || !file.type || !file.type.startsWith("image/")) return;
         const reader = new FileReader();
         reader.onload = () => {
             ephemeralVisionDataUrl = String(reader.result || "");
+            ephemeralVisionMeta = {
+                name: file.name || "vision-upload.png",
+                type: file.type || "image/png",
+                size: file.size || 0
+            };
             const preview = document.getElementById("media-preview-container");
             const meta = document.getElementById("v4-vision-meta");
             if (preview) {
                 preview.style.display = "flex";
-                preview.innerHTML = `<img src="${ephemeralVisionDataUrl}" alt="See-only session image: ${file.name}">`;
+                preview.innerHTML = `<img src="${ephemeralVisionDataUrl}" alt="See-only session image: ${ephemeralVisionMeta.name}">`;
             }
             if (meta) {
-                meta.textContent = `In-memory see-only image: ${file.name} (${Math.round(file.size / 1024)} KB) — never written to Git.`;
+                meta.textContent = `Session image loaded: ${ephemeralVisionMeta.name} (${Math.round(ephemeralVisionMeta.size / 1024)} KB) — in RAM until saved to Git or cleared.`;
             }
         };
         reader.readAsDataURL(file);
@@ -167,6 +174,7 @@
 
     function clearSeeOnlyVision() {
         ephemeralVisionDataUrl = null;
+        ephemeralVisionMeta = null;
         const inputEl = document.getElementById("v4-vision-file");
         const preview = document.getElementById("media-preview-container");
         const meta = document.getElementById("v4-vision-meta");
@@ -176,6 +184,87 @@
             preview.style.display = "none";
         }
         if (meta) meta.textContent = "Memory buffer: cleared.";
+    }
+
+    async function saveVisionImageToRepo() {
+        const metaEl = document.getElementById("v4-vision-meta");
+        if (!ephemeralVisionDataUrl || !ephemeralVisionDataUrl.includes(",")) {
+            if (metaEl) metaEl.textContent = "No session image loaded in memory to save.";
+            return;
+        }
+        const token = getCleanGitHubToken();
+        if (!token) { toggleSettings(); return; }
+
+        const rawName = (ephemeralVisionMeta && ephemeralVisionMeta.name) || "vision-image.png";
+        const safeName = rawName.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const pathEl = document.getElementById("active-file-path");
+        const customPath = pathEl && pathEl.value.trim() ? pathEl.value.trim() : "";
+        const targetPath = customPath && /\.(png|jpg|jpeg|gif|webp|svg|avif)$/i.test(customPath)
+            ? customPath
+            : `${WORKSPACE_ROOT}/vision/uploads/${Date.now()}-${safeName}`;
+
+        if (!isInV4Scope(targetPath)) {
+            if (metaEl) metaEl.textContent = `Blocked: ${targetPath} is outside ${WORKSPACE_ROOT}/.`;
+            return;
+        }
+
+        const base64Payload = ephemeralVisionDataUrl.split(",")[1] || "";
+        if (!base64Payload) {
+            if (metaEl) metaEl.textContent = "Invalid image data in session buffer.";
+            return;
+        }
+
+        setMoodState("saving");
+        try {
+            let existingSha = null;
+            try {
+                const checkRes = await fetchWithTimeout(
+                    `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${targetPath}?ref=${encodeURIComponent(activeBranch)}`,
+                    { headers: getGitHubHeaders(), cache: "no-store" },
+                    10000
+                );
+                if (checkRes.ok) {
+                    const checkData = await checkRes.json();
+                    existingSha = checkData && checkData.sha ? checkData.sha : null;
+                }
+            } catch (e) {}
+
+            const body = {
+                message: `feat(v4-vision): save session image to ${targetPath}`,
+                content: base64Payload,
+                branch: activeBranch
+            };
+            if (existingSha) body.sha = existingSha;
+
+            const putRes = await fetchWithTimeout(
+                `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${targetPath}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        ...getGitHubHeaders(),
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                },
+                15000
+            );
+
+            if (!putRes.ok) {
+                const errTxt = await putRes.text();
+                throw new Error(`HTTP ${putRes.status}: ${errTxt.slice(0, 160)}`);
+            }
+
+            appendMessage("System Telemetry", `VISION SAVED: ${targetPath} committed to ${GITHUB_REPO_NAME} (${activeBranch}).`, "msg_vis_save_" + Date.now(), false);
+            if (metaEl) metaEl.textContent = `Saved to Git: ${targetPath}`;
+            speakText(`Saved ${safeName} to repository.`);
+            await fetchRepoTree();
+        } catch (err) {
+            const errMsg = err && err.message ? err.message : "Vision save failed.";
+            if (metaEl) metaEl.textContent = `Save failed: ${errMsg}`;
+            appendMessage("System Telemetry", `VISION SAVE FAILED: ${errMsg}`, "msg_vis_err_" + Date.now(), false);
+        } finally {
+            setMoodState("standby");
+        }
     }
 
     function setActionsStatus(label, statusClass) {
@@ -1316,16 +1405,20 @@ function registerCreatedMarkdownFile(path, content) {
 }
 
 function getAgentAnnaVoiceHeader(bypassMode = false) {
+    const capabilityLedger =
+        "CAPABILITIES & BOUNDARIES: You run in the V4 cockpit (A1/v4) with Dahl chat/audit, GitHub file sync/edit/commit/delete via PAT, browser TTS (SPEAK/STFU when supported), and session image inspection with optional SAVE TO REPO into A1/v4/vision/uploads/. Heavy project data belongs outside A1/v4 (such as A1/strayd/ and planned A1/dispatch-social/ + repo-root workflows). State honestly when a feature is external or not yet built; never claim TTS is missing or invent unbuilt tools.";
     if (bypassMode) {
         return (
             "You are AGENT ANNA V4 (AA01) inside A1/v4.\n" +
             "VOICE: Sharp, calm, direct, zero fluff, military-grade clarity.\n" +
+            capabilityLedger + "\n" +
             "RULES: Reply immediately and concisely. Never read markdown or code blocks aloud."
         );
     }
     return (
         "You are AGENT ANNA V4 (AA01) inside A1/v4 of agent-anna/anna-v2.\n" +
         "VOICE: Sharp, calm, composed, tactical, zero fluff, zero filler.\n" +
+        capabilityLedger + "\n" +
         "RULES: V4 state lives in A1/v4/memory/brain.json, A1/v4/memory/memory.json, and A1/v4/memory.json (code in A1/v4/functions/). Reach for requested files/layers on demand without bloating normal replies; never invent missing files or live web facts; never read code blocks aloud."
     );
 }
@@ -1725,6 +1818,7 @@ async function sendMessage() {
     window.updateRoomDecor = updateRoomDecor;
     window.updatePulseCadence = updatePulseCadence;
     window.clearSeeOnlyVision = clearSeeOnlyVision;
+    window.saveVisionImageToRepo = saveVisionImageToRepo;
     window.triggerAutonomousBootSequence = triggerAutonomousBootSequence;
     window.toggleFolderRowEl = toggleFolderRowEl;
     window.toggleVoice = toggleVoice;
