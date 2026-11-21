@@ -1430,6 +1430,121 @@ function searchOfflineWorld(promptText) {
 }
 // === ANNA V4.0 BYPASS & OFFLINE WORLD SEARCH END ===
 
+// === ANNA V4.0 PILLARS & GITBOOK MIRROR START ===
+const annaGitbookState = {
+    pages: [],
+    index: 0
+};
+
+function parsePillarPayload(rawText) {
+    if (typeof rawText !== "string" || !rawText.trim()) {
+        return { ok: false, parsed: null, raw: "" };
+    }
+    const trimmed = rawText.trim();
+    try {
+        return { ok: true, parsed: JSON.parse(trimmed), raw: trimmed };
+    } catch {
+        return { ok: false, parsed: null, raw: trimmed.slice(0, 600) };
+    }
+}
+
+function getCorePillarsContext(promptText) {
+    const q = String(promptText || "").trim().toLowerCase();
+    const asksBrain = /\bbrain(\.json)?\b/.test(q);
+    const asksMemory = /\bmemory(\.json)?\b/.test(q);
+    const asksPillars = /\bpillars?\b|\bcore\b/.test(q);
+
+    if (!asksBrain && !asksMemory && !asksPillars) return "";
+
+    const vault = (typeof repoVaultFiles === "object" && repoVaultFiles) ? repoVaultFiles : {};
+    const sections = [];
+
+    if (asksBrain || asksPillars) {
+        const bRaw = vault["A1/v4/memory/brain.json"] || "";
+        const bInfo = parsePillarPayload(bRaw);
+        sections.push(
+            bInfo.ok
+                ? `[PILLAR: brain.json]\n${JSON.stringify(bInfo.parsed, null, 2).slice(0, 1200)}`
+                : `[PILLAR: brain.json (RAW/UNPARSED)]\n${bInfo.raw || "(not loaded in session vault yet)"}`
+        );
+    }
+
+    if (asksMemory || asksPillars) {
+        const m1Raw = vault["A1/v4/memory/memory.json"] || "";
+        const m0Raw = vault["A1/v4/memory.json"] || "";
+        const m1Info = parsePillarPayload(m1Raw);
+        const m0Info = parsePillarPayload(m0Raw);
+
+        if (m1Info.ok) {
+            sections.push(`[PILLAR: memory/memory.json]\n${JSON.stringify(m1Info.parsed, null, 2).slice(0, 1200)}`);
+        } else if (m1Info.raw) {
+            sections.push(`[PILLAR: memory/memory.json (RAW/UNPARSED)]\n${m1Info.raw}`);
+        }
+
+        if (m0Info.ok) {
+            sections.push(`[PILLAR: memory.json]\n${JSON.stringify(m0Info.parsed, null, 2).slice(0, 1000)}`);
+        } else if (m0Info.raw) {
+            sections.push(`[PILLAR: memory.json (RAW/UNPARSED)]\n${m0Info.raw}`);
+        }
+
+        if (!m1Info.raw && !m0Info.raw) {
+            sections.push("[PILLAR: memory.json]\n(not loaded in session vault yet)");
+        }
+    }
+
+    return sections.join("\n\n");
+}
+
+function getGitbookMirrorPages() {
+    const vault = (typeof repoVaultFiles === "object" && repoVaultFiles) ? repoVaultFiles : {};
+    const orderedPaths = [
+        "A1/v4/docs/agent-anna-docs/landing-page/README.md",
+        "A1/v4/docs/agent-anna-docs/landing-page/SUMMARY.md",
+        "A1/v4/docs/agent-anna-docs/landing-page/01-the-roots.md",
+        "A1/v4/docs/agent-anna-docs/landing-page/02-the-trunk.md",
+        "A1/v4/docs/agent-anna-docs/landing-page/03-the-branches.md",
+        "A1/v4/docs/agent-anna-docs/landing-page/04-tree-of-life.md",
+        "A1/v4/docs/00-anna-bible-index.md"
+    ];
+
+    const pages = [];
+    for (const p of orderedPaths) {
+        if (typeof vault[p] === "string" && vault[p].trim()) {
+            pages.push({ path: p, content: vault[p] });
+        }
+    }
+    annaGitbookState.pages = pages;
+    return pages;
+}
+
+function flipGitbookPage(delta = 1) {
+    const pages = annaGitbookState.pages.length ? annaGitbookState.pages : getGitbookMirrorPages();
+    if (!pages.length) return null;
+    annaGitbookState.index = (annaGitbookState.index + delta + pages.length) % pages.length;
+    return {
+        pageNumber: annaGitbookState.index + 1,
+        totalPages: pages.length,
+        page: pages[annaGitbookState.index]
+    };
+}
+
+function getGitbookMirrorContext(promptText) {
+    const q = String(promptText || "").trim().toLowerCase();
+    if (!/\b(gitbook|bible|handbook|flip\s*page|next\s*page|prev\s*page|docs\/)\b/.test(q)) {
+        return "";
+    }
+    const pages = getGitbookMirrorPages();
+    if (!pages.length) {
+        return "[GITBOOK_MIRROR]\nMirror pages are on-demand and not loaded yet. Run SYNC if you need to pull A1/v4/docs/ pages.";
+    }
+    if (/\bprev\s*page\b/.test(q)) flipGitbookPage(-1);
+    else if (/\bnext\s*page\b/.test(q)) flipGitbookPage(1);
+
+    const cur = pages[annaGitbookState.index] || pages[0];
+    return `[GITBOOK_MIRROR (Page ${annaGitbookState.index + 1}/${pages.length}: ${cur.path})]\n${cur.content.slice(0, 1400)}`;
+}
+// === ANNA V4.0 PILLARS & GITBOOK MIRROR END ===
+
 async function sendMessage() {
         const input = document.getElementById("user-input");
         const prompt = input ? input.value.trim() : "";
