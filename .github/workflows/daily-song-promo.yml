@@ -1,1 +1,29 @@
-
+name: Daily Song Promo Gate
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        required: true
+        default: "PREPARE_DAILY"
+      task_id:
+        required: false
+        default: ""
+      note:
+        required: false
+        default: ""
+permissions:
+  contents: write
+jobs:
+  promo-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - env:
+          PROMO_MODE: ${{ github.event.inputs.mode }}
+          PROMO_TASK_ID: ${{ github.event.inputs.task_id }}
+          PROMO_NOTE: ${{ github.event.inputs.note }}
+        run: node A1/promo-gate/build-daily-promo.js
+      - run: git config user.name "agent-anna-bot" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com" && git add A1/strayd/promo-queue.json A1/promo-gate/latest-package.json A1/promo-gate/latest-review.html && (git diff --cached --quiet || (git commit -m "chore(promo-gate): ${{ github.event.inputs.mode }}" && git push))
