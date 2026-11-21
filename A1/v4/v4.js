@@ -1563,7 +1563,9 @@ async function sendMessage() {
             const voiceHeader = getAgentAnnaVoiceHeader(bypassMode);
             const offlineHits = bypassMode ? "" : searchOfflineWorld(prompt);
             const vaultContext = bypassMode ? "" : getCompactVaultContext(prompt);
-            const systemPrompt = [voiceHeader, vaultContext, offlineHits].filter(Boolean).join("\n\n");
+            const pillarContext = bypassMode ? "" : getCorePillarsContext(prompt);
+            const gitbookContext = bypassMode ? "" : getGitbookMirrorContext(prompt);
+            const systemPrompt = [voiceHeader, vaultContext, pillarContext, offlineHits, gitbookContext].filter(Boolean).join("\n\n");
 
             const result = await callDahlDirect(
                 [
