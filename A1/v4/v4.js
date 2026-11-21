@@ -1565,13 +1565,13 @@ async function sendMessage() {
                 ],
                 (liveText, liveTtft, liveElapsed, liveModel) => {
                     setMoodState("responding");
-                    updateMessage(assistantMsgId, `${liveText}\n\n[${liveModel || getActiveModel()} | TTFT: ${liveTtft}ms | ${liveElapsed}ms streaming]`);
+                    updateMessage(assistantMsgId, `${liveText}\n\n[Anna v4 | TTFT: ${liveTtft}ms | ${liveElapsed}ms streaming]`);
                 }
             );
 
             const reply = typeof result === "string" ? result : result.text;
             const timingTag = typeof result === "object" && result
-                ? `\n\n[${result.model || getActiveModel()} | HTTP ${result.status} | TTFT: ${result.ttftMs}ms | Total: ${result.totalMs}ms]`
+                ? `\n\n[Anna v4 | HTTP ${result.status} | TTFT: ${result.ttftMs}ms | Total: ${result.totalMs}ms]`
                 : "";
 
             setMoodState("responding");
