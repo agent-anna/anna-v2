@@ -221,7 +221,7 @@
     <header class="topbar">
       <div>
         <h1>A1 Shell • Agent Anna v4 Studio</h1>
-        <div class="muted">Martin Strayd • Dahl AI + GitHub PAT • Strictly realistic live-action only (zero cartoon)</div>
+        <div class="muted">Agent Anna DJ &amp; Catalog Desk • Martin Strayd • Tree: A1/strayd + A1/promo-gate + docs/1 v4BIBLE • Live-Action Only (Zero Cartoon)</div>
       </div>
       <div class="muted" id="bootStatus">Initializing...</div>
     </header>
@@ -232,10 +232,10 @@
           <img id="artPreview" src="" alt="Martin Strayd Cover Sleeve" />
         </div>
         <div>
-          <div class="eyebrow">Featured Sleeve &amp; Campaign Brief</div>
+          <div class="eyebrow">365-Day Catalog &amp; Campaign Brief (A1 Sidecar to V4)</div>
           <div class="hero-title" id="heroTitle">Who Killed Fun (Pay the Rent)</div>
           <div class="hero-meta" id="artFileMeta">Artwork: loading catalog...</div>
-          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: preparing shot &amp; mood brief...</div>
+          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: awaiting AI generation from brain.json, song notes &amp; keywords...</div>
           <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="badges" id="statusBadges"></div>
           <div class="muted" id="engineModeMeta" style="margin-top:8px;">Copy engine: Ready</div>
@@ -246,7 +246,7 @@
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="card-title">1. Track &amp; Engine Controls</div>
+            <div class="card-title">1. Track &amp; AI Engine Controls</div>
 
             <label for="songPicker">Select Single</label>
             <select id="songPicker"></select>
@@ -254,19 +254,19 @@
             <label for="customSong">Custom Song Title Override</label>
             <input id="customSong" type="text" placeholder="Type a title or leave blank..." />
 
-            <label for="keywordsInput">Priority Keywords, Trends &amp; Playlists</label>
-            <input id="keywordsInput" type="text" placeholder="e.g. indie rock, late night drive, direct mp3, live room..." />
+            <label for="keywordsInput">SEO Keywords, Trends &amp; Playlists</label>
+            <input id="keywordsInput" type="text" placeholder="e.g. indie rock, late night drive, direct mp3, kunda cafe music..." />
 
-            <label for="rotationShift">Angle &amp; Rotation</label>
+            <label for="rotationShift">Campaign Focus / 365-Day Cycle</label>
             <select id="rotationShift">
-              <option value="auto">Auto (Day of Week)</option>
-              <option value="0">01 • High-Voltage Release Hype</option>
+              <option value="auto">Auto (365-Day Calendar Cycle)</option>
+              <option value="0">01 • DJ Drop &amp; High-Voltage Hook</option>
               <option value="1">02 • Lyrics, Tension &amp; Real Stakes</option>
               <option value="2">03 • Live-Action Reel &amp; Camera</option>
               <option value="3">04 • Own MP3 + Sleeve Bundle</option>
               <option value="4">05 • Search, Keywords &amp; Playlists</option>
-              <option value="5">06 • External Note &amp; Story Cut</option>
-              <option value="6">07 • Weekend Catalog Spotlight</option>
+              <option value="5">06 • Brain Memory &amp; Song Note Cut</option>
+              <option value="6">07 • Catalog Spotlight &amp; Share Push</option>
             </select>
 
             <label for="directLink">Direct MP3 + Cover Art Link</label>
@@ -289,7 +289,7 @@
 
             <div class="actions">
               <button type="button" class="accent" id="generateBtn">Generate Channel Copy</button>
-              <button type="button" id="reloadBtn">Reload Catalog &amp; Notes</button>
+              <button type="button" id="reloadBtn">Reload Tree, Brain &amp; Catalog</button>
               <button type="button" class="primary" id="approveBtn">OK To Post</button>
             </div>
           </section>
@@ -298,7 +298,7 @@
             <div class="card-title">2. Chat With Agent Anna</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Ask Anna for a hook, scene, or rewrite..." />
+              <input id="chatInput" type="text" placeholder="Direct Anna on song angle, scene, or SEO..." />
               <button type="button" id="chatSendBtn">Send</button>
             </div>
           </section>
@@ -306,8 +306,8 @@
 
         <div>
           <section class="card">
-            <div class="card-title">3. External Notes &amp; Brain Context (Outside v4 Core)</div>
-            <textarea id="bibleBox" readonly style="min-height:84px;"></textarea>
+            <div class="card-title">3. Brain.json, v4BIBLE &amp; Tree Context (Outside V4 Hot CTX)</div>
+            <textarea id="bibleBox" readonly style="min-height:92px;"></textarea>
           </section>
 
           <section class="card">
@@ -326,10 +326,10 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>TikTok • Hook + Live-Action Reel + Bundle Pitch (API max 2,200 / Native 4,000 chars)</span>
+                <span>TikTok • 100–300c Lead + Reel &amp; Bundle (1–4/day • 3–5 tags • max 2,200c)</span>
                 <span class="stats" id="ttStats">0 words • 0 / 2,200 chars</span>
               </div>
-              <textarea id="ttOut" style="min-height:150px;"></textarea>
+              <textarea id="ttOut" style="min-height:140px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="ttOut">Copy TikTok</button>
                 <button type="button" class="post-btn" data-post="tiktok" data-source="ttOut">Post</button>
@@ -338,10 +338,10 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Instagram • Lead Hook + Story + Reel &amp; Direct Link (max 2,200 chars)</span>
+                <span>Instagram • First 125c Hook + Story &amp; Link (1–2/day + Stories • 3–5 tags • max 2,200c)</span>
                 <span class="stats" id="igStats">0 words • 0 / 2,200 chars</span>
               </div>
-              <textarea id="igOut" style="min-height:150px;"></textarea>
+              <textarea id="igOut" style="min-height:140px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="igOut">Copy Instagram</button>
                 <button type="button" class="post-btn" data-post="instagram" data-source="igOut">Post</button>
@@ -350,12 +350,12 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>YouTube Title (max 100 chars)</span>
+                <span>YouTube Title (target 60–100 chars • max 100)</span>
                 <span class="stats" id="ytTitleStats">0 words • 0 / 100 chars</span>
               </div>
               <input id="ytTitleOut" type="text" maxlength="100" />
               <div class="channel-head" style="margin-top:12px;">
-                <span>YouTube Description • SEO Lead + Story + Press/Reel + Link (max 5,000 chars)</span>
+                <span>YouTube Description • SEO Keywords + Story + Reel + Link (200–5,000 chars • 3–5 tags)</span>
                 <span class="stats" id="ytDescStats">0 words • 0 / 5,000 chars</span>
               </div>
               <textarea id="ytDescOut" style="min-height:175px;"></textarea>
@@ -368,10 +368,10 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Facebook • Full Hype, Story &amp; Share Pitch (up to 63,206 chars)</span>
+                <span>Facebook • 20–150c Punchy Lead + Catalog Story (1–3/day • 2–5 tags • up to 63,206c)</span>
                 <span class="stats" id="fbStats">0 words • 0 / 63,206 chars</span>
               </div>
-              <textarea id="fbOut" style="min-height:155px;"></textarea>
+              <textarea id="fbOut" style="min-height:145px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="fbOut">Copy Facebook</button>
                 <button type="button" class="post-btn" data-post="facebook" data-source="fbOut">Post</button>
@@ -380,7 +380,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>X • Punchy High-Impact Post (limit: &le; 280 chars)</span>
+                <span>X • Punchy High-Impact Post (3–10/day • 0–2 tags • limit &le; 280 chars)</span>
                 <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
               <textarea id="xOut" style="min-height:82px;"></textarea>
@@ -414,12 +414,26 @@
     const DEFAULT_DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
     const RAW_BASE = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
     const CATALOG_URLS = ["./strayd-artist-live.json", `${RAW_BASE}A1/strayd/strayd-artist-live.json`];
-    const BRAIN_URLS = ["./brain.json", `${RAW_BASE}brain.json`, `${RAW_BASE}A1/brain.json`];
+    const QUEUE_URLS = ["./promo-queue.json", `${RAW_BASE}A1/strayd/promo-queue.json`];
+    const PROMO_PKG_URLS = [`${RAW_BASE}A1/promo-gate/latest-package.json`];
+    const BRAIN_URLS = [
+      "./brain.json",
+      `${RAW_BASE}brain.json`,
+      `${RAW_BASE}A1/brain.json`,
+      `${RAW_BASE}A1/memory/brain.json`,
+      `${RAW_BASE}A1/v4/memory/brain.json`
+    ];
+    const BIBLE_URLS = [`${RAW_BASE}docs/1%20v4BIBLE`, `${RAW_BASE}A1/docs/1%20v4BIBLE`, `${RAW_BASE}A1/v4BIBLE`];
 
     let catalog = [];
     let externalNotePaths = [];
     const noteCache = new Map();
+    let brainData = null;
     let brainSummary = "";
+    let bibleExcerpt = "";
+    let queueSummary = "";
+    let promoPkgSummary = "";
+    let sessionMemories = [];
     let runCounter = 1;
     let customDirective = "";
     let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "Martin Strayd - Who Killed Fun (Pay the Rent).png", url: "" };
@@ -427,6 +441,12 @@
 
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
+
+    function getDayOfYear() {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 0);
+      return Math.floor((now - start) / 86400000);
+    }
 
     function cleanSecret(val) {
       return nonEmpty(val).replace(/[^\x20-\x7E\xA0-\xFF]/g, "");
@@ -499,16 +519,35 @@
     async function loadExternalBrain() {
       const hit = await fetchFirstText(BRAIN_URLS);
       if (!hit || !hit.text) {
+        brainData = null;
         brainSummary = "";
         return;
       }
       try {
-        const parsed = JSON.parse(hit.text);
-        const flat = JSON.stringify(parsed).replace(/[{}"]/g, " ").replace(/\s+/g, " ").trim();
-        brainSummary = flat.slice(0, 260);
+        brainData = JSON.parse(hit.text);
+        const flat = JSON.stringify(brainData).replace(/[{}"]/g, " ").replace(/\s+/g, " ").trim();
+        brainSummary = flat.slice(0, 320);
       } catch (_) {
-        brainSummary = hit.text.replace(/\s+/g, " ").trim().slice(0, 260);
+        brainData = null;
+        brainSummary = hit.text.replace(/\s+/g, " ").trim().slice(0, 320);
       }
+    }
+
+    async function loadBibleSummary() {
+      const hit = await fetchFirstText(BIBLE_URLS);
+      bibleExcerpt = hit && hit.text
+        ? hit.text.replace(/\r\n/g, "\n").split("\n").filter((l) => l.trim()).slice(0, 8).join(" ").slice(0, 240)
+        : "";
+    }
+
+    async function loadQueueAndPromoContext() {
+      const [qHit, pHit] = await Promise.all([fetchFirstText(QUEUE_URLS), fetchFirstText(PROMO_PKG_URLS)]);
+      queueSummary = qHit && qHit.text
+        ? qHit.text.replace(/\s+/g, " ").trim().slice(0, 180)
+        : "";
+      promoPkgSummary = pHit && pHit.text
+        ? pHit.text.replace(/\s+/g, " ").trim().slice(0, 180)
+        : "";
     }
 
     async function loadExternalNotesIndex() {
@@ -556,117 +595,6 @@
       return record;
     }
 
-    function parseKeywords(rawKeywords) {
-      const list = nonEmpty(rawKeywords)
-        .split(/[,\n]+/)
-        .map((k) => k.trim())
-        .filter(Boolean);
-      const hashtags = list.map((k) => {
-        const cleanTag = k.replace(/[^a-zA-Z0-9]+/g, "");
-        return cleanTag ? `#${cleanTag}` : "";
-      }).filter(Boolean);
-
-      const defaults = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter", "#NewMusic", "#DirectMP3"];
-      const merged = [...hashtags];
-      for (const tag of defaults) {
-        if (!merged.some((t) => t.toLowerCase() === tag.toLowerCase())) merged.push(tag);
-      }
-      return {
-        list,
-        phrase: list.slice(0, 4).join(" "),
-        tags: merged.slice(0, 7).join(" "),
-        shortTags: merged.slice(0, 2).join(" ")
-      };
-    }
-
-    function buildSceneBrief(title, noteRec, shift, seed, directive) {
-      const noteLine = noteRec && Array.isArray(noteRec.lines) && noteRec.lines.length
-        ? noteRec.lines[(Math.abs(shift) + seed) % noteRec.lines.length].replace(/\s+/g, " ").trim()
-        : "";
-
-      const scenes = [
-        "Handheld realistic live-action camera moving through late-evening streets, grounded natural light and real room/street energy, strictly live-action with zero cartoon",
-        "Close-up realistic live-action performance in a raw working room, real breath and tactile atmosphere, strictly live-action with zero cartoon",
-        "Fluid live-action tracking cut along real city pavement and reflections, unpolished cinema grit, strictly live-action with zero cartoon",
-        "Late-night live-action session cut with real human presence and natural shadows, strictly live-action with zero cartoon"
-      ];
-      const scene = nonEmpty(directive)
-        ? `Live-action brief: ${nonEmpty(directive)} (strictly realistic live-action cinematography only, zero cartoon, zero anime, zero illustration)`
-        : scenes[(Math.abs(shift) + seed) % scenes.length];
-
-      const noteContext = noteLine
-        ? `Catalog note: ${noteLine.slice(0, 160)}`
-        : `Catalog showcase: "${title}" from Martin Strayd's 70+ song vault (also played in Kunda Cafe's live-room rotation)`;
-      return { scene, noteContext };
-    }
-
-    function buildDrafts(track, noteRec, link, shift, seed, directive, rawKeywords) {
-      const title = nonEmpty(track.title, "Who Killed Fun (Pay the Rent)");
-      const url = nonEmpty(link, "https://www.paypal.com/paypalme/martinstrayd");
-      const kw = parseKeywords(rawKeywords);
-      const { scene, noteContext } = buildSceneBrief(title, noteRec, shift, seed, directive);
-
-      const hookSets = [
-        `Most tracks play safe behind polite algorithms until "${title}" kicks the door open and commands the whole room.`,
-        `Stop scrolling past disposable filler—"${title}" by Martin Strayd hits with real weight, sharp attitude, and melody that stays in your head all week.`,
-        `You feel the tension in "${title}" before the chorus even explodes—this is why Martin Strayd's catalog hits harder every time it drops.`
-      ];
-      const hypeHook = hookSets[(Math.abs(shift) + seed) % hookSets.length];
-      const kwFocus = kw.phrase ? `Keywords & playlist lane: ${kw.phrase}.` : "Keywords & playlist lane: independent rock, songwriter spotlight, catalog drop.";
-
-      const press = [
-        `NY / HOLLYWOOD PRESS & REEL BRIEF — "${title}" by Martin Strayd (STRAYD)`,
-        `Headline Angle: Agent Anna spotlights "${title}" as a high-voltage catalog release built for real listeners and direct ownership.`,
-        `Story & Hype Pitch: ${hypeHook} ${noteContext}.`,
-        `Live-Action Reel Direction (Zero Cartoon): ${scene}.`,
-        `Direct MP3 + Cover Sleeve Bundle: ${url} (${kwFocus})`
-      ].join("\n\n");
-
-      const tiktok = [
-        `${hypeHook}`,
-        `Agent Anna Reel Cue: ${scene}.`,
-        `${kwFocus} Built for replay across song clips, mood playlists, and late-night discovery.`,
-        `Skip renting streams—grab the MP3 + cover sleeve bundle direct: ${url}`,
-        `${kw.tags}`
-      ].join("\n\n").slice(0, 2200);
-
-      const instagram = [
-        `"${title}" — Martin Strayd (Agent Anna Showcase)`,
-        `${hypeHook}`,
-        `${noteContext}. ${kwFocus}`,
-        `Live-Action Visual Cue: ${scene}.`,
-        `Own the MP3 + cover art sleeve direct: ${url}`,
-        `${kw.tags}`
-      ].join("\n\n").slice(0, 2200);
-
-      const ytTitle = (kw.phrase
-        ? `${title} — Martin Strayd | ${kw.phrase}`
-        : `${title} — Martin Strayd | Official Release`).slice(0, 100);
-
-      const ytDesc = [
-        `"${title}" by Martin Strayd (STRAYD) — featured and promoted by Agent Anna.`,
-        `${hypeHook}`,
-        `${noteContext}. ${kwFocus}`,
-        `NY / Hollywood Press & Live-Action Reel Cue: ${scene}.`,
-        `Own the full MP3 + cover sleeve bundle direct from the source: ${url}`,
-        `Tags & Discovery: ${kw.tags}`
-      ].join("\n\n").slice(0, 5000);
-
-      const facebook = [
-        `Agent Anna on the desk with a big one from Martin Strayd: "${title}".`,
-        `${hypeHook}`,
-        `${noteContext}. ${kwFocus}`,
-        `Live-Action Scene Direction: ${scene}.`,
-        `Which line or moment in "${title}" grabs you first—and who in your crew needs this track on rotation?`,
-        `Claim the MP3 + cover sleeve bundle direct: ${url}`
-      ].join("\n\n").slice(0, 63206);
-
-      const xFull = `"${title}" — Martin Strayd. ${hypeHook.slice(0, 125)} Own MP3 + sleeve: ${url} ${kw.shortTags}`;
-      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd. ${url} ${kw.shortTags}`.slice(0, 280);
-
-      return { press, tiktok, instagram, ytTitle, ytDesc, facebook, x, scene };
-    }
-
     function updateStats() {
       const prVal = nonEmpty($("pressOut").value);
       $("pressStats").textContent = `${countWords(prVal)} words • ${prVal.length} chars`;
@@ -712,10 +640,11 @@
       const hasDahl = Boolean(getDahlKey());
       const hasGh = Boolean(getGhToken());
       $("statusBadges").innerHTML = [
-        `<span class="badge">Shell: A1 + Lean v4</span>`,
+        `<span class="badge">A1 Sidecar to V4 (Lean CTX)</span>`,
         `<span class="badge">Live-Action Only (Zero Cartoon)</span>`,
-        `<span class="badge">${hasDahl ? "Dahl Key Active" : "Local Full-Space Engine"}</span>`,
-        `<span class="badge">${hasGh ? "GitHub PAT Set" : "Public Catalog"}</span>`
+        `<span class="badge">${hasDahl ? "Dahl AI Active" : "Dahl Key Needed"}</span>`,
+        `<span class="badge">${brainSummary ? "Brain.json Linked" : "Tree Context Ready"}</span>`,
+        `<span class="badge">${hasGh ? "GitHub PAT Set" : "Public Tree"}</span>`
       ].join("");
     }
 
@@ -741,14 +670,14 @@
       return null;
     }
 
-    async function askDahl(messages, expectJson = false) {
+    async function askDahl(messages, expectJson = false, temperature = 0.95) {
       const key = getDahlKey();
       const endpoint = nonEmpty($("dahlEndpoint")?.value, DEFAULT_DAHL_URL);
       const model = nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL);
       if (!key) return { ok: false, reason: "no-key" };
 
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 30000);
+      const timer = setTimeout(() => controller.abort(), 45000);
       try {
         const res = await fetch(endpoint, {
           method: "POST",
@@ -756,7 +685,7 @@
             Authorization: `Bearer ${key}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ model, temperature: 0.9, messages }),
+          body: JSON.stringify({ model, temperature, messages }),
           signal: controller.signal
         });
         if (!res.ok) return { ok: false, reason: `http-${res.status}` };
@@ -793,6 +722,15 @@
       }
     }
 
+    function annaSystemPrompt() {
+      return [
+        "You are Agent Anna operating as DJ, artist manager, and catalog campaign operator for recording artist Martin Strayd (STRAYD) across a 70-100 song catalog and 365-day daily release calendar (including music played at Kunda Cafe, distinct from the cafe itself). This studio lives in A1/strayd/ beside A1/v4/ and A1/promo-gate/ so V4 keeps its hot context, STT, and TTS lean while full catalog/SEO/promo workflows run cleanly.",
+        "Never use pre-canned or cookie-cutter formulas; craft fresh, high-conversion SEO, keyword/playlist, and hype copy tailored to the exact song, keywords, brain state, and creative directive.",
+        "Platform craft targets: TikTok 100-300c punchy opening inside <=2,200c (3-5 tags), Facebook 20-150c punchy hook + story inside <=63,206c (2-5 tags), Instagram first 125c critical hook inside <=2,200c (3-5 tags), ytTitle 60-100c (<=100c), ytDesc 200-5,000c with strong search keywords (3-5 tags), x <=280c (0-2 tags), plus a NY/Hollywood press & live-action reel brief (press).",
+        "Strict laws: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration); direct MP3 + cover sleeve ownership; zero fake network endorsements or fabricated quotes."
+      ].join(" ");
+    }
+
     async function generateAll() {
       const typed = nonEmpty($("customSong").value);
       const selected = nonEmpty($("songPicker").value);
@@ -818,63 +756,69 @@
       renderBadges();
 
       const shiftVal = $("rotationShift").value === "auto"
-        ? new Date().getDay()
+        ? (getDayOfYear() % 7)
         : (parseInt($("rotationShift").value, 10) || 0);
       const link = nonEmpty($("directLink").value, "https://www.paypal.com/paypalme/martinstrayd");
       const rawKw = nonEmpty($("keywordsInput")?.value);
       writeStorage("STRAYD_DIRECT_LINK", link);
       writeStorage("STRAYD_KEYWORDS", rawKw);
 
-      const fallback = buildDrafts(activeTrack, activeNote, link, shiftVal, runCounter, customDirective, rawKw);
-      $("sceneBriefMeta").textContent = `Live-action direction: ${fallback.scene}`;
+      const contextLines = [];
+      if (brainSummary) contextLines.push(`brain.json: ${brainSummary}`);
+      if (activeNote.found) contextLines.push(`Song note (${activeNote.path}): ${activeNote.raw.slice(0, 240)}`);
+      if (queueSummary) contextLines.push(`A1/strayd/promo-queue.json: ${queueSummary}`);
+      if (promoPkgSummary) contextLines.push(`A1/promo-gate/latest-package.json: ${promoPkgSummary}`);
+      if (bibleExcerpt) contextLines.push(`docs/1 v4BIBLE: ${bibleExcerpt}`);
+      if (sessionMemories.length) contextLines.push(`Anna session updates: ${sessionMemories.slice(-3).join(" | ")}`);
+      $("bibleBox").value = contextLines.length
+        ? contextLines.join("\n\n")
+        : "External brain.json, promo-queue, promo-gate, and docs/1 v4BIBLE context stay outside A1/v4 hot context until loaded.";
 
-      const noteParts = [];
-      if (activeNote.found) noteParts.push(`External note: ${activeNote.path}\n${activeNote.raw.slice(0, 260)}`);
-      if (brainSummary) noteParts.push(`External brain context: ${brainSummary}`);
-      $("bibleBox").value = noteParts.length
-        ? noteParts.join("\n\n")
-        : `External notes and brain.json stay outside v4 core so v4 stays lean. Use Anna chat or add external notes anytime.`;
-
-      applyDrafts(fallback);
+      const nonce = `${Date.now()}-${runCounter}-d${getDayOfYear()}-s${shiftVal}`;
       $("engineModeMeta").textContent = getDahlKey()
-        ? "Copy engine: Requesting custom Dahl full-space drafts..."
-        : "Copy engine: Full-space hype & SEO engine active (add Dahl API key for AI rewrites)";
+        ? `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) generating fresh 365-day drafts...`
+        : "Copy engine: Enter Dahl API Key for live 365-day AI generation";
 
       const dahlOut = await askDahl([
-        {
-          role: "system",
-          content:
-            "You are Agent Anna in the A1 shell (v4 core) operating as DJ, artist manager, and campaign strategist for Martin Strayd (STRAYD). Deliver high-energy sales/hype craft, rich SEO keywords/playlist angles, and a NY/Hollywood press & live-action reel brief (press). Make full effective use of each platform's space while strictly respecting limits: ytTitle <= 100 chars, x <= 280 chars, tiktok <= 2200 chars, instagram <= 2200 chars, ytDesc <= 5000 chars, facebook rich long-form. Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration), direct MP3 + cover sleeve ownership, and zero fake network claims. Return ONLY valid JSON with keys: press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
-        },
+        { role: "system", content: annaSystemPrompt() },
         {
           role: "user",
           content: JSON.stringify({
+            generationNonce: nonce,
+            dayOfYear: getDayOfYear(),
+            focusShift: shiftVal,
             song: activeTrack.title,
+            artworkFile: activeTrack.filename,
             keywords: rawKw,
-            note: activeNote.found ? activeNote.lines.slice(0, 4).join(" | ") : "",
-            brain: brainSummary,
-            scene: fallback.scene,
             directive: customDirective,
+            sessionMemories: sessionMemories.slice(-5),
+            songNote: activeNote.found ? activeNote.lines.slice(0, 6).join(" | ") : "",
+            brainSummary,
+            queueSummary,
+            promoPkgSummary,
             directLink: link
-          })
+          }) + "\nReturn ONLY valid JSON with keys: sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
         }
-      ], true);
+      ], true, 0.95);
 
       if (dahlOut && dahlOut.ok && dahlOut.json) {
         const j = dahlOut.json;
-        const nextDrafts = {
-          press: nonEmpty(j.press, fallback.press),
-          tiktok: nonEmpty(j.tiktok, fallback.tiktok).slice(0, 2200),
-          instagram: nonEmpty(j.instagram, fallback.instagram).slice(0, 2200),
-          ytTitle: nonEmpty(j.ytTitle, fallback.ytTitle).slice(0, 100),
-          ytDesc: nonEmpty(j.ytDesc, fallback.ytDesc).slice(0, 5000),
-          facebook: nonEmpty(j.facebook, fallback.facebook).slice(0, 63206),
-          x: nonEmpty(j.x, fallback.x).slice(0, 280)
-        };
-        applyDrafts(nextDrafts);
-        $("engineModeMeta").textContent = `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) full-space drafts applied`;
-      } else if (getDahlKey()) {
-        $("engineModeMeta").textContent = `Copy engine: Full-space engine active (Dahl fallback: ${dahlOut?.reason || "unavailable"})`;
+        const sceneText = nonEmpty(j.sceneBrief, customDirective || `Day ${getDayOfYear()} live-action capture for "${activeTrack.title}" (strictly live-action only, zero cartoon)`);
+        $("sceneBriefMeta").textContent = `Live-action direction: ${sceneText}`;
+        applyDrafts({
+          press: nonEmpty(j.press),
+          tiktok: nonEmpty(j.tiktok).slice(0, 2200),
+          instagram: nonEmpty(j.instagram).slice(0, 2200),
+          ytTitle: nonEmpty(j.ytTitle).slice(0, 100),
+          ytDesc: nonEmpty(j.ytDesc).slice(0, 5000),
+          facebook: nonEmpty(j.facebook).slice(0, 63206),
+          x: nonEmpty(j.x).slice(0, 280)
+        });
+        $("engineModeMeta").textContent = `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) live generation complete (#${runCounter})`;
+      } else {
+        const reason = dahlOut?.reason || "no-key";
+        $("sceneBriefMeta").textContent = `Live-action direction: Awaiting Dahl AI output (${reason}) — strictly live-action only (zero cartoon)`;
+        $("engineModeMeta").textContent = `Copy engine: Dahl not returned (${reason}) — check Dahl API Key / endpoint and click Generate Channel Copy`;
       }
     }
 
@@ -884,19 +828,19 @@
       $("chatInput").value = "";
       appendChat("You", msg);
       customDirective = msg;
+      sessionMemories.push(`${activeTrack.title}: ${msg}`);
       runCounter++;
 
       const dahlReply = await askDahl([
         {
           role: "system",
-          content:
-            "You are Agent Anna in the A1 shell (v4 core) assisting recording artist Martin Strayd with song ideas, scenes, and marketing copy. Strictly realistic live-action only (zero cartoon). Treat terms like tuk tul or tuk-tuk as real live-action street/vehicle scenes without asking clarifying questions. Reply directly and concisely in 2 sentences."
+          content: annaSystemPrompt() + " Reply in character as Agent Anna—sharp, direct, practical, zero robotic disclaimers, strictly realistic live-action only (zero cartoon)."
         },
         {
           role: "user",
-          content: `Current track: "${activeTrack.title}". Creative direction: ${msg}`
+          content: `Track: "${activeTrack.title}". Keywords: "${nonEmpty($("keywordsInput")?.value)}". Brain: "${brainSummary}". Directive: ${msg}`
         }
-      ], false);
+      ], false, 0.9);
 
       if (dahlReply && dahlReply.ok && dahlReply.text) {
         appendChat("Agent Anna", dahlReply.text);
@@ -904,8 +848,7 @@
         return;
       }
 
-      await generateAll();
-      appendChat("Agent Anna", `Updated "${activeTrack.title}" with "${msg}". Check the drafts and hit OK To Post when ready.`);
+      appendChat("Agent Anna", `Directive logged for "${activeTrack.title}" (${msg}). Connect or verify your Dahl API Key to generate fresh AI drafts.`);
     }
 
     function buildPlatformUrl(platform, text) {
@@ -934,7 +877,7 @@
       const savedKw = readStorage("STRAYD_KEYWORDS");
       if (savedKw) $("keywordsInput").value = savedKw;
 
-      await Promise.all([loadExternalNotesIndex(), loadExternalBrain()]);
+      await Promise.all([loadExternalNotesIndex(), loadExternalBrain(), loadBibleSummary(), loadQueueAndPromoContext()]);
       const catHit = await fetchFirstText(CATALOG_URLS);
       if (catHit && catHit.text) {
         try {
@@ -966,9 +909,9 @@
       }
 
       renderBadges();
-      $("bootStatus").textContent = catalog.length ? `Ready • ${catalog.length} singles` : "Ready • fallback mode";
+      $("bootStatus").textContent = catalog.length ? `Ready • ${catalog.length} singles • Day ${getDayOfYear()}` : `Ready • Day ${getDayOfYear()}`;
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", "Ready on A1 + v4. Pick a track or tell me what angle to push for Martin Strayd.");
+        appendChat("Agent Anna", `Online on A1/strayd beside V4 (Day ${getDayOfYear()}). Tell me what angle, scene, or keyword push you want for Martin Strayd.`);
       }
       await generateAll();
     }
@@ -1077,9 +1020,11 @@
         shell: "A1",
         agent: "Agent Anna",
         core: "v4 (lean)",
+        dayOfYear: getDayOfYear(),
         model: nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL),
         externalNoteSource: activeNote.found ? activeNote.path : null,
         brainContextLoaded: Boolean(brainSummary),
+        sessionMemories: sessionMemories.slice(-10),
         keywords: nonEmpty($("keywordsInput")?.value) || null,
         directive: customDirective || null,
         approved: true,
