@@ -270,7 +270,7 @@
     <header class="topbar">
       <div>
         <h1>A1 Record Command • Agent Anna Social Master</h1>
-        <div class="muted">Agent Anna Promo Host • Martin Strayd (STRAYD) 365-Single Release • Kunda Cafe • Live-Action Only</div>
+        <div class="muted" id="headerSub">Agent Anna Promo Host • 365-Single Release • Live-Action Only</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span class="waiting-pill" id="waitIndicator">Idle • Ready</span>
@@ -281,14 +281,14 @@
     <main>
       <section class="hero" aria-label="Featured Cover Artwork">
         <div class="sleeve">
-          <img id="artPreview" src="" alt="Martin Strayd Cover Sleeve" />
+          <img id="artPreview" src="" alt="Cover Sleeve" />
         </div>
         <div>
           <div class="eyebrow">365-Day Once-a-Day Single Release • Agent Anna Promo &amp; Pod Command</div>
-          <div class="hero-title" id="heroTitle">ADHD I Can Do That (Travillen Disorder)</div>
-          <div class="hero-meta" id="artFileMeta">Single: ADHD I Can Do That (Travillen Disorder) • STRAYD-ID-001</div>
-          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
-          <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
+          <div class="hero-title" id="heroTitle"></div>
+          <div class="hero-meta" id="artFileMeta"></div>
+          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: realistic live-action cinematography only.</div>
+          <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only.</div>
           <div class="badges" id="statusBadges"></div>
           <div class="muted" id="engineModeMeta" style="margin-top:8px;">Promo engine: Ready</div>
           <div class="muted" id="gateStatus" style="margin-top:8px;">Approval gate: Browser-ready — review, copy or hit Post, or click OK To Post to stage JSON</div>
@@ -306,11 +306,11 @@
               <option value="daily_az">Once-a-Day Single Roll (1/Day • 365-Day Loop)</option>
             </select>
 
-            <label for="songPicker">Select Single (A–Z Catalog Roll — Title Priority)</label>
+            <label for="songPicker">Select Single (Catalog Roll — Title Priority)</label>
             <select id="songPicker"></select>
 
             <label for="customSong">Custom Single Title Override (Locked Verbatim)</label>
-            <input id="customSong" type="text" placeholder="Type exact single title or leave blank..." />
+            <input id="customSong" type="text" placeholder="Type single title or leave blank..." />
 
             <label for="cadenceMode">Daily Release Cadence</label>
             <select id="cadenceMode">
@@ -319,7 +319,7 @@
             </select>
 
             <label for="keywordsInput">SEO Keywords, Trends &amp; Playlists</label>
-            <input id="keywordsInput" type="text" placeholder="e.g. indie rock, songwriting, direct mp3, kunda cafe music..." />
+            <input id="keywordsInput" type="text" placeholder="Keywords, genre, venue, release notes..." />
 
             <label for="rotationShift">Campaign Angle / Hook Shift</label>
             <select id="rotationShift">
@@ -327,27 +327,27 @@
               <option value="0">01 • VJ Single Pitch &amp; Hook</option>
               <option value="1">02 • Song Story &amp; Room Mood</option>
               <option value="2">03 • Live-Action Camera &amp; Heat</option>
-              <option value="3">04 • Own MP3 + Sleeve CTA</option>
+              <option value="3">04 • Own Track + Sleeve CTA</option>
               <option value="4">05 • Search, AI &amp; Playlists</option>
               <option value="5">06 • Host Take &amp; Promo Pitch</option>
               <option value="6">07 • Fan Question &amp; Share</option>
             </select>
 
-            <label for="directLink">Sales Portal / Direct MP3 + Cover Art Link</label>
-            <input id="directLink" type="text" value="https://martinstrayd.github.io/artist/" />
+            <label for="directLink">Sales Portal / Direct Release Link</label>
+            <input id="directLink" type="text" placeholder="Release / store URL..." />
 
             <label for="paypalLink">PayPal.me Direct Link</label>
-            <input id="paypalLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
+            <input id="paypalLink" type="text" placeholder="PayPal.me URL..." />
 
             <label for="bmacLink">Buy Me a Coffee Direct</label>
-            <input id="bmacLink" type="text" value="https://buymeacoffee.com/martinstrayd" />
+            <input id="bmacLink" type="text" placeholder="Buy Me a Coffee URL..." />
 
-            <label for="wiseNote">Wise QR / PayPal / Dogecoin Checkout Note</label>
-            <input id="wiseNote" type="text" value="Wise QR on store • PayPal.me • Dogecoin" />
+            <label for="wiseNote">Wise / Payment Checkout Note</label>
+            <input id="wiseNote" type="text" placeholder="Payment / checkout note..." />
 
-            <input id="spotifyUrl" type="hidden" value="https://open.spotify.com/artist/6aRM8IKV2HBUZRGnnDdrM0" />
-            <input id="ytMusicUrl" type="hidden" value="https://music.youtube.com/channel/UCUOojI7C1D6RCMLIjuNvz1g" />
-            <input id="appleMusicUrl" type="hidden" value="https://music.apple.com/us/artist/martin-strayd/1714956004" />
+            <input id="spotifyUrl" type="hidden" value="" />
+            <input id="ytMusicUrl" type="hidden" value="" />
+            <input id="appleMusicUrl" type="hidden" value="" />
 
             <input id="dahlEndpoint" type="hidden" value="https://inference.dahl.global/v1/chat/completions" />
             <input id="dahlModel" type="hidden" value="MiniMaxAI/MiniMax-M2.7" />
@@ -368,7 +368,7 @@
             <div class="card-title">2. Chat With Agent Anna (Promo Director)</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Direct Anna on today's single pitch, reply tone, MP3/sleeve CTA..." />
+              <input id="chatInput" type="text" placeholder="Direct Anna on today's single pitch, replies, release link..." />
               <button type="button" id="chatSendBtn">Send</button>
             </div>
           </section>
@@ -398,7 +398,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Agent Anna Fan Reply Pack (Comment Replies • Questions • Direct MP3 &amp; Kunda Cafe)</span>
+                <span>Agent Anna Fan Reply Pack (Comment Replies • Questions • Direct Release)</span>
                 <span class="stats" id="repliesStats">0 words • 0 chars</span>
               </div>
               <div class="insights-row" id="repliesInsights"></div>
@@ -490,7 +490,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>A4 / 3/4-Page Press Release • 365-Single Release: Martin Strayd &amp; Agent Anna</span>
+                <span>A4 / 3/4-Page Press Release • 365-Single Release: Agent Anna</span>
                 <span class="stats" id="pressStats">0 words • 0 chars</span>
               </div>
               <div class="insights-row" id="pressInsights"></div>
@@ -521,12 +521,6 @@
   (() => {
     const DEFAULT_DAHL_URL = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
-    const DEFAULT_PAYPAL = "https://www.paypal.com/paypalme/martinstrayd";
-    const DEFAULT_PORTAL = "https://martinstrayd.github.io/artist/";
-    const DEFAULT_BMAC = "https://buymeacoffee.com/martinstrayd";
-    const DEFAULT_SPOTIFY = "https://open.spotify.com/artist/6aRM8IKV2HBUZRGnnDdrM0";
-    const DEFAULT_YTMUSIC = "https://music.youtube.com/channel/UCUOojI7C1D6RCMLIjuNvz1g";
-    const DEFAULT_APPLEMUSIC = "https://music.apple.com/us/artist/martin-strayd/1714956004";
 
     const CATALOG_URLS = [
       "./strayd-artist-live.json",
@@ -547,13 +541,6 @@
       "../docs/promo-queue.json"
     ];
 
-    const INITIAL_TRACK = {
-      id: "STRAYD-ID-001",
-      title: "ADHD I Can Do That (Travillen Disorder)",
-      filename: "Martin Strayd - ADHD I Can Do That (Travillen Disorder).png",
-      url: ""
-    };
-
     let catalog = [];
     let brainSummary = "";
     let bibleExcerpt = "";
@@ -566,7 +553,13 @@
     let customDirective = "";
     let activeSpeakingBtn = null;
     let currentInsights = {};
-    let activeTrack = { ...INITIAL_TRACK };
+    let activeTrack = {
+      id: "",
+      artist: "",
+      title: "",
+      filename: "",
+      url: ""
+    };
 
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
@@ -676,7 +669,6 @@
     const normalizeKey = (str) =>
       nonEmpty(str)
         .toLowerCase()
-        .replace(/^martin strayd\s*-\s*/i, "")
         .replace(/\.[a-z0-9]+$/i, "")
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
@@ -685,8 +677,6 @@
       return nonEmpty(rawTitle)
         .replace(/<think>[\s\S]*?<\/think>/gi, "")
         .replace(/\r\n/g, " ")
-        .replace(/\bSTR\s+AYD\b/gi, "STRAYD")
-        .replace(/\bMartin\s+strayd\b/gi, "Martin Strayd")
         .replace(/[ \t]{2,}/g, " ")
         .trim();
     }
@@ -729,9 +719,11 @@
       return lines;
     }
 
-    function buildWrappedSleeveUri(title, trackId) {
-      const lines = wrapTextLines(title, 22, 4);
-      const safeId = escapeXml(preserveTitle(trackId || "STRAYD").slice(0, 20));
+    function buildWrappedSleeveUri(title, trackId, artistLabel) {
+      const displayTitle = preserveTitle(title) || "Single Release";
+      const lines = wrapTextLines(displayTitle, 22, 4);
+      const safeId = escapeXml(preserveTitle(trackId || "365-SINGLE").slice(0, 20));
+      const safeArtist = escapeXml(preserveTitle(artistLabel || "").slice(0, 36));
       const startY = lines.length <= 2 ? 250 : 210;
       const tspans = lines
         .map((ln, idx) => `<tspan x="56" dy="${idx === 0 ? 0 : 46}">${escapeXml(ln)}</tspan>`)
@@ -750,7 +742,7 @@
         <rect x="28" y="28" width="544" height="544" rx="18" fill="none" stroke="#e5b84b" stroke-opacity="0.45" stroke-width="2"/>
         <text x="56" y="84" fill="#e5b84b" font-family="system-ui,sans-serif" font-size="16" font-weight="700" letter-spacing="2.5">${safeId}</text>
         <text x="56" y="${startY}" fill="#f3f6fb" font-family="system-ui,sans-serif" font-size="36" font-weight="800">${tspans}</text>
-        <text x="56" y="${Math.min(artistY, 470)}" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="21" font-weight="600">Martin Strayd • Kunda Cafe Rotation</text>
+        ${safeArtist ? `<text x="56" y="${Math.min(artistY, 470)}" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="21" font-weight="600">${safeArtist}</text>` : ""}
         <text x="56" y="534" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="15" font-weight="700">365 SINGLE • LIVE ACTION ONLY</text>
       </svg>`;
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
@@ -784,12 +776,7 @@
 
     function cleanEditorialText(raw, lockedTitle = "") {
       let s = stripMarkdownArtifacts(nonEmpty(raw).replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/\r\n/g, "\n"));
-
-      s = s.replace(/\bSTR\s+AYD\b/gi, "STRAYD");
-      s = s.replace(/\bMartin\s+strayd\b/gi, "Martin Strayd");
-      s = s.replace(/\bmartin\s+strayd\b/gi, "Martin Strayd");
       s = s.replace(/\bAgent\s+anna\b/gi, "Agent Anna");
-      s = s.replace(/\bKunda\s+cafe\b/gi, "Kunda Cafe");
 
       const titleToProtect = preserveTitle(lockedTitle || activeTrack.title);
       const tokenMap = new Map();
@@ -1070,8 +1057,8 @@
       const base = [`Single ${cyclePos}/365`, `Shift #${shiftVal + 1}`, cadence === "multi_burst" ? "Burst Mode" : "Once-a-Day Single"];
       return {
         slots: [...base, "Morning • Midday • Evening", "Browser Tab Ready"],
-        replies: [...base, "Comment & Question Replies", "Direct MP3 + Kunda Cafe"],
-        press: [...base, "A4 / 3/4-Page Wire", "Agent Anna × Martin Strayd"],
+        replies: [...base, "Comment & Question Replies", "Direct Release CTA"],
+        press: [...base, "A4 / 3/4-Page Wire", "Agent Anna 365-Single"],
         tiktok: [...base, "100–300c Sweet Spot", "3–5 Tags • 2–3/day"],
         instagram: [...base, "First 125c Fold Hook", "3–5 Tags • 1/d + Stories"],
         youtube: [...base, "60–100c Title • 200–5kc Desc", "Shorts 1/d • Vids 3/wk"],
@@ -1081,20 +1068,23 @@
     }
 
     function composeDynamicChannelSet(track, shiftVal, rawKw, portalLink, paypalUrl, bmacLink, wiseStr, cadence, songRef) {
-      const title = preserveTitle(track.title);
+      const title = preserveTitle(track.title) || "Single Release";
+      const artist = preserveTitle(track.artist);
+      const artistTag = artist ? `#${artist.replace(/[^a-zA-Z0-9]+/g, "")}` : "";
+      const artistInline = artist ? ` by ${artist}` : "";
       const day = getDayOfYear();
       const cyclePos = ((day - 1) % 365) + 1;
       const v = (runCounter + shiftVal + cyclePos) % 7;
 
-      const kwList = cleanEditorialText(nonEmpty(rawKw, "Martin Strayd, STRAYD, indie rock, songwriting, direct MP3, cover art, Kunda Cafe music"), title);
+      const kwList = cleanEditorialText(nonEmpty(rawKw, "single release, live music, direct release, cover art"), title);
       const kwParts = kwList.split(/[,\n]+/).map((k) => k.trim()).filter(Boolean);
-      const k1 = kwParts[0] || "indie rock";
-      const k2 = kwParts[1] || "songwriting";
+      const k1 = kwParts[0] || "single release";
+      const k2 = kwParts[1] || "live sound";
 
       const cleanTags = kwParts
         .map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`)
         .filter((t) => t.length > 1);
-      const tags = Array.from(new Set(["#AgentAnna", "#MartinStrayd", "#STRAYD", ...cleanTags, "#KundaCafe", "#DirectMP3"]));
+      const tags = Array.from(new Set(["#AgentAnna", artistTag, ...cleanTags, "#365Singles"].filter(Boolean)));
       const ttTags = tags.slice(0, 4).join(" ");
       const igTags = tags.slice(0, 5).join(" ");
       const fbTags = tags.slice(0, 3).join(" ");
@@ -1104,139 +1094,145 @@
         ? "Burst cadence: TT 2–3/d, FB 1–3/d, IG 1–2/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk."
         : "Once-a-day single cadence: TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk.";
 
-      const sceneBrief = `Realistic live-action camera work in a real space with natural or practical lighting and real human presence for "${title}" — strictly live-action only (zero cartoon, zero anime, zero illustration).`;
-      const payLinks = `MP3 + sleeve: ${portalLink} | PayPal.me: ${paypalUrl} | Coffee: ${bmacLink} | ${wiseStr || "Wise QR & Dogecoin"}`;
-      const streamLinks = `Spotify: ${DEFAULT_SPOTIFY} | YT Music: ${DEFAULT_YTMUSIC} | Apple Music: ${DEFAULT_APPLEMUSIC}`;
+      const sceneBrief = `Realistic live-action camera work in a real space with natural or practical lighting and real human presence for "${title}" — strictly live-action only.`;
+      const linkItems = [
+        portalLink ? `Release: ${portalLink}` : "",
+        paypalUrl ? `PayPal: ${paypalUrl}` : "",
+        bmacLink ? `Support: ${bmacLink}` : "",
+        wiseStr || ""
+      ].filter(Boolean);
+      const payLinks = linkItems.join(" | ");
+      const streamItems = [
+        nonEmpty($("spotifyUrl")?.value) ? `Spotify: ${$("spotifyUrl").value.trim()}` : "",
+        nonEmpty($("ytMusicUrl")?.value) ? `YT Music: ${$("ytMusicUrl").value.trim()}` : "",
+        nonEmpty($("appleMusicUrl")?.value) ? `Apple Music: ${$("appleMusicUrl").value.trim()}` : ""
+      ].filter(Boolean);
+      const streamLinks = streamItems.join(" | ");
       const contextLine = songRef
-        ? `${songRef} Featured in Martin Strayd's music catalog played at Kunda Cafe.`
-        : `From Martin Strayd's 365-single catalog played at Kunda Cafe, built on ${k1} and ${k2}.`;
+        ? `${songRef}`
+        : `Part of the 365-single once-a-day release, focused on ${k1} and ${k2}.`;
 
       const fbOpeners = [
-        `Agent Anna here—would you rather own single "${title}" with the sleeve right now or keep renting streams?`,
-        `What's one single that still hooks you from the very first bar when you're spinning ${k1}?`,
-        `Real room, real camera, zero cartoon shortcuts—where are you playing "${title}" first today?`,
-        `Agent Anna just put single "${title}" in today's slot—which line hits hardest on listen one?`,
-        `If you had to queue one ${k2} single for a friend tonight, is "${title}" making the list?`,
+        `Agent Anna here—would you rather keep single "${title}"${artistInline} in rotation or send it straight to a friend?`,
+        `What's one single that still hooks you from bar one when you're spinning ${k1}?`,
+        `Real room, real camera, live-action energy—where are you playing "${title}" first today?`,
+        `Agent Anna just put single "${title}"${artistInline} in today's slot—which line hits hardest on listen one?`,
+        `If you had to queue one ${k2} single tonight, is "${title}" making the cut?`,
         `Why settle for background noise when "${title}" actually has a pulse? Tell me what you hear.`,
-        `Agent Anna's late-night single pick is "${title}"—what track keeps you up past midnight lately?`
+        `Agent Anna's daily single pick is "${title}"${artistInline}—what track keeps you locked in lately?`
       ];
       const fbLead = fbOpeners[v].slice(0, 150);
 
       const fbBodyVariants = [
-        `Martin Strayd put single "${title}" front and center today with zero filler and real room grit. ${contextLine} Drop your take in the comments or grab the MP3 + sleeve directly.`,
-        `Agent Anna is pitching single "${title}" across today's schedule—built for listeners who care about ${k1}, real songwriting, and keeping the actual music. ${contextLine}`,
-        `Filmed in live-action reality with real human presence, "${title}" brings ${k2} energy straight from the speakers. ${contextLine} Tell us your verdict below.`
+        `Single "${title}"${artistInline} takes today's slot with real room grit and sharp hooks. ${contextLine} Drop your take in the comments.`,
+        `Agent Anna is pitching single "${title}"${artistInline} across today's schedule—built around ${k1}, real songwriting, and direct listening. ${contextLine}`,
+        `Shot in live-action reality with real human presence, "${title}"${artistInline} brings ${k2} energy straight from the speakers. ${contextLine}`
       ];
       const fbBody = fbBodyVariants[v % fbBodyVariants.length];
 
-      const facebook = [
-        fbLead,
-        `${fbBody} ${sceneBrief}`,
-        `${payLinks}`,
-        `${streamLinks}`,
-        fbTags
-      ].join("\n\n").slice(0, 63206);
+      const facebook = [fbLead, `${fbBody} ${sceneBrief}`, payLinks, streamLinks, fbTags].filter(Boolean).join("\n\n").slice(0, 63206);
 
       const igOpeners = [
-        `Agent Anna pitches single "${title}" by Martin Strayd—${k1} heat & MP3 + sleeve: ${portalLink}`,
-        `On air with Agent Anna: single "${title}" by Martin Strayd. Own MP3 + cover art: ${paypalUrl}`,
-        `Today's Martin Strayd single with Agent Anna: "${title}" (${k2}). Grab it: ${portalLink}`,
-        `Agent Anna says cue single "${title}" by Martin Strayd—real ${k1}, zero cartoon. Link: ${portalLink}`
+        `Agent Anna pitches single "${title}"${artistInline}—${k1} heat${portalLink ? ` • ${portalLink}` : ""}`,
+        `On air with Agent Anna: single "${title}"${artistInline}${paypalUrl ? ` • ${paypalUrl}` : ""}`,
+        `Today's single with Agent Anna: "${title}"${artistInline} (${k2})${portalLink ? ` • ${portalLink}` : ""}`,
+        `Agent Anna says cue single "${title}"${artistInline}—live-action ${k1}${portalLink ? ` • ${portalLink}` : ""}`
       ];
       const igFirst125 = igOpeners[v % igOpeners.length].slice(0, 125);
 
-      const instagram = [
-        igFirst125,
-        `${fbBody} ${sceneBrief}`,
-        `${payLinks}`,
-        `${streamLinks}`,
-        igTags
-      ].join("\n\n").slice(0, 2200);
+      const instagram = [igFirst125, `${fbBody} ${sceneBrief}`, payLinks, streamLinks, igTags].filter(Boolean).join("\n\n").slice(0, 2200);
 
       const ttOpeners = [
-        `Agent Anna pitches single "${title}" by Martin Strayd—${k1} hook with zero filler. MP3 + art: ${portalLink} ${ttTags}`,
-        `Single "${title}" by Martin Strayd on Agent Anna's radar—real ${k2} punch. Grab it: ${paypalUrl} ${ttTags}`,
-        `Agent Anna cues "${title}" by Martin Strayd—live-action ${k1}, zero cartoon. ${portalLink} ${ttTags}`,
-        `Hear "${title}" by Martin Strayd with Agent Anna—${k1} & ${k2} straight up. ${bmacLink} ${ttTags}`,
-        `Agent Anna's daily single pitch: "${title}" by Martin Strayd. Own MP3 + sleeve: ${portalLink} ${ttTags}`,
-        `Single "${title}" by Martin Strayd hits today's roll with Agent Anna—${k2} energy. ${portalLink} ${ttTags}`,
-        `Agent Anna spins "${title}" by Martin Strayd—lock in the MP3 + art: ${portalLink} ${ttTags}`
+        `Agent Anna pitches single "${title}"${artistInline}—${k1} hook in full flight. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `Single "${title}"${artistInline} on Agent Anna's radar—real ${k2} punch. ${[paypalUrl, ttTags].filter(Boolean).join(" ")}`,
+        `Agent Anna cues "${title}"${artistInline}—live-action ${k1} on deck. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `Hear "${title}"${artistInline} with Agent Anna—${k1} & ${k2} straight up. ${[bmacLink, ttTags].filter(Boolean).join(" ")}`,
+        `Agent Anna's daily single pitch: "${title}"${artistInline}. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `Single "${title}"${artistInline} hits today's roll with Agent Anna—${k2} energy. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `Agent Anna spins "${title}"${artistInline}. ${[portalLink, ttTags].filter(Boolean).join(" ")}`
       ];
-      let tiktok = ttOpeners[v];
+      let tiktok = ttOpeners[v].trim();
       if (tiktok.length > 300) {
-        tiktok = `Agent Anna pitches "${title}" by Martin Strayd—${k1} hook. ${portalLink} ${ttTags}`.slice(0, 300);
+        tiktok = `Agent Anna pitches "${title}"${artistInline}—${k1} hook. ${[portalLink, ttTags].filter(Boolean).join(" ")}`.trim().slice(0, 300);
       }
 
       const ytTitleCandidates = [
-        `${title} — Martin Strayd Single | Agent Anna ${k1} & ${k2} Pitch`,
-        `Agent Anna Pitches Single "${title}" by Martin Strayd (${k1} • MP3)`,
-        `"${title}" — Martin Strayd Single | ${k2} & Live Action (Agent Anna)`
+        `${title}${artistInline} — Single | Agent Anna ${k1} & ${k2}`,
+        `Agent Anna Pitches Single "${title}"${artistInline} (${k1})`,
+        `"${title}"${artistInline} — Single | ${k2} & Live Action (Agent Anna)`
       ];
       let ytTitle = ytTitleCandidates[v % ytTitleCandidates.length];
       if (ytTitle.length < 60) {
-        ytTitle = `${ytTitle} • Martin Strayd Official`.slice(0, 100);
+        ytTitle = `${ytTitle} • 365-Single Release`.slice(0, 100);
       } else {
         ytTitle = ytTitle.slice(0, 100);
       }
 
       const ytDesc = [
-        `Single "${title}" by Martin Strayd (${track.id || "STRAYD"}) — ${k1}, ${k2}, ${kwList}.`,
+        `Single "${title}"${artistInline}${track.id ? ` (${track.id})` : ""} — ${k1}, ${k2}, ${kwList}.`,
         `Agent Anna pitches single "${title}" in the 365-single once-a-day release. ${fbBody} ${contextLine}`,
         `${sceneBrief} ${cadenceLine}`,
-        `${payLinks}`,
-        `${streamLinks}`,
+        payLinks,
+        streamLinks,
         igTags
-      ].join("\n\n").slice(0, 5000);
+      ].filter(Boolean).join("\n\n").slice(0, 5000);
 
       const xCandidates = [
-        `Agent Anna pitches single "${title}" by Martin Strayd (${k1}). MP3 + art: ${portalLink} ${xTags}`,
-        `Single "${title}" by Martin Strayd—Agent Anna's ${k2} pick today. Grab it: ${paypalUrl} ${xTags}`,
-        `Agent Anna spins single "${title}" by Martin Strayd. ${portalLink} ${xTags}`,
-        `Single "${title}" by Martin Strayd (${k1})—Agent Anna approved. ${bmacLink} ${xTags}`
+        `Agent Anna pitches single "${title}"${artistInline} (${k1}). ${[portalLink, xTags].filter(Boolean).join(" ")}`,
+        `Single "${title}"${artistInline}—Agent Anna's ${k2} pick today. ${[paypalUrl, xTags].filter(Boolean).join(" ")}`,
+        `Agent Anna spins single "${title}"${artistInline}. ${[portalLink, xTags].filter(Boolean).join(" ")}`,
+        `Single "${title}"${artistInline} (${k1})—Agent Anna approved. ${[bmacLink, xTags].filter(Boolean).join(" ")}`
       ];
-      const x = cleanEditorialText(xCandidates[v % xCandidates.length], title).slice(0, 280);
+      const x = cleanEditorialText(xCandidates[v % xCandidates.length], title).trim().slice(0, 280);
 
       const slots = [
-        `SINGLE ${cyclePos}/365 ROLLOUT SLOTS — "${title}" (Martin Strayd • ${cadenceLine})`,
+        `SINGLE ${cyclePos}/365 ROLLOUT SLOTS — "${title}"${artistInline} (${cadenceLine})`,
         `• SLOT 1 (Morning VJ Pitch — ~08:30): Open X & TikTok with single "${title}" hook; post 1 feed/Story on Instagram or 1 Facebook hook/question.`,
-        `• SLOT 2 (Midday Live-Action & Search Push — ~13:00): Publish YouTube Short / Video or next TikTok & X post highlighting ${k1}/${k2} and live-action direction (zero cartoon).`,
-        `• SLOT 3 (Evening / Night Direct & Kunda Cafe Closer — ~19:30–22:00): Push direct MP3 + cover art link (${portalLink}), reply to comments with Agent Anna's reply pack, and prep next single.`
+        `• SLOT 2 (Midday Live-Action & Search Push — ~13:00): Publish YouTube Short / Video or next TikTok & X post highlighting ${k1}/${k2} and live-action direction.`,
+        `• SLOT 3 (Evening / Night Closer — ~19:30–22:00): Share release link${portalLink ? ` (${portalLink})` : ""}, reply to comments with Agent Anna's reply pack, and prep next single.`
       ].join("\n\n");
 
       const replies = [
-        `AGENT ANNA REPLY PACK — Single "${title}" by Martin Strayd`,
-        `1) On Hype / Hook: "Right?! '${title}' is Martin Strayd in full flight—zero filler, just real ${k1} energy. If you want the MP3 + sleeve to keep, grab it here: ${portalLink}"`,
-        `2) On How to Buy / Support: "You can grab the MP3 + cover art direct at ${portalLink}, PayPal.me (${paypalUrl}), or Buy Me a Coffee (${bmacLink})—${wiseStr || "Wise QR & Dogecoin"} also supported."`,
-        `3) On Kunda Cafe / Live Action: "This is from Martin Strayd's catalog played at Kunda Cafe—100% live-action vibe, zero cartoon. Which line hits you first?"`,
-        `4) On Sharing / Playlists: "Pass single '${title}' to a friend who actually listens to ${k2}—drop your favorite track pick below and Agent Anna will spin it next."`
+        `AGENT ANNA REPLY PACK — Single "${title}"${artistInline}`,
+        `1) On Hype / Hook: "Right?! '${title}'${artistInline} brings real ${k1} energy that hooks on pass one.${portalLink ? ` Check the release here: ${portalLink}` : ""}"`,
+        `2) On How to Listen / Support: "${payLinks || "Check the pinned release links for direct listening and support options."}"`,
+        `3) On Live Action: "100% live-action camera work—which line or groove hits you first?"`,
+        `4) On Sharing / Playlists: "Pass single '${title}' to someone who loves ${k2}—drop your favorite track pick below and Agent Anna will spin it next."`
       ].join("\n\n");
 
       const press = [
-        `FOR IMMEDIATE RELEASE • AGENT ANNA × MARTIN STRAYD — 365-SINGLE RELEASE (SINGLE ${cyclePos}/365)`,
-        `HEADLINE: Agent Anna Pitches Martin Strayd's Single "${title}" Across Social, Music Search & AI Discovery`,
-        `SUBHEAD: Host-Driven 365-Single Campaign, Live-Action Direction (Zero Cartoon) and Direct MP3 + Sleeve Ownership`,
+        `FOR IMMEDIATE RELEASE • AGENT ANNA — 365-SINGLE RELEASE (SINGLE ${cyclePos}/365)`,
+        `HEADLINE: Agent Anna Pitches Single "${title}"${artistInline} Across Social, Music Search & AI Discovery`,
+        `SUBHEAD: Host-Driven 365-Single Campaign, Live-Action Direction and Direct Release Access`,
         `1. 365-SINGLE RELEASE & HOST PITCH`,
-        `Agent Anna leads the daily promotional pitch for recording artist Martin Strayd (STRAYD) and single "${title}" (${track.id || "STRAYD"}) within a once-a-day 365-single release. ${fbBody} ${contextLine}`,
+        `Agent Anna leads the daily promotional pitch for single "${title}"${artistInline}${track.id ? ` (${track.id})` : ""} within a once-a-day 365-single release. ${fbBody} ${contextLine}`,
         `2. CADENCE, SOCIAL CRAWLERS & AI DISCOVERY`,
         `${cadenceLine} Focused keywords and themes: ${kwList}. Built for human listeners, curators, search crawlers, and AI agents reading structured release metadata.`,
-        `3. LIVE-ACTION CINEMATOGRAPHY (ZERO CARTOON)`,
-        `${sceneBrief} Visual direction for "${title}" centers on authentic human presence and real lighting—strictly live-action only, with zero cartoon, anime, or illustration.`,
-        `4. DIRECT SALES, PAYMENT OPTIONS & STREAMING`,
-        `${payLinks}.`,
-        `${streamLinks}.`,
-        `COMMAND NODE: A1 Record Command • Agent Anna Social Master (Martin Strayd / STRAYD 365-Single Catalog).`
+        `3. LIVE-ACTION CINEMATOGRAPHY`,
+        `${sceneBrief} Visual direction for "${title}" centers on authentic human presence and real lighting in live-action cinematography.`,
+        `4. DIRECT ACCESS & STREAMING`,
+        [payLinks, streamLinks].filter(Boolean).join(". ") || "Direct release and streaming links configured per campaign.",
+        `COMMAND NODE: A1 Record Command • Agent Anna Social Master (365-Single Release).`
       ].join("\n\n");
 
       return { sceneBrief, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
     }
 
     function updateArtworkDisplay(track) {
-      const cleanTitle = preserveTitle(track.title);
-      const fallbackUri = buildWrappedSleeveUri(cleanTitle, track.id);
+      const cleanTitle = preserveTitle(track.title) || "Waiting for Catalog / Single";
+      const cleanArtist = preserveTitle(track.artist);
+      const fallbackUri = buildWrappedSleeveUri(cleanTitle, track.id, cleanArtist);
       const directUrls = buildDirectArtUrls(track);
 
+      $("headerSub").textContent = cleanArtist
+        ? `Agent Anna Promo Host • ${cleanArtist} 365-Single Release • Live-Action Only`
+        : "Agent Anna Promo Host • 365-Single Release • Live-Action Only";
       $("heroTitle").textContent = cleanTitle;
-      $("artFileMeta").textContent = `Single: ${cleanTitle} • ${nonEmpty(track.id, "STRAYD")}`;
+      $("artFileMeta").textContent = [
+        `Single: ${cleanTitle}`,
+        cleanArtist ? `Artist: ${cleanArtist}` : "",
+        nonEmpty(track.id)
+      ].filter(Boolean).join(" • ");
 
       const img = $("artPreview");
       img.onerror = null;
@@ -1260,10 +1256,10 @@
 
     function annaSystemPrompt() {
       return [
-        "You are Agent Anna—an energetic, sharp MTV-era style VJ, music reporter, and promo host pitching a once-a-day single release (365 singles) by recording artist Martin Strayd (STRAYD), whose music is played at Kunda Cafe.",
-        "Frame the campaign as releasing singles (1 single per day across 365 days), never generic SEO filler or robotic stock phrases, while keeping the exact single title verbatim.",
+        "You are Agent Anna—an energetic, sharp MTV-era style VJ, music reporter, and promo host pitching a once-a-day single release (365 singles).",
+        "Never invent or hard-code an artist or song title; always use the exact artist and single title provided in the prompt or catalog.",
         "Respect platform budgets: 'tiktok' 100–300c ideal (max 2,200c) with 3–5 hashtags; 'instagram' first 125c punchy hook (max 2,200c) with 3–5 hashtags; 'youtube' title 60–100c (max 100c) and description 200–5,000c with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150c punchy lead + conversation/memory question + story with 2–5 hashtags; 'x' max 280c with 0–2 hashtags; 'slots' morning/midday/evening rollout; 'replies' ready fan reply lines; 'press' A4 / 3/4-page style press release (~1,800–2,500c).",
-        "Strictly live-action cinematography only (zero cartoon, zero anime, zero illustration). No raw Markdown symbols (#, **, `, >) in prose; include store (https://martinstrayd.github.io/artist/), PayPal (https://www.paypal.com/paypalme/martinstrayd), Wise QR, Buy Me a Coffee, Dogecoin, Spotify, YouTube Music, and Apple Music."
+        "Strictly live-action cinematography only. No raw Markdown symbols (#, **, `, >) in prose."
       ].join(" ");
     }
 
@@ -1275,42 +1271,45 @@
       const queryTitle = preserveTitle(typed || selected || activeTrack.title);
       const key = normalizeKey(queryTitle);
 
-      const matched =
-        catalog.find((item) => normalizeKey(item.title) === key) ||
-        catalog.find((item) => {
-          const itemKey = normalizeKey(item.title);
-          return key && (itemKey.includes(key) || key.includes(itemKey));
-        });
+      const matched = key
+        ? (catalog.find((item) => normalizeKey(item.title) === key) ||
+           catalog.find((item) => {
+             const itemKey = normalizeKey(item.title);
+             return itemKey && (itemKey.includes(key) || key.includes(itemKey));
+           }))
+        : null;
 
       activeTrack = matched
         ? {
             ...activeTrack,
             ...matched,
+            artist: preserveTitle(matched.artist || activeTrack.artist),
             title: preserveTitle(matched.title),
             url: nonEmpty(matched.url || activeTrack.url)
           }
         : {
             ...activeTrack,
-            id: activeTrack.id || "CUSTOM",
+            id: activeTrack.id || "",
+            artist: preserveTitle(activeTrack.artist),
             title: queryTitle,
-            filename: activeTrack.filename || `${queryTitle}.png`,
+            filename: activeTrack.filename || (queryTitle ? `${queryTitle}.png` : ""),
             url: activeTrack.url || ""
           };
 
-      if ($("songPicker") && Array.from($("songPicker").options).some((o) => o.value === activeTrack.title)) {
+      if ($("songPicker") && activeTrack.title && Array.from($("songPicker").options).some((o) => o.value === activeTrack.title)) {
         $("songPicker").value = activeTrack.title;
       }
 
-      writeStorage("STRAYD_LAST_SONG", activeTrack.title);
+      if (activeTrack.title) writeStorage("STRAYD_LAST_SONG", activeTrack.title);
       updateArtworkDisplay(activeTrack);
       renderBadges();
 
       const shiftVal = $("rotationShift").value === "auto"
         ? (getDayOfYear() % 7)
         : (parseInt($("rotationShift").value, 10) || 0);
-      const portalLink = nonEmpty($("directLink").value, DEFAULT_PORTAL);
-      const paypalUrl = nonEmpty($("paypalLink")?.value, DEFAULT_PAYPAL);
-      const bmac = nonEmpty($("bmacLink")?.value, DEFAULT_BMAC);
+      const portalLink = nonEmpty($("directLink").value);
+      const paypalUrl = nonEmpty($("paypalLink")?.value);
+      const bmac = nonEmpty($("bmacLink")?.value);
       const wise = cleanEditorialText($("wiseNote")?.value, activeTrack.title);
       const rawKw = nonEmpty($("keywordsInput")?.value);
       const cadence = nonEmpty($("cadenceMode")?.value, "single_day");
@@ -1331,16 +1330,18 @@
       if (sessionMemories.length) contextLines.push(`Session notes: ${sessionMemories.slice(-3).join(" | ")}`);
       $("bibleBox").value = contextLines.length
         ? contextLines.join("\n\n")
-        : "A1 command node ready — reading A1/docs/v4BIBLE and staging browser-ready 365-single copy, slots, replies & audit.";
+        : "A1 command node ready — reading A1/docs/v4BIBLE and catalog dynamically.";
 
-      renderInsightsTags(buildInsightsForTrack(activeTrack.title, shiftVal, cadence));
+      renderInsightsTags(buildInsightsForTrack(activeTrack.title || "Single", shiftVal, cadence));
       const drafts = composeDynamicChannelSet(activeTrack, shiftVal, rawKw, portalLink, paypalUrl, bmac, wise, cadence, songRef);
       $("sceneBriefMeta").textContent = `Live-action direction: ${drafts.sceneBrief}`;
       applyDrafts(drafts, activeTrack.title);
       setWaitingState(false, "Ready • Instant");
-      $("engineModeMeta").textContent = `Promo engine: Slots, replies, channel copy & A4 press ready for single "${activeTrack.title}" (#${runCounter})`;
+      $("engineModeMeta").textContent = activeTrack.title
+        ? `Promo engine: Slots, replies, channel copy & A4 press ready for "${activeTrack.title}" (#${runCounter})`
+        : `Promo engine: Ready (#${runCounter}) — select or enter a single from catalog`;
 
-      if (getDahlKey()) {
+      if (getDahlKey() && activeTrack.title) {
         setWaitingState(true, "AI Gen", activeTrack.title);
         const dahlOut = await askDahl([
           { role: "system", content: annaSystemPrompt() },
@@ -1351,20 +1352,21 @@
               dayOfYear: getDayOfYear(),
               cadence,
               focusShift: shiftVal,
+              artist: activeTrack.artist || null,
               exactSingleTitle: activeTrack.title,
-              catalogId: activeTrack.id,
-              artworkFile: activeTrack.filename,
+              catalogId: activeTrack.id || null,
+              artworkFile: activeTrack.filename || null,
               keywords: rawKw,
               directive: customDirective,
               songNotes: songRef,
-              salesPortal: portalLink,
-              paypalLink: paypalUrl,
-              buyMeACoffee: bmac,
-              paymentRails: wise,
+              salesPortal: portalLink || null,
+              paypalLink: paypalUrl || null,
+              buyMeACoffee: bmac || null,
+              paymentRails: wise || null,
               streamingLinks: {
-                spotify: DEFAULT_SPOTIFY,
-                ytMusic: DEFAULT_YTMUSIC,
-                appleMusic: DEFAULT_APPLEMUSIC
+                spotify: nonEmpty($("spotifyUrl")?.value) || null,
+                ytMusic: nonEmpty($("ytMusicUrl")?.value) || null,
+                appleMusic: nonEmpty($("appleMusicUrl")?.value) || null
               }
             }) + "\nReturn ONLY valid JSON with keys: sceneBrief, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
           }
@@ -1387,7 +1389,7 @@
             facebook: nonEmpty(j.facebook, drafts.facebook),
             x: nonEmpty(j.x, drafts.x)
           }, activeTrack.title);
-          $("engineModeMeta").textContent = `Promo engine: Live AI copy, slots & replies active for single "${activeTrack.title}" (#${runCounter})`;
+          $("engineModeMeta").textContent = `Promo engine: Live AI copy, slots & replies active for "${activeTrack.title}" (#${runCounter})`;
         }
         setWaitingState(false, "Ready");
       }
@@ -1399,20 +1401,20 @@
       $("chatInput").value = "";
       appendChat("You", msg);
       customDirective = msg;
-      sessionMemories.push(`${activeTrack.title}: ${msg}`);
+      sessionMemories.push(`${activeTrack.title || "Single"}: ${msg}`);
       runCounter++;
 
       const dahlReply = getDahlKey()
         ? await askDahl([
             { role: "system", content: annaSystemPrompt() + " Reply in 2 sharp sentences as Agent Anna." },
-            { role: "user", content: `Single: "${activeTrack.title}". Keywords: "${nonEmpty($("keywordsInput")?.value)}". Directive: ${msg}` }
+            { role: "user", content: `Artist: "${activeTrack.artist}". Single: "${activeTrack.title}". Keywords: "${nonEmpty($("keywordsInput")?.value)}". Directive: ${msg}` }
           ], false, 0.95, 8500)
         : { ok: false };
 
       if (dahlReply && dahlReply.ok && dahlReply.text) {
         appendChat("Agent Anna", dahlReply.text);
       } else {
-        appendChat("Agent Anna", `Locked "${msg}" onto single "${activeTrack.title}"—refreshing schedule slots, fan replies, and channel copy now.`);
+        appendChat("Agent Anna", `Locked "${msg}" onto "${activeTrack.title || "current single"}"—refreshing schedule slots, fan replies, and channel copy now.`);
       }
       await generateAll();
     }
@@ -1438,14 +1440,17 @@
     function parseCatalogJson(rawText) {
       const parsed = JSON.parse(rawText);
       const items = [];
+      const topArtist = preserveTitle(parsed?.artist || parsed?.artistName || "");
 
       if (Array.isArray(parsed)) {
         for (const entry of parsed) {
           if (entry && (entry.title || entry.filename)) {
             const rawName = nonEmpty(entry.title || entry.filename);
+            const itemArtist = preserveTitle(entry.artist || entry.artistName || topArtist);
             items.push({
-              id: nonEmpty(entry.id || entry.code, `STRAYD-ID-${String(items.length + 1).padStart(3, "0")}`),
-              title: preserveTitle(rawName.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
+              id: nonEmpty(entry.id || entry.code, `SINGLE-${String(items.length + 1).padStart(3, "0")}`),
+              artist: itemArtist,
+              title: preserveTitle(rawName.replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
               filename: nonEmpty(entry.filename, `${rawName}.png`),
               url: nonEmpty(entry.url || entry.artworkUrl || entry.image)
             });
@@ -1460,10 +1465,12 @@
           if (!f) continue;
           const fname = nonEmpty(f.filename || f.title || f.name);
           if (!fname) continue;
-          if (/\.(png|jpe?g|webp)$/i.test(fname) || /martin strayd/i.test(fname) || f.title) {
+          if (/\.(png|jpe?g|webp)$/i.test(fname) || f.title || f.name) {
+            const itemArtist = preserveTitle(f.artist || f.artistName || topArtist);
             items.push({
-              id: nonEmpty(f.id || f.code, `STRAYD-ID-${String(items.length + 1).padStart(3, "0")}`),
-              title: preserveTitle(fname.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
+              id: nonEmpty(f.id || f.code, `SINGLE-${String(items.length + 1).padStart(3, "0")}`),
+              artist: itemArtist,
+              title: preserveTitle(fname.replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
               filename: fname,
               url: nonEmpty(f.url || f.artworkUrl || f.image)
             });
@@ -1528,15 +1535,15 @@
             for (const item of catalog) {
               const opt = document.createElement("option");
               opt.value = item.title;
-              opt.textContent = `${item.title} • ${item.id}`;
+              opt.textContent = item.id ? `${item.title} • ${item.id}` : item.title;
               picker.appendChild(opt);
             }
           } catch (_) {}
         }
       }
 
-      if (catalog.length && !nonEmpty($("customSong").value) && forceNonRepeat) {
-        const chosen = pickCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"), true);
+      if (catalog.length && !nonEmpty($("customSong").value) && (forceNonRepeat || !activeTrack.title)) {
+        const chosen = pickCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"), forceNonRepeat);
         if (chosen) {
           activeTrack = chosen;
           $("songPicker").value = chosen.title;
@@ -1558,18 +1565,17 @@
       const savedStrat = readStorage("STRAYD_LOAD_STRATEGY");
       if (savedStrat) $("loadStrategy").value = savedStrat;
 
-      activeTrack = { ...INITIAL_TRACK };
-      recordRecentPick(activeTrack.title);
       updateArtworkDisplay(activeTrack);
       renderBadges();
 
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", `Agent Anna ready—365-single once-a-day mode active starting with ${INITIAL_TRACK.title}, with non-repeating next-track picks.`);
+        appendChat("Agent Anna", "Agent Anna online—365-single once-a-day engine ready with dynamic catalog loading.");
       }
 
+      await syncCatalogAndPick(false);
       await generateAll();
 
-      Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext(), syncCatalogAndPick(false)]).then(() => {
+      Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]).then(() => {
         $("bootStatus").textContent = catalog.length
           ? `365-Single Catalog Ready • ${catalog.length} tracks`
           : `A1 Node Ready • Day ${getDayOfYear()}`;
@@ -1600,7 +1606,7 @@
 
     $("copyBundleBtn").addEventListener("click", async () => {
       const pack = [
-        `=== ${activeTrack.title} (${activeTrack.id || "STRAYD"}) — Martin Strayd 365-Single ===`,
+        `=== ${activeTrack.title || "Single"} (${activeTrack.id || "365-SINGLE"}) — 365-Single Pack ===`,
         `[Day Slots]\n${$("slotsOut").value}`,
         `[Fan Replies]\n${$("repliesOut").value}`,
         `[A4 / 3/4 Press Release]\n${$("pressOut").value}`,
@@ -1726,10 +1732,10 @@
         queueLoaded: Boolean(queueSummary),
         swallowedOrTrimmedFields: trimmedFlags.length ? trimmedFlags : ["None"],
         carriedForwardCore: [
-          "exact single title",
+          "dynamic artist & single title",
           "Agent Anna 365-single host framing",
-          "live-action cinematography rule (zero cartoon)",
-          "direct MP3 + sleeve, PayPal, Buy Me a Coffee, Wise/DOGE & streaming links"
+          "live-action cinematography rule",
+          "configured release, support & streaming links"
         ]
       };
 
@@ -1749,19 +1755,19 @@
         directive: customDirective || null,
         approved: true,
         approvedAt: new Date().toISOString(),
-        artist: "Martin Strayd",
-        song: activeTrack.title,
+        artist: activeTrack.artist || null,
+        song: activeTrack.title || null,
         songId: activeTrack.id || null,
         artworkUrl: $("artPreview")?.src || activeTrack.url || null,
-        visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)",
-        salesPortal: nonEmpty($("directLink").value),
-        paypalLink: nonEmpty($("paypalLink")?.value),
-        buyMeACoffeeLink: nonEmpty($("bmacLink")?.value),
+        visualLaw: "Strictly realistic live-action cinematography only",
+        salesPortal: nonEmpty($("directLink").value) || null,
+        paypalLink: nonEmpty($("paypalLink")?.value) || null,
+        buyMeACoffeeLink: nonEmpty($("bmacLink")?.value) || null,
         paymentRailsNote: cleanEditorialText($("wiseNote")?.value, activeTrack.title) || null,
         streamingLinks: {
-          spotify: DEFAULT_SPOTIFY,
-          ytMusic: DEFAULT_YTMUSIC,
-          appleMusic: DEFAULT_APPLEMUSIC
+          spotify: nonEmpty($("spotifyUrl")?.value) || null,
+          ytMusic: nonEmpty($("ytMusicUrl")?.value) || null,
+          appleMusic: nonEmpty($("appleMusicUrl")?.value) || null
         },
         slots: $("slotsOut").value,
         replies: $("repliesOut").value,
@@ -1776,7 +1782,7 @@
       $("payloadOut").value = JSON.stringify(payload, null, 2);
       const gate = $("gateStatus");
       const trimMsg = trimmedFlags.length ? ` • Trimmed: ${trimmedFlags.join(", ")}` : " • Zero swallowed/trimmed fields";
-      gate.textContent = `Approval gate: OK STAGED (${payload.song})${trimMsg}`;
+      gate.textContent = `Approval gate: OK STAGED (${payload.song || "Single"})${trimMsg}`;
       gate.style.color = "var(--ok)";
 
       const webhook = nonEmpty($("webhookUrl").value);
