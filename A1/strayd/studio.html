@@ -144,7 +144,7 @@
       border-color: var(--sky);
     }
     textarea {
-      min-height: 92px;
+      min-height: 128px;
       font-family: ui-monospace, Consolas, Menlo, monospace;
       font-size: 0.82rem;
       line-height: 1.5;
@@ -254,19 +254,19 @@
             <label for="customSong">Custom Song Title Override</label>
             <input id="customSong" type="text" placeholder="Type a title or leave blank..." />
 
-            <label for="keywordsInput">Priority Keywords &amp; Trends</label>
-            <input id="keywordsInput" type="text" placeholder="e.g. indie rock, late night, direct mp3, live session..." />
+            <label for="keywordsInput">Priority Keywords, Trends &amp; Playlists</label>
+            <input id="keywordsInput" type="text" placeholder="e.g. indie rock, late night drive, direct mp3, live room..." />
 
             <label for="rotationShift">Angle &amp; Rotation</label>
             <select id="rotationShift">
               <option value="auto">Auto (Day of Week)</option>
-              <option value="0">01 • Opening Hook &amp; Attitude</option>
-              <option value="1">02 • Lyrics, Stakes &amp; Tension</option>
-              <option value="2">03 • Live-Action Scene &amp; Camera</option>
+              <option value="0">01 • High-Voltage Release Hype</option>
+              <option value="1">02 • Lyrics, Tension &amp; Real Stakes</option>
+              <option value="2">03 • Live-Action Reel &amp; Camera</option>
               <option value="3">04 • Own MP3 + Sleeve Bundle</option>
-              <option value="4">05 • Search &amp; Discovery Keywords</option>
+              <option value="4">05 • Search, Keywords &amp; Playlists</option>
               <option value="5">06 • External Note &amp; Story Cut</option>
-              <option value="6">07 • Weekend Spotlight</option>
+              <option value="6">07 • Weekend Catalog Spotlight</option>
             </select>
 
             <label for="directLink">Direct MP3 + Cover Art Link</label>
@@ -318,7 +318,7 @@
                 <span>NY / Hollywood Press &amp; Live-Action Reel Brief (Zero Cartoon)</span>
                 <span class="stats" id="pressStats">0 words • 0 chars</span>
               </div>
-              <textarea id="pressOut" style="min-height:110px;"></textarea>
+              <textarea id="pressOut" style="min-height:145px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="pressOut">Copy Press Brief</button>
               </div>
@@ -326,10 +326,10 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>TikTok • Fast Hook + Live-Action Cue + Bundle CTA</span>
-                <span class="stats" id="ttStats">0 words • 0 chars</span>
+                <span>TikTok • Hook + Live-Action Reel + Bundle Pitch (API max 2,200 / Native 4,000 chars)</span>
+                <span class="stats" id="ttStats">0 words • 0 / 2,200 chars</span>
               </div>
-              <textarea id="ttOut"></textarea>
+              <textarea id="ttOut" style="min-height:150px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="ttOut">Copy TikTok</button>
                 <button type="button" class="post-btn" data-post="tiktok" data-source="ttOut">Post</button>
@@ -338,10 +338,10 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Instagram • Lead Hook + Story + Direct Link</span>
-                <span class="stats" id="igStats">0 words • 0 chars</span>
+                <span>Instagram • Lead Hook + Story + Reel &amp; Direct Link (max 2,200 chars)</span>
+                <span class="stats" id="igStats">0 words • 0 / 2,200 chars</span>
               </div>
-              <textarea id="igOut"></textarea>
+              <textarea id="igOut" style="min-height:150px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="igOut">Copy Instagram</button>
                 <button type="button" class="post-btn" data-post="instagram" data-source="igOut">Post</button>
@@ -355,10 +355,10 @@
               </div>
               <input id="ytTitleOut" type="text" maxlength="100" />
               <div class="channel-head" style="margin-top:12px;">
-                <span>YouTube Description • Context + Live-Action Note + Link</span>
-                <span class="stats" id="ytDescStats">0 words • 0 chars</span>
+                <span>YouTube Description • SEO Lead + Story + Press/Reel + Link (max 5,000 chars)</span>
+                <span class="stats" id="ytDescStats">0 words • 0 / 5,000 chars</span>
               </div>
-              <textarea id="ytDescOut"></textarea>
+              <textarea id="ytDescOut" style="min-height:175px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
                 <button type="button" class="copy-btn" data-copy="ytDescOut">Copy YT Description</button>
@@ -368,10 +368,10 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Facebook • Conversation &amp; Share Pitch</span>
-                <span class="stats" id="fbStats">0 words • 0 chars</span>
+                <span>Facebook • Full Hype, Story &amp; Share Pitch (up to 63,206 chars)</span>
+                <span class="stats" id="fbStats">0 words • 0 / 63,206 chars</span>
               </div>
-              <textarea id="fbOut"></textarea>
+              <textarea id="fbOut" style="min-height:155px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="fbOut">Copy Facebook</button>
                 <button type="button" class="post-btn" data-post="facebook" data-source="fbOut">Post</button>
@@ -380,10 +380,10 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>X • Punchy Post (target &le; 280 chars)</span>
+                <span>X • Punchy High-Impact Post (limit: &le; 280 chars)</span>
                 <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
-              <textarea id="xOut" style="min-height:74px;"></textarea>
+              <textarea id="xOut" style="min-height:82px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="xOut">Copy X</button>
                 <button type="button" class="post-btn" data-post="x" data-source="xOut">Post</button>
@@ -505,9 +505,9 @@
       try {
         const parsed = JSON.parse(hit.text);
         const flat = JSON.stringify(parsed).replace(/[{}"]/g, " ").replace(/\s+/g, " ").trim();
-        brainSummary = flat.slice(0, 220);
+        brainSummary = flat.slice(0, 260);
       } catch (_) {
-        brainSummary = hit.text.replace(/\s+/g, " ").trim().slice(0, 220);
+        brainSummary = hit.text.replace(/\s+/g, " ").trim().slice(0, 260);
       }
     }
 
@@ -566,15 +566,15 @@
         return cleanTag ? `#${cleanTag}` : "";
       }).filter(Boolean);
 
-      const defaults = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter"];
+      const defaults = ["#MartinStrayd", "#STRAYD", "#IndieRock", "#Songwriter", "#NewMusic", "#DirectMP3"];
       const merged = [...hashtags];
       for (const tag of defaults) {
         if (!merged.some((t) => t.toLowerCase() === tag.toLowerCase())) merged.push(tag);
       }
       return {
         list,
-        phrase: list.slice(0, 3).join(" "),
-        tags: merged.slice(0, 5).join(" "),
+        phrase: list.slice(0, 4).join(" "),
+        tags: merged.slice(0, 7).join(" "),
         shortTags: merged.slice(0, 2).join(" ")
       };
     }
@@ -585,16 +585,18 @@
         : "";
 
       const scenes = [
-        "Handheld live-action camera at dusk, real street atmosphere, natural lighting, zero cartoon",
-        "Close live-action performance in a cramped room, real breath and room tone, zero cartoon",
-        "Moving live-action camera following real footsteps and neon reflections, zero cartoon",
-        "Late-night live-action studio & room cut, raw human energy, zero cartoon"
+        "Handheld realistic live-action camera moving through late-evening streets, grounded natural light and real room/street energy, strictly live-action with zero cartoon",
+        "Close-up realistic live-action performance in a raw working room, real breath and tactile atmosphere, strictly live-action with zero cartoon",
+        "Fluid live-action tracking cut along real city pavement and reflections, unpolished cinema grit, strictly live-action with zero cartoon",
+        "Late-night live-action session cut with real human presence and natural shadows, strictly live-action with zero cartoon"
       ];
       const scene = nonEmpty(directive)
-        ? `Live-action brief: ${nonEmpty(directive)} (strictly realistic live-action only, zero cartoon)`
+        ? `Live-action brief: ${nonEmpty(directive)} (strictly realistic live-action cinematography only, zero cartoon, zero anime, zero illustration)`
         : scenes[(Math.abs(shift) + seed) % scenes.length];
 
-      const noteContext = noteLine ? `Note: ${noteLine.slice(0, 120)}` : `Track: "${title}" by Martin Strayd`;
+      const noteContext = noteLine
+        ? `Catalog note: ${noteLine.slice(0, 160)}`
+        : `Catalog showcase: "${title}" from Martin Strayd's 70+ song vault (also played in Kunda Cafe's live-room rotation)`;
       return { scene, noteContext };
     }
 
@@ -604,44 +606,63 @@
       const kw = parseKeywords(rawKeywords);
       const { scene, noteContext } = buildSceneBrief(title, noteRec, shift, seed, directive);
 
-      const ttHooks = [
-        `Wait till "${title}" drops the chorus—zero polite background noise.`,
-        `Stop scrolling for 10 seconds: "${title}" by Martin Strayd hits different.`,
-        `You hear the tension before the first beat of "${title}" even settles.`
+      const hookSets = [
+        `Most tracks play safe behind polite algorithms until "${title}" kicks the door open and commands the whole room.`,
+        `Stop scrolling past disposable filler—"${title}" by Martin Strayd hits with real weight, sharp attitude, and melody that stays in your head all week.`,
+        `You feel the tension in "${title}" before the chorus even explodes—this is why Martin Strayd's catalog hits harder every time it drops.`
       ];
-      const igAngles = [
-        `Real weight, real friction, and zero gloss on "${title}" by Martin Strayd.`,
-        `Behind "${title}": ${scene}. Built to be owned, not rented on a playlist.`,
-        `"${title}" carries grit from start to finish—grab the track and cover sleeve together.`
-      ];
-      const fbAngles = [
-        `Curious how "${title}" by Martin Strayd lands with you—who in your circle needs to hear it?`,
-        `Put "${title}" on tonight and tell me which line hits hardest. ${noteContext}.`,
-        `Direct MP3 + cover art ownership beats algorithms every time. What do you think of "${title}"?`
-      ];
-      const xHooks = [
-        `"${title}" — Martin Strayd. Real teeth, zero filler.`,
-        `"${title}" by Martin Strayd hits hard from line one.`,
-        `Turn up "${title}" — Martin Strayd. Own the MP3 + sleeve:`
-      ];
+      const hypeHook = hookSets[(Math.abs(shift) + seed) % hookSets.length];
+      const kwFocus = kw.phrase ? `Keywords & playlist lane: ${kw.phrase}.` : "Keywords & playlist lane: independent rock, songwriter spotlight, catalog drop.";
 
-      const ttHook = ttHooks[(Math.abs(shift) + seed) % ttHooks.length];
-      const igAngle = igAngles[(Math.abs(shift) + seed + 1) % igAngles.length];
-      const fbAngle = fbAngles[(Math.abs(shift) + seed + 2) % fbAngles.length];
-      const xHook = xHooks[(Math.abs(shift) + seed) % xHooks.length];
-      const kwFocus = kw.phrase ? ` [${kw.phrase}]` : "";
+      const press = [
+        `NY / HOLLYWOOD PRESS & REEL BRIEF — "${title}" by Martin Strayd (STRAYD)`,
+        `Headline Angle: Agent Anna spotlights "${title}" as a high-voltage catalog release built for real listeners and direct ownership.`,
+        `Story & Hype Pitch: ${hypeHook} ${noteContext}.`,
+        `Live-Action Reel Direction (Zero Cartoon): ${scene}.`,
+        `Direct MP3 + Cover Sleeve Bundle: ${url} (${kwFocus})`
+      ].join("\n\n");
 
-      const press = `NY / HOLLYWOOD PRESS PITCH — "${title}" by Martin Strayd (STRAYD)\nAngle: ${igAngle}\nLive-Action Reel (Zero Cartoon): ${scene}\nDirect MP3 + Cover Sleeve: ${url}`;
-      const tiktok = `${ttHook}${kwFocus} Shot note: ${scene}. Own MP3 + sleeve: ${url} ${kw.tags}`;
-      const instagram = `"${title}" — Martin Strayd${kwFocus}. ${igAngle} Own MP3 + cover art: ${url} ${kw.tags}`;
+      const tiktok = [
+        `${hypeHook}`,
+        `Agent Anna Reel Cue: ${scene}.`,
+        `${kwFocus} Built for replay across song clips, mood playlists, and late-night discovery.`,
+        `Skip renting streams—grab the MP3 + cover sleeve bundle direct: ${url}`,
+        `${kw.tags}`
+      ].join("\n\n").slice(0, 2200);
+
+      const instagram = [
+        `"${title}" — Martin Strayd (Agent Anna Showcase)`,
+        `${hypeHook}`,
+        `${noteContext}. ${kwFocus}`,
+        `Live-Action Visual Cue: ${scene}.`,
+        `Own the MP3 + cover art sleeve direct: ${url}`,
+        `${kw.tags}`
+      ].join("\n\n").slice(0, 2200);
+
       const ytTitle = (kw.phrase
-        ? `${title} — Martin Strayd (${kw.phrase})`
-        : `${title} — Martin Strayd (Audio & Sleeve)`).slice(0, 100);
-      const ytDesc = `"${title}" by Martin Strayd — curated via Agent Anna.\n\n${igAngle}\n${noteContext}\nLive-action shot direction: ${scene}.\n\nDirect MP3 + cover art bundle: ${url}\n\n${kw.tags}`;
-      const facebook = `${fbAngle} Direct MP3 + sleeve: ${url}`;
+        ? `${title} — Martin Strayd | ${kw.phrase}`
+        : `${title} — Martin Strayd | Official Release`).slice(0, 100);
 
-      const xFull = `${xHook} ${url} ${kw.shortTags}`;
-      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd ${url} ${kw.shortTags}`.slice(0, 280);
+      const ytDesc = [
+        `"${title}" by Martin Strayd (STRAYD) — featured and promoted by Agent Anna.`,
+        `${hypeHook}`,
+        `${noteContext}. ${kwFocus}`,
+        `NY / Hollywood Press & Live-Action Reel Cue: ${scene}.`,
+        `Own the full MP3 + cover sleeve bundle direct from the source: ${url}`,
+        `Tags & Discovery: ${kw.tags}`
+      ].join("\n\n").slice(0, 5000);
+
+      const facebook = [
+        `Agent Anna on the desk with a big one from Martin Strayd: "${title}".`,
+        `${hypeHook}`,
+        `${noteContext}. ${kwFocus}`,
+        `Live-Action Scene Direction: ${scene}.`,
+        `Which line or moment in "${title}" grabs you first—and who in your crew needs this track on rotation?`,
+        `Claim the MP3 + cover sleeve bundle direct: ${url}`
+      ].join("\n\n").slice(0, 63206);
+
+      const xFull = `"${title}" — Martin Strayd. ${hypeHook.slice(0, 125)} Own MP3 + sleeve: ${url} ${kw.shortTags}`;
+      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd. ${url} ${kw.shortTags}`.slice(0, 280);
 
       return { press, tiktok, instagram, ytTitle, ytDesc, facebook, x, scene };
     }
@@ -652,24 +673,24 @@
       $("pressStats").className = "stats";
 
       const ttVal = nonEmpty($("ttOut").value);
-      $("ttStats").textContent = `${countWords(ttVal)} words • ${ttVal.length} chars`;
-      $("ttStats").className = "stats";
+      $("ttStats").textContent = `${countWords(ttVal)} words • ${ttVal.length} / 2,200 chars`;
+      $("ttStats").className = ttVal.length > 2200 ? "stats over" : "stats";
 
       const igVal = nonEmpty($("igOut").value);
-      $("igStats").textContent = `${countWords(igVal)} words • ${igVal.length} chars`;
-      $("igStats").className = "stats";
+      $("igStats").textContent = `${countWords(igVal)} words • ${igVal.length} / 2,200 chars`;
+      $("igStats").className = igVal.length > 2200 ? "stats over" : "stats";
 
       const ytTVal = nonEmpty($("ytTitleOut").value);
       $("ytTitleStats").textContent = `${countWords(ytTVal)} words • ${ytTVal.length} / 100 chars`;
       $("ytTitleStats").className = ytTVal.length > 100 ? "stats over" : "stats";
 
       const ytDVal = nonEmpty($("ytDescOut").value);
-      $("ytDescStats").textContent = `${countWords(ytDVal)} words • ${ytDVal.length} chars`;
-      $("ytDescStats").className = "stats";
+      $("ytDescStats").textContent = `${countWords(ytDVal)} words • ${ytDVal.length} / 5,000 chars`;
+      $("ytDescStats").className = ytDVal.length > 5000 ? "stats over" : "stats";
 
       const fbVal = nonEmpty($("fbOut").value);
-      $("fbStats").textContent = `${countWords(fbVal)} words • ${fbVal.length} chars`;
-      $("fbStats").className = "stats";
+      $("fbStats").textContent = `${countWords(fbVal)} words • ${fbVal.length} / 63,206 chars`;
+      $("fbStats").className = fbVal.length > 63206 ? "stats over" : "stats";
 
       const xVal = nonEmpty($("xOut").value);
       $("xStats").textContent = `${countWords(xVal)} words • ${xVal.length} / 280 chars`;
@@ -693,7 +714,7 @@
       $("statusBadges").innerHTML = [
         `<span class="badge">Shell: A1 + Lean v4</span>`,
         `<span class="badge">Live-Action Only (Zero Cartoon)</span>`,
-        `<span class="badge">${hasDahl ? "Dahl Key Active" : "Local Multi-Voice Ready"}</span>`,
+        `<span class="badge">${hasDahl ? "Dahl Key Active" : "Local Full-Space Engine"}</span>`,
         `<span class="badge">${hasGh ? "GitHub PAT Set" : "Public Catalog"}</span>`
       ].join("");
     }
@@ -816,14 +837,14 @@
 
       applyDrafts(fallback);
       $("engineModeMeta").textContent = getDahlKey()
-        ? "Copy engine: Requesting custom Dahl drafts..."
-        : "Copy engine: Local multi-voice craft (add Dahl API key for AI rewrites)";
+        ? "Copy engine: Requesting custom Dahl full-space drafts..."
+        : "Copy engine: Full-space hype & SEO engine active (add Dahl API key for AI rewrites)";
 
       const dahlOut = await askDahl([
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core), writing marketing copy for recording artist Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Give each channel a distinct opening, angle, and rhythm, and include a NY/Hollywood press pitch + live-action reel cue (press). Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. ytTitle must be <= 100 chars and x must be <= 280 chars. Return ONLY valid JSON with keys: press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            "You are Agent Anna in the A1 shell (v4 core) operating as DJ, artist manager, and campaign strategist for Martin Strayd (STRAYD). Deliver high-energy sales/hype craft, rich SEO keywords/playlist angles, and a NY/Hollywood press & live-action reel brief (press). Make full effective use of each platform's space while strictly respecting limits: ytTitle <= 100 chars, x <= 280 chars, tiktok <= 2200 chars, instagram <= 2200 chars, ytDesc <= 5000 chars, facebook rich long-form. Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration), direct MP3 + cover sleeve ownership, and zero fake network claims. Return ONLY valid JSON with keys: press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
         },
         {
           role: "user",
@@ -841,18 +862,19 @@
 
       if (dahlOut && dahlOut.ok && dahlOut.json) {
         const j = dahlOut.json;
-        applyDrafts({
+        const nextDrafts = {
           press: nonEmpty(j.press, fallback.press),
-          tiktok: nonEmpty(j.tiktok, fallback.tiktok),
-          instagram: nonEmpty(j.instagram, fallback.instagram),
+          tiktok: nonEmpty(j.tiktok, fallback.tiktok).slice(0, 2200),
+          instagram: nonEmpty(j.instagram, fallback.instagram).slice(0, 2200),
           ytTitle: nonEmpty(j.ytTitle, fallback.ytTitle).slice(0, 100),
-          ytDesc: nonEmpty(j.ytDesc, fallback.ytDesc),
-          facebook: nonEmpty(j.facebook, fallback.facebook),
+          ytDesc: nonEmpty(j.ytDesc, fallback.ytDesc).slice(0, 5000),
+          facebook: nonEmpty(j.facebook, fallback.facebook).slice(0, 63206),
           x: nonEmpty(j.x, fallback.x).slice(0, 280)
-        });
-        $("engineModeMeta").textContent = `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) custom drafts applied`;
+        };
+        applyDrafts(nextDrafts);
+        $("engineModeMeta").textContent = `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) full-space drafts applied`;
       } else if (getDahlKey()) {
-        $("engineModeMeta").textContent = `Copy engine: Local multi-voice active (Dahl fallback: ${dahlOut?.reason || "unavailable"})`;
+        $("engineModeMeta").textContent = `Copy engine: Full-space engine active (Dahl fallback: ${dahlOut?.reason || "unavailable"})`;
       }
     }
 
