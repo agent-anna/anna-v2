@@ -167,7 +167,7 @@
       resize: vertical;
     }
     textarea.press-area {
-      min-height: 360px;
+      min-height: 320px;
     }
     textarea.generating {
       border-color: var(--warn);
@@ -270,7 +270,7 @@
     <header class="topbar">
       <div>
         <h1>A1 Record Command • Agent Anna Social Master</h1>
-        <div class="muted">Agent Anna Promo Host • Martin Strayd A–Z Catalog • Live-Action Only (Zero Cartoon)</div>
+        <div class="muted">Agent Anna Promo Host • Martin Strayd (STRAYD) 365-Single Release • Kunda Cafe • Live-Action Only</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span class="waiting-pill" id="waitIndicator">Idle • Ready</span>
@@ -284,33 +284,33 @@
           <img id="artPreview" src="" alt="Martin Strayd Cover Sleeve" />
         </div>
         <div>
-          <div class="eyebrow">365-Day A–Z Catalog Roll &amp; Multi-Post Sales Command</div>
-          <div class="hero-title" id="heroTitle">ADHD I Can Do That (Travillen Disorder)</div>
-          <div class="hero-meta" id="artFileMeta">Track: ADHD I Can Do That (Travillen Disorder) • STRAYD-ID-001</div>
+          <div class="eyebrow">365-Day Once-a-Day Single Release • Agent Anna Promo &amp; Pod Command</div>
+          <div class="hero-title" id="heroTitle">Loading Single…</div>
+          <div class="hero-meta" id="artFileMeta">Single: Syncing catalog…</div>
           <div class="hero-meta" id="sceneBriefMeta">Live-action direction: realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="badges" id="statusBadges"></div>
           <div class="muted" id="engineModeMeta" style="margin-top:8px;">Promo engine: Ready</div>
-          <div class="muted" id="gateStatus" style="margin-top:8px;">Approval gate: Staged — click OK To Post when ready</div>
+          <div class="muted" id="gateStatus" style="margin-top:8px;">Approval gate: Browser-ready — review, copy or hit Post, or click OK To Post to stage JSON</div>
         </div>
       </section>
 
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="card-title">1. A–Z Song Roll, Selection &amp; Sales Rails</div>
+            <div class="card-title">1. 365-Single Roll, Selection &amp; Sales Rails</div>
 
-            <label for="loadStrategy">On-Load Song Pick Mode (365-Day Loop)</label>
+            <label for="loadStrategy">On-Load Single Pick Mode (365-Single Loop)</label>
             <select id="loadStrategy">
-              <option value="random">Random Single on Load (Instant Variety + Full Picker)</option>
-              <option value="daily_az">Daily A–Z Roll (Min 1 Song/Day • 365-Day Loop)</option>
+              <option value="random">Non-Repeating Random on Load + Full Picker</option>
+              <option value="daily_az">Once-a-Day Single Roll (1/Day • 365-Day Loop)</option>
             </select>
 
             <label for="songPicker">Select Single (A–Z Catalog Roll — Title Priority)</label>
             <select id="songPicker"></select>
 
-            <label for="customSong">Custom Song Title Override (Locked Verbatim)</label>
-            <input id="customSong" type="text" placeholder="Type exact song title or leave blank..." />
+            <label for="customSong">Custom Single Title Override (Locked Verbatim)</label>
+            <input id="customSong" type="text" placeholder="Type exact single title or leave blank..." />
 
             <label for="cadenceMode">Daily Release Cadence</label>
             <select id="cadenceMode">
@@ -323,13 +323,13 @@
 
             <label for="rotationShift">Campaign Angle / Hook Shift</label>
             <select id="rotationShift">
-              <option value="auto">Auto (Daily Catalog Roll)</option>
-              <option value="0">01 • Hook &amp; Wit</option>
-              <option value="1">02 • Song Story &amp; Tension</option>
-              <option value="2">03 • Live-Action Reel &amp; Camera</option>
+              <option value="auto">Auto (Daily Single Roll)</option>
+              <option value="0">01 • VJ Single Pitch &amp; Hook</option>
+              <option value="1">02 • Song Story &amp; Room Mood</option>
+              <option value="2">03 • Live-Action Camera &amp; Heat</option>
               <option value="3">04 • Own MP3 + Sleeve CTA</option>
               <option value="4">05 • Search, AI &amp; Playlists</option>
-              <option value="5">06 • Host Take &amp; Promo Drop</option>
+              <option value="5">06 • Host Take &amp; Promo Pitch</option>
               <option value="6">07 • Fan Question &amp; Share</option>
             </select>
 
@@ -354,13 +354,13 @@
             <input id="dahlKey" type="hidden" value="" />
             <input id="ghPat" type="hidden" value="" />
 
-            <label for="webhookUrl">GitHub / PHP / AI / JS Automation Webhook (Optional)</label>
-            <input id="webhookUrl" type="text" placeholder="https://.../anna-dispatch.php" />
+            <label for="webhookUrl">Optional Webhook / A1 Workflow Target (Leave Blank for Browser-Only)</label>
+            <input id="webhookUrl" type="text" placeholder="Optional webhook URL..." />
 
             <div class="actions">
-              <button type="button" class="accent" id="generateBtn">Generate Channel Copy</button>
-              <button type="button" id="reloadBtn">Load / Refresh A–Z Catalog &amp; Brain</button>
-              <button type="button" class="primary" id="approveBtn">OK To Post</button>
+              <button type="button" class="accent" id="generateBtn">Generate Single Copy + Slots + Replies</button>
+              <button type="button" id="reloadBtn">Next Non-Repeating Single &amp; Reload</button>
+              <button type="button" class="primary" id="approveBtn">OK To Post (Stage JSON &amp; Audit)</button>
             </div>
           </section>
 
@@ -368,7 +368,7 @@
             <div class="card-title">2. Chat With Agent Anna (Promo Director)</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Tell Anna what angle, joke, CTA, or repo workflow to use..." />
+              <input id="chatInput" type="text" placeholder="Direct Anna on today's single pitch, reply tone, MP3/sleeve CTA..." />
               <button type="button" id="chatSendBtn">Send</button>
             </div>
           </section>
@@ -376,23 +376,36 @@
 
         <div>
           <section class="card">
-            <div class="card-title">3. Record Command Brain, Lyrics/Notes &amp; A1 Bible Context</div>
-            <textarea id="bibleBox" readonly style="min-height:92px;"></textarea>
+            <div class="card-title">3. A1/docs/v4BIBLE Shared Context, Pod Ledger &amp; Notes</div>
+            <textarea id="bibleBox" readonly style="min-height:84px;"></textarea>
           </section>
 
           <section class="card">
-            <div class="card-title">4. Channel Drafts, Insights Tags &amp; A4 Agent Anna × Martin Strayd Press Release</div>
+            <div class="card-title">4. Day-by-Day Slots, Fan Reply Pack, Channel Drafts &amp; A4 Press Release</div>
 
             <article class="channel">
               <div class="channel-head">
-                <span>A4 / 3/4-Page Press Release • World Best Song A Day: Martin Strayd &amp; Agent Anna</span>
-                <span class="stats" id="pressStats">0 words • 0 chars</span>
+                <span>Day-by-Day Time Slots &amp; Cadence Rollout (Morning • Midday • Evening)</span>
+                <span class="stats" id="slotsStats">0 words • 0 chars</span>
               </div>
-              <div class="insights-row" id="pressInsights"></div>
-              <textarea id="pressOut" class="press-area"></textarea>
+              <div class="insights-row" id="slotsInsights"></div>
+              <textarea id="slotsOut" style="min-height:175px;"></textarea>
               <div class="btn-row">
-                <button type="button" class="tts-btn" data-tts="pressOut" data-label="Press Release">Speak</button>
-                <button type="button" class="copy-btn" data-copy="pressOut">Copy Press Release</button>
+                <button type="button" class="tts-btn" data-tts="slotsOut" data-label="Day Slots">Speak</button>
+                <button type="button" class="copy-btn" data-copy="slotsOut">Copy Schedule Slots</button>
+              </div>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>Agent Anna Fan Reply Pack (Comment Replies • Questions • Direct MP3 &amp; Kunda Cafe)</span>
+                <span class="stats" id="repliesStats">0 words • 0 chars</span>
+              </div>
+              <div class="insights-row" id="repliesInsights"></div>
+              <textarea id="repliesOut" style="min-height:165px;"></textarea>
+              <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="repliesOut" data-label="Reply Pack">Speak</button>
+                <button type="button" class="copy-btn" data-copy="repliesOut">Copy Reply Pack</button>
               </div>
             </article>
 
@@ -439,7 +452,7 @@
                 <span>YouTube Description • 200–5,000c • Keywords in First 2 Lines • 3–5 Tags</span>
                 <span class="stats" id="ytDescStats">0 words • 0 / 5,000 chars</span>
               </div>
-              <textarea id="ytDescOut" style="min-height:170px;"></textarea>
+              <textarea id="ytDescOut" style="min-height:160px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="tts-btn" data-tts="ytDescOut" data-label="YT Description">Speak YT Description</button>
                 <button type="button" class="copy-btn" data-copy="ytDescOut">Copy YT Description</button>
@@ -477,9 +490,22 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>5. Approved Payload JSON &amp; Full Campaign Pack (GitHub / PHP / AI / JS Ready)</span>
+                <span>A4 / 3/4-Page Press Release • 365-Single Release: Martin Strayd &amp; Agent Anna</span>
+                <span class="stats" id="pressStats">0 words • 0 chars</span>
               </div>
-              <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage approved JSON for GitHub / PHP / AI / JS automation..."></textarea>
+              <div class="insights-row" id="pressInsights"></div>
+              <textarea id="pressOut" class="press-area"></textarea>
+              <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="pressOut" data-label="Press Release">Speak</button>
+                <button type="button" class="copy-btn" data-copy="pressOut">Copy Press Release</button>
+              </div>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>5. Staged JSON Payload, Pod Audit &amp; Full Campaign Pack</span>
+              </div>
+              <textarea id="payloadOut" readonly placeholder="Click OK To Post (Stage JSON & Audit) or Copy Full Pack..."></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="payloadOut">Copy JSON</button>
                 <button type="button" class="copy-btn" id="copyBundleBtn">Copy Full Pack</button>
@@ -534,9 +560,9 @@
     let activeSpeakingBtn = null;
     let currentInsights = {};
     let activeTrack = {
-      id: "STRAYD-ID-001",
-      title: "ADHD I Can Do That (Travillen Disorder)",
-      filename: "Martin Strayd - ADHD I Can Do That (Travillen Disorder).png",
+      id: "STRAYD-SINGLE-01",
+      title: "Martin Strayd 365-Single Roll",
+      filename: "Martin Strayd - 365-Single Roll.png",
       url: ""
     };
 
@@ -722,40 +748,24 @@
         <rect x="28" y="28" width="544" height="544" rx="18" fill="none" stroke="#e5b84b" stroke-opacity="0.45" stroke-width="2"/>
         <text x="56" y="84" fill="#e5b84b" font-family="system-ui,sans-serif" font-size="16" font-weight="700" letter-spacing="2.5">${safeId}</text>
         <text x="56" y="${startY}" fill="#f3f6fb" font-family="system-ui,sans-serif" font-size="36" font-weight="800">${tspans}</text>
-        <text x="56" y="${Math.min(artistY, 470)}" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="21" font-weight="600">Martin Strayd • STRAYD</text>
-        <text x="56" y="534" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="15" font-weight="700">DIRECT MP3 + COVER SLEEVE • LIVE ACTION</text>
+        <text x="56" y="${Math.min(artistY, 470)}" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="21" font-weight="600">Martin Strayd • Kunda Cafe Rotation</text>
+        <text x="56" y="534" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="15" font-weight="700">365 SINGLE • LIVE ACTION ONLY</text>
       </svg>`;
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
     }
 
-    function buildArtCandidates(track) {
-      const list = [];
+    function buildDirectArtUrls(track) {
+      const urls = [];
       const add = (u) => {
         const s = nonEmpty(u);
-        if (s && !list.includes(s)) list.push(s);
+        if (s && !urls.includes(s)) urls.push(s);
       };
       add(track.url);
       add(track.artworkUrl);
       add(track.image);
-      const baseTitle = preserveTitle(track.title);
       const fname = nonEmpty(track.filename);
-      const stems = Array.from(new Set([
-        fname,
-        fname.replace(/\.[a-z0-9]+$/i, ".png"),
-        fname.replace(/\.[a-z0-9]+$/i, ".jpg"),
-        fname.replace(/\.[a-z0-9]+$/i, ".webp"),
-        `Martin Strayd - ${baseTitle}.png`,
-        `Martin Strayd - ${baseTitle}.jpg`,
-        `${baseTitle}.png`,
-        `${baseTitle}.jpg`
-      ].filter(Boolean)));
-      const dirs = ["./artwork/", "./covers/", "./images/", "./", "../artwork/", "../covers/", "../images/"];
-      for (const dir of dirs) {
-        for (const st of stems) {
-          add(`${dir}${encodeURIComponent(st)}`);
-        }
-      }
-      return list;
+      if (fname && /^https?:\/\//i.test(fname)) add(fname);
+      return urls;
     }
 
     function sanitizeBrainObject(obj) {
@@ -808,7 +818,7 @@
 
     function setWaitingState(isBusy, labelText, songName = "") {
       const pill = $("waitIndicator");
-      const targets = ["pressOut", "ttOut", "igOut", "ytDescOut", "fbOut", "xOut"];
+      const targets = ["slotsOut", "repliesOut", "pressOut", "ttOut", "igOut", "ytDescOut", "fbOut", "xOut"];
       if (waitTimer) {
         clearInterval(waitTimer);
         waitTimer = null;
@@ -821,7 +831,7 @@
           const secs = Math.floor((Date.now() - started) / 1000);
           pill.textContent = `${labelText || "Updating"} • ${secs}s`;
           if (songName) {
-            $("engineModeMeta").textContent = `Agent Anna is generating copy for "${songName}" (${secs}s)...`;
+            $("engineModeMeta").textContent = `Agent Anna is building single "${songName}" (${secs}s)...`;
           }
         };
         tick();
@@ -848,7 +858,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    async function fetchFirstText(urls, timeoutMs = 4500) {
+    async function fetchFirstText(urls, timeoutMs = 3000) {
       for (const url of urls) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -885,8 +895,8 @@
         return;
       }
       const cleanBody = stripMarkdownArtifacts(hit.text).replace(/\r\n/g, "\n");
-      bibleExcerpt = cleanBody.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 5).join(" ").slice(0, 220);
-      songNotesText = cleanBody.slice(0, 1400);
+      bibleExcerpt = cleanBody.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 6).join(" ").slice(0, 240);
+      songNotesText = cleanBody.slice(0, 1600);
     }
 
     async function loadQueueContext() {
@@ -912,6 +922,8 @@
     function renderInsightsTags(mapObj) {
       currentInsights = mapObj;
       const targets = {
+        slots: $("slotsInsights"),
+        replies: $("repliesInsights"),
         press: $("pressInsights"),
         tiktok: $("ttInsights"),
         instagram: $("igInsights"),
@@ -927,6 +939,14 @@
     }
 
     function updateStats() {
+      const slVal = nonEmpty($("slotsOut").value);
+      $("slotsStats").textContent = `${countWords(slVal)} words • ${slVal.length} chars`;
+      $("slotsStats").className = slVal.length > 0 ? "stats ok" : "stats";
+
+      const rpVal = nonEmpty($("repliesOut").value);
+      $("repliesStats").textContent = `${countWords(rpVal)} words • ${rpVal.length} chars`;
+      $("repliesStats").className = rpVal.length > 0 ? "stats ok" : "stats";
+
       const prVal = nonEmpty($("pressOut").value);
       $("pressStats").textContent = `${countWords(prVal)} words • ${prVal.length} chars (A4 target ~1,800–2,600c)`;
       $("pressStats").className = prVal.length >= 1500 ? "stats ok" : "stats";
@@ -962,6 +982,8 @@
 
     function applyDrafts(drafts, lockedTitle = "") {
       const t = preserveTitle(lockedTitle || activeTrack.title);
+      $("slotsOut").value = cleanEditorialText(drafts.slots, t);
+      $("repliesOut").value = cleanEditorialText(drafts.replies, t);
       $("pressOut").value = cleanEditorialText(drafts.press, t);
       $("ttOut").value = cleanEditorialText(drafts.tiktok, t).slice(0, 2200);
       $("igOut").value = cleanEditorialText(drafts.instagram, t).slice(0, 2200);
@@ -974,9 +996,9 @@
 
     function renderBadges() {
       const burst = $("cadenceMode")?.value === "multi_burst";
-      const strat = $("loadStrategy")?.value === "random" ? "Random Load + A–Z" : "365-Day A–Z Loop";
+      const strat = $("loadStrategy")?.value === "random" ? "Non-Repeat Random" : "Once-a-Day Single";
       $("statusBadges").innerHTML = [
-        `<span class="badge">Agent Anna • VJ &amp; Promo Host</span>`,
+        `<span class="badge">Agent Anna • 365-Single Host</span>`,
         `<span class="badge">${strat}</span>`,
         `<span class="badge">${burst ? "Burst Cadence" : "TT 2–3/d • FB 1/d • IG 1+Stories • X 5–10/d"}</span>`,
         `<span class="badge">YT Shorts 1/d • Vids 3/wk</span>`
@@ -1043,8 +1065,10 @@
     function buildInsightsForTrack(title, shiftVal, cadence) {
       const day = getDayOfYear();
       const cyclePos = ((day - 1) % 365) + 1;
-      const base = [`Day ${cyclePos}/365 A–Z`, `Shift #${shiftVal + 1}`, cadence === "multi_burst" ? "Burst Mode" : "Daily Hit Roll"];
+      const base = [`Single ${cyclePos}/365`, `Shift #${shiftVal + 1}`, cadence === "multi_burst" ? "Burst Mode" : "Once-a-Day Single"];
       return {
+        slots: [...base, "Morning • Midday • Evening", "Browser Tab Ready"],
+        replies: [...base, "Comment & Question Replies", "Direct MP3 + Kunda Cafe"],
         press: [...base, "A4 / 3/4-Page Wire", "Agent Anna × Martin Strayd"],
         tiktok: [...base, "100–300c Sweet Spot", "3–5 Tags • 2–3/day"],
         instagram: [...base, "First 125c Fold Hook", "3–5 Tags • 1/d + Stories"],
@@ -1075,30 +1099,30 @@
       const xTags = tags.slice(0, 2).join(" ");
 
       const cadenceLine = cadence === "multi_burst"
-        ? "Multi-post burst cadence: TT 2–3/d, FB 1–3/d, IG 1–2/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk."
-        : "Daily cadence: TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk.";
+        ? "Burst cadence: TT 2–3/d, FB 1–3/d, IG 1–2/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk."
+        : "Once-a-day single cadence: TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk.";
 
       const sceneBrief = `Realistic live-action camera work in a real space with natural or practical lighting and real human presence for "${title}" — strictly live-action only (zero cartoon, zero anime, zero illustration).`;
       const payLinks = `MP3 + sleeve: ${portalLink} | PayPal.me: ${paypalUrl} | Coffee: ${bmacLink} | ${wiseStr || "Wise QR & Dogecoin"}`;
       const streamLinks = `Spotify: ${DEFAULT_SPOTIFY} | YT Music: ${DEFAULT_YTMUSIC} | Apple Music: ${DEFAULT_APPLEMUSIC}`;
       const contextLine = songRef
-        ? `${songRef} Spinning on Martin Strayd's A–Z roll and Kunda Cafe rotation.`
-        : `From Martin Strayd's A–Z catalog and Kunda Cafe rotation, shaped by ${k1} and ${k2}.`;
+        ? `${songRef} Featured in Martin Strayd's music catalog played at Kunda Cafe.`
+        : `From Martin Strayd's 365-single catalog played at Kunda Cafe, built on ${k1} and ${k2}.`;
 
       const fbOpeners = [
-        `Agent Anna here—would you rather own "${title}" with the sleeve right now or keep renting streams?`,
-        `What's one track that still hooks you from the very first bar when you're spinning ${k1}?`,
+        `Agent Anna here—would you rather own single "${title}" with the sleeve right now or keep renting streams?`,
+        `What's one single that still hooks you from the very first bar when you're spinning ${k1}?`,
         `Real room, real camera, zero cartoon shortcuts—where are you playing "${title}" first today?`,
-        `Agent Anna just dropped "${title}" into today's roll—which line hits hardest on listen one?`,
-        `If you had to queue one ${k2} cut for a friend tonight, is "${title}" making the list?`,
+        `Agent Anna just put single "${title}" in today's slot—which line hits hardest on listen one?`,
+        `If you had to queue one ${k2} single for a friend tonight, is "${title}" making the list?`,
         `Why settle for background noise when "${title}" actually has a pulse? Tell me what you hear.`,
-        `Agent Anna's late-night pick is "${title}"—what song keeps you up past midnight lately?`
+        `Agent Anna's late-night single pick is "${title}"—what track keeps you up past midnight lately?`
       ];
       const fbLead = fbOpeners[v].slice(0, 150);
 
       const fbBodyVariants = [
-        `Martin Strayd put "${title}" front and center today with zero filler and real room grit. ${contextLine} Drop your take in the comments or grab the MP3 + sleeve directly.`,
-        `Agent Anna is spotlighting "${title}" across today's roll—built for listeners who care about ${k1}, real songwriting, and keeping the actual music. ${contextLine}`,
+        `Martin Strayd put single "${title}" front and center today with zero filler and real room grit. ${contextLine} Drop your take in the comments or grab the MP3 + sleeve directly.`,
+        `Agent Anna is pitching single "${title}" across today's schedule—built for listeners who care about ${k1}, real songwriting, and keeping the actual music. ${contextLine}`,
         `Filmed in live-action reality with real human presence, "${title}" brings ${k2} energy straight from the speakers. ${contextLine} Tell us your verdict below.`
       ];
       const fbBody = fbBodyVariants[v % fbBodyVariants.length];
@@ -1112,10 +1136,10 @@
       ].join("\n\n").slice(0, 63206);
 
       const igOpeners = [
-        `Agent Anna picks "${title}" by Martin Strayd—${k1} heat & direct MP3 + sleeve: ${portalLink}`,
-        `On air with Agent Anna: "${title}" by Martin Strayd. Own the MP3 + cover art: ${paypalUrl}`,
-        `Fresh from Martin Strayd's A–Z roll with Agent Anna: "${title}" (${k2}). Grab it: ${portalLink}`,
-        `Agent Anna says cue up "${title}" by Martin Strayd—real ${k1}, zero cartoon. Link: ${portalLink}`
+        `Agent Anna pitches single "${title}" by Martin Strayd—${k1} heat & MP3 + sleeve: ${portalLink}`,
+        `On air with Agent Anna: single "${title}" by Martin Strayd. Own MP3 + cover art: ${paypalUrl}`,
+        `Today's Martin Strayd single with Agent Anna: "${title}" (${k2}). Grab it: ${portalLink}`,
+        `Agent Anna says cue single "${title}" by Martin Strayd—real ${k1}, zero cartoon. Link: ${portalLink}`
       ];
       const igFirst125 = igOpeners[v % igOpeners.length].slice(0, 125);
 
@@ -1128,23 +1152,23 @@
       ].join("\n\n").slice(0, 2200);
 
       const ttOpeners = [
-        `Agent Anna drops "${title}" by Martin Strayd—${k1} hook with zero filler. MP3 + art: ${portalLink} ${ttTags}`,
-        `"${title}" by Martin Strayd on Agent Anna's radar—real ${k2} punch. Grab it: ${paypalUrl} ${ttTags}`,
+        `Agent Anna pitches single "${title}" by Martin Strayd—${k1} hook with zero filler. MP3 + art: ${portalLink} ${ttTags}`,
+        `Single "${title}" by Martin Strayd on Agent Anna's radar—real ${k2} punch. Grab it: ${paypalUrl} ${ttTags}`,
         `Agent Anna cues "${title}" by Martin Strayd—live-action ${k1}, zero cartoon. ${portalLink} ${ttTags}`,
         `Hear "${title}" by Martin Strayd with Agent Anna—${k1} & ${k2} straight up. ${bmacLink} ${ttTags}`,
-        `Agent Anna's daily hit pick: "${title}" by Martin Strayd. Own MP3 + sleeve: ${portalLink} ${ttTags}`,
-        `"${title}" by Martin Strayd hits the A–Z roll with Agent Anna—${k2} energy. ${portalLink} ${ttTags}`,
+        `Agent Anna's daily single pitch: "${title}" by Martin Strayd. Own MP3 + sleeve: ${portalLink} ${ttTags}`,
+        `Single "${title}" by Martin Strayd hits today's roll with Agent Anna—${k2} energy. ${portalLink} ${ttTags}`,
         `Agent Anna spins "${title}" by Martin Strayd—lock in the MP3 + art: ${portalLink} ${ttTags}`
       ];
       let tiktok = ttOpeners[v];
       if (tiktok.length > 300) {
-        tiktok = `Agent Anna drops "${title}" by Martin Strayd—${k1} hook. ${portalLink} ${ttTags}`.slice(0, 300);
+        tiktok = `Agent Anna pitches "${title}" by Martin Strayd—${k1} hook. ${portalLink} ${ttTags}`.slice(0, 300);
       }
 
       const ytTitleCandidates = [
-        `${title} — Martin Strayd | Agent Anna ${k1} & ${k2} Spotlight`,
-        `Agent Anna Presents: "${title}" by Martin Strayd (${k1} • Direct MP3)`,
-        `"${title}" — Martin Strayd | ${k2} & Live-Action Promo (Agent Anna)`
+        `${title} — Martin Strayd Single | Agent Anna ${k1} & ${k2} Pitch`,
+        `Agent Anna Pitches Single "${title}" by Martin Strayd (${k1} • MP3)`,
+        `"${title}" — Martin Strayd Single | ${k2} & Live Action (Agent Anna)`
       ];
       let ytTitle = ytTitleCandidates[v % ytTitleCandidates.length];
       if (ytTitle.length < 60) {
@@ -1154,8 +1178,8 @@
       }
 
       const ytDesc = [
-        `"${title}" by Martin Strayd (${track.id || "STRAYD"}) — ${k1}, ${k2}, ${kwList}.`,
-        `Agent Anna spotlights "${title}" in the daily A–Z release roll. ${fbBody} ${contextLine}`,
+        `Single "${title}" by Martin Strayd (${track.id || "STRAYD"}) — ${k1}, ${k2}, ${kwList}.`,
+        `Agent Anna pitches single "${title}" in the 365-single once-a-day release. ${fbBody} ${contextLine}`,
         `${sceneBrief} ${cadenceLine}`,
         `${payLinks}`,
         `${streamLinks}`,
@@ -1163,60 +1187,75 @@
       ].join("\n\n").slice(0, 5000);
 
       const xCandidates = [
-        `Agent Anna on "${title}" by Martin Strayd (${k1}). Own MP3 + art: ${portalLink} ${xTags}`,
-        `"${title}" by Martin Strayd—Agent Anna's ${k2} pick today. Grab it: ${paypalUrl} ${xTags}`,
-        `Agent Anna spins "${title}" by Martin Strayd. ${portalLink} ${xTags}`,
-        `"${title}" by Martin Strayd (${k1})—Agent Anna approved. ${bmacLink} ${xTags}`
+        `Agent Anna pitches single "${title}" by Martin Strayd (${k1}). MP3 + art: ${portalLink} ${xTags}`,
+        `Single "${title}" by Martin Strayd—Agent Anna's ${k2} pick today. Grab it: ${paypalUrl} ${xTags}`,
+        `Agent Anna spins single "${title}" by Martin Strayd. ${portalLink} ${xTags}`,
+        `Single "${title}" by Martin Strayd (${k1})—Agent Anna approved. ${bmacLink} ${xTags}`
       ];
       const x = cleanEditorialText(xCandidates[v % xCandidates.length], title).slice(0, 280);
 
+      const slots = [
+        `SINGLE ${cyclePos}/365 ROLLOUT SLOTS — "${title}" (Martin Strayd • ${cadenceLine})`,
+        `• SLOT 1 (Morning VJ Pitch — ~08:30): Open X & TikTok with single "${title}" hook; post 1 feed/Story on Instagram or 1 Facebook hook/question.`,
+        `• SLOT 2 (Midday Live-Action & Search Push — ~13:00): Publish YouTube Short / Video or next TikTok & X post highlighting ${k1}/${k2} and live-action direction (zero cartoon).`,
+        `• SLOT 3 (Evening / Night Direct & Kunda Cafe Closer — ~19:30–22:00): Push direct MP3 + cover art link (${portalLink}), reply to comments with Agent Anna's reply pack, and prep next single.`
+      ].join("\n\n");
+
+      const replies = [
+        `AGENT ANNA REPLY PACK — Single "${title}" by Martin Strayd`,
+        `1) On Hype / Hook: "Right?! '${title}' is Martin Strayd in full flight—zero filler, just real ${k1} energy. If you want the MP3 + sleeve to keep, grab it here: ${portalLink}"`,
+        `2) On How to Buy / Support: "You can grab the MP3 + cover art direct at ${portalLink}, PayPal.me (${paypalUrl}), or Buy Me a Coffee (${bmacLink})—${wiseStr || "Wise QR & Dogecoin"} also supported."`,
+        `3) On Kunda Cafe / Live Action: "This is from Martin Strayd's catalog played at Kunda Cafe—100% live-action vibe, zero cartoon. Which line hits you first?"`,
+        `4) On Sharing / Playlists: "Pass single '${title}' to a friend who actually listens to ${k2}—drop your favorite track pick below and Agent Anna will spin it next."`
+      ].join("\n\n");
+
       const press = [
-        `FOR IMMEDIATE RELEASE • AGENT ANNA × MARTIN STRAYD — DAILY SONG ROLL (DAY ${cyclePos}/365)`,
-        `HEADLINE: Agent Anna Champions Martin Strayd's "${title}" Across Social, Music Search & AI Discovery`,
-        `SUBHEAD: Host-Driven Campaign, Live-Action Visual Direction (Zero Cartoon) and Direct MP3 + Sleeve Ownership`,
-        `1. RELEASE & HOST SPOTLIGHT`,
-        `Agent Anna leads the daily promotional spotlight for recording artist Martin Strayd (STRAYD) and track "${title}" (${track.id || "STRAYD"}) within the 365-day A–Z catalog roll. ${fbBody} ${contextLine}`,
-        `2. CADENCE, SEARCH & AI DISCOVERY`,
-        `${cadenceLine} Focused keywords and themes: ${kwList}. Built for human listeners, curators, search engines, and AI music discovery.`,
+        `FOR IMMEDIATE RELEASE • AGENT ANNA × MARTIN STRAYD — 365-SINGLE RELEASE (SINGLE ${cyclePos}/365)`,
+        `HEADLINE: Agent Anna Pitches Martin Strayd's Single "${title}" Across Social, Music Search & AI Discovery`,
+        `SUBHEAD: Host-Driven 365-Single Campaign, Live-Action Direction (Zero Cartoon) and Direct MP3 + Sleeve Ownership`,
+        `1. 365-SINGLE RELEASE & HOST PITCH`,
+        `Agent Anna leads the daily promotional pitch for recording artist Martin Strayd (STRAYD) and single "${title}" (${track.id || "STRAYD"}) within a once-a-day 365-single release. ${fbBody} ${contextLine}`,
+        `2. CADENCE, SOCIAL CRAWLERS & AI DISCOVERY`,
+        `${cadenceLine} Focused keywords and themes: ${kwList}. Built for human listeners, curators, search crawlers, and AI agents reading structured release metadata.`,
         `3. LIVE-ACTION CINEMATOGRAPHY (ZERO CARTOON)`,
         `${sceneBrief} Visual direction for "${title}" centers on authentic human presence and real lighting—strictly live-action only, with zero cartoon, anime, or illustration.`,
         `4. DIRECT SALES, PAYMENT OPTIONS & STREAMING`,
         `${payLinks}.`,
         `${streamLinks}.`,
-        `COMMAND NODE: A1 Record Command • Agent Anna Social Master (Martin Strayd / STRAYD Catalog).`
+        `COMMAND NODE: A1 Record Command • Agent Anna Social Master (Martin Strayd / STRAYD 365-Single Catalog).`
       ].join("\n\n");
 
-      return { sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
+      return { sceneBrief, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
     }
 
     function updateArtworkDisplay(track) {
       const cleanTitle = preserveTitle(track.title);
       const fallbackUri = buildWrappedSleeveUri(cleanTitle, track.id);
-      const candidates = buildArtCandidates(track);
+      const directUrls = buildDirectArtUrls(track);
 
       $("heroTitle").textContent = cleanTitle;
-      $("artFileMeta").textContent = `Track: ${cleanTitle} • ${nonEmpty(track.id, "STRAYD")}`;
+      $("artFileMeta").textContent = `Single: ${cleanTitle} • ${nonEmpty(track.id, "STRAYD")}`;
 
       const img = $("artPreview");
-      let idx = 0;
-      const tryNext = () => {
-        if (idx < candidates.length) {
-          const nextUrl = candidates[idx++];
-          img.onerror = tryNext;
-          img.src = nextUrl;
-        } else {
-          img.onerror = null;
-          img.src = fallbackUri;
-        }
-      };
-      tryNext();
+      img.onerror = null;
+      img.src = fallbackUri;
+
+      if (directUrls.length > 0) {
+        const probe = new Image();
+        probe.onload = () => {
+          if (preserveTitle(activeTrack.title) === cleanTitle) {
+            img.src = directUrls[0];
+          }
+        };
+        probe.src = directUrls[0];
+      }
     }
 
     function annaSystemPrompt() {
       return [
-        "You are Agent Anna—an energetic, sharp MTV-era style VJ, music reporter, and promo host spotlighting daily tracks by recording artist Martin Strayd (STRAYD) and Kunda Cafe music.",
-        "Never use generic SEO filler or robotic stock phrases; write fresh, vivid, platform-specific copy while keeping the exact song title verbatim.",
-        "Respect platform budgets: 'tiktok' 100–300c ideal (max 2,200c) with 3–5 hashtags; 'instagram' first 125c punchy hook (max 2,200c) with 3–5 hashtags; 'youtube' title 60–100c (max 100c) and description 200–5,000c with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150c punchy lead + conversation/memory question + story with 2–5 hashtags; 'x' max 280c with 0–2 hashtags; 'press' A4 / 3/4-page style press release (~1,800–2,500c).",
+        "You are Agent Anna—an energetic, sharp MTV-era style VJ, music reporter, and promo host pitching a once-a-day single release (365 singles) by recording artist Martin Strayd (STRAYD), whose music is played at Kunda Cafe.",
+        "Frame the campaign as releasing singles (1 single per day across 365 days), never generic SEO filler or robotic stock phrases, while keeping the exact single title verbatim.",
+        "Respect platform budgets: 'tiktok' 100–300c ideal (max 2,200c) with 3–5 hashtags; 'instagram' first 125c punchy hook (max 2,200c) with 3–5 hashtags; 'youtube' title 60–100c (max 100c) and description 200–5,000c with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150c punchy lead + conversation/memory question + story with 2–5 hashtags; 'x' max 280c with 0–2 hashtags; 'slots' morning/midday/evening rollout; 'replies' ready fan reply lines; 'press' A4 / 3/4-page style press release (~1,800–2,500c).",
         "Strictly live-action cinematography only (zero cartoon, zero anime, zero illustration). No raw Markdown symbols (#, **, `, >) in prose; include store (https://martinstrayd.github.io/artist/), PayPal (https://www.paypal.com/paypalme/martinstrayd), Wise QR, Buy Me a Coffee, Dogecoin, Spotify, YouTube Music, and Apple Music."
       ].join(" ");
     }
@@ -1244,6 +1283,8 @@
             filename: `${queryTitle}.png`,
             url: activeTrack.url || ""
           };
+
+      writeStorage("STRAYD_LAST_SONG", activeTrack.title);
       updateArtworkDisplay(activeTrack);
       renderBadges();
 
@@ -1266,21 +1307,21 @@
       writeStorage("STRAYD_LOAD_STRATEGY", nonEmpty($("loadStrategy")?.value, "random"));
 
       const contextLines = [];
+      if (bibleExcerpt) contextLines.push(`A1/docs/v4BIBLE: ${bibleExcerpt}`);
       if (brainSummary) contextLines.push(`record-brain.json: ${brainSummary}`);
-      if (songRef) contextLines.push(`Song notes: ${songRef}`);
+      if (songRef) contextLines.push(`Single notes: ${songRef}`);
       if (queueSummary) contextLines.push(`promo-queue.json: ${queueSummary}`);
-      if (bibleExcerpt) contextLines.push(`A1 Bible summary: ${bibleExcerpt}`);
       if (sessionMemories.length) contextLines.push(`Session notes: ${sessionMemories.slice(-3).join(" | ")}`);
       $("bibleBox").value = contextLines.length
         ? contextLines.join("\n\n")
-        : "A1 record command node ready — load A1/strayd/record-brain.json, promo-queue.json, or A1/docs/v4BIBLE anytime.";
+        : "A1 command node ready — reading A1/docs/v4BIBLE and staging browser-ready 365-single copy, slots, replies & audit.";
 
       renderInsightsTags(buildInsightsForTrack(activeTrack.title, shiftVal, cadence));
       const drafts = composeDynamicChannelSet(activeTrack, shiftVal, rawKw, portalLink, paypalUrl, bmac, wise, cadence, songRef);
       $("sceneBriefMeta").textContent = `Live-action direction: ${drafts.sceneBrief}`;
       applyDrafts(drafts, activeTrack.title);
-      setWaitingState(false, "Ready • A1 Fast");
-      $("engineModeMeta").textContent = `Promo engine: Channel drafts & A4 press ready for "${activeTrack.title}" (#${runCounter})`;
+      setWaitingState(false, "Ready • Instant");
+      $("engineModeMeta").textContent = `Promo engine: Slots, replies, channel copy & A4 press ready for single "${activeTrack.title}" (#${runCounter})`;
 
       if (getDahlKey()) {
         setWaitingState(true, "AI Gen", activeTrack.title);
@@ -1293,7 +1334,7 @@
               dayOfYear: getDayOfYear(),
               cadence,
               focusShift: shiftVal,
-              exactSongTitle: activeTrack.title,
+              exactSingleTitle: activeTrack.title,
               catalogId: activeTrack.id,
               artworkFile: activeTrack.filename,
               keywords: rawKw,
@@ -1308,7 +1349,7 @@
                 ytMusic: DEFAULT_YTMUSIC,
                 appleMusic: DEFAULT_APPLEMUSIC
               }
-            }) + "\nReturn ONLY valid JSON with keys: sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            }) + "\nReturn ONLY valid JSON with keys: sceneBrief, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
           }
         ], true, 1.0, 8500);
 
@@ -1319,6 +1360,8 @@
           $("sceneBriefMeta").textContent = `Live-action direction: ${sceneText}`;
           const pressVal = nonEmpty(j.press, "").length >= 900 ? j.press : drafts.press;
           applyDrafts({
+            slots: nonEmpty(j.slots, drafts.slots),
+            replies: nonEmpty(j.replies, drafts.replies),
             press: pressVal,
             tiktok: nonEmpty(j.tiktok, drafts.tiktok),
             instagram: nonEmpty(j.instagram, drafts.instagram),
@@ -1327,7 +1370,7 @@
             facebook: nonEmpty(j.facebook, drafts.facebook),
             x: nonEmpty(j.x, drafts.x)
           }, activeTrack.title);
-          $("engineModeMeta").textContent = `Promo engine: Live AI drafts active for "${activeTrack.title}" (#${runCounter})`;
+          $("engineModeMeta").textContent = `Promo engine: Live AI copy, slots & replies active for single "${activeTrack.title}" (#${runCounter})`;
         }
         setWaitingState(false, "Ready");
       }
@@ -1345,14 +1388,14 @@
       const dahlReply = getDahlKey()
         ? await askDahl([
             { role: "system", content: annaSystemPrompt() + " Reply in 2 sharp sentences as Agent Anna." },
-            { role: "user", content: `Track: "${activeTrack.title}". Keywords: "${nonEmpty($("keywordsInput")?.value)}". Directive: ${msg}` }
+            { role: "user", content: `Single: "${activeTrack.title}". Keywords: "${nonEmpty($("keywordsInput")?.value)}". Directive: ${msg}` }
           ], false, 0.95, 8500)
         : { ok: false };
 
       if (dahlReply && dahlReply.ok && dahlReply.text) {
         appendChat("Agent Anna", dahlReply.text);
       } else {
-        appendChat("Agent Anna", `Got it—locking "${msg}" into "${activeTrack.title}" across every channel and rebuilding the set now.`);
+        appendChat("Agent Anna", `Locked "${msg}" onto single "${activeTrack.title}"—refreshing schedule slots, fan replies, and channel copy now.`);
       }
       await generateAll();
     }
@@ -1414,19 +1457,54 @@
       return items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
     }
 
-    function pickInitialCatalogTrack(list, strategy) {
+    function pickNonRepeatingRandom(list) {
       if (!list.length) return null;
-      if (strategy === "random") {
-        const idx = Math.floor(Math.random() * list.length);
-        return list[idx];
+      if (list.length === 1) return list[0];
+      const lastSong = normalizeKey(readStorage("STRAYD_LAST_SONG") || activeTrack.title);
+      const candidates = list.filter((item) => normalizeKey(item.title) !== lastSong);
+      const pool = candidates.length ? candidates : list;
+      const picked = pool[Math.floor(Math.random() * pool.length)];
+      writeStorage("STRAYD_LAST_SONG", picked.title);
+      return picked;
+    }
+
+    function pickCatalogTrack(list, strategy, forceNonRepeat = false) {
+      if (!list.length) return null;
+      if (strategy === "random" || forceNonRepeat) {
+        return pickNonRepeatingRandom(list);
       }
       const dailyIndex = (getDayOfYear() - 1) % list.length;
       return list[dailyIndex] || list[0];
     }
 
+    async function syncCatalogAndPick(forceNonRepeat = false) {
+      if (!catalog.length) {
+        const catHit = await fetchFirstText(CATALOG_URLS, 2500);
+        if (catHit && catHit.text) {
+          try {
+            catalog = parseCatalogJson(catHit.text);
+            const picker = $("songPicker");
+            picker.innerHTML = "";
+            for (const item of catalog) {
+              const opt = document.createElement("option");
+              opt.value = item.title;
+              opt.textContent = `${item.title} • ${item.id}`;
+              picker.appendChild(opt);
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (catalog.length && !nonEmpty($("customSong").value)) {
+        const chosen = pickCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"), forceNonRepeat);
+        if (chosen) {
+          activeTrack = chosen;
+          $("songPicker").value = chosen.title;
+        }
+      }
+    }
+
     async function boot() {
-      updateArtworkDisplay(activeTrack);
-      renderBadges();
       const savedLink = readStorage("STRAYD_DIRECT_LINK");
       if (savedLink) $("directLink").value = savedLink;
       const savedPaypal = readStorage("STRAYD_PAYPAL_LINK");
@@ -1440,36 +1518,21 @@
       const savedStrat = readStorage("STRAYD_LOAD_STRATEGY");
       if (savedStrat) $("loadStrategy").value = savedStrat;
 
+      updateArtworkDisplay(activeTrack);
+      renderBadges();
+
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", `Agent Anna live—ready for Martin Strayd's 365-day A–Z song roll and your GitHub/automation workflow.`);
+        appendChat("Agent Anna", `Agent Anna ready—365-single once-a-day mode active with schedule slots, fan replies, and non-repeating single picks.`);
       }
+
+      await syncCatalogAndPick(nonEmpty($("loadStrategy")?.value, "random") === "random");
       await generateAll();
 
-      await Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]);
-      const catHit = await fetchFirstText(CATALOG_URLS);
-      if (catHit && catHit.text) {
-        try {
-          catalog = parseCatalogJson(catHit.text);
-          const picker = $("songPicker");
-          picker.innerHTML = "";
-          for (const item of catalog) {
-            const opt = document.createElement("option");
-            opt.value = item.title;
-            opt.textContent = `${item.title} • ${item.id}`;
-            picker.appendChild(opt);
-          }
-          const chosen = pickInitialCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"));
-          if (chosen) {
-            activeTrack = chosen;
-            picker.value = chosen.title;
-            await generateAll();
-          }
-        } catch (_) {}
-      }
-
-      $("bootStatus").textContent = catalog.length
-        ? `A–Z Catalog Ready • ${catalog.length} tracks • 365-Day Loop`
-        : `A1 Node Ready • Day ${getDayOfYear()}`;
+      Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]).then(() => {
+        $("bootStatus").textContent = catalog.length
+          ? `365-Single Catalog Ready • ${catalog.length} tracks`
+          : `A1 Node Ready • Day ${getDayOfYear()}`;
+      });
     }
 
     document.querySelectorAll("[data-tts]").forEach((btn) => {
@@ -1496,7 +1559,9 @@
 
     $("copyBundleBtn").addEventListener("click", async () => {
       const pack = [
-        `=== ${activeTrack.title} (${activeTrack.id || "STRAYD"}) — Martin Strayd ===`,
+        `=== ${activeTrack.title} (${activeTrack.id || "STRAYD"}) — Martin Strayd 365-Single ===`,
+        `[Day Slots]\n${$("slotsOut").value}`,
+        `[Fan Replies]\n${$("repliesOut").value}`,
         `[A4 / 3/4 Press Release]\n${$("pressOut").value}`,
         `[TikTok]\n${$("ttOut").value}`,
         `[Instagram]\n${$("igOut").value}`,
@@ -1544,7 +1609,8 @@
 
     $("reloadBtn").addEventListener("click", async () => {
       runCounter++;
-      await boot();
+      await syncCatalogAndPick(true);
+      await generateAll();
     });
     $("generateBtn").addEventListener("click", () => {
       runCounter++;
@@ -1553,13 +1619,7 @@
     $("loadStrategy").addEventListener("change", async () => {
       renderBadges();
       runCounter++;
-      if (catalog.length) {
-        const chosen = pickInitialCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"));
-        if (chosen) {
-          activeTrack = chosen;
-          $("songPicker").value = chosen.title;
-        }
-      }
+      await syncCatalogAndPick(nonEmpty($("loadStrategy")?.value, "random") === "random");
       await generateAll();
     });
     $("cadenceMode").addEventListener("change", () => {
@@ -1589,7 +1649,7 @@
     $("paypalLink").addEventListener("input", () => writeStorage("STRAYD_PAYPAL_LINK", nonEmpty($("paypalLink").value)));
     $("bmacLink").addEventListener("input", () => writeStorage("STRAYD_BMAC_LINK", nonEmpty($("bmacLink").value)));
     $("wiseNote").addEventListener("input", () => writeStorage("STRAYD_WISE_NOTE", cleanEditorialText($("wiseNote").value, activeTrack.title)));
-    ["pressOut", "ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
+    ["slotsOut", "repliesOut", "pressOut", "ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
       $(id).addEventListener("input", () => {
         $(id).value = cleanEditorialText($(id).value, activeTrack.title);
         updateStats();
@@ -1597,7 +1657,9 @@
     });
 
     $("approveBtn").addEventListener("click", async () => {
-      applyDrafts({
+      const rawInputs = {
+        slots: $("slotsOut").value,
+        replies: $("repliesOut").value,
         press: $("pressOut").value,
         tiktok: $("ttOut").value,
         instagram: $("igOut").value,
@@ -1605,26 +1667,37 @@
         ytDesc: $("ytDescOut").value,
         facebook: $("fbOut").value,
         x: $("xOut").value
-      }, activeTrack.title);
+      };
+
+      const trimmedFlags = [];
+      if (rawInputs.x.length > 280) trimmedFlags.push(`x (${rawInputs.x.length}->280c)`);
+      if (rawInputs.ytTitle.length > 100) trimmedFlags.push(`ytTitle (${rawInputs.ytTitle.length}->100c)`);
+      if (rawInputs.ytDesc.length > 5000) trimmedFlags.push(`ytDesc (${rawInputs.ytDesc.length}->5000c)`);
+      if (rawInputs.tiktok.length > 2200) trimmedFlags.push(`tiktok (${rawInputs.tiktok.length}->2200c)`);
+      if (rawInputs.instagram.length > 2200) trimmedFlags.push(`instagram (${rawInputs.instagram.length}->2200c)`);
+
+      applyDrafts(rawInputs, activeTrack.title);
+
+      const podAudit = {
+        sharedBibleLoaded: Boolean(bibleExcerpt),
+        brainLoaded: Boolean(brainSummary),
+        queueLoaded: Boolean(queueSummary),
+        swallowedOrTrimmedFields: trimmedFlags.length ? trimmedFlags : ["None"],
+        carriedForwardCore: [
+          "exact single title",
+          "Agent Anna 365-single host framing",
+          "live-action cinematography rule (zero cartoon)",
+          "direct MP3 + sleeve, PayPal, Buy Me a Coffee, Wise/DOGE & streaming links"
+        ]
+      };
 
       const payload = {
         node: "A1-STRAYD-RECORD-CMD",
         team: "Anna Management, Sales, Marketing & Promo Team",
         linkedAgent: "Agent Anna (A1/v4)",
-        automationReady: {
-          php: true,
-          ai: true,
-          js: true,
-          loopSchedule: "365-day A–Z continuous roll (minimum 1 song/day)",
-          dailyCadenceTarget: {
-            tiktok: "2-3/day (100-300c ideal lead, 3-5 tags)",
-            facebook: "1/day (20-150c lead + question/story, 2-5 tags)",
-            instagram: "1 feed/day + Stories (first 125c critical, 3-5 tags)",
-            x: "5-10/day (max 280c standard, 0-2 tags)",
-            youtubeShorts: "1/day",
-            youtubeVideos: "3/week (60-100c title, 200-5000c desc, 3-5 tags)"
-          }
-        },
+        releaseModel: "365-single once-a-day release",
+        workflowMode: "browser-first-and-a1-ready",
+        podAudit,
         loadStrategy: nonEmpty($("loadStrategy")?.value, "random"),
         dayOfYear: getDayOfYear(),
         cadence: nonEmpty($("cadenceMode")?.value, "single_day"),
@@ -1648,6 +1721,8 @@
           ytMusic: DEFAULT_YTMUSIC,
           appleMusic: DEFAULT_APPLEMUSIC
         },
+        slots: $("slotsOut").value,
+        replies: $("repliesOut").value,
         press: $("pressOut").value,
         tiktok: $("ttOut").value,
         instagram: $("igOut").value,
@@ -1658,7 +1733,8 @@
       };
       $("payloadOut").value = JSON.stringify(payload, null, 2);
       const gate = $("gateStatus");
-      gate.textContent = `Approval gate: OK APPROVED (${payload.song})`;
+      const trimMsg = trimmedFlags.length ? ` • Trimmed: ${trimmedFlags.join(", ")}` : " • Zero swallowed/trimmed fields";
+      gate.textContent = `Approval gate: OK STAGED (${payload.song})${trimMsg}`;
       gate.style.color = "var(--ok)";
 
       const webhook = nonEmpty($("webhookUrl").value);
@@ -1669,9 +1745,9 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
-          gate.textContent = `Approval gate: OK APPROVED + WEBHOOK (HTTP ${r.status})`;
+          gate.textContent = `Approval gate: OK STAGED + WEBHOOK (HTTP ${r.status})${trimMsg}`;
         } catch (err) {
-          gate.textContent = `Approval gate: OK APPROVED (Webhook error: ${err.message})`;
+          gate.textContent = `Approval gate: OK STAGED (Webhook error: ${err.message})${trimMsg}`;
         }
       }
     });
