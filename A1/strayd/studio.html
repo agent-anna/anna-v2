@@ -193,6 +193,16 @@
       color: var(--accent-ink);
       border: none;
     }
+    button.tts-btn {
+      background: #132238;
+      color: var(--accent);
+      border-color: rgba(229, 184, 75, 0.45);
+    }
+    button.tts-btn.speaking {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+    }
     .actions { display: grid; gap: 8px; margin-top: 14px; }
 
     .chat-log {
@@ -233,7 +243,7 @@
     .stats { color: var(--muted); font-weight: 600; font-size: 0.78rem; }
     .stats.over { color: var(--warn); }
     .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .copy-btn, .post-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; }
+    .copy-btn, .post-btn, .tts-btn { width: auto; padding: 6px 12px; font-size: 0.78rem; }
   </style>
 </head>
 <body>
@@ -348,6 +358,7 @@
               </div>
               <textarea id="pressOut" style="min-height:145px;"></textarea>
               <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="pressOut" data-label="Press Brief">Speak</button>
                 <button type="button" class="copy-btn" data-copy="pressOut">Copy Press Brief</button>
               </div>
             </article>
@@ -359,6 +370,7 @@
               </div>
               <textarea id="ttOut" style="min-height:140px;"></textarea>
               <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="ttOut" data-label="TikTok">Speak</button>
                 <button type="button" class="copy-btn" data-copy="ttOut">Copy TikTok</button>
                 <button type="button" class="post-btn" data-post="tiktok" data-source="ttOut">Post</button>
               </div>
@@ -371,6 +383,7 @@
               </div>
               <textarea id="igOut" style="min-height:140px;"></textarea>
               <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="igOut" data-label="Instagram">Speak</button>
                 <button type="button" class="copy-btn" data-copy="igOut">Copy Instagram</button>
                 <button type="button" class="post-btn" data-post="instagram" data-source="igOut">Post</button>
               </div>
@@ -382,13 +395,17 @@
                 <span class="stats" id="ytTitleStats">0 words • 0 / 100 chars</span>
               </div>
               <input id="ytTitleOut" type="text" maxlength="100" />
+              <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="ytTitleOut" data-label="YT Title">Speak YT Title</button>
+                <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
+              </div>
               <div class="channel-head" style="margin-top:12px;">
                 <span>YouTube Description • SEO Keywords + Story/Lyrics + Reel + Sales CTA (200–5,000 chars • 3–5 tags)</span>
                 <span class="stats" id="ytDescStats">0 words • 0 / 5,000 chars</span>
               </div>
               <textarea id="ytDescOut" style="min-height:175px;"></textarea>
               <div class="btn-row">
-                <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
+                <button type="button" class="tts-btn" data-tts="ytDescOut" data-label="YT Description">Speak YT Description</button>
                 <button type="button" class="copy-btn" data-copy="ytDescOut">Copy YT Description</button>
                 <button type="button" class="post-btn" data-post="youtube" data-source="ytDescOut">Post</button>
               </div>
@@ -401,6 +418,7 @@
               </div>
               <textarea id="fbOut" style="min-height:145px;"></textarea>
               <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="fbOut" data-label="Facebook">Speak</button>
                 <button type="button" class="copy-btn" data-copy="fbOut">Copy Facebook</button>
                 <button type="button" class="post-btn" data-post="facebook" data-source="fbOut">Post</button>
               </div>
@@ -413,6 +431,7 @@
               </div>
               <textarea id="xOut" style="min-height:82px;"></textarea>
               <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="xOut" data-label="X">Speak</button>
                 <button type="button" class="copy-btn" data-copy="xOut">Copy X</button>
                 <button type="button" class="post-btn" data-post="x" data-source="xOut">Post</button>
               </div>
@@ -468,6 +487,7 @@
     let genSeq = 0;
     let waitTimer = null;
     let customDirective = "";
+    let activeSpeakingBtn = null;
     let activeTrack = {
       id: "STRAYD-ID-001",
       title: "ADHD I Can Do That (Travillen Disorder)",
@@ -477,6 +497,58 @@
 
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
+
+    function resetAllTtsButtons() {
+      document.querySelectorAll("[data-tts]").forEach((btn) => {
+        btn.classList.remove("speaking");
+        btn.textContent = btn.dataset.baseLabel || "Speak";
+      });
+      activeSpeakingBtn = null;
+    }
+
+    function stopSpeech() {
+      try {
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+        }
+      } catch (_) {}
+      resetAllTtsButtons();
+    }
+
+    function prepareSpokenText(raw) {
+      return nonEmpty(raw)
+        .replace(/https?:\/\/\S+/g, " link on screen ")
+        .replace(/#([A-Za-z0-9_]+)/g, "$1")
+        .replace(/[ \t]{2,}/g, " ")
+        .trim();
+    }
+
+    function toggleSpeakForButton(btn) {
+      if (!btn) return;
+      if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+        $("engineModeMeta").textContent = "Speech synthesis is not supported in this browser.";
+        return;
+      }
+
+      const wasThisSpeaking = activeSpeakingBtn === btn && window.speechSynthesis.speaking;
+      stopSpeech();
+      if (wasThisSpeaking) return;
+
+      const target = $(btn.dataset.tts);
+      const spoken = prepareSpokenText(target?.value);
+      if (!spoken) return;
+
+      const utter = new SpeechSynthesisUtterance(spoken);
+      utter.rate = 1.02;
+      utter.pitch = 1.04;
+      utter.onend = () => resetAllTtsButtons();
+      utter.onerror = () => resetAllTtsButtons();
+
+      activeSpeakingBtn = btn;
+      btn.classList.add("speaking");
+      btn.textContent = "Stop";
+      window.speechSynthesis.speak(utter);
+    }
 
     function getDayOfYear() {
       const now = new Date();
@@ -907,6 +979,7 @@
     }
 
     async function generateAll() {
+      stopSpeech();
       const mySeq = ++genSeq;
       const typed = nonEmpty($("customSong").value);
       const selected = nonEmpty($("songPicker").value);
@@ -1087,7 +1160,6 @@
     }
 
     async function boot() {
-      // Paint instant sleeve & first drafts immediately on load (< 50ms)
       updateArtworkDisplay(activeTrack);
       renderBadges();
       const savedLink = readStorage("STRAYD_DIRECT_LINK");
@@ -1104,7 +1176,6 @@
       }
       await generateAll();
 
-      // Load external A1 files in background and upgrade track/context cleanly
       await Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]);
       const catHit = await fetchFirstText(CATALOG_URLS);
       if (catHit && catHit.text) {
@@ -1132,6 +1203,11 @@
         ? `A1 Node Ready • ${catalog.length} singles • Day ${getDayOfYear()}`
         : `A1 Node Ready • Day ${getDayOfYear()}`;
     }
+
+    document.querySelectorAll("[data-tts]").forEach((btn) => {
+      btn.dataset.baseLabel = btn.textContent.trim();
+      btn.addEventListener("click", () => toggleSpeakForButton(btn));
+    });
 
     document.querySelectorAll("[data-copy]").forEach((btn) => {
       btn.addEventListener("click", async () => {
