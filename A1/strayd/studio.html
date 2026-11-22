@@ -139,7 +139,7 @@
       line-height: 1.5;
       resize: vertical;
     }
-    textarea.press-area { min-height: 280px; }
+    textarea.press-area { min-height: 300px; }
     textarea.deck-area { min-height: 230px; }
     textarea.generating { border-color: var(--warn); opacity: 0.82; }
     button {
@@ -502,7 +502,7 @@
     let bibleVoiceProfile = "";
     let bibleExcerpt = "";
     let queueSummary = "";
-    let songNotesText = "";
+    let bibleSentences = [];
     let sessionMemories = [];
     let runCounter = 1;
     let genSeq = 0;
@@ -648,6 +648,20 @@
         .replace(/^>\s*/gm, "")
         .replace(/\|/g, " • ")
         .trim();
+    }
+
+    function ensureSentenceEnd(str) {
+      const s = nonEmpty(str).replace(/\s+/g, " ").trim();
+      if (!s) return "";
+      return /[.!?…]$/.test(s) ? s : `${s}.`;
+    }
+
+    function isCleanSentence(line) {
+      const s = nonEmpty(line).replace(/\s+/g, " ").trim();
+      if (s.length < 24) return false;
+      if (/^(a1 v4bible|shared agent anna|master plan manifesto|strategic handbook|target path|mirrored for gitbook)/i.test(s)) return false;
+      if (/^[A-Z0-9 _-]+$/.test(s)) return false;
+      return true;
     }
 
     function escapeXml(str) {
@@ -829,17 +843,22 @@
       if (!hit || !hit.text) {
         bibleVoiceProfile = "";
         bibleExcerpt = "";
-        songNotesText = "";
+        bibleSentences = [];
         return;
       }
       const cleanBody = stripMarkdownArtifacts(hit.text).replace(/\r\n/g, "\n");
-      const lines = cleanBody.split("\n").map((l) => l.trim()).filter(Boolean);
-      const voiceLines = lines.filter((l) =>
-        /\b(anna|vj|host|podcaster|dj|radio|voice|tone|persona|character|style|hook|live-action|live action)\b/i.test(l)
+      const rawSegments = cleanBody
+        .split(/\n+|(?<=[.!?])\s+/)
+        .map((s) => s.replace(/^[-•*]\s*/, "").trim())
+        .filter(isCleanSentence)
+        .map(ensureSentenceEnd);
+
+      bibleSentences = Array.from(new Set(rawSegments));
+      const voiceMatches = bibleSentences.filter((s) =>
+        /\b(agent anna|podcaster|dj|host|radio|voice|tone|character|live-action|live action)\b/i.test(s)
       );
-      bibleVoiceProfile = voiceLines.slice(0, 4).join(" ").slice(0, 260);
-      bibleExcerpt = (voiceLines.length ? voiceLines : lines).slice(0, 6).join(" ").slice(0, 300);
-      songNotesText = cleanBody.slice(0, 2400);
+      bibleVoiceProfile = voiceMatches.slice(0, 2).join(" ");
+      bibleExcerpt = bibleSentences.slice(0, 3).join(" ");
     }
 
     async function loadQueueContext() {
@@ -848,18 +867,14 @@
     }
 
     function extractSongContext(title) {
-      if (!songNotesText) return "";
+      if (!bibleSentences.length) return "";
       const key = normalizeKey(title);
       const words = key.split(" ").filter((w) => w.length >= 3);
-      const lines = songNotesText
-        .split("\n")
-        .map((l) => l.trim())
-        .filter((l) => l.length >= 12 && !/master plan manifesto|strategic handbook|target path|mirrored for gitbook/i.test(l));
-      const matched = lines.filter((l) => {
-        const ln = normalizeKey(l);
-        return words.some((w) => ln.includes(w));
+      const matched = bibleSentences.filter((s) => {
+        const sn = normalizeKey(s);
+        return words.some((w) => sn.includes(w));
       });
-      return matched.slice(0, 3).join(" ").slice(0, 240);
+      return matched.slice(0, 2).join(" ");
     }
 
     function renderInsightsTags(mapObj) {
@@ -1012,7 +1027,7 @@
       const v = (runCounter + shiftVal) % 7;
       const hostTag = ["Late-Night Radio", "Podcast Host", "Club DJ", "Direct Release", "Search & Replay", "Unfiltered Take", "Share Hook"][v];
       return {
-        press: [hostTag, "Editorial Feature", "Live-Action Only"],
+        press: [hostTag, "Clickbait + Story", "Live-Action Only"],
         deck: ["Per-Song Pitch Deck", "Hook + Scene + SEO", "Direct Rails"],
         slots: ["Morning • Midday • Evening", cadence === "multi_burst" ? "Burst Cadence" : "Standard Cadence", "Browser Tab Ready"],
         replies: ["Comment & Question Replies", "Podcast / DJ Voice", "Direct Release CTA"],
@@ -1060,13 +1075,9 @@
         nonEmpty($("appleMusicUrl")?.value) ? `Apple Music: ${$("appleMusicUrl").value.trim()}` : ""
       ].filter(Boolean).join(" • ");
 
-      const bibleLine = bibleVoiceProfile
-        ? `Grounded in docs/v4BIBLE (${bibleVoiceProfile}).`
-        : "";
-      const noteLine = songRef
-        ? `Song notes from docs/v4BIBLE: ${songRef}`
-        : `Built around ${k1} and ${k2}, written for listeners who want real weight rather than background noise.`;
-      const directiveLine = customDirective ? `Room direction: ${customDirective}.` : "";
+      const hostRoleLine = bibleVoiceProfile ? ensureSentenceEnd(bibleVoiceProfile) : "";
+      const noteLine = songRef ? ensureSentenceEnd(songRef) : "";
+      const directiveLine = customDirective ? ensureSentenceEnd(`Room direction: ${customDirective}`) : "";
 
       const fbOpeners = [
         `Wait—why did "${title}"${artistInline} stop everyone dead in the room on the first pass?`,
@@ -1079,7 +1090,12 @@
       ];
       const fbLead = fbOpeners[v].slice(0, 150);
 
-      const fbBody = `On the mic with Agent Anna—"${title}"${artistInline} leans into ${k1} and ${k2} with real room grit. ${noteLine} ${bibleLine} ${directiveLine}`.replace(/\s+/g, " ").trim();
+      const fbBody = [
+        `Agent Anna breaks down "${title}"${artistInline} through ${k1} and ${k2}.`,
+        hostRoleLine,
+        noteLine,
+        directiveLine
+      ].filter(Boolean).join(" ");
 
       const facebook = [fbLead, `${fbBody} ${sceneBrief}`, payLinks, streamLinks, fbTags].filter(Boolean).join("\n\n").slice(0, 63206);
 
@@ -1112,8 +1128,8 @@
       ytTitle = (ytTitle.length < 60 ? `${ytTitle} • Agent Anna` : ytTitle).slice(0, 100);
 
       const ytDesc = [
-        `"${title}"${artistInline}${track.id ? ` (${track.id})` : ""} — ${k1}, ${k2}, and why listeners keep replaying it (${kwList}).`,
-        `Agent Anna breaks down "${title}"${artistInline} from a podcaster, radio host, and DJ angle. ${noteLine} ${bibleLine}`,
+        `"${title}"${artistInline}${track.id ? ` (${track.id})` : ""} — ${k1}, ${k2}, and listener hooks around ${kwList}.`,
+        [hostRoleLine, noteLine].filter(Boolean).join(" "),
         `${sceneBrief} ${cadenceLine}`,
         payLinks,
         streamLinks,
@@ -1128,23 +1144,23 @@
       ][v % 4], title).trim().slice(0, 280);
 
       const pitchDeck = [
-        `PITCH DECK — "${title}"${artistInline}${track.id ? ` (${track.id})` : ""}`,
-        `1. Hook & Clickbait Angle: Frame "${title}" around curiosity, contrast, and listener discovery (${k1} / ${k2}) rather than generic release announcements.`,
-        `2. Podcaster, Radio & DJ Positioning: ${fbBody}`,
-        `3. Live-Action Visual Direction: ${sceneBrief}`,
-        `4. Search, SEO & Audience Discovery: Target phrases around ${kwList}; lead with specific listener questions and shareable moments.`,
-        `5. Direct Release & Support Rails: ${payLinks || streamLinks || "Configure direct release, PayPal, Buy Me a Coffee, or Wise links in Section 1."}`
+        `Pitch Deck — "${title}"${artistInline}${track.id ? ` (${track.id})` : ""}`,
+        `Curiosity & Hook Angle: Lead with what makes "${title}" stand out in a crowded feed around ${k1} and ${k2}.`,
+        `Host & Artist Context: ${[hostRoleLine, noteLine, directiveLine].filter(Boolean).join(" ") || "Driven by Agent Anna across podcast, radio, and DJ angles."}`,
+        `Live-Action Visual Treatment: ${sceneBrief}`,
+        `Search & Discovery Angle: Focus keywords and listener prompts around ${kwList}.`,
+        `Direct Release & Support Rails: ${payLinks || streamLinks || "Add direct release, PayPal, Buy Me a Coffee, or Wise links in Section 1."}`
       ].join("\n\n");
 
       const slots = [
-        `ROLLOUT SCHEDULE — "${title}"${artistInline} (${cadenceLine})`,
+        `Rollout Schedule — "${title}"${artistInline} (${cadenceLine})`,
         `• Morning Slot (~08:30): Drop X punchline and TikTok hook introducing "${title}" around ${k1}; post Instagram hook/Story or Facebook listener question.`,
         `• Midday Slot (~13:00): Publish YouTube Short/Video or follow-up TikTok & X clip unpacking ${k2} and live-action camera framing.`,
         `• Evening Slot (~19:30–22:00): Share direct release link${portalLink ? ` (${portalLink})` : ""}, reply to comments with Agent Anna's reply pack, and line up the next drop.`
       ].join("\n\n");
 
       const replies = [
-        `FAN REPLY PACK — "${title}"${artistInline}`,
+        `Fan Reply Pack — "${title}"${artistInline}`,
         `1) Hook / Curiosity: "Right?! '${title}'${artistInline} has that ${k1} pull where you hear something new on the second pass.${portalLink ? ` Grab it here: ${portalLink}` : ""}"`,
         `2) Direct Access & Support: "${payLinks || streamLinks || "Check the direct release link on the page for listening and support."}"`,
         `3) Live-Action & Production: "All live-action camera and real room energy—which moment or lyric grabbed you first?"`,
@@ -1152,10 +1168,10 @@
       ].join("\n\n");
 
       const press = [
-        `Agent Anna puts "${title}"${artistInline} center stage with a sharp, live-action push built for real listeners`,
-        `Instead of treating "${title}"${artistInline}${track.id ? ` (${track.id})` : ""} like background wallpaper, Agent Anna frames the track around ${k1} and ${k2}, spotlighting the tension, hook, and personality that make listeners stop scrolling and pay attention. ${noteLine} ${bibleLine} ${directiveLine}`.replace(/\s+/g, " ").trim(),
-        `Visuals stay locked to real rooms and human presence. ${sceneBrief} Pairing grounded live-action cinematography with podcaster, radio host, and DJ storytelling gives "${title}" a clear point of view across short video, social feeds, and search.`,
-        `The rollout is structured to build conversation and repeat discovery over time. ${cadenceLine} Keywords and topic threads around ${kwList} connect curious listeners with direct release access and open dialogue in the comments.`,
+        `Why Listeners Are Stopping Cold on "${title}"${artistInline} — Agent Anna's Single Spotlight`,
+        `With "${title}"${artistInline}${track.id ? ` (${track.id})` : ""}, Agent Anna brings a sharp ${k1} and ${k2} spotlight built for listeners who want substance over background noise. ${[hostRoleLine, noteLine, directiveLine].filter(Boolean).join(" ")}`.trim(),
+        `${sceneBrief} Pairing live-action framing with podcaster, radio host, and DJ storytelling gives "${title}" a clear point of view across short video, social feeds, and search.`,
+        `${cadenceLine} Keywords and topic threads around ${kwList} connect curious listeners with direct release access and open dialogue in the comments.`,
         `Direct links and listener access: ${[payLinks, streamLinks].filter(Boolean).join(" • ") || "Direct release and payment links are managed in A1 Record Command."}`,
         `A1 Record Command • Agent Anna`
       ].filter(Boolean).join("\n\n");
@@ -1195,13 +1211,13 @@
     }
 
     function annaSystemPrompt() {
-      const voiceRef = bibleVoiceProfile ? ` Follow docs/v4BIBLE voice & character guidance: ${bibleVoiceProfile}.` : "";
+      const voiceRef = bibleVoiceProfile ? ` Follow docs/v4BIBLE voice & character guidance: ${bibleVoiceProfile}` : "";
       return [
         "You are Agent Anna—a sharp, charismatic podcaster, radio host, and DJ pitching a single release.",
         "Never invent or hard-code an artist or song title; always use the exact artist and single title provided in the prompt or catalog.",
         voiceRef,
-        "Write vivid, non-repetitive platform copy with strong hooks, clickbait curiosity where appropriate, and SEO keywords without stiff wire-service labels ('FOR IMMEDIATE RELEASE', 'HEADLINE:', 'SUBHEAD:').",
-        "Respect platform budgets: 'tiktok' 100–300c ideal (max 2,200c) with 3–5 hashtags; 'instagram' first 125c punchy hook (max 2,200c) with 3–5 hashtags; 'youtube' title 60–100c (max 100c) and description 200–5,000c with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150c punchy lead + conversation/memory question + story with 2–5 hashtags; 'x' max 280c with 0–2 hashtags; 'pitchDeck' per-song pitch deck; 'slots' morning/midday/evening rollout; 'replies' ready fan reply lines; 'press' editorial feature (~1,800–2,500c).",
+        "Write magnetic, non-repetitive press and marketing copy with strong curiosity/clickbait hooks, clean grammar, and zero cut-off words or raw doc headers.",
+        "Respect platform budgets: 'tiktok' 100–300c ideal (max 2,200c) with 3–5 hashtags; 'instagram' first 125c punchy hook (max 2,200c) with 3–5 hashtags; 'youtube' title 60–100c (max 100c) and description 200–5,000c with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150c punchy lead + conversation/memory question + story with 2–5 hashtags; 'x' max 280c with 0–2 hashtags; 'pitchDeck' per-song pitch deck; 'slots' morning/midday/evening rollout; 'replies' ready fan reply lines; 'press' compelling editorial press piece (~1,800–2,500c).",
         "Strictly live-action cinematography only. No raw Markdown symbols (#, **, `, >) in prose."
       ].join(" ");
     }
@@ -1269,7 +1285,7 @@
       if (bibleVoiceProfile) contextLines.push(`Voice & Character (docs/v4BIBLE): ${bibleVoiceProfile}`);
       if (bibleExcerpt) contextLines.push(`docs/v4BIBLE Context: ${bibleExcerpt}`);
       if (brainSummary) contextLines.push(`record-brain.json: ${brainSummary}`);
-      if (songRef) contextLines.push(`Single notes: ${songRef}`);
+      if (songRef) contextLines.push(`Track notes: ${songRef}`);
       if (queueSummary) contextLines.push(`promo-queue.json: ${queueSummary}`);
       if (sessionMemories.length) contextLines.push(`Session notes: ${sessionMemories.slice(-3).join(" | ")}`);
       $("bibleBox").value = contextLines.length
