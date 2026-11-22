@@ -1048,32 +1048,73 @@
 
     function buildLocalDrafts(track, shiftVal, rawKw, portalLink, paypalUrl, bmacLink, wiseStr, cadence, songRef) {
       const title = preserveTitle(track.title);
-      const day = getDayOfYear();
-      const cyclePos = ((day - 1) % 365) + 1;
       const kwList = cleanEditorialText(nonEmpty(rawKw, "Martin Strayd, STRAYD, indie rock, direct MP3, cover art, Kunda Cafe music"), title);
-      const tags = kwList
-        .split(/[,\n]+/)
-        .map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`)
-        .filter((t) => t.length > 1);
+      const kwParts = kwList.split(/[,\n]+/).map((k) => k.trim()).filter(Boolean);
+      const leadKw = kwParts[0] || "indie rock";
+      const secondKw = kwParts[1] || "direct MP3";
+      const tags = kwParts.map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`).filter((t) => t.length > 1);
       const mergedTags = Array.from(new Set(["#MartinStrayd", "#STRAYD", ...tags, "#DirectMP3", "#LiveAction"]));
       const ttTags = mergedTags.slice(0, 5).join(" ");
       const igTags = mergedTags.slice(0, 5).join(" ");
       const fbTags = mergedTags.slice(0, 4).join(" ");
       const xTags = mergedTags.slice(0, 2).join(" ");
-      const modeLabel = cadence === "multi_burst"
-        ? `Multi-post high-impact burst (#${runCounter})`
-        : `Daily A–Z catalog loop (Day ${cyclePos} of 365)`;
 
       const sceneBrief = `Realistic live-action camera work in a real space with natural/practical light and real human presence for "${title}" — strictly live-action cinematography only (zero cartoon, zero anime, zero illustration).`;
       const payLine = `Store: ${portalLink} | PayPal: ${paypalUrl} | Coffee: ${bmacLink} | ${wiseStr || "Wise QR on store & Dogecoin"}`;
       const streamLine = `Spotify: ${DEFAULT_SPOTIFY} | YT Music: ${DEFAULT_YTMUSIC} | Apple Music: ${DEFAULT_APPLEMUSIC}`;
       const hookStory = songRef
-        ? `${songRef} Part of Martin Strayd's A–Z catalog and music played at Kunda Cafe.`
-        : `Straight from Martin Strayd's A–Z catalog and music played at Kunda Cafe — built for listeners who keep their music.`;
+        ? `${songRef} Part of Martin Strayd's catalog and music played at Kunda Cafe.`
+        : `This one started as a raw idea, turned into a real reckoning, and landed in Martin Strayd's catalog played at Kunda Cafe.`;
+
+      const angleVariants = [
+        {
+          ttLead: `"${title}" by Martin Strayd — nobody tells you how fast the hook drops until you hit play.`,
+          igHook: `"${title}" by Martin Strayd hits straight out of the gate — raw, unpolished, and built to stay with you.`,
+          fbLead: `"${title}" by Martin Strayd is live — who else is tired of streaming scraps when you can own the real MP3 and sleeve?`,
+          xLine: `"${title}" by Martin Strayd — raw hook, real room, zero filler. Own it: ${portalLink} ${xTags}`
+        },
+        {
+          ttLead: `That one line on "${title}" by Martin Strayd. Listen before it cuts to the full track.`,
+          igHook: `"${title}" by Martin Strayd started as a spark, became a confession, and ended up as the most honest track in the set.`,
+          fbLead: `Some tracks sound polite. "${title}" by Martin Strayd hits like a confession in a quiet room — what line hits you first?`,
+          xLine: `Some songs play safe. "${title}" by Martin Strayd doesn't. PayPal: ${paypalUrl} ${xTags}`
+        },
+        {
+          ttLead: `Real camera, real room, real guitar — "${title}" by Martin Strayd on the deck right now.`,
+          igHook: `No polish, no studio tricks, no cartoon shortcuts — just "${title}" by Martin Strayd captured live.`,
+          fbLead: `Real human presence, practical light, and zero cartoon fluff on "${title}" by Martin Strayd — would you watch the full live cut?`,
+          xLine: `Live-action "${title}" by Martin Strayd — zero cartoon, pure grit. ${portalLink} ${xTags}`
+        },
+        {
+          ttLead: `Don't just stream "${title}" — own the MP3 + cover sleeve direct from Martin Strayd.`,
+          igHook: `Own "${title}" outright as a direct MP3 + cover art bundle — no middleman taking the song away later.`,
+          fbLead: `Own "${title}" as a direct MP3 + cover sleeve instead of renting access — store, PayPal.me, Wise QR & Dogecoin all live.`,
+          xLine: `Own "${title}" direct (MP3 + sleeve): ${portalLink} | PayPal: ${paypalUrl}`
+        },
+        {
+          ttLead: `Searching for ${leadKw} or ${secondKw} with bite? "${title}" by Martin Strayd just dropped in the roll.`,
+          igHook: `"${title}" by Martin Strayd is built for ${leadKw} and ${secondKw} heads who want songs with teeth.`,
+          fbLead: `If ${leadKw} and ${secondKw} are on your radar, "${title}" by Martin Strayd belongs in your rotation.`,
+          xLine: `"${title}" — Martin Strayd (${leadKw}, ${secondKw}). ${portalLink} ${xTags}`
+        },
+        {
+          ttLead: `Behind "${title}" by Martin Strayd: the real backstory before the chorus kicks in.`,
+          igHook: `Every song has a nerve behind it — "${title}" by Martin Strayd comes straight from the vault and Kunda Cafe sessions.`,
+          fbLead: `Story behind "${title}" by Martin Strayd: real tension, real lyrics, and direct ownership from the artist.`,
+          xLine: `Story & sound of "${title}" by Martin Strayd: ${portalLink} | ${paypalUrl}`
+        },
+        {
+          ttLead: `Run #${runCounter} on "${title}" by Martin Strayd — share this with the friend who knows real music.`,
+          igHook: `Pass "${title}" by Martin Strayd to someone who cares about real songwriting, cover art, and independent music.`,
+          fbLead: `Sharing "${title}" by Martin Strayd across the crew today — drop your favorite bar or pass it straight to a friend.`,
+          xLine: `"${title}" by Martin Strayd — share & own direct: ${portalLink} ${xTags}`
+        }
+      ];
+
+      const v = angleVariants[shiftVal % angleVariants.length];
 
       const press = [
         `PRESS & REEL BRIEF — "${title}" by Martin Strayd (${track.id || "STRAYD"})`,
-        `Release Mode: ${modeLabel} • Angle #${shiftVal + 1}`,
         `Story & Catalog Context: ${hookStory}`,
         `SEO & Discovery Keywords: ${kwList}`,
         `Live-Action Visual Brief: ${sceneBrief}`,
@@ -1082,38 +1123,37 @@
       ].join("\n\n");
 
       const tiktok = [
-        `"${title}" by Martin Strayd — ${modeLabel}. Hit play before the hook pulls you in and grab the full track before the next drop.`,
+        `${v.ttLead} Full track and sleeve out now.`,
         `${sceneBrief} Keywords: ${kwList}.`,
         `${payLine}`,
         ttTags
       ].join("\n\n").slice(0, 2200);
 
       const instagram = [
-        `"${title}" — Martin Strayd hits straight out of the gate. Claim the MP3 + cover art at ${portalLink} or PayPal ${paypalUrl}.`,
+        `${v.igHook}`,
         `${hookStory} ${payLine}`,
         igTags
       ].join("\n\n").slice(0, 2200);
 
-      const ytTitle = `${title} — Martin Strayd | ${kwList.split(",")[0].trim()}`.slice(0, 100);
+      const ytTitle = `${title} — Martin Strayd | ${leadKw}`.slice(0, 100);
       const ytDesc = [
-        `"${title}" by Martin Strayd — ${modeLabel} (${track.id || "STRAYD"}).`,
+        `${title} — Martin Strayd (${track.id || "STRAYD"}).`,
         hookStory,
-        `SEO Keywords & Themes: ${kwList}`,
-        `Live-Action Cinematography Direction: ${sceneBrief}`,
-        `Sales & Payment Options: ${payLine}`,
-        `Listen & Follow: ${streamLine}`,
+        `Keywords & Playlists: ${kwList}`,
+        `Live-Action Direction: ${sceneBrief}`,
+        `Own Direct & Support: ${payLine}`,
+        `Streaming: ${streamLine}`,
         ttTags
       ].join("\n\n").slice(0, 5000);
 
       const facebook = [
-        `"${title}" by Martin Strayd is live in today's catalog push — who wants real songs and artwork you actually own instead of renting?`,
+        `${v.fbLead}`,
         `${hookStory} ${sceneBrief}`,
         `${payLine} • ${streamLine}`,
         fbTags
       ].join("\n\n").slice(0, 63206);
 
-      const xRaw = `"${title}" — Martin Strayd. Store: ${portalLink} | PayPal: ${paypalUrl} ${xTags}`.trim();
-      const x = xRaw.length <= 280 ? xRaw : `"${title}" — Martin Strayd ${portalLink}`.slice(0, 280);
+      const x = cleanEditorialText(v.xLine, title).slice(0, 280);
 
       return { sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
     }
@@ -1145,7 +1185,8 @@
       return [
         "You are Agent Anna leading the Management, Sales, Marketing & Promotional Team for recording artist Martin Strayd (STRAYD) across A–Z catalog drops.",
         "Never alter or censor the exact song title—keep titles like 'Sex Sex Sex' or 'ADHD I Can Do That (Travillen Disorder)' verbatim.",
-        "Never output raw Markdown symbols (#, **, `, >) in social posts—write clean, punchy, high-CTR social copy and SEO keywords tailored to the store (https://martinstrayd.github.io/artist/), PayPal (https://www.paypal.com/paypalme/martinstrayd), Wise QR, Buy Me a Coffee, Dogecoin, Spotify, YouTube Music, and Apple Music.",
+        "Give each platform a genuinely distinct voice and pitch—punchy confession/hook on Instagram, sharp reel hook on TikTok, search/playlist SEO on YouTube, community question/debate on Facebook, and tight one-liner on X.",
+        "Never output raw Markdown symbols (#, **, `, >) in social posts—write clean, human copy tailored to the store (https://martinstrayd.github.io/artist/), PayPal (https://www.paypal.com/paypalme/martinstrayd), Wise QR, Buy Me a Coffee, Dogecoin, Spotify, YouTube Music, and Apple Music.",
         "Strict laws: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration); zero fake network endorsements or fabricated quotes."
       ].join(" ");
     }
@@ -1209,7 +1250,7 @@
       $("sceneBriefMeta").textContent = `Live-action direction: ${localDrafts.sceneBrief}`;
       applyDrafts(localDrafts, activeTrack.title);
       setWaitingState(false, "Ready • A1 Fast");
-      $("engineModeMeta").textContent = `Promo engine: Instant drafts ready for "${activeTrack.title}" (#${runCounter})`;
+      $("engineModeMeta").textContent = `Promo engine: Distinct channel copy ready for "${activeTrack.title}" (#${runCounter})`;
 
       if (getDahlKey()) {
         setWaitingState(true, "AI Boost", activeTrack.title);
