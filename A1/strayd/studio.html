@@ -247,11 +247,12 @@
 
             <label for="loadStrategy">On-Load Single Pick Mode (365-Single Loop)</label>
             <select id="loadStrategy">
-              <option value="random">Non-Repeating Random on Load + Full Picker</option>
+              <option value="first_json" selected>First Item in Catalog JSON on Load</option>
+              <option value="random">Non-Repeating Random + Full Picker</option>
               <option value="daily_az">Once-a-Day Single Roll (1/Day • 365-Day Loop)</option>
             </select>
 
-            <label for="songPicker">Select Single (Catalog Roll — Title Priority)</label>
+            <label for="songPicker">Select Single (Catalog JSON Order)</label>
             <select id="songPicker"></select>
 
             <label for="customSong">Custom Single Title Override (Locked Verbatim)</label>
@@ -268,7 +269,7 @@
 
             <label for="rotationShift">Campaign Angle / Hook Shift</label>
             <select id="rotationShift">
-              <option value="auto">Auto (Daily Single Roll)</option>
+              <option value="auto">Auto (Single Roll)</option>
               <option value="0">01 • VJ Single Pitch &amp; Hook</option>
               <option value="1">02 • Song Story &amp; Room Mood</option>
               <option value="2">03 • Live-Action Camera &amp; Heat</option>
@@ -493,6 +494,17 @@
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
 
+    function resolveAssetUrl(rawUrl, baseUrl) {
+      const s = nonEmpty(rawUrl);
+      if (!s) return "";
+      if (/^(https?:|data:|blob:)/i.test(s)) return s;
+      try {
+        return new URL(s, baseUrl || window.location.href).href;
+      } catch (_) {
+        return s;
+      }
+    }
+
     function pickFemaleVoice() {
       if (!("speechSynthesis" in window)) return null;
       const voices = window.speechSynthesis.getVoices() || [];
@@ -682,8 +694,8 @@
       add(track.artworkUrl);
       add(track.image);
       const fname = nonEmpty(track.filename);
-      if (fname && (/^https?:\/\//i.test(fname) || /\.(png|jpe?g|webp)$/i.test(fname))) {
-        add(fname);
+      if (fname && (/^(https?:|\/|\.\.?\/)/i.test(fname) || /\.(png|jpe?g|webp)$/i.test(fname))) {
+        add(resolveAssetUrl(fname, track.sourceUrl));
       }
       return urls;
     }
@@ -773,7 +785,7 @@
         const timer = setTimeout(() => controller.abort(), timeoutMs);
         try {
           const res = await fetch(url, { cache: "no-store", signal: controller.signal });
-          if (res.ok) return { url, text: await res.text() };
+          if (res.ok) return { url: res.url || url, text: await res.text() };
         } catch (_) {}
         finally { clearTimeout(timer); }
       }
@@ -896,7 +908,10 @@
 
     function renderBadges() {
       const burst = $("cadenceMode")?.value === "multi_burst";
-      const strat = $("loadStrategy")?.value === "random" ? "Non-Repeat Random" : "Once-a-Day Single";
+      const stratVal = $("loadStrategy")?.value || "first_json";
+      const strat = stratVal === "random"
+        ? "Non-Repeat Random"
+        : (stratVal === "daily_az" ? "Once-a-Day Single" : "First in Catalog JSON");
       $("statusBadges").innerHTML = [
         `<span class="badge">Agent Anna • 365-Single Host</span>`,
         `<span class="badge">${strat}</span>`,
@@ -1124,11 +1139,18 @@
       ].filter(Boolean).join(" • ");
 
       const img = $("artPreview");
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = fallbackUri;
+      let idx = 0;
+      const tryNextUrl = () => {
+        if (idx < directUrls.length) {
+          const nextUrl = directUrls[idx++];
+          img.onerror = tryNextUrl;
+          img.src = nextUrl;
+        } else {
+          img.onerror = null;
+          img.src = fallbackUri;
+        }
       };
-      img.src = directUrls[0] || fallbackUri;
+      tryNextUrl();
     }
 
     function annaSystemPrompt() {
@@ -1162,7 +1184,7 @@
             ...matched,
             artist: preserveTitle(matched.artist || activeTrack.artist),
             title: preserveTitle(matched.title),
-            url: nonEmpty(matched.url || activeTrack.url)
+            url: resolveAssetUrl(matched.url || matched.artworkUrl || matched.image || activeTrack.url, matched.sourceUrl || activeTrack.sourceUrl)
           }
         : {
             ...activeTrack,
@@ -1170,7 +1192,7 @@
             artist: preserveTitle(activeTrack.artist),
             title: queryTitle,
             filename: activeTrack.filename || (queryTitle ? `${queryTitle}.png` : ""),
-            url: activeTrack.url || ""
+            url: resolveAssetUrl(activeTrack.url, activeTrack.sourceUrl)
           };
 
       if ($("songPicker") && activeTrack.title && Array.from($("songPicker").options).some((o) => o.value === activeTrack.title)) {
@@ -1182,7 +1204,7 @@
       renderBadges();
 
       const shiftVal = $("rotationShift").value === "auto"
-        ? (getDayOfYear() % 7)
+        ? ((runCounter - 1) % 7)
         : (parseInt($("rotationShift").value, 10) || 0);
       const portalLink = nonEmpty($("directLink").value);
       const paypalUrl = nonEmpty($("paypalLink")?.value);
@@ -1197,7 +1219,7 @@
       writeStorage("STRAYD_BMAC_LINK", bmac);
       writeStorage("STRAYD_WISE_NOTE", wise);
       writeStorage("STRAYD_KEYWORDS", rawKw);
-      writeStorage("STRAYD_LOAD_STRATEGY", nonEmpty($("loadStrategy")?.value, "random"));
+      writeStorage("STRAYD_LOAD_STRATEGY", nonEmpty($("loadStrategy")?.value, "first_json"));
 
       const contextLines = [];
       if (bibleExcerpt) contextLines.push(`A1/docs/v4BIBLE: ${bibleExcerpt}`);
@@ -1207,7 +1229,7 @@
       if (sessionMemories.length) contextLines.push(`Session notes: ${sessionMemories.slice(-3).join(" | ")}`);
       $("bibleBox").value = contextLines.length
         ? contextLines.join("\n\n")
-        : "A1 command node ready — reading A1/docs/v4BIBLE and catalog dynamically.";
+        : "A1 command node ready — reading A1/docs/v4BIBLE and catalog JSON dynamically.";
 
       renderInsightsTags(buildInsightsForTrack(activeTrack.title || "Single", shiftVal, cadence));
       const drafts = composeDynamicChannelSet(activeTrack, shiftVal, rawKw, portalLink, paypalUrl, bmac, wise, cadence, songRef);
@@ -1308,44 +1330,48 @@
       }
     }
 
-    function parseCatalogJson(rawText) {
+    function parseCatalogJson(rawText, sourceUrl = "") {
       const parsed = JSON.parse(rawText);
       const items = [];
       const topArtist = preserveTitle(parsed?.artist || parsed?.artistName || "");
 
       if (Array.isArray(parsed)) {
         for (const entry of parsed) {
-          if (entry && (entry.title || entry.filename)) {
-            const rawName = nonEmpty(entry.title || entry.filename);
+          if (entry && (entry.title || entry.filename || entry.name)) {
+            const rawName = nonEmpty(entry.title || entry.filename || entry.name);
+            const rawImg = nonEmpty(entry.url || entry.artworkUrl || entry.image || entry.artwork);
             items.push({
               id: nonEmpty(entry.id || entry.code, `SINGLE-${String(items.length + 1).padStart(3, "0")}`),
               artist: preserveTitle(entry.artist || entry.artistName || topArtist),
               title: preserveTitle(rawName.replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
               filename: nonEmpty(entry.filename, `${rawName}.png`),
-              url: nonEmpty(entry.url || entry.artworkUrl || entry.image)
+              url: resolveAssetUrl(rawImg, sourceUrl),
+              sourceUrl
             });
           }
         }
       } else {
         const files = Array.isArray(parsed.files_and_folders)
           ? parsed.files_and_folders
-          : (Array.isArray(parsed.tracks) ? parsed.tracks : []);
+          : (Array.isArray(parsed.tracks) ? parsed.tracks : (Array.isArray(parsed.items) ? parsed.items : []));
         for (const f of files) {
           if (!f) continue;
           const fname = nonEmpty(f.filename || f.title || f.name);
           if (!fname) continue;
           if (/\.(png|jpe?g|webp)$/i.test(fname) || f.title || f.name) {
+            const rawImg = nonEmpty(f.url || f.artworkUrl || f.image || f.artwork);
             items.push({
               id: nonEmpty(f.id || f.code, `SINGLE-${String(items.length + 1).padStart(3, "0")}`),
               artist: preserveTitle(f.artist || f.artistName || topArtist),
               title: preserveTitle(fname.replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
               filename: fname,
-              url: nonEmpty(f.url || f.artworkUrl || f.image)
+              url: resolveAssetUrl(rawImg, sourceUrl),
+              sourceUrl
             });
           }
         }
       }
-      return items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
+      return items;
     }
 
     function readRecentPicks() {
@@ -1360,7 +1386,7 @@
       if (!k) return;
       const list = readRecentPicks().filter((x) => x !== k);
       list.push(k);
-      writeStorage("STRAYD_RECENT_SONGS", JSON.stringify(list.slice(-8)));
+      writeStorage("STRAYD_RECENT_SONGS", JSON.stringify(list.slice(-12)));
       writeStorage("STRAYD_LAST_SONG", title);
     }
 
@@ -1368,15 +1394,10 @@
       if (!list.length) return null;
       if (list.length === 1) return list[0];
       const currentKey = normalizeKey(activeTrack.title);
-      const lastKey = normalizeKey(readStorage("STRAYD_LAST_SONG"));
-      const excluded = new Set([currentKey, lastKey].filter(Boolean));
-      const recent = new Set(readRecentPicks().filter((k) => k !== currentKey));
-      let candidates = list.filter((item) => {
-        const k = normalizeKey(item.title);
-        return !excluded.has(k) && !recent.has(k);
-      });
+      const recent = new Set([...readRecentPicks(), currentKey].filter(Boolean));
+      let candidates = list.filter((item) => !recent.has(normalizeKey(item.title)));
       if (!candidates.length) {
-        writeStorage("STRAYD_RECENT_SONGS", "[]");
+        writeStorage("STRAYD_RECENT_SONGS", JSON.stringify([currentKey].filter(Boolean)));
         candidates = list.filter((item) => normalizeKey(item.title) !== currentKey);
       }
       const pool = candidates.length ? candidates : list;
@@ -1387,19 +1408,20 @@
 
     function pickCatalogTrack(list, strategy, forceNonRepeat = false) {
       if (!list.length) return null;
-      if (strategy === "random" || forceNonRepeat) return pickNonRepeatingRandom(list);
-      const dailyIndex = (getDayOfYear() - 1) % list.length;
-      const picked = list[dailyIndex] || list[0];
-      recordRecentPick(picked.title);
-      return picked;
+      if (forceNonRepeat || strategy === "random") return pickNonRepeatingRandom(list);
+      if (strategy === "daily_az") {
+        const dailyIndex = (getDayOfYear() - 1) % list.length;
+        return list[dailyIndex] || list[0];
+      }
+      return list[0];
     }
 
-    async function syncCatalogAndPick(forceNonRepeat = false) {
+    async function syncCatalogAndPick(forceNonRepeat = false, isInitialLoad = false) {
       if (!catalog.length) {
         const catHit = await fetchFirstText(CATALOG_URLS, 2500);
         if (catHit && catHit.text) {
           try {
-            catalog = parseCatalogJson(catHit.text);
+            catalog = parseCatalogJson(catHit.text, catHit.url);
             const picker = $("songPicker");
             picker.innerHTML = "";
             for (const item of catalog) {
@@ -1412,11 +1434,14 @@
         }
       }
 
-      if (catalog.length && !nonEmpty($("customSong").value) && (forceNonRepeat || !activeTrack.title)) {
-        const chosen = pickCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"), forceNonRepeat);
-        if (chosen) {
-          activeTrack = chosen;
-          $("songPicker").value = chosen.title;
+      if (catalog.length && !nonEmpty($("customSong").value)) {
+        const strat = nonEmpty($("loadStrategy")?.value, "first_json");
+        if (forceNonRepeat || isInitialLoad || !activeTrack.title) {
+          const chosen = pickCatalogTrack(catalog, isInitialLoad && strat === "daily_az" ? "first_json" : strat, forceNonRepeat);
+          if (chosen) {
+            activeTrack = chosen;
+            $("songPicker").value = chosen.title;
+          }
         }
       }
     }
@@ -1433,21 +1458,23 @@
       const savedKw = readStorage("STRAYD_KEYWORDS");
       if (savedKw) $("keywordsInput").value = savedKw;
       const savedStrat = readStorage("STRAYD_LOAD_STRATEGY");
-      if (savedStrat) $("loadStrategy").value = savedStrat;
-
-      if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", "Agent Anna online—365-single once-a-day engine ready with dynamic catalog loading.");
+      if (savedStrat && Array.from($("loadStrategy").options).some((o) => o.value === savedStrat)) {
+        $("loadStrategy").value = savedStrat;
       }
 
-      await syncCatalogAndPick(false);
+      if (!$("chatLog").children.length) {
+        appendChat("Agent Anna", "Agent Anna online—starting on first catalog item with live-action promo engine ready.");
+      }
+
+      await syncCatalogAndPick(false, true);
       updateArtworkDisplay(activeTrack);
       renderBadges();
       await generateAll();
 
       Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]).then(() => {
         $("bootStatus").textContent = catalog.length
-          ? `365-Single Catalog Ready • ${catalog.length} tracks`
-          : `A1 Node Ready • Day ${getDayOfYear()}`;
+          ? `Catalog Ready • ${catalog.length} tracks`
+          : `Node Ready • Day ${getDayOfYear()}`;
       });
     }
 
@@ -1518,14 +1545,14 @@
 
     $("reloadBtn").addEventListener("click", async () => {
       runCounter++;
-      await syncCatalogAndPick(true);
+      await syncCatalogAndPick(true, false);
       await generateAll();
     });
     $("generateBtn").addEventListener("click", () => { runCounter++; generateAll(); });
     $("loadStrategy").addEventListener("change", async () => {
       renderBadges();
       runCounter++;
-      await syncCatalogAndPick(nonEmpty($("loadStrategy")?.value, "random") === "random");
+      await syncCatalogAndPick(nonEmpty($("loadStrategy")?.value, "first_json") === "random", false);
       await generateAll();
     });
     $("cadenceMode").addEventListener("change", () => { renderBadges(); runCounter++; generateAll(); });
@@ -1589,7 +1616,7 @@
             "configured release, support & streaming links"
           ]
         },
-        loadStrategy: nonEmpty($("loadStrategy")?.value, "random"),
+        loadStrategy: nonEmpty($("loadStrategy")?.value, "first_json"),
         dayOfYear: getDayOfYear(),
         cadence: nonEmpty($("cadenceMode")?.value, "single_day"),
         insightsTags: currentInsights,
