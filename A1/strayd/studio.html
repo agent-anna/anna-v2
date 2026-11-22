@@ -139,7 +139,8 @@
       line-height: 1.5;
       resize: vertical;
     }
-    textarea.press-area { min-height: 320px; }
+    textarea.press-area { min-height: 280px; }
+    textarea.deck-area { min-height: 230px; }
     textarea.generating { border-color: var(--warn); opacity: 0.82; }
     button {
       cursor: pointer;
@@ -215,7 +216,7 @@
     <header class="topbar">
       <div>
         <h1>A1 Record Command • Agent Anna Social Master</h1>
-        <div class="muted" id="headerSub">Agent Anna Promo Host • 365-Single Release • Live-Action Only</div>
+        <div class="muted" id="headerSub">Agent Anna Podcaster / Radio Host / DJ • Live-Action Only</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span class="waiting-pill" id="waitIndicator">Idle • Ready</span>
@@ -229,7 +230,7 @@
           <img id="artPreview" src="" alt="Cover Sleeve" />
         </div>
         <div>
-          <div class="eyebrow">365-Day Once-a-Day Single Release • Agent Anna Promo &amp; Pod Command</div>
+          <div class="eyebrow">365-Day Once-a-Day Single Release • Agent Anna Podcaster &amp; DJ Command</div>
           <div class="hero-title" id="heroTitle"></div>
           <div class="hero-meta" id="artFileMeta"></div>
           <div class="hero-meta" id="sceneBriefMeta">Live-action direction: realistic live-action cinematography only.</div>
@@ -243,13 +244,13 @@
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="card-title">1. 365-Single Roll, Selection &amp; Sales Rails</div>
+            <div class="card-title">1. Single Roll, Selection &amp; Sales Rails</div>
 
-            <label for="loadStrategy">On-Load Single Pick Mode (365-Single Loop)</label>
+            <label for="loadStrategy">On-Load Single Pick Mode</label>
             <select id="loadStrategy">
               <option value="first_json" selected>First Item in Catalog JSON on Load</option>
               <option value="random">Non-Repeating Random + Full Picker</option>
-              <option value="daily_az">Once-a-Day Single Roll (1/Day • 365-Day Loop)</option>
+              <option value="daily_az">Scheduled Single Roll (1/Day • 365-Day Loop)</option>
             </select>
 
             <label for="songPicker">Select Single (Catalog JSON Order)</label>
@@ -258,25 +259,25 @@
             <label for="customSong">Custom Single Title Override (Locked Verbatim)</label>
             <input id="customSong" type="text" placeholder="Type single title or leave blank..." />
 
-            <label for="cadenceMode">Daily Release Cadence</label>
+            <label for="cadenceMode">Release Cadence</label>
             <select id="cadenceMode">
-              <option value="single_day">Daily Standard (TT 2–3/d • FB 1/d • IG 1+Stories • X 5–10/d)</option>
-              <option value="multi_burst">Multi-Post High-Impact Burst (Max Cadence Push)</option>
+              <option value="single_day">Standard (TT 2–3/d • FB 1/d • IG 1+Stories • X 5–10/d)</option>
+              <option value="multi_burst">High-Impact Burst (Max Cadence Push)</option>
             </select>
 
-            <label for="keywordsInput">SEO Keywords, Trends &amp; Playlists</label>
-            <input id="keywordsInput" type="text" placeholder="Keywords, genre, venue, release notes..." />
+            <label for="keywordsInput">SEO Keywords, Search Hooks &amp; Playlists</label>
+            <input id="keywordsInput" type="text" placeholder="Keywords, genre, listener hook, release angle..." />
 
-            <label for="rotationShift">Campaign Angle / Hook Shift</label>
+            <label for="rotationShift">Host Persona &amp; Hook Angle</label>
             <select id="rotationShift">
-              <option value="auto">Auto (Single Roll)</option>
-              <option value="0">01 • VJ Single Pitch &amp; Hook</option>
-              <option value="1">02 • Song Story &amp; Room Mood</option>
-              <option value="2">03 • Live-Action Camera &amp; Heat</option>
-              <option value="3">04 • Own Track + Sleeve CTA</option>
-              <option value="4">05 • Search, AI &amp; Playlists</option>
-              <option value="5">06 • Host Take &amp; Promo Pitch</option>
-              <option value="6">07 • Fan Question &amp; Share</option>
+              <option value="auto">Auto (Podcaster / Radio / DJ Rotation)</option>
+              <option value="0">01 • Late-Night Radio Host &amp; Clickbait Hook</option>
+              <option value="1">02 • Podcaster Story &amp; Listener Education</option>
+              <option value="2">03 • Club / Room DJ Drop &amp; Heat</option>
+              <option value="3">04 • Direct Release &amp; Sleeve Angle</option>
+              <option value="4">05 • Search, Discovery &amp; Replay Hook</option>
+              <option value="5">06 • Unfiltered Host Take &amp; Debate</option>
+              <option value="6">07 • Share-With-a-Friend Cliffhanger</option>
             </select>
 
             <label for="directLink">Sales Portal / Direct Release Link</label>
@@ -304,17 +305,17 @@
             <input id="webhookUrl" type="text" placeholder="Optional webhook URL..." />
 
             <div class="actions">
-              <button type="button" class="accent" id="generateBtn">Generate Single Copy + Slots + Replies</button>
+              <button type="button" class="accent" id="generateBtn">Generate Pitch Deck + Press + Channel Copy</button>
               <button type="button" id="reloadBtn">Next Non-Repeating Single &amp; Reload</button>
               <button type="button" class="primary" id="approveBtn">OK To Post (Stage JSON &amp; Audit)</button>
             </div>
           </section>
 
           <section class="card">
-            <div class="card-title">2. Chat With Agent Anna (Promo Director)</div>
+            <div class="card-title">2. Chat With Agent Anna (Podcaster &amp; Promo Host)</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Direct Anna on today's single pitch, replies, release link..." />
+              <input id="chatInput" type="text" placeholder="Direct Anna on voice, pitch deck, clickbait angle, links..." />
               <button type="button" id="chatSendBtn">Send</button>
             </div>
           </section>
@@ -322,42 +323,42 @@
 
         <div>
           <section class="card">
-            <div class="card-title">3. A1/docs/v4BIBLE Shared Context, Pod Ledger &amp; Notes</div>
-            <textarea id="bibleBox" readonly style="min-height:84px;"></textarea>
+            <div class="card-title">3. docs/v4BIBLE Voice, Character &amp; Shared Context</div>
+            <textarea id="bibleBox" readonly style="min-height:92px;"></textarea>
           </section>
 
           <section class="card">
-            <div class="card-title">4. Day-by-Day Slots, Fan Reply Pack, Channel Drafts &amp; A4 Press Release</div>
+            <div class="card-title">4. Press Release, Per-Song Pitch Deck, Slots, Replies &amp; Channel Drafts</div>
 
             <article class="channel">
               <div class="channel-head">
-                <span>Day-by-Day Time Slots &amp; Cadence Rollout (Morning • Midday • Evening)</span>
-                <span class="stats" id="slotsStats">0 words • 0 chars</span>
+                <span>Press Release • Editorial Feature (A4 / 3/4-Page)</span>
+                <span class="stats" id="pressStats">0 words • 0 chars</span>
               </div>
-              <div class="insights-row" id="slotsInsights"></div>
-              <textarea id="slotsOut" style="min-height:175px;"></textarea>
+              <div class="insights-row" id="pressInsights"></div>
+              <textarea id="pressOut" class="press-area"></textarea>
               <div class="btn-row">
-                <button type="button" class="tts-btn" data-tts="slotsOut" data-label="Day Slots">Speak</button>
-                <button type="button" class="copy-btn" data-copy="slotsOut">Copy Schedule Slots</button>
+                <button type="button" class="tts-btn" data-tts="pressOut" data-label="Press Release">Speak</button>
+                <button type="button" class="copy-btn" data-copy="pressOut">Copy Press Release</button>
               </div>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>Agent Anna Fan Reply Pack (Comment Replies • Questions • Direct Release)</span>
-                <span class="stats" id="repliesStats">0 words • 0 chars</span>
+                <span>Per-Song Pitch Deck • Hook, Positioning, Live-Action Scene, SEO &amp; Direct Rails</span>
+                <span class="stats" id="deckStats">0 words • 0 chars</span>
               </div>
-              <div class="insights-row" id="repliesInsights"></div>
-              <textarea id="repliesOut" style="min-height:165px;"></textarea>
+              <div class="insights-row" id="deckInsights"></div>
+              <textarea id="pitchDeckOut" class="deck-area"></textarea>
               <div class="btn-row">
-                <button type="button" class="tts-btn" data-tts="repliesOut" data-label="Reply Pack">Speak</button>
-                <button type="button" class="copy-btn" data-copy="repliesOut">Copy Reply Pack</button>
+                <button type="button" class="tts-btn" data-tts="pitchDeckOut" data-label="Pitch Deck">Speak</button>
+                <button type="button" class="copy-btn" data-copy="pitchDeckOut">Copy Pitch Deck</button>
               </div>
             </article>
 
             <article class="channel">
               <div class="channel-head">
-                <span>TikTok • 100–300c Sweet Spot (2,200c max) • 3–5 Tags • 2–3/day</span>
+                <span>TikTok • Podcaster / DJ Clickbait Hook • 100–300c Sweet Spot (2,200c max) • 2–3/day</span>
                 <span class="stats" id="ttStats">0 words • 0 / 300 ideal (2,200 max)</span>
               </div>
               <div class="insights-row" id="ttInsights"></div>
@@ -371,7 +372,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Instagram • First 125c Critical (2,200c max) • 3–5 Tags • 1 Feed/day + Stories</span>
+                <span>Instagram • Radio Host / Visual Hook • First 125c Critical (2,200c max) • 1/day + Stories</span>
                 <span class="stats" id="igStats">0 words • 0 / 2,200 chars</span>
               </div>
               <div class="insights-row" id="igInsights"></div>
@@ -385,7 +386,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>YouTube Title • 60–100c Target (100c max) • Shorts 1/d • Videos 3/wk</span>
+                <span>YouTube Clickbait &amp; SEO Title • 60–100c Target (100c max) • Shorts 1/d • Videos 3/wk</span>
                 <span class="stats" id="ytTitleStats">0 words • 0 / 100 chars</span>
               </div>
               <div class="insights-row" id="ytInsights"></div>
@@ -395,7 +396,7 @@
                 <button type="button" class="copy-btn" data-copy="ytTitleOut">Copy YT Title</button>
               </div>
               <div class="channel-head" style="margin-top:12px;">
-                <span>YouTube Description • 200–5,000c • Keywords in First 2 Lines • 3–5 Tags</span>
+                <span>YouTube Description • Search &amp; Listener Breakdown • 200–5,000c</span>
                 <span class="stats" id="ytDescStats">0 words • 0 / 5,000 chars</span>
               </div>
               <textarea id="ytDescOut" style="min-height:160px;"></textarea>
@@ -408,7 +409,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Facebook • 20–150c Punchy Lead + Conversation &amp; Memory Hook • 2–5 Tags • 1/day</span>
+                <span>Facebook • Podcaster Conversation &amp; Curiosity Lead • 20–150c Lead • 1/day</span>
                 <span class="stats" id="fbStats">0 words • 0 / 63,206 chars</span>
               </div>
               <div class="insights-row" id="fbInsights"></div>
@@ -422,7 +423,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>X • 280c Max (25,000 Premium) • 0–2 Tags • 5–10/day</span>
+                <span>X • Sharp Radio / DJ Punchline • 280c Max • 5–10/day</span>
                 <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
               <div class="insights-row" id="xInsights"></div>
@@ -436,14 +437,27 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>A4 / 3/4-Page Press Release • 365-Single Release: Agent Anna</span>
-                <span class="stats" id="pressStats">0 words • 0 chars</span>
+                <span>Day-by-Day Time Slots &amp; Cadence Rollout (Morning • Midday • Evening)</span>
+                <span class="stats" id="slotsStats">0 words • 0 chars</span>
               </div>
-              <div class="insights-row" id="pressInsights"></div>
-              <textarea id="pressOut" class="press-area"></textarea>
+              <div class="insights-row" id="slotsInsights"></div>
+              <textarea id="slotsOut" style="min-height:165px;"></textarea>
               <div class="btn-row">
-                <button type="button" class="tts-btn" data-tts="pressOut" data-label="Press Release">Speak</button>
-                <button type="button" class="copy-btn" data-copy="pressOut">Copy Press Release</button>
+                <button type="button" class="tts-btn" data-tts="slotsOut" data-label="Day Slots">Speak</button>
+                <button type="button" class="copy-btn" data-copy="slotsOut">Copy Schedule Slots</button>
+              </div>
+            </article>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>Agent Anna Fan Reply Pack (Comment Replies • Questions • Direct Release)</span>
+                <span class="stats" id="repliesStats">0 words • 0 chars</span>
+              </div>
+              <div class="insights-row" id="repliesInsights"></div>
+              <textarea id="repliesOut" style="min-height:155px;"></textarea>
+              <div class="btn-row">
+                <button type="button" class="tts-btn" data-tts="repliesOut" data-label="Reply Pack">Speak</button>
+                <button type="button" class="copy-btn" data-copy="repliesOut">Copy Reply Pack</button>
               </div>
             </article>
 
@@ -474,11 +488,18 @@
       "../docs/catalog.json"
     ];
     const RECORD_BRAIN_URLS = ["./record-brain.json", "../docs/record-brain.json"];
-    const BIBLE_URLS = ["../docs/v4BIBLE", "../docs/1%20v4BIBLE", "../../docs/1%20v4BIBLE"];
+    const BIBLE_URLS = [
+      "../docs/v4BIBLE",
+      "../docs/1%20v4BIBLE",
+      "../../docs/1%20v4BIBLE",
+      "./v4BIBLE",
+      "./1%20v4BIBLE"
+    ];
     const QUEUE_URLS = ["./promo-queue.json", "../docs/promo-queue.json"];
 
     let catalog = [];
     let brainSummary = "";
+    let bibleVoiceProfile = "";
     let bibleExcerpt = "";
     let queueSummary = "";
     let songNotesText = "";
@@ -658,7 +679,7 @@
     function buildWrappedSleeveUri(title, trackId, artistLabel) {
       const displayTitle = preserveTitle(title) || "Single Release";
       const lines = wrapTextLines(displayTitle, 22, 4);
-      const safeId = escapeXml(preserveTitle(trackId || "365-SINGLE").slice(0, 20));
+      const safeId = escapeXml(preserveTitle(trackId || "SINGLE-001").slice(0, 20));
       const safeArtist = escapeXml(preserveTitle(artistLabel || "").slice(0, 36));
       const startY = lines.length <= 2 ? 250 : 210;
       const tspans = lines
@@ -679,7 +700,7 @@
         <text x="56" y="84" fill="#e5b84b" font-family="system-ui,sans-serif" font-size="16" font-weight="700" letter-spacing="2.5">${safeId}</text>
         <text x="56" y="${startY}" fill="#f3f6fb" font-family="system-ui,sans-serif" font-size="36" font-weight="800">${tspans}</text>
         ${safeArtist ? `<text x="56" y="${Math.min(artistY, 470)}" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="21" font-weight="600">${safeArtist}</text>` : ""}
-        <text x="56" y="534" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="15" font-weight="700">365 SINGLE • LIVE ACTION ONLY</text>
+        <text x="56" y="534" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="15" font-weight="700">AGENT ANNA • LIVE ACTION ONLY</text>
       </svg>`;
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
     }
@@ -742,7 +763,7 @@
 
     function setWaitingState(isBusy, labelText, songName = "") {
       const pill = $("waitIndicator");
-      const targets = ["slotsOut", "repliesOut", "pressOut", "ttOut", "igOut", "ytDescOut", "fbOut", "xOut"];
+      const targets = ["pressOut", "pitchDeckOut", "slotsOut", "repliesOut", "ttOut", "igOut", "ytDescOut", "fbOut", "xOut"];
       if (waitTimer) {
         clearInterval(waitTimer);
         waitTimer = null;
@@ -753,7 +774,7 @@
         const tick = () => {
           const secs = Math.floor((Date.now() - started) / 1000);
           pill.textContent = `${labelText || "Updating"} • ${secs}s`;
-          if (songName) $("engineModeMeta").textContent = `Agent Anna is building single "${songName}" (${secs}s)...`;
+          if (songName) $("engineModeMeta").textContent = `Agent Anna is building "${songName}" (${secs}s)...`;
         };
         tick();
         waitTimer = setInterval(tick, 1000);
@@ -805,10 +826,20 @@
 
     async function loadBibleAndNotes() {
       const hit = await fetchFirstText(BIBLE_URLS);
-      if (!hit || !hit.text) { bibleExcerpt = ""; songNotesText = ""; return; }
+      if (!hit || !hit.text) {
+        bibleVoiceProfile = "";
+        bibleExcerpt = "";
+        songNotesText = "";
+        return;
+      }
       const cleanBody = stripMarkdownArtifacts(hit.text).replace(/\r\n/g, "\n");
-      bibleExcerpt = cleanBody.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 6).join(" ").slice(0, 240);
-      songNotesText = cleanBody.slice(0, 1600);
+      const lines = cleanBody.split("\n").map((l) => l.trim()).filter(Boolean);
+      const voiceLines = lines.filter((l) =>
+        /\b(anna|vj|host|podcaster|dj|radio|voice|tone|persona|character|style|hook|live-action|live action)\b/i.test(l)
+      );
+      bibleVoiceProfile = voiceLines.slice(0, 4).join(" ").slice(0, 260);
+      bibleExcerpt = (voiceLines.length ? voiceLines : lines).slice(0, 6).join(" ").slice(0, 300);
+      songNotesText = cleanBody.slice(0, 2400);
     }
 
     async function loadQueueContext() {
@@ -828,15 +859,16 @@
         const ln = normalizeKey(l);
         return words.some((w) => ln.includes(w));
       });
-      return matched.slice(0, 3).join(" ").slice(0, 220);
+      return matched.slice(0, 3).join(" ").slice(0, 240);
     }
 
     function renderInsightsTags(mapObj) {
       currentInsights = mapObj;
       const targets = {
+        press: $("pressInsights"),
+        deck: $("deckInsights"),
         slots: $("slotsInsights"),
         replies: $("repliesInsights"),
-        press: $("pressInsights"),
         tiktok: $("ttInsights"),
         instagram: $("igInsights"),
         youtube: $("ytInsights"),
@@ -851,6 +883,14 @@
     }
 
     function updateStats() {
+      const prVal = nonEmpty($("pressOut").value);
+      $("pressStats").textContent = `${countWords(prVal)} words • ${prVal.length} chars (A4 target ~1,800–2,600c)`;
+      $("pressStats").className = prVal.length >= 1200 ? "stats ok" : "stats";
+
+      const dkVal = nonEmpty($("pitchDeckOut").value);
+      $("deckStats").textContent = `${countWords(dkVal)} words • ${dkVal.length} chars`;
+      $("deckStats").className = dkVal.length > 0 ? "stats ok" : "stats";
+
       const slVal = nonEmpty($("slotsOut").value);
       $("slotsStats").textContent = `${countWords(slVal)} words • ${slVal.length} chars`;
       $("slotsStats").className = slVal.length > 0 ? "stats ok" : "stats";
@@ -858,10 +898,6 @@
       const rpVal = nonEmpty($("repliesOut").value);
       $("repliesStats").textContent = `${countWords(rpVal)} words • ${rpVal.length} chars`;
       $("repliesStats").className = rpVal.length > 0 ? "stats ok" : "stats";
-
-      const prVal = nonEmpty($("pressOut").value);
-      $("pressStats").textContent = `${countWords(prVal)} words • ${prVal.length} chars (A4 target ~1,800–2,600c)`;
-      $("pressStats").className = prVal.length >= 1500 ? "stats ok" : "stats";
 
       const ttVal = nonEmpty($("ttOut").value);
       const ttOver = ttVal.length > 2200;
@@ -894,9 +930,10 @@
 
     function applyDrafts(drafts, lockedTitle = "") {
       const t = preserveTitle(lockedTitle || activeTrack.title);
+      $("pressOut").value = cleanEditorialText(drafts.press, t);
+      $("pitchDeckOut").value = cleanEditorialText(drafts.pitchDeck, t);
       $("slotsOut").value = cleanEditorialText(drafts.slots, t);
       $("repliesOut").value = cleanEditorialText(drafts.replies, t);
-      $("pressOut").value = cleanEditorialText(drafts.press, t);
       $("ttOut").value = cleanEditorialText(drafts.tiktok, t).slice(0, 2200);
       $("igOut").value = cleanEditorialText(drafts.instagram, t).slice(0, 2200);
       $("ytTitleOut").value = cleanEditorialText(drafts.ytTitle, t).slice(0, 100);
@@ -911,9 +948,9 @@
       const stratVal = $("loadStrategy")?.value || "first_json";
       const strat = stratVal === "random"
         ? "Non-Repeat Random"
-        : (stratVal === "daily_az" ? "Once-a-Day Single" : "First in Catalog JSON");
+        : (stratVal === "daily_az" ? "Scheduled Roll" : "First in Catalog JSON");
       $("statusBadges").innerHTML = [
-        `<span class="badge">Agent Anna • 365-Single Host</span>`,
+        `<span class="badge">Agent Anna • Podcaster &amp; DJ Host</span>`,
         `<span class="badge">${strat}</span>`,
         `<span class="badge">${burst ? "Burst Cadence" : "TT 2–3/d • FB 1/d • IG 1+Stories • X 5–10/d"}</span>`,
         `<span class="badge">YT Shorts 1/d • Vids 3/wk</span>`
@@ -934,7 +971,7 @@
       for (const cand of candidates) {
         try {
           const obj = JSON.parse(cand);
-          if (obj && typeof obj === "object" && (obj.tiktok || obj.instagram || obj.ytTitle || obj.ytDesc || obj.facebook || obj.x || obj.press)) {
+          if (obj && typeof obj === "object" && (obj.tiktok || obj.instagram || obj.ytTitle || obj.ytDesc || obj.facebook || obj.x || obj.press || obj.pitchDeck)) {
             return obj;
           }
         } catch (_) {}
@@ -972,18 +1009,18 @@
     }
 
     function buildInsightsForTrack(title, shiftVal, cadence) {
-      const day = getDayOfYear();
-      const cyclePos = ((day - 1) % 365) + 1;
-      const base = [`Single ${cyclePos}/365`, `Shift #${shiftVal + 1}`, cadence === "multi_burst" ? "Burst Mode" : "Once-a-Day Single"];
+      const v = (runCounter + shiftVal) % 7;
+      const hostTag = ["Late-Night Radio", "Podcast Host", "Club DJ", "Direct Release", "Search & Replay", "Unfiltered Take", "Share Hook"][v];
       return {
-        slots: [...base, "Morning • Midday • Evening", "Browser Tab Ready"],
-        replies: [...base, "Comment & Question Replies", "Direct Release CTA"],
-        press: [...base, "A4 / 3/4-Page Wire", "Agent Anna 365-Single"],
-        tiktok: [...base, "100–300c Sweet Spot", "3–5 Tags • 2–3/day"],
-        instagram: [...base, "First 125c Fold Hook", "3–5 Tags • 1/d + Stories"],
-        youtube: [...base, "60–100c Title • 200–5kc Desc", "Shorts 1/d • Vids 3/wk"],
-        facebook: [...base, "20–150c Lead + Question", "2–5 Tags • 1/day"],
-        x: [...base, "Under 280c • 0–2 Tags", "5–10 posts/day"]
+        press: [hostTag, "Editorial Feature", "Live-Action Only"],
+        deck: ["Per-Song Pitch Deck", "Hook + Scene + SEO", "Direct Rails"],
+        slots: ["Morning • Midday • Evening", cadence === "multi_burst" ? "Burst Cadence" : "Standard Cadence", "Browser Tab Ready"],
+        replies: ["Comment & Question Replies", "Podcast / DJ Voice", "Direct Release CTA"],
+        tiktok: [hostTag, "Clickbait Hook • 100–300c", "2–3/day"],
+        instagram: [hostTag, "First 125c Hook", "1/d + Stories"],
+        youtube: ["Clickbait + SEO Title", "60–100c • 200–5kc Desc", "Shorts 1/d • Vids 3/wk"],
+        facebook: ["Podcast Lead Hook", "20–150c Lead + Question", "1/day"],
+        x: [hostTag, "Under 280c Punch", "5–10 posts/day"]
       };
     }
 
@@ -992,90 +1029,91 @@
       const artist = preserveTitle(track.artist);
       const artistTag = artist ? `#${artist.replace(/[^a-zA-Z0-9]+/g, "")}` : "";
       const artistInline = artist ? ` by ${artist}` : "";
-      const day = getDayOfYear();
-      const cyclePos = ((day - 1) % 365) + 1;
-      const v = (runCounter + shiftVal + cyclePos) % 7;
+      const v = (runCounter + shiftVal) % 7;
 
-      const kwList = cleanEditorialText(nonEmpty(rawKw, "single release, live music, direct release, cover art"), title);
+      const kwList = cleanEditorialText(nonEmpty(rawKw, "independent music, live performance, listener hook, direct release"), title);
       const kwParts = kwList.split(/[,\n]+/).map((k) => k.trim()).filter(Boolean);
-      const k1 = kwParts[0] || "single release";
-      const k2 = kwParts[1] || "live sound";
+      const k1 = kwParts[0] || "independent music";
+      const k2 = kwParts[1] || "live performance";
 
       const cleanTags = kwParts.map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`).filter((t) => t.length > 1);
-      const tags = Array.from(new Set(["#AgentAnna", artistTag, ...cleanTags, "#365Singles"].filter(Boolean)));
+      const tags = Array.from(new Set(["#AgentAnna", artistTag, ...cleanTags].filter(Boolean)));
       const ttTags = tags.slice(0, 4).join(" ");
       const igTags = tags.slice(0, 5).join(" ");
       const fbTags = tags.slice(0, 3).join(" ");
       const xTags = tags.slice(0, 2).join(" ");
 
       const cadenceLine = cadence === "multi_burst"
-        ? "Burst cadence: TT 2–3/d, FB 1–3/d, IG 1–2/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk."
-        : "Once-a-day single cadence: TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk.";
+        ? "High-impact burst cadence: TT 2–3/d, FB 1–3/d, IG 1–2/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk."
+        : "Standard rollout cadence: TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk.";
 
       const sceneBrief = `Realistic live-action camera work in a real space with natural or practical lighting and real human presence for "${title}" — strictly live-action only.`;
       const payLinks = [
-        portalLink ? `Release: ${portalLink}` : "",
+        portalLink ? `Direct release: ${portalLink}` : "",
         paypalUrl ? `PayPal: ${paypalUrl}` : "",
         bmacLink ? `Support: ${bmacLink}` : "",
         wiseStr || ""
-      ].filter(Boolean).join(" | ");
+      ].filter(Boolean).join(" • ");
       const streamLinks = [
         nonEmpty($("spotifyUrl")?.value) ? `Spotify: ${$("spotifyUrl").value.trim()}` : "",
         nonEmpty($("ytMusicUrl")?.value) ? `YT Music: ${$("ytMusicUrl").value.trim()}` : "",
         nonEmpty($("appleMusicUrl")?.value) ? `Apple Music: ${$("appleMusicUrl").value.trim()}` : ""
-      ].filter(Boolean).join(" | ");
-      const contextLine = songRef || `Part of the 365-single once-a-day release, focused on ${k1} and ${k2}.`;
+      ].filter(Boolean).join(" • ");
+
+      const bibleLine = bibleVoiceProfile
+        ? `Grounded in docs/v4BIBLE (${bibleVoiceProfile}).`
+        : "";
+      const noteLine = songRef
+        ? `Song notes from docs/v4BIBLE: ${songRef}`
+        : `Built around ${k1} and ${k2}, written for listeners who want real weight rather than background noise.`;
+      const directiveLine = customDirective ? `Room direction: ${customDirective}.` : "";
 
       const fbOpeners = [
-        `Agent Anna here—would you rather keep single "${title}"${artistInline} in rotation or send it straight to a friend?`,
-        `What's one single that still hooks you from bar one when you're spinning ${k1}?`,
-        `Real room, real camera, live-action energy—where are you playing "${title}" first today?`,
-        `Agent Anna just put single "${title}"${artistInline} in today's slot—which line hits hardest on listen one?`,
-        `If you had to queue one ${k2} single tonight, is "${title}" making the cut?`,
-        `Why settle for background noise when "${title}" actually has a pulse? Tell me what you hear.`,
-        `Agent Anna's daily single pick is "${title}"${artistInline}—what track keeps you locked in lately?`
+        `Wait—why did "${title}"${artistInline} stop everyone dead in the room on the first pass?`,
+        `Podcaster & DJ confession: I queued "${title}"${artistInline} to test a ${k1} set and couldn't cut away—what hits you first?`,
+        `Most tracks fade into noise before verse two. Does "${title}"${artistInline} actually earn a spot in your rotation?`,
+        `Late-night radio check: if you had one ${k2} cut to prove the room is awake, are you dropping "${title}"${artistInline}?`,
+        `Listen closely to "${title}"${artistInline}—is that hook built for headphones, a live room, or both?`,
+        `One line in "${title}"${artistInline} changes the whole temperature of the track. Catch which one yet?`,
+        `DJ booth check: "${title}"${artistInline} just cut through ${k1} chatter—who are you sending this to first?`
       ];
       const fbLead = fbOpeners[v].slice(0, 150);
 
-      const fbBodyVariants = [
-        `Single "${title}"${artistInline} takes today's slot with real room grit and sharp hooks. ${contextLine} Drop your take in the comments.`,
-        `Agent Anna is pitching single "${title}"${artistInline} across today's schedule—built around ${k1}, real songwriting, and direct listening. ${contextLine}`,
-        `Shot in live-action reality with real human presence, "${title}"${artistInline} brings ${k2} energy straight from the speakers. ${contextLine}`
-      ];
-      const fbBody = fbBodyVariants[v % fbBodyVariants.length];
+      const fbBody = `On the mic with Agent Anna—"${title}"${artistInline} leans into ${k1} and ${k2} with real room grit. ${noteLine} ${bibleLine} ${directiveLine}`.replace(/\s+/g, " ").trim();
 
       const facebook = [fbLead, `${fbBody} ${sceneBrief}`, payLinks, streamLinks, fbTags].filter(Boolean).join("\n\n").slice(0, 63206);
+
       const igFirst125 = [
-        `Agent Anna pitches single "${title}"${artistInline}—${k1} heat${portalLink ? ` • ${portalLink}` : ""}`,
-        `On air with Agent Anna: single "${title}"${artistInline}${paypalUrl ? ` • ${paypalUrl}` : ""}`,
-        `Today's single with Agent Anna: "${title}"${artistInline} (${k2})${portalLink ? ` • ${portalLink}` : ""}`,
-        `Agent Anna says cue single "${title}"${artistInline}—live-action ${k1}${portalLink ? ` • ${portalLink}` : ""}`
+        `Why "${title}"${artistInline} hijacked my DJ & podcast set (${k1})${portalLink ? ` • ${portalLink}` : ""}`,
+        `Radio host alert: "${title}"${artistInline} hits different live${paypalUrl ? ` • ${paypalUrl}` : ""}`,
+        `Stop scrolling—"${title}"${artistInline} brings raw ${k2} heat${portalLink ? ` • ${portalLink}` : ""}`,
+        `On air with Agent Anna: "${title}"${artistInline} (${k1})${portalLink ? ` • ${portalLink}` : ""}`
       ][v % 4].slice(0, 125);
       const instagram = [igFirst125, `${fbBody} ${sceneBrief}`, payLinks, streamLinks, igTags].filter(Boolean).join("\n\n").slice(0, 2200);
 
       let tiktok = [
-        `Agent Anna pitches single "${title}"${artistInline}—${k1} hook in full flight. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
-        `Single "${title}"${artistInline} on Agent Anna's radar—real ${k2} punch. ${[paypalUrl, ttTags].filter(Boolean).join(" ")}`,
-        `Agent Anna cues "${title}"${artistInline}—live-action ${k1} on deck. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
-        `Hear "${title}"${artistInline} with Agent Anna—${k1} & ${k2} straight up. ${[bmacLink, ttTags].filter(Boolean).join(" ")}`,
-        `Agent Anna's daily single pitch: "${title}"${artistInline}. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
-        `Single "${title}"${artistInline} hits today's roll with Agent Anna—${k2} energy. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
-        `Agent Anna spins "${title}"${artistInline}. ${[portalLink, ttTags].filter(Boolean).join(" ")}`
+        `DJ & podcast drop: why "${title}"${artistInline} flips a ${k1} room in seconds. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `Heard "${title}"${artistInline} once on air and couldn't leave it alone—${k2} energy. ${[paypalUrl, ttTags].filter(Boolean).join(" ")}`,
+        `Live-action ${k1} check: "${title}"${artistInline} on the deck right now. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `Radio host pick: "${title}"${artistInline}—${k1} meets ${k2} with zero polish fake-out. ${[bmacLink, ttTags].filter(Boolean).join(" ")}`,
+        `This is what happens when "${title}"${artistInline} hits a real speaker. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `Podcaster & DJ alert: "${title}"${artistInline} (${k2}) is the one people ask about. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
+        `One spin of "${title}"${artistInline} and the room shifts. ${[portalLink, ttTags].filter(Boolean).join(" ")}`
       ][v].trim();
       if (tiktok.length > 300) {
-        tiktok = `Agent Anna pitches "${title}"${artistInline}—${k1} hook. ${[portalLink, ttTags].filter(Boolean).join(" ")}`.trim().slice(0, 300);
+        tiktok = `DJ & podcast drop: "${title}"${artistInline} (${k1}). ${[portalLink, ttTags].filter(Boolean).join(" ")}`.trim().slice(0, 300);
       }
 
       let ytTitle = [
-        `${title}${artistInline} — Single | Agent Anna ${k1} & ${k2}`,
-        `Agent Anna Pitches Single "${title}"${artistInline} (${k1})`,
-        `"${title}"${artistInline} — Single | ${k2} & Live Action (Agent Anna)`
+        `Why "${title}"${artistInline} Hooks Every Listener (${k1} & ${k2}) — Agent Anna`,
+        `The Real Story Behind "${title}"${artistInline} | Podcast & DJ Breakdown`,
+        `"${title}"${artistInline} — Live-Action ${k1} Heat That Won't Let Go`
       ][v % 3];
-      ytTitle = (ytTitle.length < 60 ? `${ytTitle} • 365-Single Release` : ytTitle).slice(0, 100);
+      ytTitle = (ytTitle.length < 60 ? `${ytTitle} • Agent Anna` : ytTitle).slice(0, 100);
 
       const ytDesc = [
-        `Single "${title}"${artistInline}${track.id ? ` (${track.id})` : ""} — ${k1}, ${k2}, ${kwList}.`,
-        `Agent Anna pitches single "${title}" in the 365-single once-a-day release. ${fbBody} ${contextLine}`,
+        `"${title}"${artistInline}${track.id ? ` (${track.id})` : ""} — ${k1}, ${k2}, and why listeners keep replaying it (${kwList}).`,
+        `Agent Anna breaks down "${title}"${artistInline} from a podcaster, radio host, and DJ angle. ${noteLine} ${bibleLine}`,
         `${sceneBrief} ${cadenceLine}`,
         payLinks,
         streamLinks,
@@ -1083,43 +1121,46 @@
       ].filter(Boolean).join("\n\n").slice(0, 5000);
 
       const x = cleanEditorialText([
-        `Agent Anna pitches single "${title}"${artistInline} (${k1}). ${[portalLink, xTags].filter(Boolean).join(" ")}`,
-        `Single "${title}"${artistInline}—Agent Anna's ${k2} pick today. ${[paypalUrl, xTags].filter(Boolean).join(" ")}`,
-        `Agent Anna spins single "${title}"${artistInline}. ${[portalLink, xTags].filter(Boolean).join(" ")}`,
-        `Single "${title}"${artistInline} (${k1})—Agent Anna approved. ${[bmacLink, xTags].filter(Boolean).join(" ")}`
+        `DJ & podcast host check: "${title}"${artistInline} (${k1}) hits harder than expected. ${[portalLink, xTags].filter(Boolean).join(" ")}`,
+        `Why does "${title}"${artistInline} stay stuck after one pass? ${k2} heat on deck. ${[paypalUrl, xTags].filter(Boolean).join(" ")}`,
+        `Radio & club room note: "${title}"${artistInline} cuts straight through ${k1}. ${[portalLink, xTags].filter(Boolean).join(" ")}`,
+        `One track, real room, zero filler—"${title}"${artistInline} (${k1}). ${[bmacLink, xTags].filter(Boolean).join(" ")}`
       ][v % 4], title).trim().slice(0, 280);
 
+      const pitchDeck = [
+        `PITCH DECK — "${title}"${artistInline}${track.id ? ` (${track.id})` : ""}`,
+        `1. Hook & Clickbait Angle: Frame "${title}" around curiosity, contrast, and listener discovery (${k1} / ${k2}) rather than generic release announcements.`,
+        `2. Podcaster, Radio & DJ Positioning: ${fbBody}`,
+        `3. Live-Action Visual Direction: ${sceneBrief}`,
+        `4. Search, SEO & Audience Discovery: Target phrases around ${kwList}; lead with specific listener questions and shareable moments.`,
+        `5. Direct Release & Support Rails: ${payLinks || streamLinks || "Configure direct release, PayPal, Buy Me a Coffee, or Wise links in Section 1."}`
+      ].join("\n\n");
+
       const slots = [
-        `SINGLE ${cyclePos}/365 ROLLOUT SLOTS — "${title}"${artistInline} (${cadenceLine})`,
-        `• SLOT 1 (Morning VJ Pitch — ~08:30): Open X & TikTok with single "${title}" hook; post 1 feed/Story on Instagram or 1 Facebook hook/question.`,
-        `• SLOT 2 (Midday Live-Action & Search Push — ~13:00): Publish YouTube Short / Video or next TikTok & X post highlighting ${k1}/${k2} and live-action direction.`,
-        `• SLOT 3 (Evening / Night Closer — ~19:30–22:00): Share release link${portalLink ? ` (${portalLink})` : ""}, reply to comments with Agent Anna's reply pack, and prep next single.`
+        `ROLLOUT SCHEDULE — "${title}"${artistInline} (${cadenceLine})`,
+        `• Morning Slot (~08:30): Drop X punchline and TikTok hook introducing "${title}" around ${k1}; post Instagram hook/Story or Facebook listener question.`,
+        `• Midday Slot (~13:00): Publish YouTube Short/Video or follow-up TikTok & X clip unpacking ${k2} and live-action camera framing.`,
+        `• Evening Slot (~19:30–22:00): Share direct release link${portalLink ? ` (${portalLink})` : ""}, reply to comments with Agent Anna's reply pack, and line up the next drop.`
       ].join("\n\n");
 
       const replies = [
-        `AGENT ANNA REPLY PACK — Single "${title}"${artistInline}`,
-        `1) On Hype / Hook: "Right?! '${title}'${artistInline} brings real ${k1} energy that hooks on pass one.${portalLink ? ` Check the release here: ${portalLink}` : ""}"`,
-        `2) On How to Listen / Support: "${payLinks || "Check the pinned release links for direct listening and support options."}"`,
-        `3) On Live Action: "100% live-action camera work—which line or groove hits you first?"`,
-        `4) On Sharing / Playlists: "Pass single '${title}' to someone who loves ${k2}—drop your favorite track pick below and Agent Anna will spin it next."`
+        `FAN REPLY PACK — "${title}"${artistInline}`,
+        `1) Hook / Curiosity: "Right?! '${title}'${artistInline} has that ${k1} pull where you hear something new on the second pass.${portalLink ? ` Grab it here: ${portalLink}` : ""}"`,
+        `2) Direct Access & Support: "${payLinks || streamLinks || "Check the direct release link on the page for listening and support."}"`,
+        `3) Live-Action & Production: "All live-action camera and real room energy—which moment or lyric grabbed you first?"`,
+        `4) Share / Playlist Push: "Send '${title}' to someone into ${k2} and tell me what they say—I'll queue their pick next."`
       ].join("\n\n");
 
       const press = [
-        `FOR IMMEDIATE RELEASE • AGENT ANNA — 365-SINGLE RELEASE (SINGLE ${cyclePos}/365)`,
-        `HEADLINE: Agent Anna Pitches Single "${title}"${artistInline} Across Social, Music Search & AI Discovery`,
-        `SUBHEAD: Host-Driven 365-Single Campaign, Live-Action Direction and Direct Release Access`,
-        `1. 365-SINGLE RELEASE & HOST PITCH`,
-        `Agent Anna leads the daily promotional pitch for single "${title}"${artistInline}${track.id ? ` (${track.id})` : ""} within a once-a-day 365-single release. ${fbBody} ${contextLine}`,
-        `2. CADENCE, SOCIAL CRAWLERS & AI DISCOVERY`,
-        `${cadenceLine} Focused keywords and themes: ${kwList}. Built for human listeners, curators, search crawlers, and AI agents reading structured release metadata.`,
-        `3. LIVE-ACTION CINEMATOGRAPHY`,
-        `${sceneBrief} Visual direction for "${title}" centers on authentic human presence and real lighting in live-action cinematography.`,
-        `4. DIRECT ACCESS & STREAMING`,
-        [payLinks, streamLinks].filter(Boolean).join(". ") || "Direct release and streaming links configured per campaign.",
-        `COMMAND NODE: A1 Record Command • Agent Anna Social Master (365-Single Release).`
-      ].join("\n\n");
+        `Agent Anna puts "${title}"${artistInline} center stage with a sharp, live-action push built for real listeners`,
+        `Instead of treating "${title}"${artistInline}${track.id ? ` (${track.id})` : ""} like background wallpaper, Agent Anna frames the track around ${k1} and ${k2}, spotlighting the tension, hook, and personality that make listeners stop scrolling and pay attention. ${noteLine} ${bibleLine} ${directiveLine}`.replace(/\s+/g, " ").trim(),
+        `Visuals stay locked to real rooms and human presence. ${sceneBrief} Pairing grounded live-action cinematography with podcaster, radio host, and DJ storytelling gives "${title}" a clear point of view across short video, social feeds, and search.`,
+        `The rollout is structured to build conversation and repeat discovery over time. ${cadenceLine} Keywords and topic threads around ${kwList} connect curious listeners with direct release access and open dialogue in the comments.`,
+        `Direct links and listener access: ${[payLinks, streamLinks].filter(Boolean).join(" • ") || "Direct release and payment links are managed in A1 Record Command."}`,
+        `A1 Record Command • Agent Anna`
+      ].filter(Boolean).join("\n\n");
 
-      return { sceneBrief, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
+      return { sceneBrief, pitchDeck, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
     }
 
     function updateArtworkDisplay(track) {
@@ -1129,8 +1170,8 @@
       const directUrls = buildDirectArtUrls(track);
 
       $("headerSub").textContent = cleanArtist
-        ? `Agent Anna Promo Host • ${cleanArtist} 365-Single Release • Live-Action Only`
-        : "Agent Anna Promo Host • 365-Single Release • Live-Action Only";
+        ? `Agent Anna Podcaster & DJ • ${cleanArtist} • Live-Action Only`
+        : "Agent Anna Podcaster & DJ • Live-Action Only";
       $("heroTitle").textContent = cleanTitle;
       $("artFileMeta").textContent = [
         `Single: ${cleanTitle}`,
@@ -1154,10 +1195,13 @@
     }
 
     function annaSystemPrompt() {
+      const voiceRef = bibleVoiceProfile ? ` Follow docs/v4BIBLE voice & character guidance: ${bibleVoiceProfile}.` : "";
       return [
-        "You are Agent Anna—an energetic, sharp MTV-era style VJ, music reporter, and promo host pitching a once-a-day single release (365 singles).",
+        "You are Agent Anna—a sharp, charismatic podcaster, radio host, and DJ pitching a single release.",
         "Never invent or hard-code an artist or song title; always use the exact artist and single title provided in the prompt or catalog.",
-        "Respect platform budgets: 'tiktok' 100–300c ideal (max 2,200c) with 3–5 hashtags; 'instagram' first 125c punchy hook (max 2,200c) with 3–5 hashtags; 'youtube' title 60–100c (max 100c) and description 200–5,000c with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150c punchy lead + conversation/memory question + story with 2–5 hashtags; 'x' max 280c with 0–2 hashtags; 'slots' morning/midday/evening rollout; 'replies' ready fan reply lines; 'press' A4 / 3/4-page style press release (~1,800–2,500c).",
+        voiceRef,
+        "Write vivid, non-repetitive platform copy with strong hooks, clickbait curiosity where appropriate, and SEO keywords without stiff wire-service labels ('FOR IMMEDIATE RELEASE', 'HEADLINE:', 'SUBHEAD:').",
+        "Respect platform budgets: 'tiktok' 100–300c ideal (max 2,200c) with 3–5 hashtags; 'instagram' first 125c punchy hook (max 2,200c) with 3–5 hashtags; 'youtube' title 60–100c (max 100c) and description 200–5,000c with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150c punchy lead + conversation/memory question + story with 2–5 hashtags; 'x' max 280c with 0–2 hashtags; 'pitchDeck' per-song pitch deck; 'slots' morning/midday/evening rollout; 'replies' ready fan reply lines; 'press' editorial feature (~1,800–2,500c).",
         "Strictly live-action cinematography only. No raw Markdown symbols (#, **, `, >) in prose."
       ].join(" ");
     }
@@ -1222,14 +1266,15 @@
       writeStorage("STRAYD_LOAD_STRATEGY", nonEmpty($("loadStrategy")?.value, "first_json"));
 
       const contextLines = [];
-      if (bibleExcerpt) contextLines.push(`A1/docs/v4BIBLE: ${bibleExcerpt}`);
+      if (bibleVoiceProfile) contextLines.push(`Voice & Character (docs/v4BIBLE): ${bibleVoiceProfile}`);
+      if (bibleExcerpt) contextLines.push(`docs/v4BIBLE Context: ${bibleExcerpt}`);
       if (brainSummary) contextLines.push(`record-brain.json: ${brainSummary}`);
       if (songRef) contextLines.push(`Single notes: ${songRef}`);
       if (queueSummary) contextLines.push(`promo-queue.json: ${queueSummary}`);
       if (sessionMemories.length) contextLines.push(`Session notes: ${sessionMemories.slice(-3).join(" | ")}`);
       $("bibleBox").value = contextLines.length
         ? contextLines.join("\n\n")
-        : "A1 command node ready — reading A1/docs/v4BIBLE and catalog JSON dynamically.";
+        : "A1 command node ready — scanning docs/v4BIBLE and catalog JSON dynamically.";
 
       renderInsightsTags(buildInsightsForTrack(activeTrack.title || "Single", shiftVal, cadence));
       const drafts = composeDynamicChannelSet(activeTrack, shiftVal, rawKw, portalLink, paypalUrl, bmac, wise, cadence, songRef);
@@ -1237,7 +1282,7 @@
       applyDrafts(drafts, activeTrack.title);
       setWaitingState(false, "Ready • Instant");
       $("engineModeMeta").textContent = activeTrack.title
-        ? `Promo engine: Slots, replies, channel copy & A4 press ready for "${activeTrack.title}" (#${runCounter})`
+        ? `Promo engine: Pitch deck, press, slots & channel copy ready for "${activeTrack.title}" (#${runCounter})`
         : `Promo engine: Ready (#${runCounter}) — select or enter a single from catalog`;
 
       if (getDahlKey() && activeTrack.title) {
@@ -1257,6 +1302,7 @@
               artworkFile: activeTrack.filename || null,
               keywords: rawKw,
               directive: customDirective,
+              bibleVoice: bibleVoiceProfile || null,
               songNotes: songRef,
               salesPortal: portalLink || null,
               paypalLink: paypalUrl || null,
@@ -1267,7 +1313,7 @@
                 ytMusic: nonEmpty($("ytMusicUrl")?.value) || null,
                 appleMusic: nonEmpty($("appleMusicUrl")?.value) || null
               }
-            }) + "\nReturn ONLY valid JSON with keys: sceneBrief, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            }) + "\nReturn ONLY valid JSON with keys: sceneBrief, pitchDeck, slots, replies, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
           }
         ], true, 1.0, 8500);
 
@@ -1278,6 +1324,7 @@
           $("sceneBriefMeta").textContent = `Live-action direction: ${sceneText}`;
           const pressVal = nonEmpty(j.press, "").length >= 900 ? j.press : drafts.press;
           applyDrafts({
+            pitchDeck: nonEmpty(j.pitchDeck, drafts.pitchDeck),
             slots: nonEmpty(j.slots, drafts.slots),
             replies: nonEmpty(j.replies, drafts.replies),
             press: pressVal,
@@ -1288,7 +1335,7 @@
             facebook: nonEmpty(j.facebook, drafts.facebook),
             x: nonEmpty(j.x, drafts.x)
           }, activeTrack.title);
-          $("engineModeMeta").textContent = `Promo engine: Live AI copy, slots & replies active for "${activeTrack.title}" (#${runCounter})`;
+          $("engineModeMeta").textContent = `Promo engine: Live AI copy, pitch deck & replies active for "${activeTrack.title}" (#${runCounter})`;
         }
         setWaitingState(false, "Ready");
       }
@@ -1313,7 +1360,7 @@
       if (dahlReply && dahlReply.ok && dahlReply.text) {
         appendChat("Agent Anna", dahlReply.text);
       } else {
-        appendChat("Agent Anna", `Locked "${msg}" onto "${activeTrack.title || "current single"}"—refreshing schedule slots, fan replies, and channel copy now.`);
+        appendChat("Agent Anna", `Locked "${msg}" onto "${activeTrack.title || "current single"}"—rebuilding the pitch deck, press feature, and platform hooks now.`);
       }
       await generateAll();
     }
@@ -1463,19 +1510,22 @@
       }
 
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", "Agent Anna online—starting on first catalog item with live-action promo engine ready.");
+        appendChat("Agent Anna", "Agent Anna online—podcaster, radio host & DJ engine ready on first catalog item.");
       }
 
-      await syncCatalogAndPick(false, true);
+      await Promise.all([
+        syncCatalogAndPick(false, true),
+        loadRecordBrain(),
+        loadBibleAndNotes(),
+        loadQueueContext()
+      ]);
       updateArtworkDisplay(activeTrack);
       renderBadges();
       await generateAll();
 
-      Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]).then(() => {
-        $("bootStatus").textContent = catalog.length
-          ? `Catalog Ready • ${catalog.length} tracks`
-          : `Node Ready • Day ${getDayOfYear()}`;
-      });
+      $("bootStatus").textContent = catalog.length
+        ? `Catalog Ready • ${catalog.length} tracks`
+        : `Node Ready • Day ${getDayOfYear()}`;
     }
 
     document.querySelectorAll("[data-tts]").forEach((btn) => {
@@ -1502,16 +1552,17 @@
 
     $("copyBundleBtn").addEventListener("click", async () => {
       const pack = [
-        `=== ${activeTrack.title || "Single"} (${activeTrack.id || "365-SINGLE"}) — 365-Single Pack ===`,
-        `[Day Slots]\n${$("slotsOut").value}`,
-        `[Fan Replies]\n${$("repliesOut").value}`,
-        `[A4 / 3/4 Press Release]\n${$("pressOut").value}`,
+        `=== ${activeTrack.title || "Single"} (${activeTrack.id || "SINGLE-001"}) — Campaign Pack ===`,
+        `[Press Release]\n${$("pressOut").value}`,
+        `[Pitch Deck]\n${$("pitchDeckOut").value}`,
         `[TikTok]\n${$("ttOut").value}`,
         `[Instagram]\n${$("igOut").value}`,
         `[YouTube Title]\n${$("ytTitleOut").value}`,
         `[YouTube Description]\n${$("ytDescOut").value}`,
         `[Facebook]\n${$("fbOut").value}`,
-        `[X]\n${$("xOut").value}`
+        `[X]\n${$("xOut").value}`,
+        `[Day Slots]\n${$("slotsOut").value}`,
+        `[Fan Replies]\n${$("repliesOut").value}`
       ].join("\n\n");
       const original = $("copyBundleBtn").textContent;
       try {
@@ -1570,7 +1621,7 @@
     $("paypalLink").addEventListener("input", () => writeStorage("STRAYD_PAYPAL_LINK", nonEmpty($("paypalLink").value)));
     $("bmacLink").addEventListener("input", () => writeStorage("STRAYD_BMAC_LINK", nonEmpty($("bmacLink").value)));
     $("wiseNote").addEventListener("input", () => writeStorage("STRAYD_WISE_NOTE", cleanEditorialText($("wiseNote").value, activeTrack.title)));
-    ["slotsOut", "repliesOut", "pressOut", "ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
+    ["pressOut", "pitchDeckOut", "slotsOut", "repliesOut", "ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
       $(id).addEventListener("input", () => {
         $(id).value = cleanEditorialText($(id).value, activeTrack.title);
         updateStats();
@@ -1579,9 +1630,10 @@
 
     $("approveBtn").addEventListener("click", async () => {
       const rawInputs = {
+        press: $("pressOut").value,
+        pitchDeck: $("pitchDeckOut").value,
         slots: $("slotsOut").value,
         replies: $("repliesOut").value,
-        press: $("pressOut").value,
         tiktok: $("ttOut").value,
         instagram: $("igOut").value,
         ytTitle: $("ytTitleOut").value,
@@ -1602,19 +1654,12 @@
         node: "A1-STRAYD-RECORD-CMD",
         team: "Anna Management, Sales, Marketing & Promo Team",
         linkedAgent: "Agent Anna (A1/v4)",
-        releaseModel: "365-single once-a-day release",
         workflowMode: "browser-first-and-a1-ready",
         podAudit: {
           sharedBibleLoaded: Boolean(bibleExcerpt),
           brainLoaded: Boolean(brainSummary),
           queueLoaded: Boolean(queueSummary),
-          swallowedOrTrimmedFields: trimmedFlags.length ? trimmedFlags : ["None"],
-          carriedForwardCore: [
-            "dynamic artist & single title",
-            "Agent Anna 365-single host framing",
-            "live-action cinematography rule",
-            "configured release, support & streaming links"
-          ]
+          swallowedOrTrimmedFields: trimmedFlags.length ? trimmedFlags : ["None"]
         },
         loadStrategy: nonEmpty($("loadStrategy")?.value, "first_json"),
         dayOfYear: getDayOfYear(),
@@ -1639,9 +1684,10 @@
           ytMusic: nonEmpty($("ytMusicUrl")?.value) || null,
           appleMusic: nonEmpty($("appleMusicUrl")?.value) || null
         },
+        press: $("pressOut").value,
+        pitchDeck: $("pitchDeckOut").value,
         slots: $("slotsOut").value,
         replies: $("repliesOut").value,
-        press: $("pressOut").value,
         tiktok: $("ttOut").value,
         instagram: $("igOut").value,
         ytTitle: $("ytTitleOut").value,
