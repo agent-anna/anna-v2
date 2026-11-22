@@ -285,8 +285,8 @@
         </div>
         <div>
           <div class="eyebrow">365-Day Once-a-Day Single Release • Agent Anna Promo &amp; Pod Command</div>
-          <div class="hero-title" id="heroTitle">Loading Single…</div>
-          <div class="hero-meta" id="artFileMeta">Single: Syncing catalog…</div>
+          <div class="hero-title" id="heroTitle">ADHD I Can Do That (Travillen Disorder)</div>
+          <div class="hero-meta" id="artFileMeta">Single: ADHD I Can Do That (Travillen Disorder) • STRAYD-ID-001</div>
           <div class="hero-meta" id="sceneBriefMeta">Live-action direction: realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="badges" id="statusBadges"></div>
@@ -547,6 +547,13 @@
       "../docs/promo-queue.json"
     ];
 
+    const INITIAL_TRACK = {
+      id: "STRAYD-ID-001",
+      title: "ADHD I Can Do That (Travillen Disorder)",
+      filename: "Martin Strayd - ADHD I Can Do That (Travillen Disorder).png",
+      url: ""
+    };
+
     let catalog = [];
     let brainSummary = "";
     let bibleExcerpt = "";
@@ -559,12 +566,7 @@
     let customDirective = "";
     let activeSpeakingBtn = null;
     let currentInsights = {};
-    let activeTrack = {
-      id: "STRAYD-SINGLE-01",
-      title: "Martin Strayd 365-Single Roll",
-      filename: "Martin Strayd - 365-Single Roll.png",
-      url: ""
-    };
+    let activeTrack = { ...INITIAL_TRACK };
 
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
@@ -1247,6 +1249,11 @@
             img.src = directUrls[0];
           }
         };
+        probe.onerror = () => {
+          if (preserveTitle(activeTrack.title) === cleanTitle && !img.src) {
+            img.src = fallbackUri;
+          }
+        };
         probe.src = directUrls[0];
       }
     }
@@ -1276,13 +1283,23 @@
         });
 
       activeTrack = matched
-        ? { ...matched, title: preserveTitle(matched.title) }
+        ? {
+            ...activeTrack,
+            ...matched,
+            title: preserveTitle(matched.title),
+            url: nonEmpty(matched.url || activeTrack.url)
+          }
         : {
+            ...activeTrack,
             id: activeTrack.id || "CUSTOM",
             title: queryTitle,
-            filename: `${queryTitle}.png`,
+            filename: activeTrack.filename || `${queryTitle}.png`,
             url: activeTrack.url || ""
           };
+
+      if ($("songPicker") && Array.from($("songPicker").options).some((o) => o.value === activeTrack.title)) {
+        $("songPicker").value = activeTrack.title;
+      }
 
       writeStorage("STRAYD_LAST_SONG", activeTrack.title);
       updateArtworkDisplay(activeTrack);
@@ -1457,14 +1474,37 @@
       return items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
     }
 
+    function readRecentPicks() {
+      try {
+        const parsed = JSON.parse(readStorage("STRAYD_RECENT_SONGS") || "[]");
+        return Array.isArray(parsed) ? parsed.map(normalizeKey).filter(Boolean) : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function recordRecentPick(title) {
+      const k = normalizeKey(title);
+      if (!k) return;
+      const list = readRecentPicks().filter((x) => x !== k);
+      list.push(k);
+      writeStorage("STRAYD_RECENT_SONGS", JSON.stringify(list.slice(-8)));
+      writeStorage("STRAYD_LAST_SONG", title);
+    }
+
     function pickNonRepeatingRandom(list) {
       if (!list.length) return null;
       if (list.length === 1) return list[0];
-      const lastSong = normalizeKey(readStorage("STRAYD_LAST_SONG") || activeTrack.title);
-      const candidates = list.filter((item) => normalizeKey(item.title) !== lastSong);
-      const pool = candidates.length ? candidates : list;
+      const recent = new Set([
+        ...readRecentPicks(),
+        normalizeKey(readStorage("STRAYD_LAST_SONG")),
+        normalizeKey(activeTrack.title)
+      ].filter(Boolean));
+      const candidates = list.filter((item) => !recent.has(normalizeKey(item.title)));
+      const fallbackPool = list.filter((item) => normalizeKey(item.title) !== normalizeKey(activeTrack.title));
+      const pool = candidates.length ? candidates : (fallbackPool.length ? fallbackPool : list);
       const picked = pool[Math.floor(Math.random() * pool.length)];
-      writeStorage("STRAYD_LAST_SONG", picked.title);
+      recordRecentPick(picked.title);
       return picked;
     }
 
@@ -1495,8 +1535,8 @@
         }
       }
 
-      if (catalog.length && !nonEmpty($("customSong").value)) {
-        const chosen = pickCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"), forceNonRepeat);
+      if (catalog.length && !nonEmpty($("customSong").value) && forceNonRepeat) {
+        const chosen = pickCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"), true);
         if (chosen) {
           activeTrack = chosen;
           $("songPicker").value = chosen.title;
@@ -1518,17 +1558,18 @@
       const savedStrat = readStorage("STRAYD_LOAD_STRATEGY");
       if (savedStrat) $("loadStrategy").value = savedStrat;
 
+      activeTrack = { ...INITIAL_TRACK };
+      recordRecentPick(activeTrack.title);
       updateArtworkDisplay(activeTrack);
       renderBadges();
 
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", `Agent Anna ready—365-single once-a-day mode active with schedule slots, fan replies, and non-repeating single picks.`);
+        appendChat("Agent Anna", `Agent Anna ready—365-single once-a-day mode active starting with ${INITIAL_TRACK.title}, with non-repeating next-track picks.`);
       }
 
-      await syncCatalogAndPick(nonEmpty($("loadStrategy")?.value, "random") === "random");
       await generateAll();
 
-      Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]).then(() => {
+      Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext(), syncCatalogAndPick(false)]).then(() => {
         $("bootStatus").textContent = catalog.length
           ? `365-Single Catalog Ready • ${catalog.length} tracks`
           : `A1 Node Ready • Day ${getDayOfYear()}`;
@@ -1630,6 +1671,7 @@
     $("songPicker").addEventListener("change", () => {
       $("customSong").value = "";
       customDirective = "";
+      recordRecentPick($("songPicker").value);
       runCounter++;
       generateAll();
     });
