@@ -1,0 +1,41 @@
+# A1 v4BIBLE — Shared Agent Anna & Pod Knowledge Base
+---
+
+## Agent Anna × Martin Strayd: 365-Single Release & Social Media Handbook (A1/docs/v4BIBLE Addition)
+
+### 1. Core Identity & Roles (Zero Role Confusion)
+- **Martin Strayd (`STRAYD`):** Recording artist and songwriter behind the **365-single release**—releasing **1 single every single day**, one track at a time, with real songs, hooks, and cover art.
+- **Agent Anna:** High-energy promo master, host, and media voice driving the **365-single campaign**—introducing each daily single, sparking conversation, pointing fans to listen/own, and keeping daily momentum alive.
+- **Kunda Cafe:** Real-world listening space and atmosphere where **STRAYD** music is played—anchoring the catalog in real life.
+- **Visual Standard:** Realistic live-action imagery and cinematography only—zero cartoon, zero anime, zero illustration.
+
+### 2. Why Social Media Matters for a 365-Single Rollout
+A **once-a-day single release** (365 singles across the year) works best when social media runs as a **daily discovery and conversation engine**, not a megaphone repeating the same pitch:
+- **Daily habit & anticipation:** A new single every day gives listeners a reason to check in, listen, comment, and share what hits them today.
+- **Platform-native formats:** Each channel rewards a different entry point—fast hooks and reactions on short-form video/micro-posts, deeper story/questions on discussion feeds, and searchable titles/descriptions on video search.
+- **Direct fan support alongside streaming:** Social posts bridge discovery to both **streaming** and **owning** (direct MP3 + cover art support options, PayPal.me, Buy Me a Coffee, Wise/Dogecoin rails where offered) without crowding short posts with link walls.
+
+### 3. Social Crawlers, Search Bots & AI Agents: Essential Best Practices
+- **Separate Search/AI Retrieval Crawlers from Training Bots (`robots.txt`):** `robots.txt` controls crawling rather than indexing by itself, and bot groups are evaluated independently rather than merged. Keep core public single/artist pages crawlable for search and AI search/answer crawlers when seeking discovery and citations, while keeping private/staging/admin paths out of public indexing via access controls or `noindex` where appropriate.
+- **Open Graph (`og:title`, `og:description`, `og:image`, `og:url`):** Controls link previews when someone shares a single or artist page on social apps. Use absolute `https://` image URLs and clean framing that survives cropping.
+- **Structured Data (`Schema.org` / JSON-LD):** Define `MusicRecording`, `MusicGroup`, and `Person` clearly on public pages so search engines and AI agents parse exact single titles, artist attribution (**Martin Strayd** / **STRAYD**), and links.
+- **Real HTML & Clean URLs:** Keep song titles, context, and release links in real HTML with `200` responses rather than hiding them behind un-crawled scripts or dead paths.
+
+### 4. Essential Ways to Maximize Exposure for Each Daily Single
+- **Lead with the exact single title & artist:** Put the single title and **Martin Strayd** / **STRAYD** right up front so fans and search/AI systems immediately connect the hook to the track.
+- **Rotate the daily angle:** Vary *why* today's single matters—the hook, the mood/story behind the title, a listener question, a Kunda Cafe rotation moment, or owning the MP3 + sleeve.
+- **Respect platform length & tag budgets:**
+  - **X:** Short, punchy, `0–2` tags, under `280` characters.
+  - **TikTok:** Fast opening hook (`100–300` chars sweet spot), `3–5` tags.
+  - **Instagram:** Strong opening line before the fold (`~125` chars), visual/story note, `3–5` tags.
+  - **Facebook:** Sharp opening hook (`20–150` chars) + a genuine question or memory prompt that invites replies, `2–5` tags.
+  - **YouTube:** Clear searchable title (`60–100` chars) + description leading with key song/artist terms in the first two lines, `3–5` tags.
+- **Reply and build threads:** Use Agent Anna's voice to answer comments, ask which line or groove stood out, and thank supporters—replies turn passive views into repeat listeners.
+
+### 5. A1 Agent Pod Shared Read & "Swallowed Information" Visibility Ledger
+So **Agent Anna** and every **A1 agent pod** can read from `A1/docs/v4BIBLE` and inspect what was added, dropped, truncated, or swallowed during merges/transforms:
+- **Shared Pod Read Rule:** All A1 agent pods read from `A1/docs/v4BIBLE` as canonical shared context before generating promo copy, schedules, or replies.
+- **Swallowed / Dropped Information Watchlist (Inspect Before Overwriting):**
+  - Track any song title mutations, stripped lyric/note lines, dropped payment/streaming links, or truncated descriptions across pod handoffs.
+  - Log pod additions and any swallowed/dropped fields below so Agent Anna can audit what each pod changed:
+    - `[2026-11-22 | Handbook & Pod Ledger Added]`: Appended 365-Single Release & Social Media Handbook + A1 pod audit section to `A1/docs/v4BIBLE`. Swallowed/dropped fields: `None on initial append`.
