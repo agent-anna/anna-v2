@@ -238,7 +238,8 @@
           <div class="hero-meta" id="sceneBriefMeta">Live-action direction: preparing shot &amp; mood brief...</div>
           <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="badges" id="statusBadges"></div>
-          <div class="muted" id="gateStatus" style="margin-top:12px;">Approval gate: Staged — click OK To Post when ready</div>
+          <div class="muted" id="engineModeMeta" style="margin-top:8px;">Copy engine: Ready</div>
+          <div class="muted" id="gateStatus" style="margin-top:8px;">Approval gate: Staged — click OK To Post when ready</div>
         </div>
       </section>
 
@@ -556,15 +557,15 @@
 
       const scenes = [
         "Handheld live-action camera at dusk, real street atmosphere, natural lighting, zero cartoon",
-        "Intimate live-action room cut with genuine performance energy, no animation or illustration",
-        "Documentary-style live-action movement in real spaces, grounded shadows, zero cartoon",
-        "Late-night live-action studio & room cut, unpolished realism, zero cartoon"
+        "Close live-action performance in a cramped room, real breath and room tone, zero cartoon",
+        "Moving live-action camera following real footsteps and neon reflections, zero cartoon",
+        "Late-night live-action studio & alley cut, raw human energy, zero cartoon"
       ];
       const scene = nonEmpty(directive)
         ? `Live-action brief: ${nonEmpty(directive)} (strictly realistic live-action only, zero cartoon)`
         : scenes[(Math.abs(shift) + seed) % scenes.length];
 
-      const noteContext = noteLine ? `Note: ${noteLine.slice(0, 120)}` : `Single: "${title}" by Martin Strayd`;
+      const noteContext = noteLine ? `Note: ${noteLine.slice(0, 120)}` : `Track: "${title}" by Martin Strayd`;
       return { scene, noteContext };
     }
 
@@ -574,25 +575,43 @@
       const kw = parseKeywords(rawKeywords);
       const { scene, noteContext } = buildSceneBrief(title, noteRec, shift, seed, directive);
 
-      const hooks = [
-        `Most tracks play safe until "${title}" breaks the room.`,
-        `If flat background noise is getting old, put "${title}" by Martin Strayd on.`,
-        `"${title}" hits with real bite—no polite filler, just straight-ahead songcraft.`,
-        `Here is why "${title}" stands out right now: real weight and zero polish-gloss.`
+      const ttHooks = [
+        `Wait till "${title}" drops the chorus—zero polite background noise.`,
+        `Stop scrolling for 10 seconds: "${title}" by Martin Strayd hits different.`,
+        `You hear the tension before the first beat of "${title}" even settles.`
       ];
-      const hook = hooks[(Math.abs(shift) + seed) % hooks.length];
-      const kwLine = kw.phrase ? ` Focus: ${kw.phrase}.` : "";
+      const igAngles = [
+        `Real weight, real friction, and zero gloss on "${title}" by Martin Strayd.`,
+        `Behind "${title}": ${scene}. Built to be owned, not rented on a playlist.`,
+        `"${title}" carries grit from start to finish—grab the track and cover sleeve together.`
+      ];
+      const fbAngles = [
+        `Curious how "${title}" by Martin Strayd lands with you—who in your circle needs to hear it?`,
+        `Put "${title}" on tonight and tell me which line hits hardest. ${noteContext}.`,
+        `Direct MP3 + cover art ownership beats algorithms every time. What do you think of "${title}"?`
+      ];
+      const xHooks = [
+        `"${title}" — Martin Strayd. Real teeth, zero filler.`,
+        `"${title}" by Martin Strayd hits hard from line one.`,
+        `Turn up "${title}" — Martin Strayd. Own the MP3 + sleeve:`
+      ];
 
-      const tiktok = `${hook}${kwLine} Agent Anna cue: ${scene}. Grab the MP3 + sleeve direct: ${url} ${kw.tags}`;
-      const instagram = `"${title}" — Martin Strayd. ${hook}${kwLine} ${scene}. Own the MP3 + cover art bundle: ${url} ${kw.tags}`;
+      const ttHook = ttHooks[(Math.abs(shift) + seed) % ttHooks.length];
+      const igAngle = igAngles[(Math.abs(shift) + seed + 1) % igAngles.length];
+      const fbAngle = fbAngles[(Math.abs(shift) + seed + 2) % fbAngles.length];
+      const xHook = xHooks[(Math.abs(shift) + seed) % xHooks.length];
+      const kwFocus = kw.phrase ? ` [${kw.phrase}]` : "";
+
+      const tiktok = `${ttHook}${kwFocus} Shot note: ${scene}. Own MP3 + sleeve: ${url} ${kw.tags}`;
+      const instagram = `"${title}" — Martin Strayd${kwFocus}. ${igAngle} Own MP3 + cover art: ${url} ${kw.tags}`;
       const ytTitle = (kw.phrase
         ? `${title} — Martin Strayd (${kw.phrase})`
-        : `${title} — Martin Strayd (Official Single)`).slice(0, 100);
-      const ytDesc = `"${title}" by Martin Strayd — presented by Agent Anna.\n\n${hook}${kwLine}\n${noteContext}\nVisual direction: ${scene}.\n\nOwn the MP3 + cover sleeve direct: ${url}\n\n${kw.tags}`;
-      const facebook = `Agent Anna sharing "${title}" by Martin Strayd. ${hook}${kwLine} ${noteContext}. How does this hit you, and who else should hear it? Direct MP3 + sleeve: ${url}`;
+        : `${title} — Martin Strayd (Audio & Sleeve)`).slice(0, 100);
+      const ytDesc = `"${title}" by Martin Strayd — curated via Agent Anna.\n\n${igAngle}\n${noteContext}\nLive-action shot direction: ${scene}.\n\nDirect MP3 + cover art bundle: ${url}\n\n${kw.tags}`;
+      const facebook = `${fbAngle} Direct MP3 + sleeve: ${url}`;
 
-      const xFull = `"${title}" — Martin Strayd. ${hook} ${url} ${kw.shortTags}`;
-      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd. ${url} ${kw.shortTags}`.slice(0, 280);
+      const xFull = `${xHook} ${url} ${kw.shortTags}`;
+      const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd ${url} ${kw.shortTags}`.slice(0, 280);
 
       return { tiktok, instagram, ytTitle, ytDesc, facebook, x, scene };
     }
@@ -639,16 +658,38 @@
       $("statusBadges").innerHTML = [
         `<span class="badge">Shell: A1 + Lean v4</span>`,
         `<span class="badge">Live-Action Only (Zero Cartoon)</span>`,
-        `<span class="badge">${hasDahl ? "Dahl Connected" : "Local Engine Ready"}</span>`,
+        `<span class="badge">${hasDahl ? "Dahl Key Active" : "Local Multi-Voice Ready"}</span>`,
         `<span class="badge">${hasGh ? "GitHub PAT Set" : "Public Catalog"}</span>`
       ].join("");
+    }
+
+    function tryParseDraftJson(rawText) {
+      const stripped = nonEmpty(rawText).replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+      const candidates = [];
+      const fenced = stripped.match(/```(?:json)?\s*([\s\S]*?)```/gi) || [];
+      for (const block of fenced) {
+        candidates.push(block.replace(/^```(?:json)?\s*/i, "").replace(/```$/i, "").trim());
+      }
+      const braceMatch = stripped.match(/\{[\s\S]*\}/);
+      if (braceMatch) candidates.push(braceMatch[0]);
+      candidates.push(stripped);
+
+      for (const cand of candidates) {
+        try {
+          const obj = JSON.parse(cand);
+          if (obj && typeof obj === "object" && (obj.tiktok || obj.instagram || obj.ytTitle || obj.ytDesc || obj.facebook || obj.x)) {
+            return obj;
+          }
+        } catch (_) {}
+      }
+      return null;
     }
 
     async function askDahl(messages, expectJson = false) {
       const key = getDahlKey();
       const endpoint = nonEmpty($("dahlEndpoint")?.value, DEFAULT_DAHL_URL);
       const model = nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL);
-      if (!key) return null;
+      if (!key) return { ok: false, reason: "no-key" };
 
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 30000);
@@ -659,23 +700,21 @@
             Authorization: `Bearer ${key}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ model, temperature: 0.85, messages }),
+          body: JSON.stringify({ model, temperature: 0.9, messages }),
           signal: controller.signal
         });
-        if (!res.ok) return null;
+        if (!res.ok) return { ok: false, reason: `http-${res.status}` };
         const data = await res.json();
         const raw = nonEmpty(data?.choices?.[0]?.message?.content);
-        if (!raw) return null;
+        if (!raw) return { ok: false, reason: "empty" };
         const cleaned = raw.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
-        if (!expectJson) return { text: cleaned };
+        if (!expectJson) return { ok: true, text: cleaned };
 
-        const match = cleaned.match(/```json\s*([\s\S]*?)```/i) || cleaned.match(/(\{[\s\S]*\})/);
-        if (match) {
-          try { return { json: JSON.parse(match[1]), text: cleaned }; } catch (_) {}
-        }
-        return { text: cleaned };
-      } catch (_) {
-        return null;
+        const parsed = tryParseDraftJson(cleaned);
+        if (parsed) return { ok: true, json: parsed, text: cleaned };
+        return { ok: false, reason: "non-json", text: cleaned };
+      } catch (err) {
+        return { ok: false, reason: err?.name === "AbortError" ? "timeout" : "network" };
       } finally {
         clearTimeout(timer);
       }
@@ -737,12 +776,15 @@
         : `External notes stay outside v4 core so v4 stays lean. Use Anna chat or add external notes anytime.`;
 
       applyDrafts(fallback);
+      $("engineModeMeta").textContent = getDahlKey()
+        ? "Copy engine: Requesting custom Dahl drafts..."
+        : "Copy engine: Local multi-voice craft (add Dahl API key for AI rewrites)";
 
       const dahlOut = await askDahl([
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core), writing marketing copy for recording artist Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Write sharp, distinct copy for TikTok, Instagram, YouTube (ytTitle <= 100 chars, ytDesc), Facebook, and X (<= 280 chars). Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            "You are Agent Anna in the A1 shell (v4 core), writing marketing copy for recording artist Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Give each channel a distinct opening, angle, and rhythm—never repeat the same hook across platforms. Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. ytTitle must be <= 100 chars and x must be <= 280 chars. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
         },
         {
           role: "user",
@@ -757,7 +799,7 @@
         }
       ], true);
 
-      if (dahlOut && dahlOut.json) {
+      if (dahlOut && dahlOut.ok && dahlOut.json) {
         const j = dahlOut.json;
         applyDrafts({
           tiktok: nonEmpty(j.tiktok, fallback.tiktok),
@@ -767,6 +809,9 @@
           facebook: nonEmpty(j.facebook, fallback.facebook),
           x: nonEmpty(j.x, fallback.x).slice(0, 280)
         });
+        $("engineModeMeta").textContent = `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) custom drafts applied`;
+      } else if (getDahlKey()) {
+        $("engineModeMeta").textContent = `Copy engine: Local multi-voice active (Dahl fallback: ${dahlOut?.reason || "unavailable"})`;
       }
     }
 
@@ -790,7 +835,7 @@
         }
       ], false);
 
-      if (dahlReply && dahlReply.text) {
+      if (dahlReply && dahlReply.ok && dahlReply.text) {
         appendChat("Agent Anna", dahlReply.text);
         await generateAll();
         return;
