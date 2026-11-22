@@ -240,6 +240,21 @@
       color: var(--sky);
       margin-bottom: 8px;
     }
+    .insights-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .insight-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #0b0f18;
+      border: 1px solid rgba(163, 230, 53, 0.3);
+      color: var(--ok);
+    }
     .stats { color: var(--muted); font-weight: 600; font-size: 0.78rem; }
     .stats.over { color: var(--warn); }
     .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
@@ -251,7 +266,7 @@
     <header class="topbar">
       <div>
         <h1>A1 Record Command • Agent Anna Social Master</h1>
-        <div class="muted">Sovereign Record Promo Node in A1 (Linked to V4) • Martin Strayd Catalog • Live-Action Only (Zero Cartoon)</div>
+        <div class="muted">Management, Sales, Marketing &amp; Promo Team • Martin Strayd A–Z Catalog • Live-Action Only (Zero Cartoon)</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span class="waiting-pill" id="waitIndicator">Idle • Ready</span>
@@ -265,9 +280,9 @@
           <img id="artPreview" src="" alt="Martin Strayd Cover Sleeve" />
         </div>
         <div>
-          <div class="eyebrow">Daily Song Roll &amp; Multi-Post Sales Command</div>
+          <div class="eyebrow">365-Day A–Z Catalog Roll &amp; Multi-Post Sales Command</div>
           <div class="hero-title" id="heroTitle">ADHD I Can Do That (Travillen Disorder)</div>
-          <div class="hero-meta" id="artFileMeta">Catalog ID: STRAYD-ID-001 • Instant Sleeve Active</div>
+          <div class="hero-meta" id="artFileMeta">Track: ADHD I Can Do That (Travillen Disorder) • STRAYD-ID-001</div>
           <div class="hero-meta" id="sceneBriefMeta">Live-action direction: realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="badges" id="statusBadges"></div>
@@ -279,9 +294,15 @@
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="card-title">1. Daily Song Roll, SEO &amp; Sales Rails</div>
+            <div class="card-title">1. A–Z Song Roll, Selection &amp; Sales Rails</div>
 
-            <label for="songPicker">Select Single (74-Track Catalog Roll)</label>
+            <label for="loadStrategy">On-Load Song Pick Mode (365-Day Loop)</label>
+            <select id="loadStrategy">
+              <option value="random">Random Single on Load (Instant Variety + Full Picker)</option>
+              <option value="daily_az">Daily A–Z Roll (Min 1 Song/Day • 365-Day Loop)</option>
+            </select>
+
+            <label for="songPicker">Select Single (A–Z Catalog Roll — Title Priority)</label>
             <select id="songPicker"></select>
 
             <label for="customSong">Custom Song Title Override (Locked Verbatim)</label>
@@ -311,23 +332,30 @@
             <label for="directLink">Sales Portal / Direct MP3 + Cover Art Link</label>
             <input id="directLink" type="text" value="https://martinstrayd.github.io/artist/" />
 
-            <label for="bmacLink">Buy Me a Coffee / PayPal Direct</label>
+            <label for="paypalLink">PayPal.me Direct Link</label>
+            <input id="paypalLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
+
+            <label for="bmacLink">Buy Me a Coffee Direct</label>
             <input id="bmacLink" type="text" value="https://buymeacoffee.com/martinstrayd" />
 
-            <label for="wiseNote">Wise / PayPal / Dogecoin Checkout Note</label>
-            <input id="wiseNote" type="text" value="Wise THB • PayPal • Dogecoin on sales portal" />
+            <label for="wiseNote">Wise QR / PayPal / Dogecoin Checkout Note</label>
+            <input id="wiseNote" type="text" value="Wise QR on store • PayPal.me • Dogecoin" />
+
+            <input id="spotifyUrl" type="hidden" value="https://open.spotify.com/artist/6aRM8IKV2HBUZRGnnDdrM0" />
+            <input id="ytMusicUrl" type="hidden" value="https://music.youtube.com/channel/UCUOojI7C1D6RCMLIjuNvz1g" />
+            <input id="appleMusicUrl" type="hidden" value="https://music.apple.com/us/artist/martin-strayd/1714956004" />
 
             <input id="dahlEndpoint" type="hidden" value="https://inference.dahl.global/v1/chat/completions" />
             <input id="dahlModel" type="hidden" value="MiniMaxAI/MiniMax-M2.7" />
             <input id="dahlKey" type="hidden" value="" />
             <input id="ghPat" type="hidden" value="" />
 
-            <label for="webhookUrl">Approval / Dispatch Webhook (Optional)</label>
-            <input id="webhookUrl" type="text" placeholder="https://..." />
+            <label for="webhookUrl">PHP / AI / JS Automation Webhook (Optional)</label>
+            <input id="webhookUrl" type="text" placeholder="https://.../anna-dispatch.php" />
 
             <div class="actions">
               <button type="button" class="accent" id="generateBtn">Generate Channel Copy</button>
-              <button type="button" id="reloadBtn">Reload A1 Brain, Bible &amp; Catalog</button>
+              <button type="button" id="reloadBtn">Load / Refresh A–Z Catalog &amp; Brain</button>
               <button type="button" class="primary" id="approveBtn">OK To Post</button>
             </div>
           </section>
@@ -336,7 +364,7 @@
             <div class="card-title">2. Chat With Agent Anna (Promo Director)</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Direct Anna on hook, lyrics, Wise/DOGE CTA, or reel..." />
+              <input id="chatInput" type="text" placeholder="Direct Anna on hook, lyrics, PayPal/Wise/DOGE CTA, or reel..." />
               <button type="button" id="chatSendBtn">Send</button>
             </div>
           </section>
@@ -349,13 +377,14 @@
           </section>
 
           <section class="card">
-            <div class="card-title">4. Channel Drafts &amp; NY / Hollywood Press Brief</div>
+            <div class="card-title">4. Channel Drafts, Insights Tags &amp; NY / Hollywood Press Brief</div>
 
             <article class="channel">
               <div class="channel-head">
                 <span>NY / Hollywood Press &amp; Live-Action Reel Brief (Zero Cartoon)</span>
                 <span class="stats" id="pressStats">0 words • 0 chars</span>
               </div>
+              <div class="insights-row" id="pressInsights"></div>
               <textarea id="pressOut" style="min-height:145px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="tts-btn" data-tts="pressOut" data-label="Press Brief">Speak</button>
@@ -368,6 +397,7 @@
                 <span>TikTok • 100–300c Lead + Reel &amp; Sales CTA (3–5 tags • max 2,200c)</span>
                 <span class="stats" id="ttStats">0 words • 0 / 2,200 chars</span>
               </div>
+              <div class="insights-row" id="ttInsights"></div>
               <textarea id="ttOut" style="min-height:140px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="tts-btn" data-tts="ttOut" data-label="TikTok">Speak</button>
@@ -381,6 +411,7 @@
                 <span>Instagram • First 125c Hook + Story &amp; Sales CTA (3–5 tags • max 2,200c)</span>
                 <span class="stats" id="igStats">0 words • 0 / 2,200 chars</span>
               </div>
+              <div class="insights-row" id="igInsights"></div>
               <textarea id="igOut" style="min-height:140px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="tts-btn" data-tts="igOut" data-label="Instagram">Speak</button>
@@ -394,6 +425,7 @@
                 <span>YouTube Title (target 60–100 chars • max 100)</span>
                 <span class="stats" id="ytTitleStats">0 words • 0 / 100 chars</span>
               </div>
+              <div class="insights-row" id="ytInsights"></div>
               <input id="ytTitleOut" type="text" maxlength="100" />
               <div class="btn-row">
                 <button type="button" class="tts-btn" data-tts="ytTitleOut" data-label="YT Title">Speak YT Title</button>
@@ -416,6 +448,7 @@
                 <span>Facebook • 20–150c Punchy Lead + Catalog Story &amp; Sales CTA (2–5 tags • up to 63,206c)</span>
                 <span class="stats" id="fbStats">0 words • 0 / 63,206 chars</span>
               </div>
+              <div class="insights-row" id="fbInsights"></div>
               <textarea id="fbOut" style="min-height:145px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="tts-btn" data-tts="fbOut" data-label="Facebook">Speak</button>
@@ -429,6 +462,7 @@
                 <span>X • Punchy High-Impact Post &amp; Link (0–2 tags • limit &le; 280 chars)</span>
                 <span class="stats" id="xStats">0 words • 0 / 280 chars</span>
               </div>
+              <div class="insights-row" id="xInsights"></div>
               <textarea id="xOut" style="min-height:82px;"></textarea>
               <div class="btn-row">
                 <button type="button" class="tts-btn" data-tts="xOut" data-label="X">Speak</button>
@@ -439,9 +473,9 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>5. Approved Payload JSON &amp; Full Campaign Pack (A1 Node Output)</span>
+                <span>5. Approved Payload JSON &amp; Full Campaign Pack (PHP / AI / JS Automation Ready)</span>
               </div>
-              <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage approved JSON for A1 / V4..."></textarea>
+              <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage approved JSON for PHP / AI / JS automation..."></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="payloadOut">Copy JSON</button>
                 <button type="button" class="copy-btn" id="copyBundleBtn">Copy Full Pack</button>
@@ -457,6 +491,12 @@
   (() => {
     const DEFAULT_DAHL_URL = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
+    const DEFAULT_PAYPAL = "https://www.paypal.com/paypalme/martinstrayd";
+    const DEFAULT_PORTAL = "https://martinstrayd.github.io/artist/";
+    const DEFAULT_BMAC = "https://buymeacoffee.com/martinstrayd";
+    const DEFAULT_SPOTIFY = "https://open.spotify.com/artist/6aRM8IKV2HBUZRGnnDdrM0";
+    const DEFAULT_YTMUSIC = "https://music.youtube.com/channel/UCUOojI7C1D6RCMLIjuNvz1g";
+    const DEFAULT_APPLEMUSIC = "https://music.apple.com/us/artist/martin-strayd/1714956004";
 
     const CATALOG_URLS = [
       "./strayd-artist-live.json",
@@ -488,6 +528,7 @@
     let waitTimer = null;
     let customDirective = "";
     let activeSpeakingBtn = null;
+    let currentInsights = {};
     let activeTrack = {
       id: "STRAYD-ID-001",
       title: "ADHD I Can Do That (Travillen Disorder)",
@@ -497,6 +538,27 @@
 
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
+
+    function pickFemaleVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      const voices = window.speechSynthesis.getVoices() || [];
+      if (!voices.length) return null;
+      const preferredNames = [
+        "anna", "samantha", "victoria", "zira", "hazel", "aria", "jenny",
+        "moira", "tessa", "fiona", "karen", "google uk english female", "google us english"
+      ];
+      for (const pref of preferredNames) {
+        const match = voices.find((v) => (v.name || "").toLowerCase().includes(pref));
+        if (match) return match;
+      }
+      const femaleMatch = voices.find((v) => /female|woman|girl|anna|samantha|zira|victoria|aria|jenny/i.test(`${v.name} ${v.voiceURI}`));
+      if (femaleMatch) return femaleMatch;
+      return voices.find((v) => !/daniel|david|mark|arthur|fred|alex|george|james|ryan/i.test(v.name || "")) || voices[0];
+    }
+
+    if ("speechSynthesis" in window && typeof window.speechSynthesis.addEventListener === "function") {
+      window.speechSynthesis.addEventListener("voiceschanged", () => pickFemaleVoice());
+    }
 
     function resetAllTtsButtons() {
       document.querySelectorAll("[data-tts]").forEach((btn) => {
@@ -539,8 +601,10 @@
       if (!spoken) return;
 
       const utter = new SpeechSynthesisUtterance(spoken);
-      utter.rate = 1.02;
-      utter.pitch = 1.04;
+      const chosenVoice = pickFemaleVoice();
+      if (chosenVoice) utter.voice = chosenVoice;
+      utter.rate = 1.03;
+      utter.pitch = 1.12;
       utter.onend = () => resetAllTtsButtons();
       utter.onerror = () => resetAllTtsButtons();
 
@@ -607,9 +671,41 @@
         .trim();
     }
 
-    function buildInstantSleeveUri(title, trackId) {
-      const safeTitle = preserveTitle(title).slice(0, 44).replace(/[<>&"]/g, "");
-      const safeId = preserveTitle(trackId || "STRAYD").slice(0, 20).replace(/[<>&"]/g, "");
+    function escapeXml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function wrapTextLines(text, maxChars = 22, maxLines = 4) {
+      const words = preserveTitle(text).split(/\s+/).filter(Boolean);
+      const lines = [];
+      let cur = "";
+      for (const w of words) {
+        const next = cur ? `${cur} ${w}` : w;
+        if (next.length <= maxChars) {
+          cur = next;
+        } else {
+          if (cur) lines.push(cur);
+          cur = w.length > maxChars ? `${w.slice(0, maxChars - 1)}…` : w;
+          if (lines.length >= maxLines) break;
+        }
+      }
+      if (lines.length < maxLines && cur) lines.push(cur);
+      return lines;
+    }
+
+    function buildWrappedSleeveUri(title, trackId) {
+      const lines = wrapTextLines(title, 22, 4);
+      const safeId = escapeXml(preserveTitle(trackId || "STRAYD").slice(0, 20));
+      const startY = lines.length <= 2 ? 250 : 210;
+      const tspans = lines
+        .map((ln, idx) => `<tspan x="56" dy="${idx === 0 ? 0 : 46}">${escapeXml(ln)}</tspan>`)
+        .join("");
+      const artistY = startY + lines.length * 46 + 18;
+
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
         <defs>
           <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -620,12 +716,42 @@
         </defs>
         <rect width="600" height="600" fill="url(#bg)"/>
         <rect x="28" y="28" width="544" height="544" rx="18" fill="none" stroke="#e5b84b" stroke-opacity="0.45" stroke-width="2"/>
-        <text x="56" y="84" fill="#e5b84b" font-family="system-ui,sans-serif" font-size="18" font-weight="700" letter-spacing="3">${safeId}</text>
-        <text x="56" y="275" fill="#f3f6fb" font-family="system-ui,sans-serif" font-size="38" font-weight="800">${safeTitle}</text>
-        <text x="56" y="330" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="22" font-weight="600">Martin Strayd • STRAYD</text>
-        <text x="56" y="532" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="16" font-weight="700">DIRECT MP3 + COVER SLEEVE • LIVE ACTION</text>
+        <text x="56" y="84" fill="#e5b84b" font-family="system-ui,sans-serif" font-size="16" font-weight="700" letter-spacing="2.5">${safeId}</text>
+        <text x="56" y="${startY}" fill="#f3f6fb" font-family="system-ui,sans-serif" font-size="36" font-weight="800">${tspans}</text>
+        <text x="56" y="${Math.min(artistY, 470)}" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="21" font-weight="600">Martin Strayd • STRAYD</text>
+        <text x="56" y="534" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="15" font-weight="700">DIRECT MP3 + COVER SLEEVE • LIVE ACTION</text>
       </svg>`;
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    function buildArtCandidates(track) {
+      const list = [];
+      const add = (u) => {
+        const s = nonEmpty(u);
+        if (s && !list.includes(s)) list.push(s);
+      };
+      add(track.url);
+      add(track.artworkUrl);
+      add(track.image);
+      const baseTitle = preserveTitle(track.title);
+      const fname = nonEmpty(track.filename);
+      const stems = Array.from(new Set([
+        fname,
+        fname.replace(/\.[a-z0-9]+$/i, ".png"),
+        fname.replace(/\.[a-z0-9]+$/i, ".jpg"),
+        fname.replace(/\.[a-z0-9]+$/i, ".webp"),
+        `Martin Strayd - ${baseTitle}.png`,
+        `Martin Strayd - ${baseTitle}.jpg`,
+        `${baseTitle}.png`,
+        `${baseTitle}.jpg`
+      ].filter(Boolean)));
+      const dirs = ["./artwork/", "./covers/", "./images/", "./", "../artwork/", "../covers/", "../images/"];
+      for (const dir of dirs) {
+        for (const st of stems) {
+          add(`${dir}${encodeURIComponent(st)}`);
+        }
+      }
+      return list;
     }
 
     function sanitizeBrainObject(obj) {
@@ -779,6 +905,23 @@
       return matched.slice(0, 3).join(" ").slice(0, 220);
     }
 
+    function renderInsightsTags(mapObj) {
+      currentInsights = mapObj;
+      const targets = {
+        press: $("pressInsights"),
+        tiktok: $("ttInsights"),
+        instagram: $("igInsights"),
+        youtube: $("ytInsights"),
+        facebook: $("fbInsights"),
+        x: $("xInsights")
+      };
+      for (const [key, el] of Object.entries(targets)) {
+        if (!el) continue;
+        const tags = Array.isArray(mapObj[key]) ? mapObj[key] : [];
+        el.innerHTML = tags.map((t) => `<span class="insight-tag">${escapeXml(t)}</span>`).join("");
+      }
+    }
+
     function updateStats() {
       const prVal = nonEmpty($("pressOut").value);
       $("pressStats").textContent = `${countWords(prVal)} words • ${prVal.length} chars`;
@@ -823,11 +966,12 @@
 
     function renderBadges() {
       const cadence = $("cadenceMode")?.value === "multi_burst" ? "Multi-Post Burst" : "1 Song / Day Roll";
+      const strat = $("loadStrategy")?.value === "random" ? "Random Load + A–Z" : "365-Day A–Z Loop";
       $("statusBadges").innerHTML = [
-        `<span class="badge">A1 Record Command Node</span>`,
+        `<span class="badge">Anna Promo Team</span>`,
+        `<span class="badge">${strat}</span>`,
         `<span class="badge">${cadence}</span>`,
-        `<span class="badge">Live-Action Only (Zero Cartoon)</span>`,
-        `<span class="badge">Sales Portal • Wise • PayPal • DOGE</span>`
+        `<span class="badge">PHP • AI • JS Ready</span>`
       ].join("");
     }
 
@@ -888,9 +1032,24 @@
       }
     }
 
-    function buildLocalDrafts(track, shiftVal, rawKw, portalLink, bmacLink, wiseStr, cadence, songRef) {
+    function buildInsightsForTrack(title, shiftVal, cadence) {
+      const day = getDayOfYear();
+      const cyclePos = ((day - 1) % 365) + 1;
+      const base = [`365-Day A–Z Loop (Day ${cyclePos}/365)`, `Angle #${shiftVal + 1}`, cadence === "multi_burst" ? "Burst Mode" : "Daily Roll"];
+      return {
+        press: [...base, "Media & Live-Action Brief", "Direct Ownership CTA"],
+        tiktok: [...base, "0–3s Hook", "Reel + Store CTA"],
+        instagram: [...base, "First-125c Fold Hook", "Story + PayPal/Store CTA"],
+        youtube: [...base, "Search & Playlist SEO", "Long-Form & Shorts Ready"],
+        facebook: [...base, "Community & Share Hook", "Direct Sales CTA"],
+        x: [...base, "Under-280c Punch", "Direct Link"]
+      };
+    }
+
+    function buildLocalDrafts(track, shiftVal, rawKw, portalLink, paypalUrl, bmacLink, wiseStr, cadence, songRef) {
       const title = preserveTitle(track.title);
       const day = getDayOfYear();
+      const cyclePos = ((day - 1) % 365) + 1;
       const kwList = cleanEditorialText(nonEmpty(rawKw, "Martin Strayd, STRAYD, indie rock, direct MP3, cover art, Kunda Cafe music"), title);
       const tags = kwList
         .split(/[,\n]+/)
@@ -903,21 +1062,23 @@
       const xTags = mergedTags.slice(0, 2).join(" ");
       const modeLabel = cadence === "multi_burst"
         ? `Multi-post high-impact burst (#${runCounter})`
-        : `Daily catalog roll (Day ${day} of 365)`;
+        : `Daily A–Z catalog loop (Day ${cyclePos} of 365)`;
 
       const sceneBrief = `Realistic live-action camera work in a real space with natural/practical light and real human presence for "${title}" — strictly live-action cinematography only (zero cartoon, zero anime, zero illustration).`;
-      const payLine = `Own the MP3 + sleeve at ${portalLink} | Support: ${bmacLink} | ${wiseStr || "Wise THB, PayPal & Dogecoin"}`;
+      const payLine = `Store: ${portalLink} | PayPal: ${paypalUrl} | Coffee: ${bmacLink} | ${wiseStr || "Wise QR on store & Dogecoin"}`;
+      const streamLine = `Spotify: ${DEFAULT_SPOTIFY} | YT Music: ${DEFAULT_YTMUSIC} | Apple Music: ${DEFAULT_APPLEMUSIC}`;
       const hookStory = songRef
-        ? `${songRef} Part of Martin Strayd's 74-track catalog and music played at Kunda Cafe.`
-        : `Straight from Martin Strayd's 74-track catalog and music played at Kunda Cafe — built for listeners who keep their music.`;
+        ? `${songRef} Part of Martin Strayd's A–Z catalog and music played at Kunda Cafe.`
+        : `Straight from Martin Strayd's A–Z catalog and music played at Kunda Cafe — built for listeners who keep their music.`;
 
       const press = [
-        `PRESS & REEL BRIEF — "${title}" (${track.id || "STRAYD"}) by Martin Strayd`,
+        `PRESS & REEL BRIEF — "${title}" by Martin Strayd (${track.id || "STRAYD"})`,
         `Release Mode: ${modeLabel} • Angle #${shiftVal + 1}`,
         `Story & Catalog Context: ${hookStory}`,
         `SEO & Discovery Keywords: ${kwList}`,
         `Live-Action Visual Brief: ${sceneBrief}`,
-        `Direct Ownership & Payment Rails: ${payLine}`
+        `Direct Store & Payment Rails: ${payLine}`,
+        `Streaming & Catalog Links: ${streamLine}`
       ].join("\n\n");
 
       const tiktok = [
@@ -928,29 +1089,30 @@
       ].join("\n\n").slice(0, 2200);
 
       const instagram = [
-        `"${title}" — Martin Strayd hits straight out of the gate. Claim the MP3 + cover art directly on ${portalLink}.`,
+        `"${title}" — Martin Strayd hits straight out of the gate. Claim the MP3 + cover art at ${portalLink} or PayPal ${paypalUrl}.`,
         `${hookStory} ${payLine}`,
         igTags
       ].join("\n\n").slice(0, 2200);
 
       const ytTitle = `${title} — Martin Strayd | ${kwList.split(",")[0].trim()}`.slice(0, 100);
       const ytDesc = [
-        `"${title}" by Martin Strayd (${track.id || "STRAYD"}) — ${modeLabel}.`,
+        `"${title}" by Martin Strayd — ${modeLabel} (${track.id || "STRAYD"}).`,
         hookStory,
         `SEO Keywords & Themes: ${kwList}`,
         `Live-Action Cinematography Direction: ${sceneBrief}`,
         `Sales & Payment Options: ${payLine}`,
+        `Listen & Follow: ${streamLine}`,
         ttTags
       ].join("\n\n").slice(0, 5000);
 
       const facebook = [
         `"${title}" by Martin Strayd is live in today's catalog push — who wants real songs and artwork you actually own instead of renting?`,
         `${hookStory} ${sceneBrief}`,
-        `${payLine}`,
+        `${payLine} • ${streamLine}`,
         fbTags
       ].join("\n\n").slice(0, 63206);
 
-      const xRaw = `"${title}" — Martin Strayd. Own it direct: ${portalLink} ${xTags}`.trim();
+      const xRaw = `"${title}" — Martin Strayd. Store: ${portalLink} | PayPal: ${paypalUrl} ${xTags}`.trim();
       const x = xRaw.length <= 280 ? xRaw : `"${title}" — Martin Strayd ${portalLink}`.slice(0, 280);
 
       return { sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
@@ -958,22 +1120,32 @@
 
     function updateArtworkDisplay(track) {
       const cleanTitle = preserveTitle(track.title);
-      const fallbackUri = buildInstantSleeveUri(cleanTitle, track.id);
+      const fallbackUri = buildWrappedSleeveUri(cleanTitle, track.id);
+      const candidates = buildArtCandidates(track);
+
       $("heroTitle").textContent = cleanTitle;
-      $("artFileMeta").textContent = `Catalog ID: ${nonEmpty(track.id, "STRAYD")} • File: ${nonEmpty(track.filename, cleanTitle)}`;
+      $("artFileMeta").textContent = `Track: ${cleanTitle} • ${nonEmpty(track.id, "STRAYD")}`;
+
       const img = $("artPreview");
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = fallbackUri;
+      let idx = 0;
+      const tryNext = () => {
+        if (idx < candidates.length) {
+          const nextUrl = candidates[idx++];
+          img.onerror = tryNext;
+          img.src = nextUrl;
+        } else {
+          img.onerror = null;
+          img.src = fallbackUri;
+        }
       };
-      img.src = nonEmpty(track.url) ? track.url : fallbackUri;
+      tryNext();
     }
 
     function annaSystemPrompt() {
       return [
-        "You are Agent Anna running the Record Company Promotional Command Center node in A1/strayd/ alongside A1/v4/ for recording artist Martin Strayd (STRAYD).",
+        "You are Agent Anna leading the Management, Sales, Marketing & Promotional Team for recording artist Martin Strayd (STRAYD) across A–Z catalog drops.",
         "Never alter or censor the exact song title—keep titles like 'Sex Sex Sex' or 'ADHD I Can Do That (Travillen Disorder)' verbatim.",
-        "Never output raw Markdown symbols (#, **, `, >) in social posts—write clean, punchy, high-CTR social copy and SEO keywords tailored to the sales portal (https://martinstrayd.github.io/artist/), Wise THB, PayPal, Buy Me a Coffee, and Dogecoin.",
+        "Never output raw Markdown symbols (#, **, `, >) in social posts—write clean, punchy, high-CTR social copy and SEO keywords tailored to the store (https://martinstrayd.github.io/artist/), PayPal (https://www.paypal.com/paypalme/martinstrayd), Wise QR, Buy Me a Coffee, Dogecoin, Spotify, YouTube Music, and Apple Music.",
         "Strict laws: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration); zero fake network endorsements or fabricated quotes."
       ].join(" ");
     }
@@ -1007,17 +1179,20 @@
       const shiftVal = $("rotationShift").value === "auto"
         ? (getDayOfYear() % 7)
         : (parseInt($("rotationShift").value, 10) || 0);
-      const portalLink = nonEmpty($("directLink").value, "https://martinstrayd.github.io/artist/");
-      const bmac = nonEmpty($("bmacLink")?.value, "https://buymeacoffee.com/martinstrayd");
+      const portalLink = nonEmpty($("directLink").value, DEFAULT_PORTAL);
+      const paypalUrl = nonEmpty($("paypalLink")?.value, DEFAULT_PAYPAL);
+      const bmac = nonEmpty($("bmacLink")?.value, DEFAULT_BMAC);
       const wise = cleanEditorialText($("wiseNote")?.value, activeTrack.title);
       const rawKw = nonEmpty($("keywordsInput")?.value);
       const cadence = nonEmpty($("cadenceMode")?.value, "single_day");
       const songRef = extractSongContext(activeTrack.title);
 
       writeStorage("STRAYD_DIRECT_LINK", portalLink);
+      writeStorage("STRAYD_PAYPAL_LINK", paypalUrl);
       writeStorage("STRAYD_BMAC_LINK", bmac);
       writeStorage("STRAYD_WISE_NOTE", wise);
       writeStorage("STRAYD_KEYWORDS", rawKw);
+      writeStorage("STRAYD_LOAD_STRATEGY", nonEmpty($("loadStrategy")?.value, "random"));
 
       const contextLines = [];
       if (brainSummary) contextLines.push(`record-brain.json: ${brainSummary}`);
@@ -1029,7 +1204,8 @@
         ? contextLines.join("\n\n")
         : "A1 record command node ready — load A1/strayd/record-brain.json, promo-queue.json, or A1/docs/v4BIBLE anytime.";
 
-      const localDrafts = buildLocalDrafts(activeTrack, shiftVal, rawKw, portalLink, bmac, wise, cadence, songRef);
+      renderInsightsTags(buildInsightsForTrack(activeTrack.title, shiftVal, cadence));
+      const localDrafts = buildLocalDrafts(activeTrack, shiftVal, rawKw, portalLink, paypalUrl, bmac, wise, cadence, songRef);
       $("sceneBriefMeta").textContent = `Live-action direction: ${localDrafts.sceneBrief}`;
       applyDrafts(localDrafts, activeTrack.title);
       setWaitingState(false, "Ready • A1 Fast");
@@ -1052,8 +1228,14 @@
               directive: customDirective,
               songNotes: songRef,
               salesPortal: portalLink,
+              paypalLink: paypalUrl,
               buyMeACoffee: bmac,
-              paymentRails: wise
+              paymentRails: wise,
+              streamingLinks: {
+                spotify: DEFAULT_SPOTIFY,
+                ytMusic: DEFAULT_YTMUSIC,
+                appleMusic: DEFAULT_APPLEMUSIC
+              }
             }) + "\nReturn ONLY valid JSON with keys: sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
           }
         ], true, 0.92, 8000);
@@ -1136,27 +1318,37 @@
             });
           }
         }
-        return items;
-      }
+      } else {
+        const files = Array.isArray(parsed.files_and_folders)
+          ? parsed.files_and_folders
+          : (Array.isArray(parsed.tracks) ? parsed.tracks : []);
 
-      const files = Array.isArray(parsed.files_and_folders)
-        ? parsed.files_and_folders
-        : (Array.isArray(parsed.tracks) ? parsed.tracks : []);
-
-      for (const f of files) {
-        if (!f) continue;
-        const fname = nonEmpty(f.filename || f.title || f.name);
-        if (!fname) continue;
-        if (/\.(png|jpe?g|webp)$/i.test(fname) || /martin strayd/i.test(fname) || f.title) {
-          items.push({
-            id: nonEmpty(f.id || f.code, `STRAYD-ID-${String(items.length + 1).padStart(3, "0")}`),
-            title: preserveTitle(fname.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
-            filename: fname,
-            url: nonEmpty(f.url || f.artworkUrl || f.image)
-          });
+        for (const f of files) {
+          if (!f) continue;
+          const fname = nonEmpty(f.filename || f.title || f.name);
+          if (!fname) continue;
+          if (/\.(png|jpe?g|webp)$/i.test(fname) || /martin strayd/i.test(fname) || f.title) {
+            items.push({
+              id: nonEmpty(f.id || f.code, `STRAYD-ID-${String(items.length + 1).padStart(3, "0")}`),
+              title: preserveTitle(fname.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
+              filename: fname,
+              url: nonEmpty(f.url || f.artworkUrl || f.image)
+            });
+          }
         }
       }
-      return items;
+
+      return items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
+    }
+
+    function pickInitialCatalogTrack(list, strategy) {
+      if (!list.length) return null;
+      if (strategy === "random") {
+        const idx = Math.floor(Math.random() * list.length);
+        return list[idx];
+      }
+      const dailyIndex = (getDayOfYear() - 1) % list.length;
+      return list[dailyIndex] || list[0];
     }
 
     async function boot() {
@@ -1164,15 +1356,19 @@
       renderBadges();
       const savedLink = readStorage("STRAYD_DIRECT_LINK");
       if (savedLink) $("directLink").value = savedLink;
+      const savedPaypal = readStorage("STRAYD_PAYPAL_LINK");
+      if (savedPaypal) $("paypalLink").value = savedPaypal;
       const savedBmac = readStorage("STRAYD_BMAC_LINK");
       if (savedBmac) $("bmacLink").value = savedBmac;
       const savedWise = readStorage("STRAYD_WISE_NOTE");
       if (savedWise) $("wiseNote").value = savedWise;
       const savedKw = readStorage("STRAYD_KEYWORDS");
       if (savedKw) $("keywordsInput").value = savedKw;
+      const savedStrat = readStorage("STRAYD_LOAD_STRATEGY");
+      if (savedStrat) $("loadStrategy").value = savedStrat;
 
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", `Record Command active on A1 (Day ${getDayOfYear()}). Pick a single or tell me what hook, Wise/PayPal/DOGE CTA, or live-action scene to push.`);
+        appendChat("Agent Anna", `Anna Promo Team active on A1 (365-day A–Z loop). Random or daily load ready—pick any song or tell me what to push.`);
       }
       await generateAll();
 
@@ -1186,21 +1382,20 @@
           for (const item of catalog) {
             const opt = document.createElement("option");
             opt.value = item.title;
-            opt.textContent = `${item.id} • ${item.title}`;
+            opt.textContent = `${item.title} • ${item.id}`;
             picker.appendChild(opt);
           }
-          const dailyIndex = (getDayOfYear() - 1) % Math.max(catalog.length, 1);
-          const dailyTrack = catalog[dailyIndex] || catalog[0];
-          if (dailyTrack) {
-            activeTrack = dailyTrack;
-            picker.value = dailyTrack.title;
+          const chosen = pickInitialCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"));
+          if (chosen) {
+            activeTrack = chosen;
+            picker.value = chosen.title;
             await generateAll();
           }
         } catch (_) {}
       }
 
       $("bootStatus").textContent = catalog.length
-        ? `A1 Node Ready • ${catalog.length} singles • Day ${getDayOfYear()}`
+        ? `A–Z Catalog Ready • ${catalog.length} tracks • 365-Day Loop`
         : `A1 Node Ready • Day ${getDayOfYear()}`;
     }
 
@@ -1282,6 +1477,18 @@
       runCounter++;
       generateAll();
     });
+    $("loadStrategy").addEventListener("change", async () => {
+      renderBadges();
+      runCounter++;
+      if (catalog.length) {
+        const chosen = pickInitialCatalogTrack(catalog, nonEmpty($("loadStrategy")?.value, "random"));
+        if (chosen) {
+          activeTrack = chosen;
+          $("songPicker").value = chosen.title;
+        }
+      }
+      await generateAll();
+    });
     $("cadenceMode").addEventListener("change", () => {
       renderBadges();
       runCounter++;
@@ -1306,6 +1513,7 @@
       generateAll();
     });
     $("directLink").addEventListener("input", () => writeStorage("STRAYD_DIRECT_LINK", nonEmpty($("directLink").value)));
+    $("paypalLink").addEventListener("input", () => writeStorage("STRAYD_PAYPAL_LINK", nonEmpty($("paypalLink").value)));
     $("bmacLink").addEventListener("input", () => writeStorage("STRAYD_BMAC_LINK", nonEmpty($("bmacLink").value)));
     $("wiseNote").addEventListener("input", () => writeStorage("STRAYD_WISE_NOTE", cleanEditorialText($("wiseNote").value, activeTrack.title)));
     ["pressOut", "ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
@@ -1328,22 +1536,37 @@
 
       const payload = {
         node: "A1-STRAYD-RECORD-CMD",
+        team: "Anna Management, Sales, Marketing & Promo Team",
         linkedAgent: "Agent Anna (A1/v4)",
+        automationReady: {
+          php: true,
+          ai: true,
+          js: true,
+          loopSchedule: "365-day A–Z continuous roll (minimum 1 song/day)"
+        },
+        loadStrategy: nonEmpty($("loadStrategy")?.value, "random"),
         dayOfYear: getDayOfYear(),
         cadence: nonEmpty($("cadenceMode")?.value, "single_day"),
+        insightsTags: currentInsights,
         sessionMemories: sessionMemories.slice(-10),
         keywords: nonEmpty($("keywordsInput")?.value) || null,
         directive: customDirective || null,
         approved: true,
         approvedAt: new Date().toISOString(),
         artist: "Martin Strayd",
-        songId: activeTrack.id || null,
         song: activeTrack.title,
-        artworkUrl: activeTrack.url,
+        songId: activeTrack.id || null,
+        artworkUrl: $("artPreview")?.src || activeTrack.url || null,
         visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)",
         salesPortal: nonEmpty($("directLink").value),
+        paypalLink: nonEmpty($("paypalLink")?.value),
         buyMeACoffeeLink: nonEmpty($("bmacLink")?.value),
         paymentRailsNote: cleanEditorialText($("wiseNote")?.value, activeTrack.title) || null,
+        streamingLinks: {
+          spotify: DEFAULT_SPOTIFY,
+          ytMusic: DEFAULT_YTMUSIC,
+          appleMusic: DEFAULT_APPLEMUSIC
+        },
         press: $("pressOut").value,
         tiktok: $("ttOut").value,
         instagram: $("igOut").value,
