@@ -270,7 +270,7 @@
     <header class="topbar">
       <div>
         <h1>A1 Record Command • Agent Anna Social Master</h1>
-        <div class="muted">Management, Sales, Marketing &amp; Promo Team • Martin Strayd A–Z Catalog • Live-Action Only (Zero Cartoon)</div>
+        <div class="muted">MTV-Style Host Agent Anna • Martin Strayd A–Z Catalog • Live-Action Only (Zero Cartoon)</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span class="waiting-pill" id="waitIndicator">Idle • Ready</span>
@@ -324,13 +324,13 @@
             <label for="rotationShift">Campaign Angle / Clickbait Hook Shift</label>
             <select id="rotationShift">
               <option value="auto">Auto (Daily Catalog Roll)</option>
-              <option value="0">01 • High-Voltage Hook &amp; Wit</option>
-              <option value="1">02 • Confession, Tension &amp; Real Stakes</option>
-              <option value="2">03 • Live-Action Reel &amp; Camera</option>
-              <option value="3">04 • Own MP3 + Sleeve Bundle CTA</option>
+              <option value="0">01 • VJ Drop &amp; Instant Hook</option>
+              <option value="1">02 • Late-Night Confession &amp; Wit</option>
+              <option value="2">03 • Live-Action Camera &amp; Room Heat</option>
+              <option value="3">04 • Own MP3 + Sleeve Bundle Drop</option>
               <option value="4">05 • Search, AI Discovery &amp; Playlists</option>
-              <option value="5">06 • Song Story &amp; Promo War Room</option>
-              <option value="6">07 • Fan Share &amp; Collector Push</option>
+              <option value="5">06 • Backstage Story &amp; Promo Flash</option>
+              <option value="6">07 • Pass-The-Track &amp; Fan Debate</option>
             </select>
 
             <label for="directLink">Sales Portal / Direct MP3 + Cover Art Link</label>
@@ -368,7 +368,7 @@
             <div class="card-title">2. Chat With Agent Anna (Promo Director)</div>
             <div class="chat-log" id="chatLog" aria-live="polite"></div>
             <div class="chat-row">
-              <input id="chatInput" type="text" placeholder="Direct Anna on hook, wit, PayPal/Wise/DOGE CTA, or reel..." />
+              <input id="chatInput" type="text" placeholder="Direct Anna on VJ hook, wit, PayPal/Wise/DOGE CTA, or reel..." />
               <button type="button" id="chatSendBtn">Send</button>
             </div>
           </section>
@@ -449,7 +449,7 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>Facebook • 20–150c Punchy Lead, Longer Story OK • 2–5 Tags • 1/day</span>
+                <span>Facebook • 20–150c Punchy Lead + Conversation &amp; Memory Hook • 2–5 Tags • 1/day</span>
                 <span class="stats" id="fbStats">0 words • 0 / 63,206 chars</span>
               </div>
               <div class="insights-row" id="fbInsights"></div>
@@ -821,7 +821,7 @@
           const secs = Math.floor((Date.now() - started) / 1000);
           pill.textContent = `${labelText || "Updating"} • ${secs}s`;
           if (songName) {
-            $("engineModeMeta").textContent = `Generating fresh copy for "${songName}" (${secs}s)...`;
+            $("engineModeMeta").textContent = `Agent Anna is spinning up "${songName}" (${secs}s)...`;
           }
         };
         tick();
@@ -951,8 +951,9 @@
       $("ytDescStats").className = ytDVal.length > 5000 ? "stats over" : (ytDVal.length >= 200 ? "stats ok" : "stats");
 
       const fbVal = nonEmpty($("fbOut").value);
-      $("fbStats").textContent = `${countWords(fbVal)} words • ${fbVal.length} / 63,206 chars (20–150c lead + story)`;
-      $("fbStats").className = fbVal.length > 63206 ? "stats over" : "stats";
+      const fbLeadLen = (fbVal.split("\n")[0] || fbVal).length;
+      $("fbStats").textContent = `${countWords(fbVal)} words • ${fbVal.length} / 63,206 chars (lead ${fbLeadLen}c • 20–150c sweet)`;
+      $("fbStats").className = fbVal.length > 63206 ? "stats over" : (fbLeadLen <= 150 ? "stats ok" : "stats");
 
       const xVal = nonEmpty($("xOut").value);
       $("xStats").textContent = `${countWords(xVal)} words • ${xVal.length} / 280 chars`;
@@ -975,7 +976,7 @@
       const burst = $("cadenceMode")?.value === "multi_burst";
       const strat = $("loadStrategy")?.value === "random" ? "Random Load + A–Z" : "365-Day A–Z Loop";
       $("statusBadges").innerHTML = [
-        `<span class="badge">Anna Promo Team</span>`,
+        `<span class="badge">Agent Anna • VJ &amp; Promo Star</span>`,
         `<span class="badge">${strat}</span>`,
         `<span class="badge">${burst ? "Burst Cadence" : "TT 2–3/d • FB 1/d • IG 1+Stories • X 5–10/d"}</span>`,
         `<span class="badge">YT Shorts 1/d • Vids 3/wk</span>`
@@ -1004,7 +1005,7 @@
       return null;
     }
 
-    async function askDahl(messages, expectJson = false, temperature = 0.96, timeoutMs = 8500) {
+    async function askDahl(messages, expectJson = false, temperature = 0.98, timeoutMs = 8500) {
       const key = getDahlKey();
       const endpoint = nonEmpty($("dahlEndpoint")?.value, DEFAULT_DAHL_URL);
       const model = nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL);
@@ -1042,22 +1043,22 @@
     function buildInsightsForTrack(title, shiftVal, cadence) {
       const day = getDayOfYear();
       const cyclePos = ((day - 1) % 365) + 1;
-      const base = [`Day ${cyclePos}/365 A–Z`, `Angle #${shiftVal + 1}`, cadence === "multi_burst" ? "Burst Mode" : "Daily Schedule"];
+      const base = [`Day ${cyclePos}/365 A–Z`, `Angle #${shiftVal + 1}`, cadence === "multi_burst" ? "Burst Mode" : "Daily Hit Roll"];
       return {
-        press: [...base, "A4 / 3/4-Page Release", "Search & AI Music Index"],
-        tiktok: [...base, "100–300c Sweet Spot", "3–5 Tags • 2–3/day"],
+        press: [...base, "A4 / 3/4-Page Wire", "Agent Anna × Martin Strayd"],
+        tiktok: [...base, "100–300c VJ Hook", "3–5 Tags • 2–3/day"],
         instagram: [...base, "First 125c Fold Hook", "3–5 Tags • 1/d + Stories"],
         youtube: [...base, "60–100c Title • 200–5kc Desc", "Shorts 1/d • Vids 3/wk"],
-        facebook: [...base, "20–150c Lead + Story", "2–5 Tags • 1/day"],
+        facebook: [...base, "20–150c Lead + Question", "2–5 Tags • 1/day"],
         x: [...base, "Under 280c • 0–2 Tags", "5–10 posts/day"]
       };
     }
 
-    function synthesizeDynamicDrafts(track, shiftVal, rawKw, portalLink, paypalUrl, bmacLink, wiseStr, cadence, songRef) {
+    function synthesizeVjDrafts(track, shiftVal, rawKw, portalLink, paypalUrl, bmacLink, wiseStr, cadence, songRef) {
       const title = preserveTitle(track.title);
       const day = getDayOfYear();
       const cyclePos = ((day - 1) % 365) + 1;
-      const seed = (runCounter + shiftVal + cyclePos) % 7;
+      const slot = (runCounter + shiftVal + cyclePos) % 7;
 
       const kwList = cleanEditorialText(nonEmpty(rawKw, "Martin Strayd, STRAYD, indie rock, songwriting, direct MP3, cover art, Kunda Cafe music"), title);
       const kwParts = kwList.split(/[,\n]+/).map((k) => k.trim()).filter(Boolean);
@@ -1067,7 +1068,7 @@
       const cleanTags = kwParts
         .map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`)
         .filter((t) => t.length > 1);
-      const tagPool = Array.from(new Set(["#MartinStrayd", "#STRAYD", ...cleanTags, "#DirectMP3", "#LiveActionMusic"]));
+      const tagPool = Array.from(new Set(["#AgentAnna", "#MartinStrayd", "#STRAYD", ...cleanTags, "#KundaCafe", "#DirectMP3"]));
 
       const ttTags = tagPool.slice(0, 4).join(" ");
       const igTags = tagPool.slice(0, 5).join(" ");
@@ -1076,81 +1077,118 @@
 
       const cadenceSummary = cadence === "multi_burst"
         ? "Multi-post burst active (TT 2–3/d, FB 1–3/d, IG 1–2/d + Stories, X 5–10/d, YT Shorts 1/d & Videos 3/wk)"
-        : "Daily cadence active (TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d & Videos 3/wk)";
+        : "Daily song roll active (TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d & Videos 3/wk)";
 
       const sceneBrief = `Realistic live-action cinematography in an authentic environment with natural/practical light and real human presence for "${title}" — strictly live-action only (zero cartoon, zero anime, zero illustration).`;
-      const payLine = `Direct MP3 + cover art: ${portalLink} | PayPal.me: ${paypalUrl} | Coffee: ${bmacLink} | ${wiseStr || "Wise QR & Dogecoin"}`;
-      const streamLine = `Spotify: ${DEFAULT_SPOTIFY} | YouTube Music: ${DEFAULT_YTMUSIC} | Apple Music: ${DEFAULT_APPLEMUSIC}`;
-      const storyBlock = songRef
-        ? `${songRef} Part of Martin Strayd's A–Z catalog played at Kunda Cafe.`
-        : `Authored for Martin Strayd's A–Z catalog and Kunda Cafe rotation — built for listeners and search/AI music discovery.`;
+      const payLine = `Grab the MP3 + sleeve at ${portalLink} or PayPal.me: ${paypalUrl} (${bmacLink} • ${wiseStr || "Wise QR & Dogecoin"})`;
+      const streamLine = `Spotify: ${DEFAULT_SPOTIFY} | YT Music: ${DEFAULT_YTMUSIC} | Apple Music: ${DEFAULT_APPLEMUSIC}`;
+      const storySpark = songRef
+        ? `${songRef} Spinning on Martin Strayd's A–Z roll and Kunda Cafe speakers.`
+        : `Straight from Martin Strayd's A–Z hit roll and Kunda Cafe speakers—zero plastic gloss, just real ${leadKw} & ${secondKw} energy.`;
 
-      const witOpeners = [
-        `"${title}" by Martin Strayd — proof that late-night ${leadKw} chaos can turn into a song you actually want to keep. ${portalLink} ${ttTags}`,
-        `Nobody puts "${title}" in a polite elevator playlist — Martin Strayd turns ${leadKw} grit into a hook that hits fast. ${portalLink} ${ttTags}`,
-        `Real camera, real ${leadKw} tension, zero cartoon shortcuts on "${title}" by Martin Strayd. Own the MP3 + sleeve: ${portalLink} ${ttTags}`,
-        `Why rent songs when you can own "${title}" by Martin Strayd? ${leadKw} & ${secondKw} energy straight to your speakers. ${portalLink} ${ttTags}`,
-        `Search bots and ${leadKw} fans alike: "${title}" by Martin Strayd brings a real story, sleeve art, and direct access. ${portalLink} ${ttTags}`,
-        `Agent Anna cleared "${title}" by Martin Strayd for today's ${leadKw} push — hit play and grab the track direct. ${portalLink} ${ttTags}`,
-        `Text "${title}" by Martin Strayd to the friend who asks for real ${leadKw} & ${secondKw} tracks. ${portalLink} ${ttTags}`
+      const vjSets = [
+        {
+          fbLead: `Agent Anna here—would you rather keep renting streams or own "${title}" with the MP3 + sleeve right now?`,
+          fbBody: `Martin Strayd just dropped "${title}" into today's roll and it hits like a late-night confession in a packed room. Tell me in the comments: first listen—hooked immediately or takes two spins?`,
+          igFirst125: `Agent Anna drops today's hit pick: "${title}" by Martin Strayd. Own the MP3 + cover art: ${portalLink}`,
+          ttHook: `Agent Anna on deck: "${title}" by Martin Strayd has zero filler and a hook that steals the room before thirty seconds are up. ${portalLink} ${ttTags}`,
+          xPost: `Agent Anna pick: "${title}" by Martin Strayd—real ${leadKw} bite, zero filler. Grab MP3 + sleeve: ${portalLink} ${xTags}`
+        },
+        {
+          fbLead: `What's the wildest 2 AM music idea that actually turned out awesome for you?`,
+          fbBody: `Agent Anna's spotlight today is "${title}" by Martin Strayd—proof that raw ${leadKw} instincts beat over-polished snooze-fests every single time. Drop your story below or grab the track direct.`,
+          igFirst125: `Stop scrolling—Agent Anna just cued up "${title}" by Martin Strayd. Direct MP3 + art: ${paypalUrl}`,
+          ttHook: `MTV-era energy, zero cartoon gimmicks: Agent Anna puts "${title}" by Martin Strayd front and center for ${leadKw} fans. ${portalLink} ${ttTags}`,
+          xPost: `"${title}" by Martin Strayd just hijacked Agent Anna's daily roll—pure ${leadKw} heat. ${paypalUrl} ${xTags}`
+        },
+        {
+          fbLead: `Real camera, real room, zero cartoon fluff—would you spin "${title}" first in the car or with headphones?`,
+          fbBody: `Agent Anna is hyping "${title}" by Martin Strayd today—filmed in live-action reality with real human presence and a melody that refuses to leave your head.`,
+          igFirst125: `Live-action alert from Agent Anna: "${title}" by Martin Strayd is live. Own MP3 + sleeve: ${portalLink}`,
+          ttHook: `Real room, real guitar, zero cartoon shortcuts—Agent Anna calls "${title}" by Martin Strayd a must-hear ${leadKw} drop. ${portalLink} ${ttTags}`,
+          xPost: `Zero cartoon, pure live-action grit: "${title}" by Martin Strayd on Agent Anna's radar. ${portalLink} ${xTags}`
+        },
+        {
+          fbLead: `Which song from Martin Strayd's vault would you play first for a friend who loves real songwriting?`,
+          fbBody: `Agent Anna has "${title}" locked in today—another sharp cut from Martin Strayd's catalog and Kunda Cafe rotation. Tag a friend or grab your own copy direct.`,
+          igFirst125: `Agent Anna says pass this to a real music fan: "${title}" by Martin Strayd. Grab it: ${portalLink}`,
+          ttHook: `Send this to the friend who asks for real ${secondKw}: Agent Anna spotlights "${title}" by Martin Strayd. ${portalLink} ${ttTags}`,
+          xPost: `Friend check: "${title}" by Martin Strayd belongs in your queue. Agent Anna approved: ${portalLink} ${xTags}`
+        },
+        {
+          fbLead: `Why do algorithms push safe background noise when tracks like "${title}" have actual personality?`,
+          fbBody: `Agent Anna and Martin Strayd are flipping the script with "${title}"—built for fans searching ${leadKw} and ${secondKw} who want songs with teeth and artwork they actually own.`,
+          igFirst125: `Agent Anna × Martin Strayd: "${title}" brings real ${leadKw} & ${secondKw} attitude. Own it: ${portalLink}`,
+          ttHook: `Searching for ${leadKw} that actually slaps? Agent Anna calls "${title}" by Martin Strayd today's standout cut. ${portalLink} ${ttTags}`,
+          xPost: `Forget beige background noise—"${title}" by Martin Strayd brings ${leadKw} teeth. ${portalLink} ${xTags}`
+        },
+        {
+          fbLead: `Agent Anna just raided the A1 promo desk—are you claiming "${title}" direct or streaming first?`,
+          fbBody: `Martin Strayd's "${title}" is front and center today with direct MP3 + cover art access, PayPal.me, Buy Me a Coffee, Wise QR & Dogecoin options, plus full streaming links.`,
+          igFirst125: `Straight from Agent Anna's promo desk: "${title}" by Martin Strayd is live. ${bmacLink}`,
+          ttHook: `Agent Anna cleared "${title}" by Martin Strayd for today's hit push—hook hits hard and stays loud. ${portalLink} ${ttTags}`,
+          xPost: `Agent Anna's daily hit drop: "${title}" by Martin Strayd. Own MP3 + sleeve: ${portalLink} ${xTags}`
+        },
+        {
+          fbLead: `Ever have one chorus ruin your plans to go to bed on time?`,
+          fbBody: `Agent Anna blames "${title}" by Martin Strayd for keeping late-night listeners wide awake today. Tell us what kept you up lately and grab the track direct.`,
+          igFirst125: `Late-night villain alert from Agent Anna: "${title}" by Martin Strayd. Grab it: ${portalLink}`,
+          ttHook: `Blame Agent Anna and Martin Strayd if "${title}" stays stuck in your head all week. ${portalLink} ${ttTags}`,
+          xPost: `"${title}" by Martin Strayd is officially Agent Anna's favorite late-night hook. ${portalLink} ${xTags}`
+        }
       ];
 
-      let tiktok = witOpeners[seed];
+      const v = vjSets[slot];
+
+      let tiktok = v.ttHook;
       if (tiktok.length > 300) {
-        tiktok = `"${title}" by Martin Strayd — ${leadKw} hook that hits fast. ${portalLink} ${ttTags}`.slice(0, 300);
+        tiktok = `Agent Anna drops "${title}" by Martin Strayd—${leadKw} hook that hits fast. ${portalLink} ${ttTags}`.slice(0, 300);
       }
 
-      const igLead = `"${title}" by Martin Strayd — ${leadKw} hook with real bite. Own MP3 + art: ${portalLink}`;
       const instagram = [
-        igLead.slice(0, 125),
-        `${storyBlock} ${sceneBrief}`,
-        `PayPal: ${paypalUrl} • ${bmacLink} • ${wiseStr || "Wise QR & Dogecoin"}`,
+        v.igFirst125.slice(0, 125),
+        `${storySpark} ${sceneBrief}`,
+        `${payLine} • ${streamLine}`,
         igTags
       ].join("\n\n").slice(0, 2200);
 
-      const fbLeadPool = [
-        `"${title}" by Martin Strayd — would you rather own the real MP3 + sleeve or keep renting access?`,
-        `Real ${leadKw} & ${secondKw} energy on "${title}" by Martin Strayd — which line or moment grabs you first?`,
-        `"${title}" by Martin Strayd just hit the daily roll — what track belongs next on your playlist?`
-      ];
-      const fbLead = fbLeadPool[seed % fbLeadPool.length].slice(0, 150);
+      const fbLead = v.fbLead.slice(0, 150);
       const facebook = [
         fbLead,
-        `${storyBlock} ${sceneBrief}`,
+        `${v.fbBody} ${storySpark}`,
         `${payLine}`,
         `${streamLine}`,
         fbTags
       ].join("\n\n").slice(0, 63206);
 
-      const ytTitleBase = `${title} — Martin Strayd | ${leadKw} & ${secondKw}`;
-      const ytTitle = (ytTitleBase.length >= 60 ? ytTitleBase : `${ytTitleBase} (Direct MP3 & Live Action)`).slice(0, 100);
+      const ytTitleRaw = `${title} — Martin Strayd (Agent Anna Pick • ${leadKw})`;
+      const ytTitle = (ytTitleRaw.length >= 60 ? ytTitleRaw : `${ytTitleRaw} • Direct MP3 & Live Action`).slice(0, 100);
 
       const ytDesc = [
-        `${title} — Martin Strayd (${track.id || "STRAYD"}) • ${leadKw}, ${secondKw}, ${kwList}.`,
-        `${storyBlock} ${sceneBrief}`,
-        `Schedule & Cadence: ${cadenceSummary}.`,
-        `Own Direct (MP3 + Cover Art): ${payLine}`,
-        `Stream: ${streamLine}`,
+        `Agent Anna spotlights "${title}" by Martin Strayd (${track.id || "STRAYD"}) — ${leadKw}, ${secondKw}, ${kwList}.`,
+        `${v.fbBody} ${storySpark}`,
+        `${sceneBrief} ${cadenceSummary}.`,
+        `${payLine}`,
+        `${streamLine}`,
         igTags
       ].join("\n\n").slice(0, 5000);
 
-      const xRaw = `"${title}" — Martin Strayd (${leadKw}). Own MP3 + art: ${portalLink} ${xTags}`.trim();
-      const x = xRaw.length <= 280 ? xRaw : `"${title}" — Martin Strayd ${portalLink} ${xTags}`.slice(0, 280);
+      const x = cleanEditorialText(v.xPost, title).slice(0, 280);
 
       const press = [
         `FOR IMMEDIATE RELEASE • AGENT ANNA × MARTIN STRAYD — DAILY WORLD-BEST SONG ROLL (DAY ${cyclePos}/365)`,
-        `HEADLINE: "${title}" Headlines Martin Strayd & Agent Anna Music Campaign Across Search, AI Discovery and Social Channels`,
-        `SUBHEAD: Witty Hook Craft, Live-Action Cinematography (Zero Cartoon) and Direct-to-Fan MP3 + Cover Art Ownership`,
-        `1. RELEASE & CAMPAIGN OVERVIEW`,
-        `Recording artist Martin Strayd (STRAYD) and promotional strategist Agent Anna feature "${title}" (${track.id || "STRAYD"}) in a continuous 365-day A–Z music catalog roll. ${storyBlock}`,
-        `2. PLATFORM CADENCE & AUDIENCE STRATEGY`,
-        `${cadenceSummary}. Each release is calibrated to platform length sweet spots and high-intent music search/AI discovery around ${kwList}.`,
-        `3. LIVE-ACTION CINEMATOGRAPHY & VISUAL STANDARD`,
-        `${sceneBrief} Visual assets for "${title}" follow strict live-action direction with real human presence and practical lighting—zero cartoon, zero anime, zero illustration.`,
-        `4. DIRECT SALES, PAYMENT OPTIONS & STREAMING LINKS`,
+        `HEADLINE: VJ & Promo Star Agent Anna Champions Martin Strayd's "${title}" as Daily Hit Drop Across Social, Search & AI Discovery`,
+        `SUBHEAD: High-Voltage Host Energy, Live-Action Cinematography (Zero Cartoon) and Direct MP3 + Sleeve Ownership`,
+        `1. THE AGENT ANNA × MARTIN STRAYD SPOTLIGHT`,
+        `Stepping into the role of high-energy music reporter, VJ, and promo strategist, Agent Anna spotlights "${title}" (${track.id || "STRAYD"}) by recording artist Martin Strayd (STRAYD) as part of a nonstop 365-day A–Z catalog release campaign. ${v.fbBody} ${storySpark}`,
+        `2. DAILY HIT CADENCE, SEARCH & AI MUSIC DISCOVERY`,
+        `${cadenceSummary}. Engineered for music fans, playlist curators, search engines, and AI music discovery around keywords: ${kwList}.`,
+        `3. LIVE-ACTION CINEMATOGRAPHY LAW (ZERO CARTOON)`,
+        `${sceneBrief} Every visual reel and promotional moment tied to "${title}" is built around real spaces, natural or practical light, and human presence—strictly live-action only, with zero cartoon, anime, or illustration.`,
+        `4. DIRECT OWNERSHIP, PAYMENT RAILS & STREAMING`,
         `${payLine}.`,
         `${streamLine}.`,
-        `PRESS & AUTOMATION NODE: A1 Record Command • Agent Anna Social Master (Martin Strayd / STRAYD Catalog).`
+        `PRESS & COMMAND DESK: A1 Record Command • Agent Anna Social Master (Martin Strayd / STRAYD Catalog).`
       ].join("\n\n");
 
       return { sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x };
@@ -1181,11 +1219,10 @@
 
     function annaSystemPrompt() {
       return [
-        "You are Agent Anna leading the Management, Sales, Marketing & Promotional Team for recording artist Martin Strayd (STRAYD) across A–Z catalog drops.",
-        "Never alter or censor the exact song title—keep titles like 'Sex Sex Sex' or 'ADHD I Can Do That (Travillen Disorder)' verbatim.",
-        "Write an A4 / 3/4-page press release for 'press' (~1,800–2,500 chars) themed around Martin Strayd and Agent Anna's daily song roll, witty humor, music search/AI discovery, live-action cinematography (zero cartoon), and direct sales/streaming links.",
-        "Follow exact platform limits: 'tiktok' 100–300 chars ideal (max 2,200) with 3–5 hashtags; 'instagram' first 125 chars punchy hook (max 2,200) with 3–5 hashtags; 'youtube' title 60–100 chars (max 100) and description 200–5,000 chars with keywords in first 2 lines and 3–5 hashtags; 'facebook' 20–150 chars punchy lead + story with 2–5 hashtags; 'x' max 280 chars with 0–2 hashtags.",
-        "No raw Markdown symbols (#, **, `, >) in prose; include store (https://martinstrayd.github.io/artist/), PayPal (https://www.paypal.com/paypalme/martinstrayd), Wise QR, Buy Me a Coffee, Dogecoin, Spotify, YouTube Music, and Apple Music."
+        "You are Agent Anna—the charismatic MTV-era style VJ, music reporter, and promo star hyping daily song drops from recording artist Martin Strayd (STRAYD) and the Kunda Cafe music catalog.",
+        "Never sound like a dry database or generic SEO template; bring witty, punchy, memorable host energy while keeping the exact song title verbatim.",
+        "Make each platform distinct: 'facebook' starts with a punchy 20–150 char hook + conversational question/memory prompt; 'instagram' puts a punchy hook in the first 125 chars; 'tiktok' hits 100–300 chars ideal with 3–5 tags; 'youtube' has a 60–100 char title and 200–5,000 char description with keywords in the first 2 lines and 3–5 tags; 'x' stays under 280 chars with 0–2 tags; 'press' is an A4 / 3/4-page style press release (~1,800–2,500 chars).",
+        "Strictly live-action cinematography only (zero cartoon, zero anime, zero illustration). No raw Markdown symbols (#, **, `, >) in prose; include store (https://martinstrayd.github.io/artist/), PayPal (https://www.paypal.com/paypalme/martinstrayd), Wise QR, Buy Me a Coffee, Dogecoin, Spotify, YouTube Music, and Apple Music."
       ].join(" ");
     }
 
@@ -1244,14 +1281,14 @@
         : "A1 record command node ready — load A1/strayd/record-brain.json, promo-queue.json, or A1/docs/v4BIBLE anytime.";
 
       renderInsightsTags(buildInsightsForTrack(activeTrack.title, shiftVal, cadence));
-      const drafts = synthesizeDynamicDrafts(activeTrack, shiftVal, rawKw, portalLink, paypalUrl, bmac, wise, cadence, songRef);
+      const drafts = synthesizeVjDrafts(activeTrack, shiftVal, rawKw, portalLink, paypalUrl, bmac, wise, cadence, songRef);
       $("sceneBriefMeta").textContent = `Live-action direction: ${drafts.sceneBrief}`;
       applyDrafts(drafts, activeTrack.title);
       setWaitingState(false, "Ready • A1 Fast");
-      $("engineModeMeta").textContent = `Promo engine: Tuned multi-platform drafts & A4 press ready for "${activeTrack.title}" (#${runCounter})`;
+      $("engineModeMeta").textContent = `Promo engine: Agent Anna VJ & A4 press drafts ready for "${activeTrack.title}" (#${runCounter})`;
 
       if (getDahlKey()) {
-        setWaitingState(true, "AI Gen", activeTrack.title);
+        setWaitingState(true, "AI VJ", activeTrack.title);
         const dahlOut = await askDahl([
           { role: "system", content: annaSystemPrompt() },
           {
@@ -1278,7 +1315,7 @@
               }
             }) + "\nReturn ONLY valid JSON with keys: sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
           }
-        ], true, 0.96, 8500);
+        ], true, 0.98, 8500);
 
         if (mySeq !== genSeq) return;
         if (dahlOut && dahlOut.ok && dahlOut.json) {
@@ -1295,7 +1332,7 @@
             facebook: nonEmpty(j.facebook, drafts.facebook),
             x: nonEmpty(j.x, drafts.x)
           }, activeTrack.title);
-          $("engineModeMeta").textContent = `Promo engine: Live AI drafts active for "${activeTrack.title}" (#${runCounter})`;
+          $("engineModeMeta").textContent = `Promo engine: Live AI VJ drafts active for "${activeTrack.title}" (#${runCounter})`;
         }
         setWaitingState(false, "Ready");
       }
@@ -1312,15 +1349,15 @@
 
       const dahlReply = getDahlKey()
         ? await askDahl([
-            { role: "system", content: annaSystemPrompt() + " Reply in 2 sharp sentences as Agent Anna." },
+            { role: "system", content: annaSystemPrompt() + " Reply in 2 sharp, punchy VJ sentences as Agent Anna." },
             { role: "user", content: `Track: "${activeTrack.title}". Keywords: "${nonEmpty($("keywordsInput")?.value)}". Directive: ${msg}` }
-          ], false, 0.92, 8500)
+          ], false, 0.95, 8500)
         : { ok: false };
 
       if (dahlReply && dahlReply.ok && dahlReply.text) {
         appendChat("Agent Anna", dahlReply.text);
       } else {
-        appendChat("Agent Anna", `Locked "${msg}" onto "${activeTrack.title}" across platform sweet spots. Regenerating channel copy now.`);
+        appendChat("Agent Anna", `Say less—I'm locking "${msg}" onto "${activeTrack.title}" with full VJ punch across every platform right now.`);
       }
       await generateAll();
     }
@@ -1409,7 +1446,7 @@
       if (savedStrat) $("loadStrategy").value = savedStrat;
 
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", `Anna Promo Team active on A1 (365-day A–Z loop). Platform sweet spots & A4 press release ready—pick any song or tell me what to push.`);
+        appendChat("Agent Anna", `Agent Anna on air—pushing Martin Strayd's 365-day A–Z hit roll with real VJ punch, zero filler, and distinct platform angles.`);
       }
       await generateAll();
 
@@ -1586,7 +1623,7 @@
           loopSchedule: "365-day A–Z continuous roll (minimum 1 song/day)",
           dailyCadenceTarget: {
             tiktok: "2-3/day (100-300c ideal lead, 3-5 tags)",
-            facebook: "1/day (20-150c lead + story, 2-5 tags)",
+            facebook: "1/day (20-150c lead + question/story, 2-5 tags)",
             instagram: "1 feed/day + Stories (first 125c critical, 3-5 tags)",
             x: "5-10/day (max 280c standard, 0-2 tags)",
             youtubeShorts: "1/day",
