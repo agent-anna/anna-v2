@@ -306,12 +306,23 @@
 
         <div>
           <section class="card">
-            <div class="card-title">3. External Notes (Outside v4 Core)</div>
-            <textarea id="bibleBox" readonly style="min-height:74px;"></textarea>
+            <div class="card-title">3. External Notes &amp; Brain Context (Outside v4 Core)</div>
+            <textarea id="bibleBox" readonly style="min-height:84px;"></textarea>
           </section>
 
           <section class="card">
-            <div class="card-title">4. Channel Drafts</div>
+            <div class="card-title">4. Channel Drafts &amp; NY / Hollywood Press Brief</div>
+
+            <article class="channel">
+              <div class="channel-head">
+                <span>NY / Hollywood Press &amp; Live-Action Reel Brief (Zero Cartoon)</span>
+                <span class="stats" id="pressStats">0 words • 0 chars</span>
+              </div>
+              <textarea id="pressOut" style="min-height:110px;"></textarea>
+              <div class="btn-row">
+                <button type="button" class="copy-btn" data-copy="pressOut">Copy Press Brief</button>
+              </div>
+            </article>
 
             <article class="channel">
               <div class="channel-head">
@@ -381,11 +392,12 @@
 
             <article class="channel">
               <div class="channel-head">
-                <span>5. Approved Payload JSON</span>
+                <span>5. Approved Payload JSON &amp; Full Campaign Pack</span>
               </div>
               <textarea id="payloadOut" readonly placeholder="Click OK To Post to stage approved JSON..."></textarea>
               <div class="btn-row">
                 <button type="button" class="copy-btn" data-copy="payloadOut">Copy JSON</button>
+                <button type="button" class="copy-btn" id="copyBundleBtn">Copy Full Pack</button>
               </div>
             </article>
           </section>
@@ -402,10 +414,12 @@
     const DEFAULT_DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
     const RAW_BASE = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/`;
     const CATALOG_URLS = ["./strayd-artist-live.json", `${RAW_BASE}A1/strayd/strayd-artist-live.json`];
+    const BRAIN_URLS = ["./brain.json", `${RAW_BASE}brain.json`, `${RAW_BASE}A1/brain.json`];
 
     let catalog = [];
     let externalNotePaths = [];
     const noteCache = new Map();
+    let brainSummary = "";
     let runCounter = 1;
     let customDirective = "";
     let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "Martin Strayd - Who Killed Fun (Pay the Rent).png", url: "" };
@@ -480,6 +494,21 @@
         } catch (_) {}
       }
       return null;
+    }
+
+    async function loadExternalBrain() {
+      const hit = await fetchFirstText(BRAIN_URLS);
+      if (!hit || !hit.text) {
+        brainSummary = "";
+        return;
+      }
+      try {
+        const parsed = JSON.parse(hit.text);
+        const flat = JSON.stringify(parsed).replace(/[{}"]/g, " ").replace(/\s+/g, " ").trim();
+        brainSummary = flat.slice(0, 220);
+      } catch (_) {
+        brainSummary = hit.text.replace(/\s+/g, " ").trim().slice(0, 220);
+      }
     }
 
     async function loadExternalNotesIndex() {
@@ -559,7 +588,7 @@
         "Handheld live-action camera at dusk, real street atmosphere, natural lighting, zero cartoon",
         "Close live-action performance in a cramped room, real breath and room tone, zero cartoon",
         "Moving live-action camera following real footsteps and neon reflections, zero cartoon",
-        "Late-night live-action studio & alley cut, raw human energy, zero cartoon"
+        "Late-night live-action studio & room cut, raw human energy, zero cartoon"
       ];
       const scene = nonEmpty(directive)
         ? `Live-action brief: ${nonEmpty(directive)} (strictly realistic live-action only, zero cartoon)`
@@ -602,6 +631,7 @@
       const xHook = xHooks[(Math.abs(shift) + seed) % xHooks.length];
       const kwFocus = kw.phrase ? ` [${kw.phrase}]` : "";
 
+      const press = `NY / HOLLYWOOD PRESS PITCH — "${title}" by Martin Strayd (STRAYD)\nAngle: ${igAngle}\nLive-Action Reel (Zero Cartoon): ${scene}\nDirect MP3 + Cover Sleeve: ${url}`;
       const tiktok = `${ttHook}${kwFocus} Shot note: ${scene}. Own MP3 + sleeve: ${url} ${kw.tags}`;
       const instagram = `"${title}" — Martin Strayd${kwFocus}. ${igAngle} Own MP3 + cover art: ${url} ${kw.tags}`;
       const ytTitle = (kw.phrase
@@ -613,10 +643,14 @@
       const xFull = `${xHook} ${url} ${kw.shortTags}`;
       const x = xFull.length <= 280 ? xFull : `"${title}" — Martin Strayd ${url} ${kw.shortTags}`.slice(0, 280);
 
-      return { tiktok, instagram, ytTitle, ytDesc, facebook, x, scene };
+      return { press, tiktok, instagram, ytTitle, ytDesc, facebook, x, scene };
     }
 
     function updateStats() {
+      const prVal = nonEmpty($("pressOut").value);
+      $("pressStats").textContent = `${countWords(prVal)} words • ${prVal.length} chars`;
+      $("pressStats").className = "stats";
+
       const ttVal = nonEmpty($("ttOut").value);
       $("ttStats").textContent = `${countWords(ttVal)} words • ${ttVal.length} chars`;
       $("ttStats").className = "stats";
@@ -643,6 +677,7 @@
     }
 
     function applyDrafts(drafts) {
+      $("pressOut").value = drafts.press;
       $("ttOut").value = drafts.tiktok;
       $("igOut").value = drafts.instagram;
       $("ytTitleOut").value = drafts.ytTitle;
@@ -677,7 +712,7 @@
       for (const cand of candidates) {
         try {
           const obj = JSON.parse(cand);
-          if (obj && typeof obj === "object" && (obj.tiktok || obj.instagram || obj.ytTitle || obj.ytDesc || obj.facebook || obj.x)) {
+          if (obj && typeof obj === "object" && (obj.tiktok || obj.instagram || obj.ytTitle || obj.ytDesc || obj.facebook || obj.x || obj.press)) {
             return obj;
           }
         } catch (_) {}
@@ -771,9 +806,13 @@
 
       const fallback = buildDrafts(activeTrack, activeNote, link, shiftVal, runCounter, customDirective, rawKw);
       $("sceneBriefMeta").textContent = `Live-action direction: ${fallback.scene}`;
-      $("bibleBox").value = activeNote.found
-        ? `External note: ${activeNote.path}\n\n${activeNote.raw.slice(0, 360)}`
-        : `External notes stay outside v4 core so v4 stays lean. Use Anna chat or add external notes anytime.`;
+
+      const noteParts = [];
+      if (activeNote.found) noteParts.push(`External note: ${activeNote.path}\n${activeNote.raw.slice(0, 260)}`);
+      if (brainSummary) noteParts.push(`External brain context: ${brainSummary}`);
+      $("bibleBox").value = noteParts.length
+        ? noteParts.join("\n\n")
+        : `External notes and brain.json stay outside v4 core so v4 stays lean. Use Anna chat or add external notes anytime.`;
 
       applyDrafts(fallback);
       $("engineModeMeta").textContent = getDahlKey()
@@ -784,7 +823,7 @@
         {
           role: "system",
           content:
-            "You are Agent Anna in the A1 shell (v4 core), writing marketing copy for recording artist Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Give each channel a distinct opening, angle, and rhythm—never repeat the same hook across platforms. Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. ytTitle must be <= 100 chars and x must be <= 280 chars. Return ONLY valid JSON with keys: tiktok, instagram, ytTitle, ytDesc, facebook, x."
+            "You are Agent Anna in the A1 shell (v4 core), writing marketing copy for recording artist Martin Strayd (STRAYD). Weave in priority keywords/trends naturally without keyword-stuffing or fake network claims. Give each channel a distinct opening, angle, and rhythm, and include a NY/Hollywood press pitch + live-action reel cue (press). Enforce strictly realistic live-action cinematography only (zero cartoon/anime/illustration) and direct MP3 + sleeve ownership. ytTitle must be <= 100 chars and x must be <= 280 chars. Return ONLY valid JSON with keys: press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
         },
         {
           role: "user",
@@ -792,6 +831,7 @@
             song: activeTrack.title,
             keywords: rawKw,
             note: activeNote.found ? activeNote.lines.slice(0, 4).join(" | ") : "",
+            brain: brainSummary,
             scene: fallback.scene,
             directive: customDirective,
             directLink: link
@@ -802,6 +842,7 @@
       if (dahlOut && dahlOut.ok && dahlOut.json) {
         const j = dahlOut.json;
         applyDrafts({
+          press: nonEmpty(j.press, fallback.press),
           tiktok: nonEmpty(j.tiktok, fallback.tiktok),
           instagram: nonEmpty(j.instagram, fallback.instagram),
           ytTitle: nonEmpty(j.ytTitle, fallback.ytTitle).slice(0, 100),
@@ -871,7 +912,7 @@
       const savedKw = readStorage("STRAYD_KEYWORDS");
       if (savedKw) $("keywordsInput").value = savedKw;
 
-      await loadExternalNotesIndex();
+      await Promise.all([loadExternalNotesIndex(), loadExternalBrain()]);
       const catHit = await fetchFirstText(CATALOG_URLS);
       if (catHit && catHit.text) {
         try {
@@ -925,6 +966,28 @@
         }
         setTimeout(() => { btn.textContent = original; }, 1200);
       });
+    });
+
+    $("copyBundleBtn").addEventListener("click", async () => {
+      const pack = [
+        `=== ${activeTrack.title} — Martin Strayd ===`,
+        `[NY / Hollywood Press & Reel]\n${$("pressOut").value}`,
+        `[TikTok]\n${$("ttOut").value}`,
+        `[Instagram]\n${$("igOut").value}`,
+        `[YouTube Title]\n${$("ytTitleOut").value}`,
+        `[YouTube Description]\n${$("ytDescOut").value}`,
+        `[Facebook]\n${$("fbOut").value}`,
+        `[X]\n${$("xOut").value}`
+      ].join("\n\n");
+      const original = $("copyBundleBtn").textContent;
+      try {
+        await navigator.clipboard.writeText(pack);
+        $("copyBundleBtn").textContent = "Pack Copied";
+      } catch (_) {
+        $("payloadOut").value = pack;
+        $("copyBundleBtn").textContent = "Staged Below";
+      }
+      setTimeout(() => { $("copyBundleBtn").textContent = original; }, 1200);
     });
 
     document.querySelectorAll("[data-post]").forEach((btn) => {
@@ -983,7 +1046,7 @@
     $("directLink").addEventListener("input", generateAll);
     $("dahlKey").addEventListener("input", renderBadges);
     $("ghPat").addEventListener("input", renderBadges);
-    ["ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
+    ["pressOut", "ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
       $(id).addEventListener("input", updateStats);
     });
 
@@ -994,6 +1057,7 @@
         core: "v4 (lean)",
         model: nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL),
         externalNoteSource: activeNote.found ? activeNote.path : null,
+        brainContextLoaded: Boolean(brainSummary),
         keywords: nonEmpty($("keywordsInput")?.value) || null,
         directive: customDirective || null,
         approved: true,
@@ -1003,6 +1067,7 @@
         artworkUrl: activeTrack.url,
         visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)",
         link: nonEmpty($("directLink").value),
+        press: $("pressOut").value,
         tiktok: $("ttOut").value,
         instagram: $("igOut").value,
         ytTitle: $("ytTitleOut").value,
