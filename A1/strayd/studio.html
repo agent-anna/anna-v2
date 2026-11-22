@@ -28,7 +28,6 @@
       line-height: 1.5;
     }
     .container { max-width: 1280px; margin: 0 auto; }
-
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -39,7 +38,7 @@
       padding-bottom: 14px;
       margin-bottom: 18px;
     }
-    .topbar h1 { margin: 0; font-size: 1.32rem; letter-spacing: 0.01em; }
+    .topbar h1 { margin: 0; font-size: 1.32rem; }
     .muted { color: var(--muted); font-size: 0.85rem; }
     .waiting-pill {
       display: inline-flex;
@@ -53,11 +52,7 @@
       background: #0b0f18;
       color: var(--muted);
     }
-    .waiting-pill.busy {
-      border-color: var(--warn);
-      color: var(--warn);
-    }
-
+    .waiting-pill.busy { border-color: var(--warn); color: var(--warn); }
     .hero {
       display: grid;
       grid-template-columns: 300px 1fr;
@@ -82,12 +77,7 @@
       overflow: hidden;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
     }
-    .sleeve img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .sleeve img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .eyebrow {
       font-size: 0.75rem;
       font-weight: 700;
@@ -96,12 +86,7 @@
       color: var(--accent);
       margin-bottom: 6px;
     }
-    .hero-title {
-      font-size: 1.55rem;
-      font-weight: 800;
-      margin: 0 0 8px;
-      line-height: 1.2;
-    }
+    .hero-title { font-size: 1.55rem; font-weight: 800; margin: 0 0 8px; line-height: 1.2; }
     .hero-meta { margin: 6px 0; color: var(--muted); font-size: 0.9rem; }
     .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .badge {
@@ -113,17 +98,13 @@
       border: 1px solid var(--line);
       color: var(--sky);
     }
-
     .workspace {
       display: grid;
       grid-template-columns: 390px minmax(0, 1fr);
       gap: 20px;
       align-items: start;
     }
-    @media (max-width: 980px) {
-      .workspace { grid-template-columns: 1fr; }
-    }
-
+    @media (max-width: 980px) { .workspace { grid-template-columns: 1fr; } }
     .card {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -139,12 +120,7 @@
       color: var(--accent);
       margin-bottom: 10px;
     }
-    label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin: 10px 0 4px;
-    }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin: 10px 0 4px; }
     label:first-of-type { margin-top: 0; }
     input, select, textarea, button {
       width: 100%;
@@ -155,10 +131,7 @@
       padding: 9px 12px;
       font-size: 0.9rem;
     }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--sky);
-    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--sky); }
     textarea {
       min-height: 112px;
       font-family: ui-monospace, Consolas, Menlo, monospace;
@@ -166,13 +139,8 @@
       line-height: 1.5;
       resize: vertical;
     }
-    textarea.press-area {
-      min-height: 320px;
-    }
-    textarea.generating {
-      border-color: var(--warn);
-      opacity: 0.82;
-    }
+    textarea.press-area { min-height: 320px; }
+    textarea.generating { border-color: var(--warn); opacity: 0.82; }
     button {
       cursor: pointer;
       font-weight: 700;
@@ -181,33 +149,16 @@
     }
     button:hover { border-color: var(--accent); }
     button:active { transform: translateY(1px); }
-    button.primary {
-      background: var(--ok);
-      color: var(--accent-ink);
-      border: none;
-    }
-    button.accent {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border: none;
-    }
-    button.post-btn {
-      background: var(--sky);
-      color: var(--accent-ink);
-      border: none;
-    }
+    button.primary { background: var(--ok); color: var(--accent-ink); border: none; }
+    button.accent { background: var(--accent); color: var(--accent-ink); border: none; }
+    button.post-btn { background: var(--sky); color: var(--accent-ink); border: none; }
     button.tts-btn {
       background: #132238;
       color: var(--accent);
       border-color: rgba(229, 184, 75, 0.45);
     }
-    button.tts-btn.speaking {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border-color: var(--accent);
-    }
+    button.tts-btn.speaking { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
     .actions { display: grid; gap: 8px; margin-top: 14px; }
-
     .chat-log {
       background: #0b0f18;
       border: 1px solid var(--line);
@@ -223,7 +174,6 @@
     .chat-msg strong { color: var(--accent); }
     .chat-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
     .chat-row button { width: auto; padding: 9px 16px; }
-
     .channel {
       background: var(--panel-2);
       border: 1px solid var(--line);
@@ -243,12 +193,7 @@
       color: var(--sky);
       margin-bottom: 8px;
     }
-    .insights-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
+    .insights-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
     .insight-tag {
       font-size: 0.7rem;
       font-weight: 600;
@@ -527,19 +472,9 @@
       "../docs/strayd-artist-live.json",
       "../docs/catalog.json"
     ];
-    const RECORD_BRAIN_URLS = [
-      "./record-brain.json",
-      "../docs/record-brain.json"
-    ];
-    const BIBLE_URLS = [
-      "../docs/v4BIBLE",
-      "../docs/1%20v4BIBLE",
-      "../../docs/1%20v4BIBLE"
-    ];
-    const QUEUE_URLS = [
-      "./promo-queue.json",
-      "../docs/promo-queue.json"
-    ];
+    const RECORD_BRAIN_URLS = ["./record-brain.json", "../docs/record-brain.json"];
+    const BIBLE_URLS = ["../docs/v4BIBLE", "../docs/1%20v4BIBLE", "../../docs/1%20v4BIBLE"];
+    const QUEUE_URLS = ["./promo-queue.json", "../docs/promo-queue.json"];
 
     let catalog = [];
     let brainSummary = "";
@@ -553,13 +488,7 @@
     let customDirective = "";
     let activeSpeakingBtn = null;
     let currentInsights = {};
-    let activeTrack = {
-      id: "",
-      artist: "",
-      title: "",
-      filename: "",
-      url: ""
-    };
+    let activeTrack = { id: "", artist: "", title: "", filename: "", url: "" };
 
     const $ = (id) => document.getElementById(id);
     const nonEmpty = (val, fallback = "") => (typeof val === "string" && val.trim() ? val.trim() : fallback);
@@ -594,11 +523,7 @@
     }
 
     function stopSpeech() {
-      try {
-        if ("speechSynthesis" in window) {
-          window.speechSynthesis.cancel();
-        }
-      } catch (_) {}
+      try { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); } catch (_) {}
       resetAllTtsButtons();
     }
 
@@ -616,7 +541,6 @@
         $("engineModeMeta").textContent = "Speech synthesis is not supported in this browser.";
         return;
       }
-
       const wasThisSpeaking = activeSpeakingBtn === btn && window.speechSynthesis.speaking;
       stopSpeech();
       if (wasThisSpeaking) return;
@@ -758,7 +682,9 @@
       add(track.artworkUrl);
       add(track.image);
       const fname = nonEmpty(track.filename);
-      if (fname && /^https?:\/\//i.test(fname)) add(fname);
+      if (fname && (/^https?:\/\//i.test(fname) || /\.(png|jpe?g|webp)$/i.test(fname))) {
+        add(fname);
+      }
       return urls;
     }
 
@@ -798,10 +724,7 @@
       s = s.replace(/\s+([,.;:!?])/g, "$1");
       s = s.replace(/\n{3,}/g, "\n\n");
 
-      tokenMap.forEach((val, tok) => {
-        s = s.split(tok).join(val);
-      });
-
+      tokenMap.forEach((val, tok) => { s = s.split(tok).join(val); });
       return s.trim();
     }
 
@@ -812,16 +735,13 @@
         clearInterval(waitTimer);
         waitTimer = null;
       }
-
       if (isBusy) {
         const started = Date.now();
         pill.className = "waiting-pill busy";
         const tick = () => {
           const secs = Math.floor((Date.now() - started) / 1000);
           pill.textContent = `${labelText || "Updating"} • ${secs}s`;
-          if (songName) {
-            $("engineModeMeta").textContent = `Agent Anna is building single "${songName}" (${secs}s)...`;
-          }
+          if (songName) $("engineModeMeta").textContent = `Agent Anna is building single "${songName}" (${secs}s)...`;
         };
         tick();
         waitTimer = setInterval(tick, 1000);
@@ -847,7 +767,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    async function fetchFirstText(urls, timeoutMs = 3000) {
+    async function fetchFirstText(urls, timeoutMs = 2500) {
       for (const url of urls) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -855,19 +775,14 @@
           const res = await fetch(url, { cache: "no-store", signal: controller.signal });
           if (res.ok) return { url, text: await res.text() };
         } catch (_) {}
-        finally {
-          clearTimeout(timer);
-        }
+        finally { clearTimeout(timer); }
       }
       return null;
     }
 
     async function loadRecordBrain() {
       const hit = await fetchFirstText(RECORD_BRAIN_URLS);
-      if (!hit || !hit.text) {
-        brainSummary = "";
-        return;
-      }
+      if (!hit || !hit.text) { brainSummary = ""; return; }
       try {
         const cleanObj = sanitizeBrainObject(JSON.parse(hit.text));
         brainSummary = JSON.stringify(cleanObj).replace(/[{}"]/g, " ").replace(/\s+/g, " ").trim().slice(0, 320);
@@ -878,11 +793,7 @@
 
     async function loadBibleAndNotes() {
       const hit = await fetchFirstText(BIBLE_URLS);
-      if (!hit || !hit.text) {
-        bibleExcerpt = "";
-        songNotesText = "";
-        return;
-      }
+      if (!hit || !hit.text) { bibleExcerpt = ""; songNotesText = ""; return; }
       const cleanBody = stripMarkdownArtifacts(hit.text).replace(/\r\n/g, "\n");
       bibleExcerpt = cleanBody.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 6).join(" ").slice(0, 240);
       songNotesText = cleanBody.slice(0, 1600);
@@ -1027,10 +938,7 @@
       try {
         const res = await fetch(endpoint, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${key}`,
-            "Content-Type": "application/json"
-          },
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
           body: JSON.stringify({ model, temperature, messages }),
           signal: controller.signal
         });
@@ -1040,15 +948,12 @@
         if (!raw) return { ok: false, reason: "empty" };
         const cleaned = cleanEditorialText(raw);
         if (!expectJson) return { ok: true, text: cleaned };
-
         const parsed = tryParseDraftJson(cleaned);
         if (parsed) return { ok: true, json: parsed, text: cleaned };
         return { ok: false, reason: "non-json", text: cleaned };
       } catch (err) {
         return { ok: false, reason: err?.name === "AbortError" ? "timeout" : "network" };
-      } finally {
-        clearTimeout(timer);
-      }
+      } finally { clearTimeout(timer); }
     }
 
     function buildInsightsForTrack(title, shiftVal, cadence) {
@@ -1081,9 +986,7 @@
       const k1 = kwParts[0] || "single release";
       const k2 = kwParts[1] || "live sound";
 
-      const cleanTags = kwParts
-        .map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`)
-        .filter((t) => t.length > 1);
+      const cleanTags = kwParts.map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`).filter((t) => t.length > 1);
       const tags = Array.from(new Set(["#AgentAnna", artistTag, ...cleanTags, "#365Singles"].filter(Boolean)));
       const ttTags = tags.slice(0, 4).join(" ");
       const igTags = tags.slice(0, 5).join(" ");
@@ -1095,22 +998,18 @@
         : "Once-a-day single cadence: TT 2–3/d, FB 1/d, IG 1 feed/d + Stories, X 5–10/d, YT Shorts 1/d, YT Videos 3/wk.";
 
       const sceneBrief = `Realistic live-action camera work in a real space with natural or practical lighting and real human presence for "${title}" — strictly live-action only.`;
-      const linkItems = [
+      const payLinks = [
         portalLink ? `Release: ${portalLink}` : "",
         paypalUrl ? `PayPal: ${paypalUrl}` : "",
         bmacLink ? `Support: ${bmacLink}` : "",
         wiseStr || ""
-      ].filter(Boolean);
-      const payLinks = linkItems.join(" | ");
-      const streamItems = [
+      ].filter(Boolean).join(" | ");
+      const streamLinks = [
         nonEmpty($("spotifyUrl")?.value) ? `Spotify: ${$("spotifyUrl").value.trim()}` : "",
         nonEmpty($("ytMusicUrl")?.value) ? `YT Music: ${$("ytMusicUrl").value.trim()}` : "",
         nonEmpty($("appleMusicUrl")?.value) ? `Apple Music: ${$("appleMusicUrl").value.trim()}` : ""
-      ].filter(Boolean);
-      const streamLinks = streamItems.join(" | ");
-      const contextLine = songRef
-        ? `${songRef}`
-        : `Part of the 365-single once-a-day release, focused on ${k1} and ${k2}.`;
+      ].filter(Boolean).join(" | ");
+      const contextLine = songRef || `Part of the 365-single once-a-day release, focused on ${k1} and ${k2}.`;
 
       const fbOpeners = [
         `Agent Anna here—would you rather keep single "${title}"${artistInline} in rotation or send it straight to a friend?`,
@@ -1131,18 +1030,15 @@
       const fbBody = fbBodyVariants[v % fbBodyVariants.length];
 
       const facebook = [fbLead, `${fbBody} ${sceneBrief}`, payLinks, streamLinks, fbTags].filter(Boolean).join("\n\n").slice(0, 63206);
-
-      const igOpeners = [
+      const igFirst125 = [
         `Agent Anna pitches single "${title}"${artistInline}—${k1} heat${portalLink ? ` • ${portalLink}` : ""}`,
         `On air with Agent Anna: single "${title}"${artistInline}${paypalUrl ? ` • ${paypalUrl}` : ""}`,
         `Today's single with Agent Anna: "${title}"${artistInline} (${k2})${portalLink ? ` • ${portalLink}` : ""}`,
         `Agent Anna says cue single "${title}"${artistInline}—live-action ${k1}${portalLink ? ` • ${portalLink}` : ""}`
-      ];
-      const igFirst125 = igOpeners[v % igOpeners.length].slice(0, 125);
-
+      ][v % 4].slice(0, 125);
       const instagram = [igFirst125, `${fbBody} ${sceneBrief}`, payLinks, streamLinks, igTags].filter(Boolean).join("\n\n").slice(0, 2200);
 
-      const ttOpeners = [
+      let tiktok = [
         `Agent Anna pitches single "${title}"${artistInline}—${k1} hook in full flight. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
         `Single "${title}"${artistInline} on Agent Anna's radar—real ${k2} punch. ${[paypalUrl, ttTags].filter(Boolean).join(" ")}`,
         `Agent Anna cues "${title}"${artistInline}—live-action ${k1} on deck. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
@@ -1150,23 +1046,17 @@
         `Agent Anna's daily single pitch: "${title}"${artistInline}. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
         `Single "${title}"${artistInline} hits today's roll with Agent Anna—${k2} energy. ${[portalLink, ttTags].filter(Boolean).join(" ")}`,
         `Agent Anna spins "${title}"${artistInline}. ${[portalLink, ttTags].filter(Boolean).join(" ")}`
-      ];
-      let tiktok = ttOpeners[v].trim();
+      ][v].trim();
       if (tiktok.length > 300) {
         tiktok = `Agent Anna pitches "${title}"${artistInline}—${k1} hook. ${[portalLink, ttTags].filter(Boolean).join(" ")}`.trim().slice(0, 300);
       }
 
-      const ytTitleCandidates = [
+      let ytTitle = [
         `${title}${artistInline} — Single | Agent Anna ${k1} & ${k2}`,
         `Agent Anna Pitches Single "${title}"${artistInline} (${k1})`,
         `"${title}"${artistInline} — Single | ${k2} & Live Action (Agent Anna)`
-      ];
-      let ytTitle = ytTitleCandidates[v % ytTitleCandidates.length];
-      if (ytTitle.length < 60) {
-        ytTitle = `${ytTitle} • 365-Single Release`.slice(0, 100);
-      } else {
-        ytTitle = ytTitle.slice(0, 100);
-      }
+      ][v % 3];
+      ytTitle = (ytTitle.length < 60 ? `${ytTitle} • 365-Single Release` : ytTitle).slice(0, 100);
 
       const ytDesc = [
         `Single "${title}"${artistInline}${track.id ? ` (${track.id})` : ""} — ${k1}, ${k2}, ${kwList}.`,
@@ -1177,13 +1067,12 @@
         igTags
       ].filter(Boolean).join("\n\n").slice(0, 5000);
 
-      const xCandidates = [
+      const x = cleanEditorialText([
         `Agent Anna pitches single "${title}"${artistInline} (${k1}). ${[portalLink, xTags].filter(Boolean).join(" ")}`,
         `Single "${title}"${artistInline}—Agent Anna's ${k2} pick today. ${[paypalUrl, xTags].filter(Boolean).join(" ")}`,
         `Agent Anna spins single "${title}"${artistInline}. ${[portalLink, xTags].filter(Boolean).join(" ")}`,
         `Single "${title}"${artistInline} (${k1})—Agent Anna approved. ${[bmacLink, xTags].filter(Boolean).join(" ")}`
-      ];
-      const x = cleanEditorialText(xCandidates[v % xCandidates.length], title).trim().slice(0, 280);
+      ][v % 4], title).trim().slice(0, 280);
 
       const slots = [
         `SINGLE ${cyclePos}/365 ROLLOUT SLOTS — "${title}"${artistInline} (${cadenceLine})`,
@@ -1235,23 +1124,11 @@
       ].filter(Boolean).join(" • ");
 
       const img = $("artPreview");
-      img.onerror = null;
-      img.src = fallbackUri;
-
-      if (directUrls.length > 0) {
-        const probe = new Image();
-        probe.onload = () => {
-          if (preserveTitle(activeTrack.title) === cleanTitle) {
-            img.src = directUrls[0];
-          }
-        };
-        probe.onerror = () => {
-          if (preserveTitle(activeTrack.title) === cleanTitle && !img.src) {
-            img.src = fallbackUri;
-          }
-        };
-        probe.src = directUrls[0];
-      }
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = fallbackUri;
+      };
+      img.src = directUrls[0] || fallbackUri;
     }
 
     function annaSystemPrompt() {
@@ -1300,7 +1177,7 @@
         $("songPicker").value = activeTrack.title;
       }
 
-      if (activeTrack.title) writeStorage("STRAYD_LAST_SONG", activeTrack.title);
+      if (activeTrack.title) recordRecentPick(activeTrack.title);
       updateArtworkDisplay(activeTrack);
       renderBadges();
 
@@ -1422,18 +1299,12 @@
     function buildPlatformUrl(platform, text) {
       const encoded = encodeURIComponent(nonEmpty(text));
       switch (platform) {
-        case "x":
-          return `https://x.com/intent/tweet?text=${encoded}`;
-        case "facebook":
-          return "https://www.facebook.com/";
-        case "tiktok":
-          return "https://www.tiktok.com/tiktokstudio/upload";
-        case "instagram":
-          return "https://www.instagram.com/";
-        case "youtube":
-          return "https://studio.youtube.com/";
-        default:
-          return "";
+        case "x": return `https://x.com/intent/tweet?text=${encoded}`;
+        case "facebook": return "https://www.facebook.com/";
+        case "tiktok": return "https://www.tiktok.com/tiktokstudio/upload";
+        case "instagram": return "https://www.instagram.com/";
+        case "youtube": return "https://studio.youtube.com/";
+        default: return "";
       }
     }
 
@@ -1446,10 +1317,9 @@
         for (const entry of parsed) {
           if (entry && (entry.title || entry.filename)) {
             const rawName = nonEmpty(entry.title || entry.filename);
-            const itemArtist = preserveTitle(entry.artist || entry.artistName || topArtist);
             items.push({
               id: nonEmpty(entry.id || entry.code, `SINGLE-${String(items.length + 1).padStart(3, "0")}`),
-              artist: itemArtist,
+              artist: preserveTitle(entry.artist || entry.artistName || topArtist),
               title: preserveTitle(rawName.replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
               filename: nonEmpty(entry.filename, `${rawName}.png`),
               url: nonEmpty(entry.url || entry.artworkUrl || entry.image)
@@ -1460,16 +1330,14 @@
         const files = Array.isArray(parsed.files_and_folders)
           ? parsed.files_and_folders
           : (Array.isArray(parsed.tracks) ? parsed.tracks : []);
-
         for (const f of files) {
           if (!f) continue;
           const fname = nonEmpty(f.filename || f.title || f.name);
           if (!fname) continue;
           if (/\.(png|jpe?g|webp)$/i.test(fname) || f.title || f.name) {
-            const itemArtist = preserveTitle(f.artist || f.artistName || topArtist);
             items.push({
               id: nonEmpty(f.id || f.code, `SINGLE-${String(items.length + 1).padStart(3, "0")}`),
-              artist: itemArtist,
+              artist: preserveTitle(f.artist || f.artistName || topArtist),
               title: preserveTitle(fname.replace(/\.(png|jpe?g|webp|mp3)$/i, "")),
               filename: fname,
               url: nonEmpty(f.url || f.artworkUrl || f.image)
@@ -1477,7 +1345,6 @@
           }
         }
       }
-
       return items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
     }
 
@@ -1485,9 +1352,7 @@
       try {
         const parsed = JSON.parse(readStorage("STRAYD_RECENT_SONGS") || "[]");
         return Array.isArray(parsed) ? parsed.map(normalizeKey).filter(Boolean) : [];
-      } catch (_) {
-        return [];
-      }
+      } catch (_) { return []; }
     }
 
     function recordRecentPick(title) {
@@ -1502,14 +1367,19 @@
     function pickNonRepeatingRandom(list) {
       if (!list.length) return null;
       if (list.length === 1) return list[0];
-      const recent = new Set([
-        ...readRecentPicks(),
-        normalizeKey(readStorage("STRAYD_LAST_SONG")),
-        normalizeKey(activeTrack.title)
-      ].filter(Boolean));
-      const candidates = list.filter((item) => !recent.has(normalizeKey(item.title)));
-      const fallbackPool = list.filter((item) => normalizeKey(item.title) !== normalizeKey(activeTrack.title));
-      const pool = candidates.length ? candidates : (fallbackPool.length ? fallbackPool : list);
+      const currentKey = normalizeKey(activeTrack.title);
+      const lastKey = normalizeKey(readStorage("STRAYD_LAST_SONG"));
+      const excluded = new Set([currentKey, lastKey].filter(Boolean));
+      const recent = new Set(readRecentPicks().filter((k) => k !== currentKey));
+      let candidates = list.filter((item) => {
+        const k = normalizeKey(item.title);
+        return !excluded.has(k) && !recent.has(k);
+      });
+      if (!candidates.length) {
+        writeStorage("STRAYD_RECENT_SONGS", "[]");
+        candidates = list.filter((item) => normalizeKey(item.title) !== currentKey);
+      }
+      const pool = candidates.length ? candidates : list;
       const picked = pool[Math.floor(Math.random() * pool.length)];
       recordRecentPick(picked.title);
       return picked;
@@ -1517,11 +1387,11 @@
 
     function pickCatalogTrack(list, strategy, forceNonRepeat = false) {
       if (!list.length) return null;
-      if (strategy === "random" || forceNonRepeat) {
-        return pickNonRepeatingRandom(list);
-      }
+      if (strategy === "random" || forceNonRepeat) return pickNonRepeatingRandom(list);
       const dailyIndex = (getDayOfYear() - 1) % list.length;
-      return list[dailyIndex] || list[0];
+      const picked = list[dailyIndex] || list[0];
+      recordRecentPick(picked.title);
+      return picked;
     }
 
     async function syncCatalogAndPick(forceNonRepeat = false) {
@@ -1565,14 +1435,13 @@
       const savedStrat = readStorage("STRAYD_LOAD_STRATEGY");
       if (savedStrat) $("loadStrategy").value = savedStrat;
 
-      updateArtworkDisplay(activeTrack);
-      renderBadges();
-
       if (!$("chatLog").children.length) {
         appendChat("Agent Anna", "Agent Anna online—365-single once-a-day engine ready with dynamic catalog loading.");
       }
 
       await syncCatalogAndPick(false);
+      updateArtworkDisplay(activeTrack);
+      renderBadges();
       await generateAll();
 
       Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]).then(() => {
@@ -1635,14 +1504,9 @@
         const text = platform === "youtube"
           ? `${nonEmpty($("ytTitleOut")?.value)}\n\n${nonEmpty($("ytDescOut")?.value)}`.trim()
           : nonEmpty($(sourceId)?.value);
-
-        try {
-          if (text) await navigator.clipboard.writeText(text);
-        } catch (_) {}
-
+        try { if (text) await navigator.clipboard.writeText(text); } catch (_) {}
         const targetUrl = buildPlatformUrl(platform, text);
         if (targetUrl) window.open(targetUrl, "_blank", "noopener,noreferrer");
-
         const original = btn.textContent;
         btn.textContent = "Opened";
         setTimeout(() => { btn.textContent = original; }, 1200);
@@ -1650,30 +1514,21 @@
     });
 
     $("chatSendBtn").addEventListener("click", sendChatToAnna);
-    $("chatInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendChatToAnna();
-    });
+    $("chatInput").addEventListener("keydown", (e) => { if (e.key === "Enter") sendChatToAnna(); });
 
     $("reloadBtn").addEventListener("click", async () => {
       runCounter++;
       await syncCatalogAndPick(true);
       await generateAll();
     });
-    $("generateBtn").addEventListener("click", () => {
-      runCounter++;
-      generateAll();
-    });
+    $("generateBtn").addEventListener("click", () => { runCounter++; generateAll(); });
     $("loadStrategy").addEventListener("change", async () => {
       renderBadges();
       runCounter++;
       await syncCatalogAndPick(nonEmpty($("loadStrategy")?.value, "random") === "random");
       await generateAll();
     });
-    $("cadenceMode").addEventListener("change", () => {
-      renderBadges();
-      runCounter++;
-      generateAll();
-    });
+    $("cadenceMode").addEventListener("change", () => { renderBadges(); runCounter++; generateAll(); });
     $("songPicker").addEventListener("change", () => {
       $("customSong").value = "";
       customDirective = "";
@@ -1681,18 +1536,9 @@
       runCounter++;
       generateAll();
     });
-    $("customSong").addEventListener("input", () => {
-      runCounter++;
-      generateAll();
-    });
-    $("keywordsInput").addEventListener("input", () => {
-      runCounter++;
-      generateAll();
-    });
-    $("rotationShift").addEventListener("change", () => {
-      runCounter++;
-      generateAll();
-    });
+    $("customSong").addEventListener("input", () => { runCounter++; generateAll(); });
+    $("keywordsInput").addEventListener("input", () => { runCounter++; generateAll(); });
+    $("rotationShift").addEventListener("change", () => { runCounter++; generateAll(); });
     $("directLink").addEventListener("input", () => writeStorage("STRAYD_DIRECT_LINK", nonEmpty($("directLink").value)));
     $("paypalLink").addEventListener("input", () => writeStorage("STRAYD_PAYPAL_LINK", nonEmpty($("paypalLink").value)));
     $("bmacLink").addEventListener("input", () => writeStorage("STRAYD_BMAC_LINK", nonEmpty($("bmacLink").value)));
@@ -1716,7 +1562,6 @@
         facebook: $("fbOut").value,
         x: $("xOut").value
       };
-
       const trimmedFlags = [];
       if (rawInputs.x.length > 280) trimmedFlags.push(`x (${rawInputs.x.length}->280c)`);
       if (rawInputs.ytTitle.length > 100) trimmedFlags.push(`ytTitle (${rawInputs.ytTitle.length}->100c)`);
@@ -1726,26 +1571,24 @@
 
       applyDrafts(rawInputs, activeTrack.title);
 
-      const podAudit = {
-        sharedBibleLoaded: Boolean(bibleExcerpt),
-        brainLoaded: Boolean(brainSummary),
-        queueLoaded: Boolean(queueSummary),
-        swallowedOrTrimmedFields: trimmedFlags.length ? trimmedFlags : ["None"],
-        carriedForwardCore: [
-          "dynamic artist & single title",
-          "Agent Anna 365-single host framing",
-          "live-action cinematography rule",
-          "configured release, support & streaming links"
-        ]
-      };
-
       const payload = {
         node: "A1-STRAYD-RECORD-CMD",
         team: "Anna Management, Sales, Marketing & Promo Team",
         linkedAgent: "Agent Anna (A1/v4)",
         releaseModel: "365-single once-a-day release",
         workflowMode: "browser-first-and-a1-ready",
-        podAudit,
+        podAudit: {
+          sharedBibleLoaded: Boolean(bibleExcerpt),
+          brainLoaded: Boolean(brainSummary),
+          queueLoaded: Boolean(queueSummary),
+          swallowedOrTrimmedFields: trimmedFlags.length ? trimmedFlags : ["None"],
+          carriedForwardCore: [
+            "dynamic artist & single title",
+            "Agent Anna 365-single host framing",
+            "live-action cinematography rule",
+            "configured release, support & streaming links"
+          ]
+        },
         loadStrategy: nonEmpty($("loadStrategy")?.value, "random"),
         dayOfYear: getDayOfYear(),
         cadence: nonEmpty($("cadenceMode")?.value, "single_day"),
