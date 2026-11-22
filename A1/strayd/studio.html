@@ -168,7 +168,7 @@
     }
     textarea.generating {
       border-color: var(--warn);
-      opacity: 0.78;
+      opacity: 0.82;
     }
     button {
       cursor: pointer;
@@ -245,7 +245,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span class="waiting-pill" id="waitIndicator">Idle • Ready</span>
-        <span class="muted" id="bootStatus">Initializing...</span>
+        <span class="muted" id="bootStatus">Ready</span>
       </div>
     </header>
 
@@ -257,8 +257,8 @@
         <div>
           <div class="eyebrow">Daily Song Roll &amp; Multi-Post Sales Command</div>
           <div class="hero-title" id="heroTitle">ADHD I Can Do That (Travillen Disorder)</div>
-          <div class="hero-meta" id="artFileMeta">Catalog source: loading A1 local JSON...</div>
-          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: awaiting AI generation from record-brain, lyrics/notes &amp; SEO keywords...</div>
+          <div class="hero-meta" id="artFileMeta">Catalog ID: STRAYD-ID-001 • Instant Sleeve Active</div>
+          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="badges" id="statusBadges"></div>
           <div class="muted" id="engineModeMeta" style="margin-top:8px;">Promo engine: Ready</div>
@@ -439,7 +439,6 @@
     const DEFAULT_DAHL_URL = "https://inference.dahl.global/v1/chat/completions";
     const DEFAULT_DAHL_MODEL = "MiniMaxAI/MiniMax-M2.7";
 
-    // Local/A1 first — pull from A1/* or A1/docs/* JSON/docs before any fallback
     const CATALOG_URLS = [
       "./strayd-artist-live.json",
       "../docs/strayd-artist-live.json",
@@ -524,6 +523,39 @@
         .trim();
     }
 
+    function stripMarkdownArtifacts(str) {
+      return nonEmpty(str)
+        .replace(/```[\s\S]*?```/g, " ")
+        .replace(/`([^`]*)`/g, "$1")
+        .replace(/\*\*([^*]*)\*\*/g, "$1")
+        .replace(/\*([^*]*)\*/g, "$1")
+        .replace(/^#{1,6}\s+/gm, "")
+        .replace(/^>\s*/gm, "")
+        .replace(/\|/g, " • ")
+        .trim();
+    }
+
+    function buildInstantSleeveUri(title, trackId) {
+      const safeTitle = preserveTitle(title).slice(0, 44).replace(/[<>&"]/g, "");
+      const safeId = preserveTitle(trackId || "STRAYD").slice(0, 20).replace(/[<>&"]/g, "");
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+        <defs>
+          <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0d1320"/>
+            <stop offset="55%" stop-color="#182238"/>
+            <stop offset="100%" stop-color="#090c12"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="600" fill="url(#bg)"/>
+        <rect x="28" y="28" width="544" height="544" rx="18" fill="none" stroke="#e5b84b" stroke-opacity="0.45" stroke-width="2"/>
+        <text x="56" y="84" fill="#e5b84b" font-family="system-ui,sans-serif" font-size="18" font-weight="700" letter-spacing="3">${safeId}</text>
+        <text x="56" y="275" fill="#f3f6fb" font-family="system-ui,sans-serif" font-size="38" font-weight="800">${safeTitle}</text>
+        <text x="56" y="330" fill="#98a6bd" font-family="system-ui,sans-serif" font-size="22" font-weight="600">Martin Strayd • STRAYD</text>
+        <text x="56" y="532" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="16" font-weight="700">DIRECT MP3 + COVER SLEEVE • LIVE ACTION</text>
+      </svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
     function sanitizeBrainObject(obj) {
       if (!obj || typeof obj !== "object") return obj;
       const hiddenKeys = new Set(["emergency_safe_word", "safe_word", "safeWord", "pat", "apiKey", "token"]);
@@ -537,9 +569,7 @@
     }
 
     function cleanEditorialText(raw, lockedTitle = "") {
-      let s = nonEmpty(raw)
-        .replace(/<think>[\s\S]*?<\/think>/gi, "")
-        .replace(/\r\n/g, "\n");
+      let s = stripMarkdownArtifacts(nonEmpty(raw).replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/\r\n/g, "\n"));
 
       s = s.replace(/\bSTR\s+AYD\b/gi, "STRAYD");
       s = s.replace(/\bMartin\s+strayd\b/gi, "Martin Strayd");
@@ -587,20 +617,14 @@
         pill.className = "waiting-pill busy";
         const tick = () => {
           const secs = Math.floor((Date.now() - started) / 1000);
-          pill.textContent = `${labelText || "Generating"} • ${secs}s`;
+          pill.textContent = `${labelText || "Updating"} • ${secs}s`;
           if (songName) {
-            $("engineModeMeta").textContent = `Generating fresh drafts & SEO for "${songName}" (${secs}s)...`;
+            $("engineModeMeta").textContent = `Refreshing copy & SEO for "${songName}" (${secs}s)...`;
           }
         };
         tick();
         waitTimer = setInterval(tick, 1000);
         targets.forEach((id) => $(id)?.classList.add("generating"));
-        if (songName) {
-          targets.forEach((id) => {
-            const el = $(id);
-            if (el) el.value = `Generating fresh campaign copy & SEO for "${songName}"... (0s)`;
-          });
-        }
       } else {
         pill.className = "waiting-pill";
         pill.textContent = labelText || "Idle • Ready";
@@ -622,12 +646,17 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    async function fetchFirstText(urls) {
+    async function fetchFirstText(urls, timeoutMs = 4500) {
       for (const url of urls) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
         try {
-          const res = await fetch(url, { cache: "no-store" });
+          const res = await fetch(url, { cache: "no-store", signal: controller.signal });
           if (res.ok) return { url, text: await res.text() };
         } catch (_) {}
+        finally {
+          clearTimeout(timer);
+        }
       }
       return null;
     }
@@ -642,7 +671,7 @@
         const cleanObj = sanitizeBrainObject(JSON.parse(hit.text));
         brainSummary = JSON.stringify(cleanObj).replace(/[{}"]/g, " ").replace(/\s+/g, " ").trim().slice(0, 320);
       } catch (_) {
-        brainSummary = hit.text.replace(/\s+/g, " ").trim().slice(0, 320);
+        brainSummary = stripMarkdownArtifacts(hit.text).replace(/\s+/g, " ").trim().slice(0, 320);
       }
     }
 
@@ -653,22 +682,29 @@
         songNotesText = "";
         return;
       }
-      const norm = hit.text.replace(/\r\n/g, "\n");
-      bibleExcerpt = norm.split("\n").filter((l) => l.trim()).slice(0, 8).join(" ").slice(0, 240);
-      songNotesText = norm.slice(0, 1200);
+      const cleanBody = stripMarkdownArtifacts(hit.text).replace(/\r\n/g, "\n");
+      bibleExcerpt = cleanBody.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 5).join(" ").slice(0, 220);
+      songNotesText = cleanBody.slice(0, 1400);
     }
 
     async function loadQueueContext() {
       const qHit = await fetchFirstText(QUEUE_URLS);
-      queueSummary = qHit && qHit.text ? qHit.text.replace(/\s+/g, " ").trim().slice(0, 180) : "";
+      queueSummary = qHit && qHit.text ? stripMarkdownArtifacts(qHit.text).replace(/\s+/g, " ").trim().slice(0, 180) : "";
     }
 
     function extractSongContext(title) {
       if (!songNotesText) return "";
       const key = normalizeKey(title);
-      const lines = songNotesText.split("\n").map((l) => l.trim()).filter(Boolean);
-      const matches = lines.filter((l) => key && normalizeKey(l).includes(key.split(" ")[0] || ""));
-      return (matches.length ? matches.slice(0, 4) : lines.slice(0, 3)).join(" | ").slice(0, 260);
+      const words = key.split(" ").filter((w) => w.length >= 3);
+      const lines = songNotesText
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.length >= 12 && !/master plan manifesto|strategic handbook|target path|mirrored for gitbook/i.test(l));
+      const matched = lines.filter((l) => {
+        const ln = normalizeKey(l);
+        return words.some((w) => ln.includes(w));
+      });
+      return matched.slice(0, 3).join(" ").slice(0, 220);
     }
 
     function updateStats() {
@@ -724,7 +760,7 @@
     }
 
     function tryParseDraftJson(rawText) {
-      const stripped = cleanEditorialText(rawText);
+      const stripped = nonEmpty(rawText).replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
       const candidates = [];
       const fenced = stripped.match(/```(?:json)?\s*([\s\S]*?)```/gi) || [];
       for (const block of fenced) {
@@ -745,14 +781,14 @@
       return null;
     }
 
-    async function askDahl(messages, expectJson = false, temperature = 0.95) {
+    async function askDahl(messages, expectJson = false, temperature = 0.92, timeoutMs = 8000) {
       const key = getDahlKey();
       const endpoint = nonEmpty($("dahlEndpoint")?.value, DEFAULT_DAHL_URL);
       const model = nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL);
       if (!key) return { ok: false, reason: "no-key" };
 
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 45000);
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const res = await fetch(endpoint, {
           method: "POST",
@@ -783,7 +819,7 @@
     function buildLocalDrafts(track, shiftVal, rawKw, portalLink, bmacLink, wiseStr, cadence, songRef) {
       const title = preserveTitle(track.title);
       const day = getDayOfYear();
-      const kwList = nonEmpty(rawKw, "Martin Strayd, STRAYD, indie rock, direct MP3, cover art, Kunda Cafe music");
+      const kwList = cleanEditorialText(nonEmpty(rawKw, "Martin Strayd, STRAYD, indie rock, direct MP3, cover art, Kunda Cafe music"), title);
       const tags = kwList
         .split(/[,\n]+/)
         .map((k) => `#${k.replace(/[^a-zA-Z0-9]+/g, "")}`)
@@ -798,34 +834,37 @@
         : `Daily catalog roll (Day ${day} of 365)`;
 
       const sceneBrief = `Realistic live-action camera work in a real space with natural/practical light and real human presence for "${title}" — strictly live-action cinematography only (zero cartoon, zero anime, zero illustration).`;
-      const payLine = `Get the track & sleeve on ${portalLink} | Support: ${bmacLink} | ${wiseStr || "Wise THB, PayPal & Dogecoin"}`;
+      const payLine = `Own the MP3 + sleeve at ${portalLink} | Support: ${bmacLink} | ${wiseStr || "Wise THB, PayPal & Dogecoin"}`;
+      const hookStory = songRef
+        ? `${songRef} Part of Martin Strayd's 74-track catalog and music played at Kunda Cafe.`
+        : `Straight from Martin Strayd's 74-track catalog and music played at Kunda Cafe — built for listeners who keep their music.`;
 
       const press = [
         `PRESS & REEL BRIEF — "${title}" (${track.id || "STRAYD"}) by Martin Strayd`,
         `Release Mode: ${modeLabel} • Angle #${shiftVal + 1}`,
-        `Story & Catalog Context: ${songRef || `${title} from Martin Strayd's 74-release catalog (including tracks played at Kunda Cafe).`}`,
+        `Story & Catalog Context: ${hookStory}`,
         `SEO & Discovery Keywords: ${kwList}`,
         `Live-Action Visual Brief: ${sceneBrief}`,
         `Direct Ownership & Payment Rails: ${payLine}`
       ].join("\n\n");
 
       const tiktok = [
-        `Why is everyone talking about "${title}" from Martin Strayd? ${modeLabel} — hit play before the hook locks in.`,
+        `"${title}" by Martin Strayd — ${modeLabel}. Hit play before the hook pulls you in and grab the full track before the next drop.`,
         `${sceneBrief} Keywords: ${kwList}.`,
         `${payLine}`,
         ttTags
       ].join("\n\n").slice(0, 2200);
 
       const instagram = [
-        `"${title}" — Martin Strayd hits hard from frame one. Own the MP3 + cover art directly on ${portalLink}.`,
-        `${songRef || "Direct catalog drop built for real listeners who keep their music."} ${payLine}`,
+        `"${title}" — Martin Strayd hits straight out of the gate. Claim the MP3 + cover art directly on ${portalLink}.`,
+        `${hookStory} ${payLine}`,
         igTags
       ].join("\n\n").slice(0, 2200);
 
       const ytTitle = `${title} — Martin Strayd | ${kwList.split(",")[0].trim()}`.slice(0, 100);
       const ytDesc = [
         `"${title}" by Martin Strayd (${track.id || "STRAYD"}) — ${modeLabel}.`,
-        `${songRef || "Part of Martin Strayd's catalog releases and Kunda Cafe soundtrack rotation."}`,
+        hookStory,
         `SEO Keywords & Themes: ${kwList}`,
         `Live-Action Cinematography Direction: ${sceneBrief}`,
         `Sales & Payment Options: ${payLine}`,
@@ -833,8 +872,8 @@
       ].join("\n\n").slice(0, 5000);
 
       const facebook = [
-        `"${title}" by Martin Strayd just stepped up in the rotation — who else wants music you actually own instead of renting?`,
-        `${songRef || "Direct MP3 + cover sleeve release."} ${sceneBrief}`,
+        `"${title}" by Martin Strayd is live in today's catalog push — who wants real songs and artwork you actually own instead of renting?`,
+        `${hookStory} ${sceneBrief}`,
         `${payLine}`,
         fbTags
       ].join("\n\n").slice(0, 63206);
@@ -846,27 +885,23 @@
     }
 
     function updateArtworkDisplay(track) {
-      $("heroTitle").textContent = preserveTitle(track.title);
-      $("artFileMeta").textContent = `Catalog ID: ${nonEmpty(track.id, "STRAYD")} • File: ${nonEmpty(track.filename, track.title)}`;
+      const cleanTitle = preserveTitle(track.title);
+      const fallbackUri = buildInstantSleeveUri(cleanTitle, track.id);
+      $("heroTitle").textContent = cleanTitle;
+      $("artFileMeta").textContent = `Catalog ID: ${nonEmpty(track.id, "STRAYD")} • File: ${nonEmpty(track.filename, cleanTitle)}`;
       const img = $("artPreview");
-      if (track.url) {
-        if (img.src !== track.url) {
-          img.onerror = () => {
-            img.onerror = null;
-            img.src = `./${encodeURIComponent(track.filename || "")}`;
-          };
-          img.src = track.url;
-        }
-      } else {
-        img.removeAttribute("src");
-      }
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = fallbackUri;
+      };
+      img.src = nonEmpty(track.url) ? track.url : fallbackUri;
     }
 
     function annaSystemPrompt() {
       return [
         "You are Agent Anna running the Record Company Promotional Command Center node in A1/strayd/ alongside A1/v4/ for recording artist Martin Strayd (STRAYD).",
         "Never alter or censor the exact song title—keep titles like 'Sex Sex Sex' or 'ADHD I Can Do That (Travillen Disorder)' verbatim.",
-        "Craft high-conversion SEO, keyword/playlist, and clickable sales copy tailored to the song, keywords, cadence (1 song a day roll vs multi-post burst), sales portal (https://martinstrayd.github.io/artist/), Wise THB, PayPal, Buy Me a Coffee, and Dogecoin.",
+        "Never output raw Markdown symbols (#, **, `, >) in social posts—write clean, punchy, high-CTR social copy and SEO keywords tailored to the sales portal (https://martinstrayd.github.io/artist/), Wise THB, PayPal, Buy Me a Coffee, and Dogecoin.",
         "Strict laws: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration); zero fake network endorsements or fabricated quotes."
       ].join(" ");
     }
@@ -895,7 +930,6 @@
           };
       updateArtworkDisplay(activeTrack);
       renderBadges();
-      setWaitingState(true, "Generating", activeTrack.title);
 
       const shiftVal = $("rotationShift").value === "auto"
         ? (getDayOfYear() % 7)
@@ -914,61 +948,60 @@
 
       const contextLines = [];
       if (brainSummary) contextLines.push(`record-brain.json: ${brainSummary}`);
-      if (songRef) contextLines.push(`Song/Bible notes: ${songRef}`);
+      if (songRef) contextLines.push(`Song notes: ${songRef}`);
       if (queueSummary) contextLines.push(`promo-queue.json: ${queueSummary}`);
-      if (bibleExcerpt) contextLines.push(`v4BIBLE summary: ${bibleExcerpt}`);
+      if (bibleExcerpt) contextLines.push(`A1 Bible summary: ${bibleExcerpt}`);
       if (sessionMemories.length) contextLines.push(`Session notes: ${sessionMemories.slice(-3).join(" | ")}`);
       $("bibleBox").value = contextLines.length
         ? contextLines.join("\n\n")
         : "A1 record command node ready — load A1/strayd/record-brain.json, promo-queue.json, or A1/docs/v4BIBLE anytime.";
 
       const localDrafts = buildLocalDrafts(activeTrack, shiftVal, rawKw, portalLink, bmac, wise, cadence, songRef);
+      $("sceneBriefMeta").textContent = `Live-action direction: ${localDrafts.sceneBrief}`;
+      applyDrafts(localDrafts, activeTrack.title);
+      setWaitingState(false, "Ready • A1 Fast");
+      $("engineModeMeta").textContent = `Promo engine: Instant drafts ready for "${activeTrack.title}" (#${runCounter})`;
 
-      const dahlOut = getDahlKey()
-        ? await askDahl([
-            { role: "system", content: annaSystemPrompt() },
-            {
-              role: "user",
-              content: JSON.stringify({
-                run: runCounter,
-                dayOfYear: getDayOfYear(),
-                cadence,
-                focusShift: shiftVal,
-                exactSongTitle: activeTrack.title,
-                catalogId: activeTrack.id,
-                keywords: rawKw,
-                directive: customDirective,
-                songNotes: songRef,
-                salesPortal: portalLink,
-                buyMeACoffee: bmac,
-                paymentRails: wise
-              }) + "\nReturn ONLY valid JSON with keys: sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
-            }
-          ], true, 0.92)
-        : { ok: false, reason: "local-node" };
+      if (getDahlKey()) {
+        setWaitingState(true, "AI Boost", activeTrack.title);
+        const dahlOut = await askDahl([
+          { role: "system", content: annaSystemPrompt() },
+          {
+            role: "user",
+            content: JSON.stringify({
+              run: runCounter,
+              dayOfYear: getDayOfYear(),
+              cadence,
+              focusShift: shiftVal,
+              exactSongTitle: activeTrack.title,
+              catalogId: activeTrack.id,
+              keywords: rawKw,
+              directive: customDirective,
+              songNotes: songRef,
+              salesPortal: portalLink,
+              buyMeACoffee: bmac,
+              paymentRails: wise
+            }) + "\nReturn ONLY valid JSON with keys: sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
+          }
+        ], true, 0.92, 8000);
 
-      if (mySeq !== genSeq) return;
-
-      if (dahlOut && dahlOut.ok && dahlOut.json) {
-        const j = dahlOut.json;
-        const sceneText = cleanEditorialText(nonEmpty(j.sceneBrief, localDrafts.sceneBrief), activeTrack.title);
-        $("sceneBriefMeta").textContent = `Live-action direction: ${sceneText}`;
-        applyDrafts({
-          press: nonEmpty(j.press, localDrafts.press),
-          tiktok: nonEmpty(j.tiktok, localDrafts.tiktok),
-          instagram: nonEmpty(j.instagram, localDrafts.instagram),
-          ytTitle: nonEmpty(j.ytTitle, localDrafts.ytTitle),
-          ytDesc: nonEmpty(j.ytDesc, localDrafts.ytDesc),
-          facebook: nonEmpty(j.facebook, localDrafts.facebook),
-          x: nonEmpty(j.x, localDrafts.x)
-        }, activeTrack.title);
-        setWaitingState(false, "Ready • AI Live");
-        $("engineModeMeta").textContent = `Promo engine: Fresh AI drafts generated for "${activeTrack.title}" (#${runCounter})`;
-      } else {
-        $("sceneBriefMeta").textContent = `Live-action direction: ${localDrafts.sceneBrief}`;
-        applyDrafts(localDrafts, activeTrack.title);
-        setWaitingState(false, "Ready • A1 Engine");
-        $("engineModeMeta").textContent = `Promo engine: Fresh A1 record drafts generated for "${activeTrack.title}" (#${runCounter})`;
+        if (mySeq !== genSeq) return;
+        if (dahlOut && dahlOut.ok && dahlOut.json) {
+          const j = dahlOut.json;
+          const sceneText = cleanEditorialText(nonEmpty(j.sceneBrief, localDrafts.sceneBrief), activeTrack.title);
+          $("sceneBriefMeta").textContent = `Live-action direction: ${sceneText}`;
+          applyDrafts({
+            press: nonEmpty(j.press, localDrafts.press),
+            tiktok: nonEmpty(j.tiktok, localDrafts.tiktok),
+            instagram: nonEmpty(j.instagram, localDrafts.instagram),
+            ytTitle: nonEmpty(j.ytTitle, localDrafts.ytTitle),
+            ytDesc: nonEmpty(j.ytDesc, localDrafts.ytDesc),
+            facebook: nonEmpty(j.facebook, localDrafts.facebook),
+            x: nonEmpty(j.x, localDrafts.x)
+          }, activeTrack.title);
+          $("engineModeMeta").textContent = `Promo engine: AI-boosted drafts active for "${activeTrack.title}" (#${runCounter})`;
+        }
+        setWaitingState(false, "Ready");
       }
     }
 
@@ -980,13 +1013,12 @@
       customDirective = msg;
       sessionMemories.push(`${activeTrack.title}: ${msg}`);
       runCounter++;
-      setWaitingState(true, "Anna directing", activeTrack.title);
 
       const dahlReply = getDahlKey()
         ? await askDahl([
             { role: "system", content: annaSystemPrompt() + " Reply in 2 sharp sentences as Agent Anna." },
             { role: "user", content: `Track: "${activeTrack.title}". Keywords: "${nonEmpty($("keywordsInput")?.value)}". Directive: ${msg}` }
-          ], false, 0.9)
+          ], false, 0.9, 8000)
         : { ok: false };
 
       if (dahlReply && dahlReply.ok && dahlReply.text) {
@@ -1055,6 +1087,9 @@
     }
 
     async function boot() {
+      // Paint instant sleeve & first drafts immediately on load (< 50ms)
+      updateArtworkDisplay(activeTrack);
+      renderBadges();
       const savedLink = readStorage("STRAYD_DIRECT_LINK");
       if (savedLink) $("directLink").value = savedLink;
       const savedBmac = readStorage("STRAYD_BMAC_LINK");
@@ -1064,8 +1099,13 @@
       const savedKw = readStorage("STRAYD_KEYWORDS");
       if (savedKw) $("keywordsInput").value = savedKw;
 
-      await Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]);
+      if (!$("chatLog").children.length) {
+        appendChat("Agent Anna", `Record Command active on A1 (Day ${getDayOfYear()}). Pick a single or tell me what hook, Wise/PayPal/DOGE CTA, or live-action scene to push.`);
+      }
+      await generateAll();
 
+      // Load external A1 files in background and upgrade track/context cleanly
+      await Promise.all([loadRecordBrain(), loadBibleAndNotes(), loadQueueContext()]);
       const catHit = await fetchFirstText(CATALOG_URLS);
       if (catHit && catHit.text) {
         try {
@@ -1083,18 +1123,14 @@
           if (dailyTrack) {
             activeTrack = dailyTrack;
             picker.value = dailyTrack.title;
+            await generateAll();
           }
         } catch (_) {}
       }
 
-      renderBadges();
       $("bootStatus").textContent = catalog.length
         ? `A1 Node Ready • ${catalog.length} singles • Day ${getDayOfYear()}`
         : `A1 Node Ready • Day ${getDayOfYear()}`;
-      if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", `Record Command active on A1 (Day ${getDayOfYear()}). Pick a single or tell me what hook, Wise/PayPal/DOGE CTA, or live-action scene to push.`);
-      }
-      await generateAll();
     }
 
     document.querySelectorAll("[data-copy]").forEach((btn) => {
