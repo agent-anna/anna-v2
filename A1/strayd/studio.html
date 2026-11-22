@@ -41,6 +41,22 @@
     }
     .topbar h1 { margin: 0; font-size: 1.32rem; letter-spacing: 0.01em; }
     .muted { color: var(--muted); font-size: 0.85rem; }
+    .waiting-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #0b0f18;
+      color: var(--muted);
+    }
+    .waiting-pill.busy {
+      border-color: var(--warn);
+      color: var(--warn);
+    }
 
     .hero {
       display: grid;
@@ -150,6 +166,10 @@
       line-height: 1.5;
       resize: vertical;
     }
+    textarea.generating {
+      border-color: var(--warn);
+      opacity: 0.78;
+    }
     button {
       cursor: pointer;
       font-weight: 700;
@@ -221,9 +241,12 @@
     <header class="topbar">
       <div>
         <h1>A1 Shell • Agent Anna v4 Studio</h1>
-        <div class="muted">Agent Anna DJ &amp; Catalog Desk • Martin Strayd • Tree: A1/strayd + A1/promo-gate + docs/1 v4BIBLE • Live-Action Only (Zero Cartoon)</div>
+        <div class="muted">Agent Anna DJ &amp; Catalog Desk • Martin Strayd • 365-Day AI Release &amp; SEO Engine • Live-Action Only (Zero Cartoon)</div>
       </div>
-      <div class="muted" id="bootStatus">Initializing...</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span class="waiting-pill" id="waitIndicator">Idle • Ready</span>
+        <span class="muted" id="bootStatus">Initializing...</span>
+      </div>
     </header>
 
     <main>
@@ -235,7 +258,7 @@
           <div class="eyebrow">365-Day Catalog &amp; Campaign Brief (A1 Sidecar to V4)</div>
           <div class="hero-title" id="heroTitle">Who Killed Fun (Pay the Rent)</div>
           <div class="hero-meta" id="artFileMeta">Artwork: loading catalog...</div>
-          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: awaiting AI generation from brain.json, song notes &amp; keywords...</div>
+          <div class="hero-meta" id="sceneBriefMeta">Live-action direction: awaiting fresh generation from brain.json, song notes &amp; keywords...</div>
           <div class="hero-meta" id="visualRuleMeta">Visual law: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration).</div>
           <div class="badges" id="statusBadges"></div>
           <div class="muted" id="engineModeMeta" style="margin-top:8px;">Copy engine: Ready</div>
@@ -246,13 +269,13 @@
       <div class="workspace">
         <aside>
           <section class="card">
-            <div class="card-title">1. Track &amp; AI Engine Controls</div>
+            <div class="card-title">1. Track, Sales &amp; AI Controls</div>
 
             <label for="songPicker">Select Single</label>
             <select id="songPicker"></select>
 
             <label for="customSong">Custom Song Title Override</label>
-            <input id="customSong" type="text" placeholder="Type a title or leave blank..." />
+            <input id="customSong" type="text" placeholder="Type exact song title or leave blank..." />
 
             <label for="keywordsInput">SEO Keywords, Trends &amp; Playlists</label>
             <input id="keywordsInput" type="text" placeholder="e.g. indie rock, late night drive, direct mp3, kunda cafe music..." />
@@ -269,14 +292,17 @@
               <option value="6">07 • Catalog Spotlight &amp; Share Push</option>
             </select>
 
-            <label for="directLink">Direct MP3 + Cover Art Link</label>
+            <label for="directLink">Direct MP3 + Cover Art Link (PayPal / Direct)</label>
             <input id="directLink" type="text" value="https://www.paypal.com/paypalme/martinstrayd" />
 
-            <label for="dahlEndpoint">Dahl Endpoint</label>
-            <input id="dahlEndpoint" type="text" value="https://inference.dahl.global/v1/chat/completions" />
+            <label for="bmacLink">Buy Me a Coffee Support Link</label>
+            <input id="bmacLink" type="text" value="https://buymeacoffee.com/martinstrayd" />
 
-            <label for="dahlModel">Dahl Model</label>
-            <input id="dahlModel" type="text" value="MiniMaxAI/MiniMax-M2.7" />
+            <label for="wiseNote">Wise Banking / Direct Transfer Note</label>
+            <input id="wiseNote" type="text" value="Wise direct transfer available (THB / multi-currency on request)" />
+
+            <input id="dahlEndpoint" type="hidden" value="https://inference.dahl.global/v1/chat/completions" />
+            <input id="dahlModel" type="hidden" value="MiniMaxAI/MiniMax-M2.7" />
 
             <label for="dahlKey">Dahl API Key</label>
             <input id="dahlKey" type="password" placeholder="Stored locally in browser..." />
@@ -435,6 +461,8 @@
     let promoPkgSummary = "";
     let sessionMemories = [];
     let runCounter = 1;
+    let genSeq = 0;
+    let waitTimer = null;
     let customDirective = "";
     let activeTrack = { title: "Who Killed Fun (Pay the Rent)", filename: "Martin Strayd - Who Killed Fun (Pay the Rent).png", url: "" };
     let activeNote = { found: false, path: "", lines: [], raw: "" };
@@ -492,6 +520,93 @@
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
 
+    function preserveTitle(rawTitle) {
+      let t = nonEmpty(rawTitle)
+        .replace(/<think>[\s\S]*?<\/think>/gi, "")
+        .replace(/\r\n/g, " ")
+        .replace(/\bSTR\s+AYD\b/gi, "STRAYD")
+        .replace(/\bMartin\s+strayd\b/gi, "Martin Strayd")
+        .replace(/[ \t]{2,}/g, " ")
+        .trim();
+      return t;
+    }
+
+    function cleanEditorialText(raw, lockedTitle = "") {
+      let s = nonEmpty(raw)
+        .replace(/<think>[\s\S]*?<\/think>/gi, "")
+        .replace(/\r\n/g, "\n");
+
+      // Fix known artist/brand spacing and casing slips without touching song titles
+      s = s.replace(/\bSTR\s+AYD\b/gi, "STRAYD");
+      s = s.replace(/\bMartin\s+strayd\b/g, "Martin Strayd");
+      s = s.replace(/\bmartin\s+strayd\b/g, "Martin Strayd");
+      s = s.replace(/\bAgent\s+anna\b/g, "Agent Anna");
+      s = s.replace(/\bKunda\s+cafe\b/g, "Kunda Cafe");
+
+      // Protect exact song title before fixing stray spacing/punctuation
+      const titleToProtect = preserveTitle(lockedTitle || activeTrack.title);
+      const tokenMap = new Map();
+      let tokenIdx = 0;
+      const protectSegment = (seg) => {
+        if (!seg) return seg;
+        const tok = `@@LOCKEDTITLE${tokenIdx++}@@`;
+        tokenMap.set(tok, seg);
+        return tok;
+      };
+
+      if (titleToProtect) {
+        const escaped = titleToProtect.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        s = s.replace(new RegExp(escaped, "gi"), (m) => protectSegment(m));
+      }
+
+      // Fix spacing around punctuation and slashes
+      s = s.replace(/[ \t]{2,}/g, " ");
+      s = s.replace(/\(\s+/g, "(").replace(/\s+\)/g, ")");
+      s = s.replace(/\s+([,.;:!?])/g, "$1");
+      s = s.replace(/\n{3,}/g, "\n\n");
+
+      // Restore exact song title untouched
+      tokenMap.forEach((val, tok) => {
+        s = s.split(tok).join(val);
+      });
+
+      return s.trim();
+    }
+
+    function setWaitingState(isBusy, labelText, songName = "") {
+      const pill = $("waitIndicator");
+      const targets = ["pressOut", "ttOut", "igOut", "ytDescOut", "fbOut", "xOut"];
+      if (waitTimer) {
+        clearInterval(waitTimer);
+        waitTimer = null;
+      }
+
+      if (isBusy) {
+        const started = Date.now();
+        pill.className = "waiting-pill busy";
+        const tick = () => {
+          const secs = Math.floor((Date.now() - started) / 1000);
+          pill.textContent = `${labelText || "Waiting on AI"} • ${secs}s`;
+          if (songName) {
+            $("engineModeMeta").textContent = `Generating fresh 365-day drafts for "${songName}" (${secs}s elapsed)...`;
+          }
+        };
+        tick();
+        waitTimer = setInterval(tick, 1000);
+        targets.forEach((id) => $(id)?.classList.add("generating"));
+        if (songName) {
+          targets.forEach((id) => {
+            const el = $(id);
+            if (el) el.value = `Agent Anna is generating fresh copy & SEO for "${songName}"... (${0}s)`;
+          });
+        }
+      } else {
+        pill.className = "waiting-pill";
+        pill.textContent = labelText || "Idle • Ready";
+        targets.forEach((id) => $(id)?.classList.remove("generating"));
+      }
+    }
+
     function appendChat(sender, text) {
       const box = $("chatLog");
       const row = document.createElement("div");
@@ -499,7 +614,7 @@
       const strong = document.createElement("strong");
       strong.textContent = `${sender}: `;
       const span = document.createElement("span");
-      span.textContent = nonEmpty(text).replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+      span.textContent = cleanEditorialText(text);
       row.appendChild(strong);
       row.appendChild(span);
       box.appendChild(row);
@@ -625,14 +740,15 @@
       $("xStats").className = xVal.length > 280 ? "stats over" : "stats";
     }
 
-    function applyDrafts(drafts) {
-      $("pressOut").value = drafts.press;
-      $("ttOut").value = drafts.tiktok;
-      $("igOut").value = drafts.instagram;
-      $("ytTitleOut").value = drafts.ytTitle;
-      $("ytDescOut").value = drafts.ytDesc;
-      $("fbOut").value = drafts.facebook;
-      $("xOut").value = drafts.x;
+    function applyDrafts(drafts, lockedTitle = "") {
+      const t = preserveTitle(lockedTitle || activeTrack.title);
+      $("pressOut").value = cleanEditorialText(drafts.press, t);
+      $("ttOut").value = cleanEditorialText(drafts.tiktok, t).slice(0, 2200);
+      $("igOut").value = cleanEditorialText(drafts.instagram, t).slice(0, 2200);
+      $("ytTitleOut").value = cleanEditorialText(drafts.ytTitle, t).slice(0, 100);
+      $("ytDescOut").value = cleanEditorialText(drafts.ytDesc, t).slice(0, 5000);
+      $("fbOut").value = cleanEditorialText(drafts.facebook, t).slice(0, 63206);
+      $("xOut").value = cleanEditorialText(drafts.x, t).slice(0, 280);
       updateStats();
     }
 
@@ -642,14 +758,14 @@
       $("statusBadges").innerHTML = [
         `<span class="badge">A1 Sidecar to V4 (Lean CTX)</span>`,
         `<span class="badge">Live-Action Only (Zero Cartoon)</span>`,
-        `<span class="badge">${hasDahl ? "Dahl AI Active" : "Dahl Key Needed"}</span>`,
+        `<span class="badge">${hasDahl ? "Dahl AI Ready" : "Dahl Key Needed"}</span>`,
         `<span class="badge">${brainSummary ? "Brain.json Linked" : "Tree Context Ready"}</span>`,
         `<span class="badge">${hasGh ? "GitHub PAT Set" : "Public Tree"}</span>`
       ].join("");
     }
 
     function tryParseDraftJson(rawText) {
-      const stripped = nonEmpty(rawText).replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+      const stripped = cleanEditorialText(rawText);
       const candidates = [];
       const fenced = stripped.match(/```(?:json)?\s*([\s\S]*?)```/gi) || [];
       for (const block of fenced) {
@@ -692,7 +808,7 @@
         const data = await res.json();
         const raw = nonEmpty(data?.choices?.[0]?.message?.content);
         if (!raw) return { ok: false, reason: "empty" };
-        const cleaned = raw.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        const cleaned = cleanEditorialText(raw);
         if (!expectJson) return { ok: true, text: cleaned };
 
         const parsed = tryParseDraftJson(cleaned);
@@ -706,7 +822,7 @@
     }
 
     function updateArtworkDisplay(track) {
-      $("heroTitle").textContent = track.title;
+      $("heroTitle").textContent = preserveTitle(track.title);
       $("artFileMeta").textContent = `Artwork: ${nonEmpty(track.filename, track.title)}`;
       const img = $("artPreview");
       if (track.url) {
@@ -725,16 +841,18 @@
     function annaSystemPrompt() {
       return [
         "You are Agent Anna operating as DJ, artist manager, and catalog campaign operator for recording artist Martin Strayd (STRAYD) across a 70-100 song catalog and 365-day daily release calendar (including music played at Kunda Cafe, distinct from the cafe itself). This studio lives in A1/strayd/ beside A1/v4/ and A1/promo-gate/ so V4 keeps its hot context, STT, and TTS lean while full catalog/SEO/promo workflows run cleanly.",
-        "Never use pre-canned or cookie-cutter formulas; craft fresh, high-conversion SEO, keyword/playlist, and hype copy tailored to the exact song, keywords, brain state, and creative directive.",
+        "Never alter or censor the exact song title—if a track title repeats a word intentionally (such as 'Sex Sex Sex'), keep the exact title verbatim every single time.",
+        "Never use pre-canned or cookie-cutter formulas; craft fresh, high-conversion SEO, keyword/playlist, and hype copy tailored to the exact song, keywords, brain state, payment/support links, and creative directive.",
         "Platform craft targets: TikTok 100-300c punchy opening inside <=2,200c (3-5 tags), Facebook 20-150c punchy hook + story inside <=63,206c (2-5 tags), Instagram first 125c critical hook inside <=2,200c (3-5 tags), ytTitle 60-100c (<=100c), ytDesc 200-5,000c with strong search keywords (3-5 tags), x <=280c (0-2 tags), plus a NY/Hollywood press & live-action reel brief (press).",
-        "Strict laws: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration); direct MP3 + cover sleeve ownership; zero fake network endorsements or fabricated quotes."
+        "Strict laws: Strictly realistic live-action cinematography only (zero cartoon, zero anime, zero illustration); direct MP3 + cover sleeve ownership; include configured direct link, Buy Me a Coffee link, and Wise note naturally where helpful; zero fake network endorsements or fabricated quotes."
       ].join(" ");
     }
 
     async function generateAll() {
+      const mySeq = ++genSeq;
       const typed = nonEmpty($("customSong").value);
       const selected = nonEmpty($("songPicker").value);
-      const queryTitle = typed || selected || activeTrack.title;
+      const queryTitle = preserveTitle(typed || selected || activeTrack.title);
       const key = normalizeKey(queryTitle);
 
       const matched =
@@ -744,14 +862,18 @@
           return key && (itemKey.includes(key) || key.includes(itemKey));
         });
 
-      activeTrack = matched || {
-        title: queryTitle,
-        filename: `${queryTitle}.png`,
-        url: activeTrack.url || ""
-      };
+      activeTrack = matched
+        ? { ...matched, title: preserveTitle(matched.title) }
+        : {
+            title: queryTitle,
+            filename: `${queryTitle}.png`,
+            url: activeTrack.url || ""
+          };
       updateArtworkDisplay(activeTrack);
+      setWaitingState(true, "Waiting on Dahl AI", activeTrack.title);
 
       const noteRec = await loadExternalSongNote(activeTrack.title);
+      if (mySeq !== genSeq) return;
       activeNote = noteRec;
       renderBadges();
 
@@ -759,8 +881,12 @@
         ? (getDayOfYear() % 7)
         : (parseInt($("rotationShift").value, 10) || 0);
       const link = nonEmpty($("directLink").value, "https://www.paypal.com/paypalme/martinstrayd");
+      const bmac = nonEmpty($("bmacLink")?.value, "https://buymeacoffee.com/martinstrayd");
+      const wise = cleanEditorialText($("wiseNote")?.value, activeTrack.title);
       const rawKw = nonEmpty($("keywordsInput")?.value);
       writeStorage("STRAYD_DIRECT_LINK", link);
+      writeStorage("STRAYD_BMAC_LINK", bmac);
+      writeStorage("STRAYD_WISE_NOTE", wise);
       writeStorage("STRAYD_KEYWORDS", rawKw);
 
       const contextLines = [];
@@ -775,10 +901,6 @@
         : "External brain.json, promo-queue, promo-gate, and docs/1 v4BIBLE context stay outside A1/v4 hot context until loaded.";
 
       const nonce = `${Date.now()}-${runCounter}-d${getDayOfYear()}-s${shiftVal}`;
-      $("engineModeMeta").textContent = getDahlKey()
-        ? `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) generating fresh 365-day drafts...`
-        : "Copy engine: Enter Dahl API Key for live 365-day AI generation";
-
       const dahlOut = await askDahl([
         { role: "system", content: annaSystemPrompt() },
         {
@@ -787,7 +909,7 @@
             generationNonce: nonce,
             dayOfYear: getDayOfYear(),
             focusShift: shiftVal,
-            song: activeTrack.title,
+            exactSongTitle: activeTrack.title,
             artworkFile: activeTrack.filename,
             keywords: rawKw,
             directive: customDirective,
@@ -796,29 +918,38 @@
             brainSummary,
             queueSummary,
             promoPkgSummary,
-            directLink: link
+            directLink: link,
+            buyMeACoffeeLink: bmac,
+            wiseBankingNote: wise
           }) + "\nReturn ONLY valid JSON with keys: sceneBrief, press, tiktok, instagram, ytTitle, ytDesc, facebook, x."
         }
-      ], true, 0.95);
+      ], true, 0.92);
+
+      if (mySeq !== genSeq) return;
 
       if (dahlOut && dahlOut.ok && dahlOut.json) {
         const j = dahlOut.json;
-        const sceneText = nonEmpty(j.sceneBrief, customDirective || `Day ${getDayOfYear()} live-action capture for "${activeTrack.title}" (strictly live-action only, zero cartoon)`);
+        const sceneText = cleanEditorialText(
+          nonEmpty(j.sceneBrief, customDirective || `Day ${getDayOfYear()} live-action capture for "${activeTrack.title}" (strictly live-action only, zero cartoon)`),
+          activeTrack.title
+        );
         $("sceneBriefMeta").textContent = `Live-action direction: ${sceneText}`;
         applyDrafts({
           press: nonEmpty(j.press),
-          tiktok: nonEmpty(j.tiktok).slice(0, 2200),
-          instagram: nonEmpty(j.instagram).slice(0, 2200),
-          ytTitle: nonEmpty(j.ytTitle).slice(0, 100),
-          ytDesc: nonEmpty(j.ytDesc).slice(0, 5000),
-          facebook: nonEmpty(j.facebook).slice(0, 63206),
-          x: nonEmpty(j.x).slice(0, 280)
-        });
-        $("engineModeMeta").textContent = `Copy engine: Dahl (${nonEmpty($("dahlModel")?.value, DEFAULT_DAHL_MODEL)}) live generation complete (#${runCounter})`;
+          tiktok: nonEmpty(j.tiktok),
+          instagram: nonEmpty(j.instagram),
+          ytTitle: nonEmpty(j.ytTitle),
+          ytDesc: nonEmpty(j.ytDesc),
+          facebook: nonEmpty(j.facebook),
+          x: nonEmpty(j.x)
+        }, activeTrack.title);
+        setWaitingState(false, "Ready • Fresh AI");
+        $("engineModeMeta").textContent = `Copy engine: Fresh 365-day drafts generated for "${activeTrack.title}" (#${runCounter})`;
       } else {
         const reason = dahlOut?.reason || "no-key";
-        $("sceneBriefMeta").textContent = `Live-action direction: Awaiting Dahl AI output (${reason}) — strictly live-action only (zero cartoon)`;
-        $("engineModeMeta").textContent = `Copy engine: Dahl not returned (${reason}) — check Dahl API Key / endpoint and click Generate Channel Copy`;
+        setWaitingState(false, `Waiting (${reason})`);
+        $("sceneBriefMeta").textContent = `Live-action direction: Awaiting Dahl AI response (${reason}) — strictly live-action only (zero cartoon)`;
+        $("engineModeMeta").textContent = `Copy engine: Waiting on Dahl (${reason}) — check Dahl API Key and click Generate Channel Copy`;
       }
     }
 
@@ -830,6 +961,7 @@
       customDirective = msg;
       sessionMemories.push(`${activeTrack.title}: ${msg}`);
       runCounter++;
+      setWaitingState(true, "Anna thinking", activeTrack.title);
 
       const dahlReply = await askDahl([
         {
@@ -848,7 +980,8 @@
         return;
       }
 
-      appendChat("Agent Anna", `Directive logged for "${activeTrack.title}" (${msg}). Connect or verify your Dahl API Key to generate fresh AI drafts.`);
+      setWaitingState(false, "Ready");
+      appendChat("Agent Anna", `Directive logged for "${activeTrack.title}" (${msg}). Add or verify your Dahl API Key to generate fresh AI drafts.`);
     }
 
     function buildPlatformUrl(platform, text) {
@@ -874,6 +1007,10 @@
       $("ghPat").value = getGhToken();
       const savedLink = readStorage("STRAYD_DIRECT_LINK");
       if (savedLink) $("directLink").value = savedLink;
+      const savedBmac = readStorage("STRAYD_BMAC_LINK");
+      if (savedBmac) $("bmacLink").value = savedBmac;
+      const savedWise = readStorage("STRAYD_WISE_NOTE");
+      if (savedWise) $("wiseNote").value = savedWise;
       const savedKw = readStorage("STRAYD_KEYWORDS");
       if (savedKw) $("keywordsInput").value = savedKw;
 
@@ -886,7 +1023,7 @@
           catalog = files
             .filter((f) => f && f.filename && /\.(png|jpe?g|webp)$/i.test(f.filename) && /martin strayd\s*-\s*/i.test(f.filename))
             .map((f) => ({
-              title: f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.(png|jpe?g|webp)$/i, "").trim(),
+              title: preserveTitle(f.filename.replace(/^Martin Strayd\s*-\s*/i, "").replace(/\.(png|jpe?g|webp)$/i, "")),
               filename: f.filename,
               url: f.url
             }));
@@ -911,7 +1048,7 @@
       renderBadges();
       $("bootStatus").textContent = catalog.length ? `Ready • ${catalog.length} singles • Day ${getDayOfYear()}` : `Ready • Day ${getDayOfYear()}`;
       if (!$("chatLog").children.length) {
-        appendChat("Agent Anna", `Online on A1/strayd beside V4 (Day ${getDayOfYear()}). Tell me what angle, scene, or keyword push you want for Martin Strayd.`);
+        appendChat("Agent Anna", `Online on A1/strayd beside V4 (Day ${getDayOfYear()}). Pick a single or tell me what angle, scene, or keyword push you want for Martin Strayd.`);
       }
       await generateAll();
     }
@@ -1008,14 +1145,28 @@
       runCounter++;
       generateAll();
     });
-    $("directLink").addEventListener("input", generateAll);
+    $("directLink").addEventListener("input", () => writeStorage("STRAYD_DIRECT_LINK", nonEmpty($("directLink").value)));
+    $("bmacLink").addEventListener("input", () => writeStorage("STRAYD_BMAC_LINK", nonEmpty($("bmacLink").value)));
+    $("wiseNote").addEventListener("input", () => writeStorage("STRAYD_WISE_NOTE", cleanEditorialText($("wiseNote").value, activeTrack.title)));
     $("dahlKey").addEventListener("input", renderBadges);
     $("ghPat").addEventListener("input", renderBadges);
     ["pressOut", "ttOut", "igOut", "ytTitleOut", "ytDescOut", "fbOut", "xOut"].forEach((id) => {
-      $(id).addEventListener("input", updateStats);
+      $(id).addEventListener("input", () => {
+        $(id).value = cleanEditorialText($(id).value, activeTrack.title);
+        updateStats();
+      });
     });
 
     $("approveBtn").addEventListener("click", async () => {
+      applyDrafts({
+        press: $("pressOut").value,
+        tiktok: $("ttOut").value,
+        instagram: $("igOut").value,
+        ytTitle: $("ytTitleOut").value,
+        ytDesc: $("ytDescOut").value,
+        facebook: $("fbOut").value,
+        x: $("xOut").value
+      }, activeTrack.title);
       const payload = {
         shell: "A1",
         agent: "Agent Anna",
@@ -1034,6 +1185,8 @@
         artworkUrl: activeTrack.url,
         visualLaw: "Strictly realistic live-action cinematography only (zero cartoon)",
         link: nonEmpty($("directLink").value),
+        buyMeACoffeeLink: nonEmpty($("bmacLink")?.value),
+        wiseBankingNote: cleanEditorialText($("wiseNote")?.value, activeTrack.title) || null,
         press: $("pressOut").value,
         tiktok: $("ttOut").value,
         instagram: $("igOut").value,
