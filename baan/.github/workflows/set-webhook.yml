@@ -1,0 +1,13 @@
+name: Set Telegram Webhook
+
+on:
+  workflow_dispatch:
+
+jobs:
+  set-webhook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set webhook
+        run: |
+          curl -X POST "https://api.telegram.org/bot9166211236:AAEzhJM_0DbHqcr6qFAwL4URwaiJFb0-dz0/setWebhook" \
+            -d "url=https://api.github.com/repos/agent-anna/baan/dispatches"
