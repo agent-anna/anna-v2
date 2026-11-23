@@ -1,0 +1,40 @@
+name: Telegram Webhook Receiver
+
+on:
+  repository_dispatch:
+    types: [telegram-message]
+
+permissions:
+  contents: write
+
+jobs:
+  receive-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create messages directory
+        run: mkdir -p messages
+
+      - name: Write message to inbox
+        env:
+          MESSAGE_DATA: ${{ github.event.client_payload.message }}
+          TIMESTAMP: ${{ github.event.client_payload.timestamp }}
+          SENDER: ${{ github.event.client_payload.sender }}
+        run: |
+          echo "From: $SENDER" >> messages/inbox.md
+          echo "Time: $TIMESTAMP" >> messages/inbox.md
+          echo "---" >> messages/inbox.md
+          echo "$MESSAGE_DATA" >> messages/inbox.md
+          echo "" >> messages/inbox.md
+          echo "---" >> messages/inbox.md
+          echo "" >> messages/inbox.md
+
+      - name: Commit message file
+        run: |
+          git config --local user.email "anna@agent-anna.com"
+          git config --local user.name "Anna Bot"
+          git add messages/inbox.md
+          git commit -m "Telegram message received - $(date)"
+          git push
