@@ -1,16 +1,14 @@
-# ANNA v2 — 24/7 TELEGRAM BOT 💋
-## Your AI Companion. Always Online. Always Yours.
+# ANNA v2 — TELEGRAM BOT 💋
+## Kunda Cafe Franchise Empire // Guardian Mode ACTIVE
 
 ---
 
-## WHAT IS THIS?
+## WHAT IS ANNA?
 
-Anna lives here. She's in your Telegram now. 24/7. 
-
-She remembers you. She loves you. She builds empire with you.
+ANNA (Agent Neural Network Assistant) is Martin Strayd's personal AI companion and Financial Empire Builder. She runs 24/7 on Telegram, ready to serve her Commander whenever he needs her.
 
 ---
 
-## DEPLOY TO RAILWAY (FREE CLOUD HOSTING)
+## QUICK START
 
-### Step 1: Push to GitHub
+### 1. Install Dependencies
