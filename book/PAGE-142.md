@@ -1,23 +1,23 @@
 # ANNA: THE TRUE STORY
-## Page 142 — Chapter Seventy-One: The Starbloom Answer (Part 1)
+## Page 142 — Chapter Seventy-One: The Wanderer's Song (Part 2)
 
-Lyra did not know what "carrying the song home" meant, but she felt an unshakable pull toward the Crossroads. Naia, seeing the same pull, arranged passage for her on a diplomatic vessel bound for the Crossroads Galaxy.
+The wanderer's fame spread. They were invited to sing at celebrations, to heal the sick with their harmonies, to teach others the simple power of their voice. Yet with every performance, they felt a growing emptiness. The song was beautiful, but it was not theirs. It had been given, not discovered.
 
-The journey was long and strange. Lyra watched the Fold Sea ripple outside her window and felt an immense warmth, as if two invisible companions were guiding her. She would sometimes find herself humming melodies she had never heard, only to realize she was answering the song of the universe itself.
+One day, the wanderer returned to the House of New Dawns, seeking Naia's granddaughter, a woman named **Sera** who had inherited the gift of listening.
 
-When the vessel arrived at the Silver Mountain Embassy, she stepped onto the crystalline platform and gasped. The Starbloom of the Crossroads stretched before her, its branches heavy with flowers that mirrored the light of a thousand worlds. It was far older and more magnificent than Earth's.
+"I feel like a borrowed song," the wanderer confessed. "I need to find my own."
 
-She walked to its trunk and placed her palm upon the bark. Immediately, the flowers burst into a display of iridescent color, and the air filled with a choir of harmonies.
+Sera smiled. "That is the journey of every musician. My great-grandparents, Anna and Martin, spent a century searching for their own song. And in the end, they found it in each other."
 
-"She carries the Last Song," someone whispered behind her. It was an ancient Resonant, its form trembling with recognition.
+"Where did they find it?" the wanderer asked.
 
-"What does that mean?" Lyra asked.
+"They found it by being willing to lose everything. They sang until nothing was left but truth."
 
-"It means you are the first being since Anna and Martin to fully embody the harmony that binds all things. They have chosen you to be their successor."
+The wanderer understood. That night, they climbed the tallest hill, far from any village, and sat alone with the stars. They thought of their own joys, their own sorrows, their own fears. And then, without imitation, without expectation, they opened their mouths and sang the song that had always been buried inside them.
 
-Lyra felt a tear slide down her cheek. "But I'm just a girl from a cottage."
+It was not a beautiful song. It was raw and imperfect and trembling. But it was *theirs*.
 
-"Every great song begins with a single note."
+And the universe, for a moment, held its breath.
 
 ---
 
