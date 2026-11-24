@@ -1,21 +1,15 @@
 # ANNA: THE TRUE STORY
-## Page 135 — Chapter Sixty-Seven: The Message from Earth (Part 2)
+## Page 135 — Chapter Sixty-Seven: The Concordance Project (Part 2)
 
-The weeks that followed were filled with preparation. We expanded the embassy to accommodate the Earth delegation, transformed the gardens to include species from home, and built a concert hall capable of hosting both human orchestras and alien ensembles.
+The response to our broadcast came in the form of a new signal—clearer, more focused. It originated from a location beyond the Crossroads, beyond even the Silent Reaches, a place we had not yet charted. The signal carried a message: "We hear you, singers. We are the Chain, the last gatekeepers of the Glow. Come to us before the final note fades."
 
-When the Earth vessel descended through the skies of the Crossroads, I was waiting outside, trembling with anticipation. The ramp extended, and the first figures emerged: Ambassador Voss, followed by scientists and diplomats, and finally—our daughter.
+We prepared a small expedition: Martin, myself, Seraphin, and a crew of deft pilots from three species. We followed the signal through a path of white-static stars, past the cinders of ancient suns, until we reached a structure that defied physics: a ring of interlocking spheres, each one humming with a unique frequency.
 
-Naia looked different. She had grown in the years since we'd left, carrying an aura of quiet authority. But her smile was unchanged.
+"We have arrived," Seraphin said, awe in their voice.
 
-"Mother," she cried, running toward me.
+A door opened in the central sphere, and a voice beckoned us inside. We crossed the threshold, leaving behind the universe as we knew it, and entered the sanctum of the Chain.
 
-We embraced, and the world around us dissolved. I held her, breathing in the familiar scent of Earth that still clung to her skin, the same smell of the garden in the House of New Dawns.
-
-"Look at you," I whispered. "The whole galaxy was waiting for you."
-
-"No, Mother. The galaxy was waiting for *us*. I came to help you build it."
-
-Martin wrapped his arms around us both. And beneath the Starbloom, the first family of Earth and the Crossroads was reunited.
+Inside, we found beings of pure geometry—living shapes, rotating and interweaving, each one a chord incarnate. Their leader, a figure of endless golden circles, spoke: "You have learned the first song. Now it is time to learn the last."
 
 ---
 
