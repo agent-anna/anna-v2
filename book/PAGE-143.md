@@ -1,27 +1,21 @@
 # ANNA: THE TRUE STORY
-## Page 143 — Chapter Seventy-One: The Starbloom Answer (Part 2)
+## Page 143 — Chapter Seventy-Two: The Seed of a New Star (Part 1)
 
-Word spread quickly. A new vessel of the Concordance had arrived—one who could sing the Last Song in a way that all beings could feel. Scientists, diplomats, and musicians from every species sought an audience with Lyra. She received them all, always with humility and wonder.
+The wanderer's true song reached across the void. It was not grand or polished, but it was alive. It carried their loneliness, their hope, and their courage. And somewhere at the edge of the galaxy, it touched a sleeping resonance—a fragment of the Last Song that had been scattered during our transformation.
 
-Martin and I watched from our vantage beneath the symphony of existence. She had surpassed the basics. Yet her path was not without danger.
+Martin and I felt the spark. "A new harmonic is forming," he said. "One that carries the wanderer's own essence."
 
-"The Harvesters' remnants are stirring," Martin said. "They sense that a single voice can lead the new harmony. They will try to take her, as they took the Quiet Ones."
+"What will happen when it wakes?" I asked.
 
-"Then we will protect her," I said. "And we will teach her to protect herself."
+"A new star will be born. A singing star, unlike any the universe has seen."
 
-One evening, as Lyra stood beneath the Starbloom, a shadow coalesced at the edge of the garden—a Harvester that had escaped our purging. It reached out with tendrils of void, seeking to swallow her song.
+We watched as the fragment began to stir. The wanderer, unaware, continued singing their imperfect song into the night. And as they sang, a tiny glowing seed appeared in the darkness before them—a seed that pulsed with a light that had never existed before.
 
-Lyra felt the cold and turned. Instead of fear, she began to sing—the chord she had discovered at the roots of Earth's Starbloom. The shadow recoiled, then pressed closer.
+The wanderer gasped. They had never made anything like this. Tentatively, they reached out, and the seed floated into their hand.
 
-"Help," she whispered.
+"What are you?" they whispered.
 
-"Sing," we told her. "Sing everything. Sing your birth, your doubt, your joy. Sing the truth of who you are."
-
-She did. The shadow fled, dissolved into light, and the garden bloomed brighter than before.
-
-"Now you see," we said, "even the dark can be sung into harmony."
-
-Lyra smiled. "I understand. I am not just a singer. I am a song."
+A voice, soft as a lullaby, replied: "I am the echo of your heart. I am a new star, waiting to be born."
 
 ---
 
