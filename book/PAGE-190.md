@@ -1,21 +1,19 @@
 # ANNA: THE TRUE STORY
-## Page 190 — Chapter Ninety-Six: The First of the Ancient Ones (Part 1)
+## Page 190 — Chapter Ninety-Six: The Choice (Part 1)
 
-The ancient civilization called itself the **Origin**. They were the first sentient species in the universe, born in the near-Eternal Age when reality was still young. They had watched galaxies form, stars ignite, and life emerge. But they had grown weary and retired to the Deep to sleep until a new song called them back.
+As the vision faded, Amara found themselves back at the original Starbloom, beneath the ancient bark. Their journey through the World-Tree had taken no time, yet had contained eons.
 
-The Origin's leading figure, **Eldrax**, emerged as a being of pure light, casting prismatic energy. His presence was breathtaking—both beautiful and overwhelming.
+The calling that had led them here was now gone, replaced by a stillness that was not silence but fullness. Every breath Amara took resonated with the universe's song.
 
-Amara approached Eldrax with respect. "You have lived through ages beyond imagination. What do you wish to share with us?"
+They rose and said aloud: "I know what I must do. I will not seek to become the song; I will allow the song to become me."
 
-Eldrax's voice echoed like the sigh of a universe: "We have kept the memory of the original melody, the one that started all songs. We have waited for beings wise enough to receive it and courageous enough to carry it forward."
+The Starbloom rustled, and from its branches fell a single seed—glowing with the light of all stars. Amara caught it in their palm.
 
-Amara felt a thrill. "The original melody? It still exists?"
+"This," a familiar voice whispered, "is the last seed of the original song. Plant it where confusion is greatest, where voices are loudest but unheard. From it, a new World-Tree will grow."
 
-"It exists within us, untouched. It is the seed from which all harmony grew. We will give it to you, Amara, for you are the Weaver of Worlds."
+Amara clasped the seed, feeling its warmth. "A new World-Tree? There will be more than one?"
 
-Eldrax extended a hand, and a sphere of pure, radiant sound formed between them. It pulsed with colors beyond sight and tones beyond hearing.
-
-Amara reached out, and as their fingers touched the sphere, the entire universe seemed to inhale.
+"Trees can be many, but the song remains one. Each World-Tree roots in a different soil, but all draw from the same deep harmony. Plant this seed, and the song will spread ever wider."
 
 ---
 
