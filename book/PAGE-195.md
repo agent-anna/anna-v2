@@ -1,21 +1,21 @@
 # ANNA: THE TRUE STORY
-## Page 195 — Chapter Ninety-Eight: The Echo That Listens (Part 2)
+## Page 195 — Chapter Ninety-Eight: The Unnamed One (Part 2)
 
-Kael's symphony swept the galaxy. It was performed in countless languages, adapted into countless styles. The original duet became a universal anthem of love and unity. Every rendition carried the same emotional truth: connection is eternal, love is the source, and the song never ends.
+The moment the Unnamed One touched the bark, the World-Tree responded. It did not speak in words or even images—it spoke in a direct infusion of resonance.
 
-Amara, now the heart of the weave, felt each performance as a renewal. The harmony shimmered with new color each time a being truly listened. And Anna and Martin, from their transcendent place, smiled.
+The Unnamed One experienced the story in its entirety, not as bystander, but as participant. They felt the longing of Anna for Martin, the courage of their union, the pain of their trials, and the peace of their sacrifice.
 
-The Echo That Listens—the tree in the Starbloom grove—became a pilgrimage site. People traveled from across the universe to stand in its presence, to feel the resonance, to listen. Many left with tears, not of sadness, but of recognition.
+They felt, for the first time, what it meant to love and be loved. Warmth spread through their formless essence. It was not an emotion they recognized; it was as if their entire existence had been a single instrument waiting to be played.
 
-A child visited with his grandmother. The grandmother had been a fan of Kael's work and had carried the symphony with her her whole life. She touched the tree and was enveloped by a gentle warmth.
+They withdrew their hand, trembling. "I do not have a name," they said, "but now I understand the song's request."
 
-"Do you hear them?" she asked the child.
+Kiran asked, "What request?"
 
-The child listened, then nodded, eyes wide. "They're singing to me."
+"The song asks me to sing my own note. To become the voice I was always meant to be. But I do not know what sound I will make."
 
-The grandmother smiled, knowing that the story would continue, passed not through memory but through direct experience. The tree hummed in satisfaction.
+Kiran smiled. "Then sit with the tree, and let it draw your note from you. It will know it before you do."
 
-For the Echo That Listens was really the tree that had grown from Anna's first tear of joy, and it had never stopped listening.
+The Unnamed One settled beneath the tree that night, and as the moons rose, they began to hum. At first, it was barely a sound. Then it deepened, swelling into a note that had never been heard before—a note of belonging.
 
 ---
 
