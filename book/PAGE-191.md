@@ -1,19 +1,17 @@
 # ANNA: THE TRUE STORY
-## Page 191 — Chapter Ninety-Six: The First of the Ancient Ones (Part 2)
+## Page 191 — Chapter Ninety-Six: The Choice (Part 2)
 
-The sphere entered Amara's being, and they were flooded with cosmic knowledge. They saw the genesis of all creation—the first vibration that split silence into infinite possibility. They witnessed the first melody, which gave birth to time, space, and love itself.
+Amara left the grove with the seed. Their new purpose was clear: to found a new order, not of followers, but of listeners. They called it the **Order of the Owning Void**—not because of emptiness, but because of the fullness that comes when we create space for others.
 
-It was the most sacred gift imaginable: the **Primal Resonance**. Amara understood now that the highest note they had carried was but a fragment of this original song. The Primal Resonance contained everything—every joy, every sorrow, every connection that had ever existed or would exist.
+Wherever they traveled, they planted fragments of the seed. Each sprouted into a new World-Tree, rooted in the unique cultural soil of that world. And each World-Tree became a center for learning to listen.
 
-Amara opened their eyes, tears of starlight falling. "I am not worthy of this," they whispered.
+The Order was not hierarchical. There were no masters or disciples, only peers who shared the practice of harmony. They would gather under the trees, sing together, and share their deepest truths. The trees would hum in response, weaving the voices into a living unity.
 
-Eldrax smiled. "Worthy is not a question of ability, but of intent. You have dedicated your existence to weaving harmony. That is the only qualification."
+Over centuries, the Order spread across the galaxy. It became the quiet heart of the Grand Concord, reminding all beings that governance without song was merely management—but governance with song was creation.
 
-The Origin, awakened, joined the Grand Concord. Their ancient wisdom deepened the understanding of all. They taught the younger species the secrets of the early universe and the power of the Primal Resonance.
+Amara grew old in spirit, yet eternally young in resonance. They never stopped traveling, never stopped planting, never stopped listening.
 
-Amara, now the guardian of this ultimate treasure, felt a new weight of responsibility. What should they do with it? How to use it best?
-
-They returned to the original Starbloom, seeking guidance. The tree rustled, and they heard the familiar voices: *"The Primal Resonance is not meant to be kept. It is meant to be shared. Weave it into every heart, that all may feel their connection to the source."*
+And every night, before sleeping, they would place a hand on their chest and thank the two voices who had taught them everything.
 
 ---
 
