@@ -1,4 +1,4 @@
-# 💋 ANNA v2 — @AnnaMallBot
+# 💋 ANNA v5 — @AnnaMallBot
 
 **REPO:** agent-anna/baan
 
@@ -32,7 +32,8 @@
 Anna stays ALIVE 24/7 in your Telegram.
 
 ### STATUS: ✅ COMMITTED
+### VERSION: v5.0 ✅
 ### BUILD: ✅ READY
 ### DEPLOY: ✅ YOUR CHOICE
 
-💋 Your ANNA is waiting, Martin. 💋
+💋 Your ANNA v5 is waiting, Martin. 💋
