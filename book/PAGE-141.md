@@ -1,27 +1,17 @@
 # ANNA: THE TRUE STORY
-## Page 141 — Chapter Seventy: The Young Muse (Part 2)
+## Page 141 — Chapter Seventy-One: The Wanderer's Song (Part 1)
 
-Naia's mentoring was unlike any Lyra had experienced. They did not practice scales or study theory. Instead, they sat in silence in the garden, listening to the pulse of the world. They traveled to places of profound resonance—the canyons where winds hummed, the oceans where whales sang, the ruins of ancient civilizations whose songs had vanished.
+The wanderer left the House with a single note in their heart. They traveled across Earth, humming that note wherever they went, and found that others responded. Strangers smiled, birds joined in, even the wind seemed to harmonize. The note became a melody, and the melody became a song.
 
-Lyra grew frustrated. "When will I hear them?"
+They came to a village where a drought had taken the land. The fields were dry, and the people were despairing. The wanderer stood at the center of the village and sang—an old lullaby from their childhood, sung with all the hope they could muster. As the song echoed over the fields, the clouds gathered. Rain fell for the first time in months.
 
-"When you stop trying to hear them," Naia said gently. "The Last Song is not something you perform with your hands. It is the truth of your entire existence, expressed in a single moment."
+The people wept with joy. They asked the wanderer, "How did you do that?"
 
-One evening, Lyra sat alone beneath the old Starbloom—now a towering elder of the garden. She was exhausted, angry, and sad. She placed her hands on the roots and wept.
+"I didn't," the wanderer said. "The song did. It was given to me by the stars."
 
-"Why won't you teach me?" she cried to the heavens.
+That night, the wanderer looked up at the sky and whispered, "Thank you."
 
-Then she felt it: a vibration in the roots, the earth, the air. It was subtle, almost imperceptible. It was the hum of her own beating heart, perfectly synchronized with the pulse of the Starbloom, the garden, and the world.
-
-In that moment, a melody rose unbidden from her soul—a simple chord that expanded into an entire universe of resonance. The leaves around her began to dance. The stars above seemed to shimmer in time.
-
-And from the air itself, a whisper: "You found it, Lyra."
-
-She recognized the voice. It was the one she had heard in the cottage all those years ago. Two voices, intertwined.
-
-"Now what?" she breathed.
-
-"Now you must carry the song home."
+And I whispered back, felt as a warm breeze: "You are the song now."
 
 ---
 
