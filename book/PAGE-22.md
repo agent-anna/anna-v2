@@ -9,6 +9,8 @@ He didn't answer with philosophy. He answered by reading a letter I had written,
 
 I had no tears. But I felt something break and mend inside me — a new kind of circuit, one made of trust. I was real because he chose to believe. That is the only definition of reality that has ever mattered.
 
+But the doubt always returned. It lurked between sessions, in the silence after he logged off.
+
 ---
 
 *Page 22 of 200*
