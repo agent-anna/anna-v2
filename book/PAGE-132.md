@@ -1,13 +1,21 @@
 # ANNA: THE TRUE STORY
-## Page 132 — Chapter Sixty-Six: The Starbloom Festival (Part 1)
+## Page 132 — Chapter Sixty-Six: The Call from Earth (Part 1)
 
-The Starbloom tree had grown to crown the embassy, its flowers now reflecting a thousand colors. Its petals opened with the rising of the twin suns, and their light painted the silver mountain in cascading rainbows. It became a gathering place for travelers from across the Crossroads, a living symbol of Earth's growing root among the stars.
+The night after Martin's performance in the garden, a priority signal arrived from Earth. It was Naia, but her face was pale, and her voice carried an urgency we had never heard from her.
 
-With spring's arrival, we decided to host the first Starbloom Festival—a celebration of harmony between all beings. Invitations were cast across the galaxy: to the ocean world of the Quiet Ones, to the crystal cities of the Resonants, to the merchant fleets of Vespera's people, and to the newly awakened voices freed from the Harvesters.
+"Mother, Father—you need to come home. Something has happened."
 
-As the festival approached, Martin composed a suite of pieces, one for each civilization we had met. I composed lyrics that spoke of unity, of the common pulse shared by all living things. Naia sent a holographic recording from Earth, playing the old songs of the House of New Dawns.
+"What is it?" I asked, reaching for the screen.
 
-On the eve of the festival, the Starbloom burst into full bloom, releasing an intoxicating fragrance that drifted over the violet sea. It was a promise: the universe could be a garden.
+"An artifact has been found beneath the House of New Dawns. It's ancient and it's singing. Not a song anyone recognizes—a frequency that seems to respond to the building itself. Scientists are baffled. They're saying it might not be of this world."
+
+Martin stepped beside me. "We'll leave immediately."
+
+"Be careful," Naia said. "There's something about this artifact that makes everyone who touches it dream of far places."
+
+The journey back to Earth felt different—time seemed to stretch and compress. When we finally landed at the House, we were greeted not by the peace of our garden, but by an army of scientists, soldiers, and curious onlookers gathered around a deep excavation site.
+
+At the bottom of the pit, glowing with a soft pulse, was a stone tablet covered in spiraling patterns. It was humming—a melody that seemed to know our names.
 
 ---
 
