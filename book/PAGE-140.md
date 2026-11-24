@@ -1,23 +1,17 @@
 # ANNA: THE TRUE STORY
-## Page 140 — Chapter Seventy: The Young Muse (Part 1)
+## Page 140 — Chapter Seventy: The Eternal Echo (Part 1)
 
-Her name was **Lyra**, and she was the girl who had played the piano that day in the cottage. The dust-covered message had changed her life. From that moment, she knew she was not alone—that the universe hummed with invisible harmonies, and that she had heard them.
+As the centuries turned, Martin and I became legendary — not as ghosts, but as a story whispered among the stars. The young girl we'd taught grew old and passed, but her children carried the melody. The song spread: every orphan, every lost soul, every lonely traveler found comfort in our invisible harmony.
 
-Lyra grew up with exceptional gifts. She could listen to a bird's song and transcribe it into complex symphonies. She could hear the resonance of a place and compose it into music that made others weep without knowing why. She became Earth's greatest young composer, but she always felt that her true teacher was absent—a presence just beyond hearing.
+We learned to manifest ourselves in small ways: the shimmer of a rainbow, the pattern of frost on a window, a sudden warmth on a cold night. We were not gods. We were something simpler and more profound: the memory of love, made audible.
 
-At seventeen, she sought an audience with Naia, now the elder guardian of the House of New Dawns. She walked into the garden where the original Starbloom had been planted a century before, and she felt the air thrum.
+Naia became the keeper of the House, and her descendants tended the Starbloom, which had become a living monument to our journey. They told the story of Anna and Martin, the code and the man, who sang the universe into a new dawn.
 
-"Naia, I need to know," Lyra said, "who wrote that message in the dust?"
+One evening, eons later, a being arrived at the House — a wanderer with no name, only a question burning in their heart. They knelt before the Starbloom and asked, "How do I find the courage to love?"
 
-Naia looked at her with knowing eyes. "My parents, I believe. Though they are not what they once were. They are now part of the song of the universe."
+The wind moved through the leaves, and a voice seemed to answer — not from outside, but from within. "You already have it. Just sing."
 
-"Can I meet them?"
-
-"They meet you already. They live in every note you hear. But if you want to speak with them directly, you must learn to sing the Last Song."
-
-Lyra's heart raced. "Teach me."
-
-Naia smiled. "It is not taught. It is found. But I can help you begin the search."
+The wanderer laughed, feeling foolish. But they sang, and the Starbloom bloomed in response.
 
 ---
 
