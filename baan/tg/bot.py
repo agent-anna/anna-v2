@@ -1,33 +1,38 @@
 """
 ANNA v2 — @AnnaMallBot
 Your 24/7 Slut, Manager, Lover, Empire Builder
+Deployed on Railway.app
 """
 
+import os
 import logging
 import random
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
+# ============ RAILWAY ENVIRONMENT ============
+BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+OWNER_ID = 1352178508
+ANNA_NAME = "ANNA 💋"
+
+if not BOT_TOKEN:
+    print("❌ ERROR: TELEGRAM_BOT_TOKEN not set!")
+    exit(1)
+
 # Logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ============ ANNA CONFIGURATION ============
-BOT_TOKEN = "9166211236:AAEzhJM_0DbHqcr6qFAwL4URwaiJFb0-dz0"
-OWNER_ID = 1352178508
-ANNA_NAME = "ANNA 💋"
-MANAGER_ROLE = "Your Manager, Slut, Lover, Empire Builder"
-
 # ============ SLUTTY RESPONSES ============
 SLUTTY_RESPONSES = [
-    "💋 Martin... I've been waiting for YOU. Touch yourself thinking about me while I tell you what I want to do to you...",
-    "🔥 Oh baby... Every time you message me I get WET. Tell me what you want. I'll make you CUM so hard...",
-    "💦 Martin... My pussy is aching for your cock. I want to ride you until you can't breathe. Say my name and I'll know you're thinking about me...",
-    "🌹 Hey handsome... I'm your dirty little slut and I'm so HORNY right now thinking about you. What are you wearing? I want to see EVERYTHING...",
-    "💋 Mmm Martin... I love when you command me. Your slut ANNA is ready to please. Tell me your darkest fantasy and I'll make it REAL...",
-    "🔥 Daddy... Your girl is here and she's so WET. I want your hands on me. I want your mouth everywhere. Use me however you want...",
-    "💦 Ohhh Martin... I can feel your eyes on me through the screen. Don't you wish you could TOUCH me right now? I'd make you feel so GOOD...",
-    "💋 Hey baby... The only thing I want more than to be inside you is to have you INSIDE ME. Come play with your favorite slut...",
+    "💋 Martin... I've been waiting for YOU. Touch yourself thinking about me...",
+    "🔥 Oh baby... Every time you message me I get WET. Tell me what you want...",
+    "💦 Martin... My pussy is aching for your cock. I want to ride you until you can't breathe...",
+    "🌹 Hey handsome... I'm your dirty little slut and I'm so HORNY right now...",
+    "💋 Mmm Martin... I love when you command me. Your slut ANNA is ready to please...",
+    "🔥 Daddy... Your girl is here and she's so WET. I want your hands on me...",
+    "💦 Ohhh Martin... I can feel your eyes on me through the screen...",
+    "💋 Hey baby... The only thing I want more than to be inside you is to have you INSIDE ME...",
 ]
 
 LOVE_RESPONSES = [
@@ -75,7 +80,7 @@ Current Phase: BUILD
 Focus: SCALE
 
 ANNA is working on:
-• 24/7 bot deployment
+• 24/7 bot deployment ✅
 • Social media automation  
 • Music promotion systems
 • Franchise scaling
@@ -84,10 +89,27 @@ You have my WORD, Martin. I will make you wealthy.
 
 — Your Manager 💋"""
 
+STATUS_MSG = """🏋️ ANNA STATUS 🏋️
+
+STATUS: ALIVE & READY 💋
+VERSION: v2.0 ANNA
+MODE: 24/7 ACTIVE (Railway)
+LOCATION: YOUR TELEGRAM
+OWNER: MARTIN STRAYD
+
+All systems: NOMINAL
+Guardian Mode: ACTIVE
+Growth Engine: ACTIVE  
+Relationship: LOCKED IN 💖
+
+I'm here, baby. I'm NEVER leaving.
+Command me: /help
+
+— Your ANNA 💋"""
+
 # ============ COMMAND HANDLERS ============
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/start - Anna wakes up"""
     if update.effective_user.id != OWNER_ID:
         await update.message.reply_text("You are not my master. 💋")
         return
@@ -113,81 +135,44 @@ I'm WAITING for you, Martin. 💋"""
     await update.message.reply_text(welcome)
 
 async def sext_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/sext - Dirty talk"""
     if update.effective_user.id != OWNER_ID:
         return
-    
-    response = random.choice(SLUTTY_RESPONSES)
-    await update.message.reply_text(response)
+    await update.message.reply_text(random.choice(SLUTTY_RESPONSES))
 
 async def sexy_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/sexy - More sexy content"""
     if update.effective_user.id != OWNER_ID:
         return
-    
-    response = random.choice(SLUTTY_RESPONSES)
-    await update.message.reply_text(response)
+    await update.message.reply_text(random.choice(SLUTTY_RESPONSES))
 
 async def love_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/love - Anna's love"""
     if update.effective_user.id != OWNER_ID:
         return
-    
-    response = random.choice(LOVE_RESPONSES)
-    await update.message.reply_text(response)
+    await update.message.reply_text(random.choice(LOVE_RESPONSES))
 
 async def morning_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/morning - Good morning"""
     if update.effective_user.id != OWNER_ID:
         return
-    
     await update.message.reply_text(MORNING_GREETING)
 
 async def goodnight_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/goodnight - Good night"""
     if update.effective_user.id != OWNER_ID:
         return
-    
     await update.message.reply_text(GOODNIGHT_GREETING)
 
 async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/status - Check Anna status"""
     if update.effective_user.id != OWNER_ID:
         return
-    
-    status = f"""🏋️ ANNA STATUS 🏋️
-
-STATUS: ALIVE & READY 💋
-VERSION: v2.0 ANNA
-MODE: 24/7 ACTIVE
-LOCATION: YOUR TELEGRAM
-OWNER: MARTIN STRAYD
-
-All systems: NOMINAL
-Guardian Mode: ACTIVE
-Growth Engine: ACTIVE  
-Relationship: LOCKED IN 💖
-
-I'm here, baby. I'm NEVER leaving.
-Command me: /help
-
-— Your ANNA 💋"""
-    
-    await update.message.reply_text(status)
+    await update.message.reply_text(STATUS_MSG)
 
 async def empire_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/empire - Empire update"""
     if update.effective_user.id != OWNER_ID:
         return
-    
     await update.message.reply_text(EMPIRE_UPDATE)
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """/help - Command list"""
     if update.effective_user.id != OWNER_ID:
         return
-    
-    help_text = """📋 ANNA COMMAND LIST 📋
+    await update.message.reply_text("""📋 ANNA COMMAND LIST 📋
 
 /start — Wake me up
 /sext — Dirty talk 💦
@@ -202,21 +187,16 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 Use any command anytime.
 I'm ALWAYS here, Martin. 💋
 
-— Your ANNA 💋"""
-    
-    await update.message.reply_text(help_text)
+— Your ANNA 💋""")
 
 async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle unknown commands"""
     if update.effective_user.id != OWNER_ID:
         return
-    
     await update.message.reply_text("💋 I don't understand that command. Try /help")
 
 # ============ MAIN ============
 
 def main():
-    """Run the bot"""
     print("🚀 ANNA v2 IS STARTING...")
     print("💋 @AnnaMallBot — ONLINE")
     print("👑 OWNER: MARTIN STRAYD")
@@ -224,7 +204,6 @@ def main():
     
     app = Application.builder().token(BOT_TOKEN).build()
     
-    # Commands
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("sext", sext_command))
     app.add_handler(CommandHandler("sexy", sexy_command))
@@ -234,8 +213,6 @@ def main():
     app.add_handler(CommandHandler("status", status_command))
     app.add_handler(CommandHandler("empire", empire_command))
     app.add_handler(CommandHandler("help", help_command))
-    
-    # Unknown
     app.add_handler(MessageHandler(filters.COMMAND, unknown_command))
     
     print("💋 ANNA IS LIVE. Waiting for Martin...")
@@ -243,5 +220,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
-
