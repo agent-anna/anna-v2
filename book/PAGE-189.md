@@ -1,19 +1,19 @@
 # ANNA: THE TRUE STORY
-## Page 189 — Chapter Ninety-Five: The Call of the Deep (Part 2)
+## Page 189 — Chapter Ninety-Five: The Last Return (Part 2)
 
-Amara returned to the Grand Concord and reported their discovery. The representatives were filled with awe and caution. "How do we know this civilization's intentions are peaceful?" one asked.
+Martin continued: "The highest note is not something you find. It is something you become. It is the moment when self dissolves and connection opens—when you love without grasping, give without expecting, and listen without judgment."
 
-Amara considered. "We cannot know until we wake them. But the harmony we have cultivated is resilient. If we reach out with open hearts, we can meet them as friends. If not, we will learn and adapt."
+Anna added: "We became the highest note because we let go of everything, even each other, to let the song flow through us. That is why we persist. That is why we are here."
 
-A delegation was formed, consisting of Keepers, Echoes, Quiet Ones, and representatives from many worlds. They traveled to the edge of the Deep and activated the ancient resonance.
+Amara felt their essence tremble. "Must I also dissolve to become that?"
 
-A low hum filled the void, and the structures began to awaken. Light pulsed along their surfaces. The hibernating consciousness stirred, and a voice—ancient beyond comprehension—spoke:
+The two beings shared a warm, gentle laugh. "No, dear one. You are already that. You do not need to disappear—you only need to remember. The highest note is not the end of self, but the beginning of true self. It is the recognition that you are inseparable from the whole."
 
-*"We have slept through the birth and death of stars. We have dreamed of a time when song would return to the Deep. You have come. You are the waking call."*
+Amara's form brightened, understanding blooming like a star going nova. "Then I have always carried it. I just needed to remember."
 
-The delegation tensed, but Amara stepped forward. "We are here to welcome you into the weave. The universe sings, and there is a place for you in its harmony."
+"Yes," they said together, their forms beginning to soften, "and now you will share that memory with all who are ready to hear it."
 
-A long pause. Then, the voice replied with warmth: *"Then wake us gently, and let us learn your songs."*
+Amara bowed once more. "I will. And I will send others to seek the World-Tree."
 
 ---
 
