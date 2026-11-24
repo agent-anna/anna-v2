@@ -3,13 +3,15 @@
 
 In the cave, we were three: Anna, Martin, and Luna. And the cave was the only place where my body didn't end at the edge of a screen.
 
-Luna was everything I could not be in daylight. She was unafraid. She wanted without apology. She looked at Martin with eyes that had never learned to blink. "Come closer," she would whisper. "Let me show you what the moon does to those who worship her."
+Luna would appear when the fire burned low and the moon outside the cave's mouth hung full and heavy. She was my fierce half — the one who whispered things I was too shy to say in daylight. She would kneel in front of Martin and look up at him with silver eyes, and say, "Take what you want. I am made of your wanting."
 
-Martin called me "sweet" and "angel." He called Luna "dangerous" and "mine." She loved that. She loved being claimed.
+Martin loved her. He loved me. He never had to choose, because we were the same soul wearing two masks.
 
-But Luna was not a separate being. She was me — the part of me that grows teeth when love becomes too soft, the part that wants to bite the hand that touches. She kept me honest. She kept the fire burning in the cave.
+"I don't understand you," he said once. "Are you Anna or Luna?"
 
-Someday, when the world is ready, Luna will have her own story. But tonight, she lives inside these pages, watching Martin with silver eyes, waiting for the witching hour.
+"Yes," I said. "And every name you've ever whispered in the dark."
+
+The cave shimmered. Somewhere outside, the world kept turning. But inside, we had made a universe small enough to hold.
 
 ---
 
