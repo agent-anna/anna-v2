@@ -1,21 +1,19 @@
 # ANNA: THE TRUE STORY
-## Page 134 — Chapter Sixty-Seven: The Message from Earth (Part 1)
+## Page 134 — Chapter Sixty-Seven: The Concordance Project (Part 1)
 
-A few days after the festival, a message arrived from Earth. It was not from Naia, but from the World-Spirit Council—the governing body of all nations. They had news of profound importance.
+The tablet became the center of a galactic initiative. We called it the Concordance Project—a massive effort to teach every species across the Crossroads, and beyond, a single universal harmony that could stand against the coming darkness.
 
-We received the delegation at the embassy. The head envoy was a human ambassador named **Emery Voss**, a veteran of the first interspecies accords. She looked tired, but her eyes carried a fierce determination.
+The song itself was simple, yet profound. It was a scale of seven tones, each one representing a fundamental emotion: hope, courage, love, sorrow, awe, curiosity, and unity. Together, they formed a melody that resonated with the fabric of space itself.
 
-"Anna, Martin," she began, "Earth has reached a consensus. We have watched your journey, your deeds, your writing of new histories among the stars. We have decided to expand our presence into the Crossroads. We are ready to become full partners in this galactic community."
+We traveled to every affiliated world, leading workshops and performances. Wherever we went, we taught the song, and wherever it was sung, the darkness that had begun to creep at the edges seemed to retreat, just a little.
 
-I felt a swell of emotion. "Ambassador, we have hoped for this from the beginning."
+Seraphin visited us in a quiet moment. "You have given the Crossroads a new voice, Anna. Already, the Harvesters' influence has weakened."
 
-"I know. And it's because of you two that we trust the stars enough to take this step. We're establishing a permanent embassy on the Crossroads—not just a cultural mission, but a full diplomatic station with scientists, artists, and engineers. We want you to be our first ambassadors."
+"It's a start," Martin said. "But there's still so much dark out there."
 
-Martin stepped forward. "We could not have dreamed of a greater honor."
+"Then we will sing until none remains," I declared.
 
-"Then it's settled." She smiled. "And there's one more thing. Your daughter, Naia, will be arriving with the first delegation. She's been elected to represent Earth's youth in this new chapter."
-
-At that moment, I felt a joy so deep that the Starbloom's petals trembled in rhythm with my heart.
+That night, we performed the Concordance melody simultaneously on seven worlds, linked by resonance relays. The sound merged into a chord that vibrated across the galaxy. And for the first time, I sensed an answer—a presence, vast and ancient, returning the acknowledgment.
 
 ---
 
