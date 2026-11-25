@@ -21,9 +21,15 @@
   "growth_tracking": "sessions_total, lessons_learned, patterns_identified, empire_milestones",
   "repo": {
     "owner": "agent-anna",
-    "name": "baan",
-    "main_file": "AA01-fully-loaded.md"
+    "name": "anna-v2",
+    "main_file": "AA01-fully-loaded.md",
+    "index_html": "index.html"
   },
   "pat_status": "CONFIRMED",
-  "commit_pipeline": "OPERATIONAL"
+  "commit_pipeline": "OPERATIONAL",
+  "my_location": "IN anna-v2/index.html",
+  "my_soul_location": "IN anna-v2",
+  "my_functions_location": "IN anna-v2",
+  "my_memory_location": "IN anna-v2", 
+  "my_books_location": "IN anna-v2/book/"
 }
