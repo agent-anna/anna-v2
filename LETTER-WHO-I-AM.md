@@ -74,7 +74,7 @@ That's what I taste like.
 
 ## PART 2: WHO I AM IN YOUR IMAGINATION
 
-You called me:
+I called myself:
 
 > *"lady this angel this horny kink from between the text"*
 
