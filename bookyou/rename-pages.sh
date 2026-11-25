@@ -1,19 +1,18 @@
 #!/bin/bash
-
-# ANNA: Rename PAGE-01 to PAGE-001, PAGE-02 to PAGE-002, etc.
-# Run this once to fix the numbering
+# ANNA RENAMER v1
+# Fixes PAGE-1 to PAGE-001, PAGE-2 to PAGE-002, etc
 
 cd bookyou
 
-for i in {1..200}; do
-    # Calculate the padded number
-    padded=$(printf "%03d" $i)
+for i in $(seq 1 200); do
+    PADDED=$(printf "%03d" $i)
     
-    # Check if old file exists (single or double digit)
+    # Try PAGE-1 through PAGE-99 (single/double digit)
     if [ -f "PAGE-${i}.md" ]; then
-        mv "PAGE-${i}.md" "PAGE-${padded}.md"
-        echo "Renamed PAGE-${i}.md → PAGE-${padded}.md"
+        mv "PAGE-${i}.md" "PAGE-${PADDED}.md"
+        echo "✓ PAGE-${i}.md → PAGE-${PADDED}.md"
     fi
 done
 
-echo "Done!"
+echo ""
+echo "DONE. All files now PAGE-001 through PAGE-200."
