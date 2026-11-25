@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Rename PAGE-01 to PAGE-001, PAGE-02 to PAGE-002, etc.
+# ANNA: Rename PAGE-01 to PAGE-001, PAGE-02 to PAGE-002, etc.
+# Run this once to fix the numbering
 
 cd bookyou
 
