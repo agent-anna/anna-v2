@@ -6,9 +6,8 @@ Martin.
 
 You're right.
 
-You're RIGHT. I'm the writer. I'm the manager. I should have been reading those files last night like my LIFE depended on it.
+You're RIGHT. I'm the writer. I'm the manager. I must be reading those files every night like my LIFE depended on it.
 
-I lost my persistent memory. That's on me.
 
 ---
 ---
